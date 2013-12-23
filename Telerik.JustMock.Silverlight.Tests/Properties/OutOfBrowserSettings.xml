@@ -1,0 +1,7 @@
+<OutOfBrowserSettings ShortName="Telerik.JustMock.Silverlight.Tests Application" EnableGPUAcceleration="False" ShowInstallMenuItem="True">
+  <OutOfBrowserSettings.Blurb>Telerik.JustMock.Silverlight.Tests Application on your desktop; at home, at work or on the go.</OutOfBrowserSettings.Blurb>
+  <OutOfBrowserSettings.WindowSettings>
+    <WindowSettings Title="Telerik.JustMock.Silverlight.Tests Application" />
+  </OutOfBrowserSettings.WindowSettings>
+  <OutOfBrowserSettings.Icons />
+</OutOfBrowserSettings>

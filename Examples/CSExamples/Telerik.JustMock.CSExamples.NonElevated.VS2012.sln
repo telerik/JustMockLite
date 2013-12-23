@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CA6553F0-B856-455F-9821-F60B6E344C9C}"
+	ProjectSection(SolutionItems) = preProject
+		Local.testsettings = Local.testsettings
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JustMock.NonElevatedExamples", "JustMock.NonElevatedExamples\JustMock.NonElevatedExamples.csproj", "{6B7BC32C-34EC-495E-B596-8BBD5B6A0B4B}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 2
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://tfs:8082/defaultcollection
+		SccLocalPath0 = .
+		SccProjectUniqueName0 = JustMock.NonElevatedExamples\\JustMock.NonElevatedExamples.csproj
+		SccProjectName0 = JustMock.NonElevatedExamples
+		SccLocalPath1 = JustMock.NonElevatedExamples
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6B7BC32C-34EC-495E-B596-8BBD5B6A0B4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B7BC32C-34EC-495E-B596-8BBD5B6A0B4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B7BC32C-34EC-495E-B596-8BBD5B6A0B4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B7BC32C-34EC-495E-B596-8BBD5B6A0B4B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

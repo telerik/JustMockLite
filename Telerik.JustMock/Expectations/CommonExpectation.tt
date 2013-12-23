@@ -1,0 +1,71 @@
+﻿/*
+ JustMock Lite
+ Copyright © 2010-2014 Telerik AD
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+<#@ output extension=".partial.cs" #>
+<#@ include file="..\\TextBuilder.include"#>
+using System;
+using Telerik.JustMock.Core;
+
+namespace Telerik.JustMock.Expectations
+{
+	/// <summary>
+	/// Implements common expecations.
+	/// </summary>
+	public partial class CommonExpectation<TContainer>
+	{
+		<#
+			string commentFormat= "/// <typeparam name=\"T{0}\">Type of the {1} parameter of the method that this delegate encapsulates</typeparam>";
+			
+			StringBuilder commentArguments = new StringBuilder();
+	
+			string[] numberNames = GetNumberNames();
+			
+			int index = 1; 
+			
+			foreach (TextBuilder t in GetTextItems(17)) { 
+			string actionName = "Action";  
+			
+			commentArguments.Clear();
+				
+			for (int commentIndex = 1; commentIndex <= index; commentIndex++)
+			{
+				commentArguments.AppendFormat(commentFormat, commentIndex, numberNames[commentIndex -1]);
+				if(commentIndex < index){
+					commentArguments.Append("\r\n\t\t");
+				}
+			}	
+			index++;
+		#>
+		
+		///<summary>
+		/// Specifies the delegate that will execute for the expected method.
+		///</summary>
+		<#= commentArguments.ToString() #>
+		///	<param name="action">Target action delegate to execute as method body</param>
+		public TContainer DoInstead<<#= t.GenericParameters.ToString() #>>(<#= actionName #><<#= t.GenericParameters.ToString() #>> action)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+				{
+					this.ProcessDoInstead(action, true);
+					return (TContainer) (object) this;
+				});
+		}<#}#>
+		
+	}
+}

@@ -1,0 +1,141 @@
+﻿/*
+ JustMock Lite
+ Copyright © 2010-2014 Telerik AD
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+/*  Auto generated */
+<#@ include file="TextBuilder.include"#>
+
+using System;
+using Telerik.JustMock.Expectations;
+using Telerik.JustMock.Core;
+using Telerik.JustMock.Core.Context;
+
+namespace Telerik.JustMock
+{
+	/// <summary>
+	/// Mock entry point for settting up expection, creating mock objects and verfiying results.
+	/// </summary>
+	public partial class Mock
+	{
+		#if VISUALBASIC
+		
+
+		/// <summary>
+		/// Prepares a mock call with user expectations.
+		/// </summary>
+		/// <remarks> For use in Visual Basic 3.5 to mock actions without parameters</remarks>.
+		/// <param name="action"></param>
+		public static ActionExpectation Arrange(Action action)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				var repo = MockingContext.CurrentRepository;
+				return repo.Arrange(repo.ConvertDelegateAndArgumentsToExpression(action, new object[0]), () => new ActionExpectation());
+			});
+		}
+
+
+		/// <summary>
+		/// Asserts the specific action call.
+		/// </summary>
+		/// <param name="action">Action defining the set operation</param>
+		public static void Assert(Action action)
+		{
+			ProfilerInterceptor.GuardInternal(() =>
+			{
+				var repo = MockingContext.CurrentRepository;
+				repo.Assert(null, repo.ConvertDelegateAndArgumentsToExpression(action, new object[0]));
+			});
+		}
+
+		/// <summary>
+		/// Asserts the specific action call.
+		/// </summary>
+		/// <param name="action">Action defining the set operation</param>
+		public static void Assert(Action action, Occurs occurs)
+		{
+			ProfilerInterceptor.GuardInternal(() =>
+			{
+				var repo = MockingContext.CurrentRepository;
+				repo.Assert(null, repo.ConvertDelegateAndArgumentsToExpression(action, new object[0]), null, occurs);
+			});
+		}
+
+
+		<# int index = 1; #> 
+		
+		<# foreach (TextBuilder t in GetTextItems(10)) { 
+			
+			string actionName = "Action";  
+			index++;
+		#>
+
+		/// <summary>
+		/// Prepares a mock call with user expectations.
+		/// </summary>
+		/// <remarks> For use in Visual Basic 3.5 to mock actions with parameters</remarks>.
+		/// <param name="action"></param>
+		<#= t.Comments.ToString() #>
+		public static ActionExpectation Arrange<<#= t.GenericParameters.ToString() #>>(<#= actionName #><<#= t.GenericParameters.ToString() #>> action, <#= t.Arguments.ToString() #>)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				var repo = MockingContext.CurrentRepository;
+				return repo.Arrange(repo.ConvertDelegateAndArgumentsToExpression(action, new object[] {<#= t.ArgList.ToString() #>}), () => new ActionExpectation());
+			});
+		}
+		
+		/// <summary>
+		/// Asserts a specific action call on the mock.
+		/// <remarks> For use in Visual Basic 3.5 to mock actions with parameters</remarks>.
+		/// </summary>
+		/// <param name="action">Method to Assert</param>
+		<#= t.Comments.ToString() #>
+		public static void Assert<<#= t.GenericParameters.ToString() #>>(<#= actionName #><<#= t.GenericParameters.ToString() #>> action, <#= t.Arguments.ToString() #>)
+		{
+			ProfilerInterceptor.GuardInternal(() =>
+			{
+				var repo = MockingContext.CurrentRepository;
+				repo.Assert(null, repo.ConvertDelegateAndArgumentsToExpression(action, new object[] {<#= t.ArgList.ToString() #> }));
+			});
+		}
+
+		/// <summary>
+		/// Asserts a specific action call on the mock.
+		/// <remarks> For use in Visual Basic 3.5 to mock actions with parameters</remarks>.
+		/// </summary>
+		/// <param name="action">Method to Assert</param>
+		<#= t.Comments.ToString() #>
+		/// <param name="occurs">Specify number times a call should occur</param>
+		public static void Assert<<#= t.GenericParameters.ToString() #>>(<#= actionName #><<#= t.GenericParameters.ToString() #>> action, <#= t.Arguments.ToString() #>, Occurs occurs)
+		{
+			ProfilerInterceptor.GuardInternal(() =>
+			{
+				var repo = MockingContext.CurrentRepository;
+				repo.Assert(null, repo.ConvertDelegateAndArgumentsToExpression(action, new object[] {<#= t.ArgList.ToString() #> }), null, occurs);
+			});
+		}
+
+
+		<#
+		}
+		#>
+
+		#endif
+	}
+}

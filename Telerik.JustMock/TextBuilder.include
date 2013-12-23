@@ -1,0 +1,86 @@
+﻿<#/*
+ JustMock Lite
+ Copyright © 2010-2014 Telerik AD
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/#>
+
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+
+<#+
+	public class TextBuilder
+	{
+		public TextBuilder()
+		{
+			argList = new StringBuilder();
+			genParameters = new StringBuilder();
+			arguments = new StringBuilder();
+			comments = new StringBuilder();
+		}
+
+		public StringBuilder GenericParameters{ get { return genParameters; } }
+		public StringBuilder Arguments { get { return arguments; } }
+		public StringBuilder Comments {get { return comments; } }
+		public StringBuilder ArgList { get { return argList; } }
+
+		private StringBuilder genParameters;
+		private StringBuilder arguments;
+		private StringBuilder comments;
+		private StringBuilder argList;
+	}
+
+	public string[] GetNumberNames()
+	{
+		string [] numberNames = new string[]{ "first", "second" , "third", 
+			"fourth", "fifth" , "sixth", "seventh", "eighth", 
+			"ninth" , "tenth", "eleventh", "twelveth", "thirteenth", "fourteenth", "fifteenth", "sixteenth"};
+		return numberNames;
+	}
+
+
+	public IList<TextBuilder>  GetTextItems(int len)
+	{
+		IList<TextBuilder> list = new List<TextBuilder>();
+
+		for(int index = 1; index < len; index++)
+		{
+			TextBuilder builder = new TextBuilder();
+
+			for (int typeIndex = 1; typeIndex <= index; typeIndex++)
+			{
+				string genericTypeName = "T" + typeIndex;
+				
+				builder.Comments.Append("///<param name=\"" + "arg" + typeIndex + "\">Method argument " + typeIndex + "</param>");
+			
+				builder.GenericParameters.Append(genericTypeName);
+				builder.Arguments.Append(genericTypeName + " "  + "arg" + typeIndex);
+				builder.ArgList.Append("arg" + typeIndex);
+				
+				if (typeIndex < index)
+				{
+					builder.GenericParameters.Append(", ");
+					builder.Arguments.Append(", ");
+					builder.ArgList.Append(", ");
+					builder.Comments.Append("\r\n\t\t");
+				}	
+				
+			}
+
+			list.Add(builder);
+		
+		}
+
+		return list;
+	}
+#>

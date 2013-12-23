@@ -1,0 +1,71 @@
+﻿/*
+ JustMock Lite
+ Copyright © 2010-2014 Telerik AD
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text" #>
+/*  Auto generated */
+using System.ComponentModel;
+
+namespace Telerik.JustMock
+{
+	<# int len = 17; #>
+	<#
+	
+		string [] numberNames = new string[]{ "first", "second" , "third", 
+			"fourth", "fifth" , "sixth", "seventh", "eighth", 
+			"ninth" , "tenth", "eleventh", "twelveth", "thirteenth", "fourteenth", "fifteenth", "sixteenth"};
+		
+		
+		for (int delIndex = 5; delIndex< len; delIndex++)
+		{
+			StringBuilder genericParameters = new StringBuilder();
+			StringBuilder arguments = new StringBuilder();
+			StringBuilder comments = new StringBuilder();
+
+		
+			for (int index = 1; index <= delIndex; index++)
+			{
+				string genericTypeName = "T" + index;
+				string argumentComment = string.Format("The type of the {0} parameter of the method that this delegate encapsulates", numberNames[index-1]);
+				string comment = string.Format("///<typeparam name=\"{0}\">{1}</typeparam>", genericTypeName, argumentComment);
+				
+				comments.Append(comment);
+				
+				genericParameters.Append(genericTypeName);
+				arguments.Append(genericTypeName + " "  + "arg" + index);
+				
+				if (index < delIndex)
+				{
+					genericParameters.Append(", ");
+					arguments.Append(", ");
+					comments.Append("\r\n\t");
+				}		
+			}
+	#>
+	
+	/// <summary>
+	/// Encapsulates a method that has <#= delIndex.ToString() #> parameters and does not return a value.
+	/// </summary>
+	<#= comments.ToString() #>
+	[EditorBrowsable(EditorBrowsableState.Never)]
+	public delegate void Action<<#= genericParameters.ToString() #>>(<#= arguments.ToString() #>);
+
+	<#
+		}
+	#>
+	
+}
