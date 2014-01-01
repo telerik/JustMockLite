@@ -157,7 +157,7 @@ namespace Telerik.JustMock
 					case Behavior.RecursiveLoose:
 					case Behavior.Loose:
 					case Behavior.Strict:
-						mockConstructorCall = constructorArgs == null || constructorArgs.Length == 0;
+						mockConstructorCall = constructorArgs == null;
 						break;
 					case Behavior.CallOriginal:
 						mockConstructorCall = false;

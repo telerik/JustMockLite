@@ -132,5 +132,22 @@ namespace Telerik.JustMock.Tests
 
 			Assert.Equal(5, proxy.i);
 		}
+
+		public class CallsCtor
+		{
+			public bool ok;
+
+			public CallsCtor()
+			{
+				ok = true;
+			}
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Constructor")]
+		public void ShouldCallDefaultConstructorWhenExplicitlyGivenNoArguments()
+		{
+			var mock = Mock.Create<CallsCtor>(new object[0]);
+			Assert.True(mock.ok);
+		}
 	}
 }
