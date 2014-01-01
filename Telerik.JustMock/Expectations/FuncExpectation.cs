@@ -45,6 +45,20 @@ namespace Telerik.JustMock.Expectations
 		}
 
 		/// <summary>
+		/// Specifies the delegate to evaluate and return for the expected method.
+		/// </summary>
+		/// <param name="delegate">Target delegate to evaluate.</param>
+		/// <returns>Reference to <see cref="IAssertable"/> interface</returns>
+		public IAssertable Returns(Delegate @delegate)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				this.ProcessDoInstead(@delegate ?? new Func<TReturn>(() => default(TReturn)), false);
+				return this;
+			});
+		}
+
+		/// <summary>
 		/// Specifies the function to evaluate and return.
 		/// </summary>
 		/// <param name="func">Target function to evaluate</param>

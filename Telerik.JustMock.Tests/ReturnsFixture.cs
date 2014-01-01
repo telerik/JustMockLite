@@ -297,5 +297,25 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(2, mock.Value);
 			Assert.Equal(2, mock.Value);
 		}
+
+		public interface IRefReturns
+		{
+			object Do(ref int a);
+		}
+
+		public delegate object DoDelegate(ref int a);
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Returns")]
+		public void ShouldReturnUsingCustomDelegate()
+		{
+			var mock = Mock.Create<IRefReturns>();
+			Mock.Arrange(() => mock.Do(ref Arg.Ref(Arg.AnyInt).Value)).Returns(new DoDelegate((ref int a) => a++));
+
+			int value = 5;
+			object result = mock.Do(ref value);
+
+			Assert.Equal(6, value);
+			Assert.Equal(5, result);
+		}
 	}
 }

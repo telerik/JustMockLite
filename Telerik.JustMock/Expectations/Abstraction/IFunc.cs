@@ -26,7 +26,6 @@ namespace Telerik.JustMock.Expectations.Abstraction
 	/// <typeparam name="TReturn"></typeparam>
 	public interface IFunc<TReturn> : IDoInstead<IFunc<TReturn>>, IThrows<IFunc<TReturn>>, IAssertable
 	{
-	
 		/// <summary>	
 		/// Specifies the return value for the expected method.
 		/// </summary>
@@ -37,8 +36,15 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <summary>
 		/// Specifies the delegate to evaluate and return for the expected method.
 		/// </summary>
+		/// <param name="delegate">Target delegate to evaluate.</param>
+		/// <returns>Reference to <see cref="IAssertable"/> interface</returns>
+		IAssertable Returns(Delegate @delegate);
+
+		/// <summary>
+		/// Specifies the delegate to evaluate and return for the expected method.
+		/// </summary>
 		/// <param name="func">Target delegate to evaluate</param>
-		/// <returns>Refarence to <see cref="IAssertable"/> interface</returns>
+		/// <returns>Reference to <see cref="IAssertable"/> interface</returns>
 		IAssertable Returns(Func<TReturn> func);
 		
 		/// <summary>
