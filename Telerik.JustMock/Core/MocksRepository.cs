@@ -25,6 +25,7 @@ using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Runtime.ConstrainedExecution;
 using System.Text;
+using System.Threading;
 using Telerik.JustMock.Core.Behaviors;
 using Telerik.JustMock.Core.Castle.DynamicProxy;
 using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
@@ -80,8 +81,8 @@ namespace Telerik.JustMock.Core
 #endif
             };
 
-        internal static IMockMixin GetMockMixin(object obj, Type objType)
-        {
+		internal static IMockMixin GetMockMixin(object obj, Type objType)
+		{
             var asMixin = obj as IMockMixin;
             if (asMixin != null)
                 return asMixin;
@@ -178,7 +179,9 @@ namespace Telerik.JustMock.Core
 
 		private readonly List<WeakReference> controlledMocks = new List<WeakReference>();
 
-        internal IRecorder Recorder
+		private readonly Thread creatingThread;
+
+		internal IRecorder Recorder
         {
             get { return this.sharedContext.Recorder; }
         }
@@ -188,7 +191,9 @@ namespace Telerik.JustMock.Core
 		{
 			get
 			{
-				return this.isRetired || (this.parentRepository != null && this.parentRepository.IsRetired);
+				return this.isRetired 
+						|| !this.creatingThread.IsAlive
+						|| (this.parentRepository != null && this.parentRepository.IsRetired);
 			}
 			set
 			{
@@ -222,6 +227,7 @@ namespace Telerik.JustMock.Core
         internal MocksRepository(MocksRepository parentRepository, MethodBase method)
         {
             this.method = method;
+			this.creatingThread = Thread.CurrentThread;
             if (parentRepository != null)
 			{
                 this.parentRepository = parentRepository;
