@@ -27,7 +27,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyProduct("Telerik.JustMock.Tests")]
 [assembly: AssemblyCompany("Telerik AD")]
-[assembly: AssemblyCopyright("Copyright © Telerik 2010-2013 Telerik AD")]
+[assembly: AssemblyCopyright("Copyright © Telerik 2010-2014 Telerik AD")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
