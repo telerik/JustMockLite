@@ -29,7 +29,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyCompany("Telerik AD")]
-[assembly: AssemblyCopyright("Copyright © Telerik 2010-2014 Telerik AD")]
+[assembly: AssemblyCopyright("Copyright © 2010-2014 Telerik AD")]
 
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
