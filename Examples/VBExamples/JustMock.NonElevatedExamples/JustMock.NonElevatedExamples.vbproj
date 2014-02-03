@@ -59,13 +59,11 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Telerik.JustMock, Version=2013.3.819.0, Culture=neutral, PublicKeyToken=721b6c5bc0326b3a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\Telerik\JustMock\Libraries\Telerik.JustMock.dll</HintPath>
+    <Reference Include="Telerik.JustMock">
+      <HintPath>..\..\..\..\..\..\..\..\..\Program Files (x86)\Telerik\JustMock\Libraries\Telerik.JustMock.dll</HintPath>
     </Reference>
-    <Reference Include="Telerik.JustMock.Container, Version=2013.3.819.0, Culture=neutral, PublicKeyToken=721b6c5bc0326b3a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\Telerik\JustMock\Libraries\Telerik.JustMock.Container.dll</HintPath>
+    <Reference Include="Telerik.JustMock.Container">
+      <HintPath>..\..\..\..\..\..\..\..\..\Program Files (x86)\Telerik\JustMock\Libraries\Telerik.JustMock.Container.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

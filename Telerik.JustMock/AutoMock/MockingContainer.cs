@@ -192,6 +192,7 @@ namespace Telerik.JustMock.AutoMock
 		/// <summary>
 		/// Asserts a specific dependency
 		/// </summary>
+        /// <param name="bindingName">Name.</param>
 		/// <typeparam name="TService">Service Type.</typeparam>
 		/// <param name="take">Specifies the instance to resolve.</param>
 		public void Assert<TService>(string bindingName)
@@ -225,6 +226,7 @@ namespace Telerik.JustMock.AutoMock
 		/// Asserts the specific call
 		/// </summary>
 		/// <typeparam name="TService">Service Type.</typeparam>
+        /// <param name="bindingName">Name.</param>
 		/// <param name="expression">Target expression.</param>
 		/// <param name="take">Specifies the instance to resolve.</param>
 		public void Assert<TService>(string bindingName, Expression<Func<TService, object>> expression)
@@ -236,6 +238,7 @@ namespace Telerik.JustMock.AutoMock
 		/// Asserts the specific call
 		/// </summary>
 		/// <typeparam name="TService">Service Type.</typeparam>
+        /// <param name="bindingName">Name.</param>
 		/// <param name="expression">Target expression.</param>
 		/// <param name="take">Specifies the instance to resolve.</param>
 		public void Assert<TService>(string bindingName, Expression<Action<TService>> expression)
@@ -247,6 +250,7 @@ namespace Telerik.JustMock.AutoMock
 		/// Asserts the specific call
 		/// </summary>
 		/// <typeparam name="TService">Service Type.</typeparam>
+        /// <param name="bindingName">Name.</param>
 		/// <param name="expression">Target expression.</param>
 		/// <param name="occurs">Specifies the number of times a mock call should occur.</param>
 		/// <param name="take">Specifies the instance to resolve.</param>
@@ -258,7 +262,8 @@ namespace Telerik.JustMock.AutoMock
 		/// <summary>
 		/// Asserts the specific call
 		/// </summary>
-		/// <typeparam name="TService">Service Type.</typeparam>
+        /// <typeparam name="TService">Service Type.</typeparam>
+        /// <param name="bindingName">Name.</param>
 		/// <param name="expression">Target expression.</param>
 		/// <param name="occurs">Specifies the number of times a mock call should occur.</param>
 		/// <param name="take">Specifies the instance to resolve.</param>
