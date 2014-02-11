@@ -24,7 +24,8 @@ namespace Telerik.JustMock.Core.Behaviors
 	{
 		public void Process(Invocation invocation)
 		{
-			if (!invocation.Recording || invocation.RetainBehaviorDuringRecording)
+			if ((!invocation.Recording || invocation.RetainBehaviorDuringRecording)
+				&& !invocation.UserProvidedImplementation)
 			{
 				invocation.UserProvidedImplementation = true;
 				invocation.CallOriginal = true;

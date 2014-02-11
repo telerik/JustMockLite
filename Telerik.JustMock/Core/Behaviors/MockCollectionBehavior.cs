@@ -27,7 +27,7 @@ namespace Telerik.JustMock.Core.Behaviors
 
 		public MockCollectionBehavior(Type resultCollection, MocksRepository repo, IEnumerable collection)
 		{
-			this.collection = (IEnumerable) MockCollection.Create(resultCollection, repo, collection);
+			this.collection = (IEnumerable) MockCollection.Create(resultCollection, repo, null, collection);
 		}
 
 		public void Process(Invocation invocation)

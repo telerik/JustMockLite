@@ -73,14 +73,14 @@ namespace Telerik.JustMock.Core.Behaviors
 					if (mock == null && idictionaryType != null)
 					{
 						var dictType = typeof(Dictionary<,>).MakeGenericType(idictionaryType.GetGenericArguments());
-						mock = MockCollection.Create(returnType, repository, (IEnumerable)MockingUtil.CreateInstance(dictType));
+						mock = MockCollection.Create(returnType, repository, replicator, (IEnumerable)MockingUtil.CreateInstance(dictType));
 					}
 
 					var ienumerableType = returnType.GetImplementationOfGenericInterface(typeof(IEnumerable<>));
 					if (mock == null && ienumerableType != null)
 					{
 						var listType = typeof(List<>).MakeGenericType(ienumerableType.GetGenericArguments());
-						mock = MockCollection.Create(returnType, repository, (IEnumerable)MockingUtil.CreateInstance(listType));
+						mock = MockCollection.Create(returnType, repository, replicator, (IEnumerable)MockingUtil.CreateInstance(listType));
 					}
 
 					if (mock == null && mustReturnAMock)

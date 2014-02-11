@@ -24,7 +24,7 @@ namespace Telerik.JustMock.Core.Behaviors
 {
 	internal static class MockCollection
 	{
-		public static object Create(Type resultCollectionType, MocksRepository repo, IEnumerable collection)
+		public static object Create(Type resultCollectionType, MocksRepository repo, IMockReplicator replicator, IEnumerable collection)
 		{
 			if (resultCollectionType == typeof(string))
 				return null;
@@ -68,8 +68,19 @@ namespace Telerik.JustMock.Core.Behaviors
 			var queryableBehavior = new DelegatedImplementationBehavior(queryable,
 				new[] { queryableType.GetImplementationOfGenericInterface(typeof(IQueryable<>)) });
 
-			return repo.Create(resultCollectionType, null, Behavior.Loose, Type.EmptyTypes, null,
-				null, null, new List<IBehavior> { listBehavior, queryableBehavior });
+			if (replicator != null)
+			{
+				var mock = replicator.CreateSimilarMock(repo, resultCollectionType, null, true, null);
+				var mockMixin = MocksRepository.GetMockMixin(mock, null);
+				mockMixin.FallbackBehaviors.Insert(0, queryableBehavior);
+				mockMixin.FallbackBehaviors.Insert(0, listBehavior);
+				return mock;
+			}
+			else
+			{
+				return repo.Create(resultCollectionType, null, Behavior.Loose, Type.EmptyTypes, null,
+					null, null, new List<IBehavior> { listBehavior, queryableBehavior });
+			}
 		}
 	}
 }

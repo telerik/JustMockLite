@@ -324,6 +324,34 @@ namespace Telerik.JustMock.Tests
 			var actual = service.Query<ValidateMember>().With("me");
 			Assert.Equal(true, actual);
 		}
+
+		public interface IBenefits
+		{
+		}
+
+		public interface IOuter
+		{
+			IEnumerableWithBenefits Bar { get; }
+			IDictionaryWithBenefits Dict { get; }
+		}
+
+		public interface IEnumerableWithBenefits : IEnumerable<Object>
+		{
+			IBenefits GetBaz();
+		}
+
+		public interface IDictionaryWithBenefits : IDictionary<string, int>
+		{
+			IBenefits GetBaz();
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Recursive")]
+		public void ShouldMockRecursivelyCustomMembersOnIEnumerable()
+		{
+			var foo = Mock.Create<IOuter>(Behavior.RecursiveLoose);
+			Assert.NotNull(foo.Bar.GetBaz());
+			Assert.NotNull(foo.Dict.GetBaz());
+		}
 	}
 
 	[TestClass]

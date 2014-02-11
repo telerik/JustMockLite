@@ -42,17 +42,17 @@ namespace Telerik.JustMock.Core
 		/// are recursively asserted. Dependent mocks are added for example by arranging a call
 		/// on this mock to return another mock.
 		/// </summary>
-		ICollection<object> DependentMocks { get; }
+		IList<object> DependentMocks { get; }
 
 		/// <summary>
 		/// Behaviors that are processed after the behaviors for any method mock are processed.
 		/// </summary>
-		ICollection<IBehavior> SupplementaryBehaviors { get; }
+		IList<IBehavior> SupplementaryBehaviors { get; }
 
 		/// <summary>
 		/// Behaviors to process when there was no method mock for a dispatched invocation.
 		/// </summary>
-		ICollection<IBehavior> FallbackBehaviors { get; }
+		IList<IBehavior> FallbackBehaviors { get; }
 
 		Type DeclaringType { get; }
 
@@ -96,7 +96,7 @@ namespace Telerik.JustMock.Core
 		public bool IsStaticConstructorMocked { get; set; }
 		public bool IsInstanceConstructorMocked { get; set; }
 
-		public ICollection<object> DependentMocks
+		public IList<object> DependentMocks
 		{
 			get
 			{
@@ -105,13 +105,13 @@ namespace Telerik.JustMock.Core
 				return this.dependentMocks;
 			}
 		}
-  
-		public ICollection<IBehavior> SupplementaryBehaviors
+
+		public IList<IBehavior> SupplementaryBehaviors
 		{
 			get { return this.supplementaryBehaviors; }
 		}
 
-		public ICollection<IBehavior> FallbackBehaviors
+		public IList<IBehavior> FallbackBehaviors
 		{
 			get { return this.fallbackBehaviors; }
 		}
