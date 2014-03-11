@@ -19,7 +19,6 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using Telerik.JustMock.Abstraction;
-using Telerik.JustMock.Analytics;
 using Telerik.JustMock.Core;
 using Telerik.JustMock.Core.Behaviors;
 using Telerik.JustMock.Core.Context;
@@ -44,16 +43,6 @@ namespace Telerik.JustMock
 			}
 #endif
 
-#if !LITE_EDITION
-			if (!MockingUtil.IsMetro())
-			{
-				try
-				{
-					AnalyticsTracker.Instance.CreateDefaultTracker(AnalyticsConfiguration.EnableAnalytics);
-				}
-				catch { }
-			}
-#endif
 		}
 
 		/// <summary>

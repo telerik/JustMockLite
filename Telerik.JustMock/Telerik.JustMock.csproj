@@ -81,11 +81,6 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Abstraction\IFluentConfig.cs" />
-    <Compile Include="Analytics\AnalyticsConfiguration.cs" />
-    <Compile Include="Analytics\AnalyticsData.cs" />
-    <Compile Include="Analytics\CompositeAnalyticsTracker.cs" />
-    <Compile Include="Analytics\EQATEC\JustMockEqatecAnalyticsTracker.cs" />
-    <Compile Include="Analytics\IAnalyticsTracker.cs" />
     <Compile Include="AutoMock\AutoMockSettings.cs" />
     <Compile Include="AutoMock\CreateSingletonParameter.cs" />
     <Compile Include="AutoMock\MockingContainer.cs" />
@@ -536,13 +531,11 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Core\FunctionalSpecParser.cs" />
-    <Compile Include="Analytics\JustMockInformation.cs" />
     <Compile Include="MockAssertionFailedException.cs" />
     <Compile Include="Param.cs" />
     <Compile Include="PrivateAccessor.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Analytics\SystemInformation.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

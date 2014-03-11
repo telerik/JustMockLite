@@ -35,7 +35,6 @@ namespace Telerik.JustMock.Tests
 	{
 		public static Exception Throws<T>(Action action) where T : Exception
 		{
-			Exception targetException = null;
 
 			try
 			{
