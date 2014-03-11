@@ -1489,7 +1489,7 @@ namespace Telerik.JustMock.Tests
 
 		public interface ILoanStringField : ILoanField
 		{
-			string Value { get; set; }
+			new string Value { get; set; }
 		}
 
 		public interface ILoanField
@@ -1559,7 +1559,7 @@ namespace Telerik.JustMock.Tests
 		public interface IDocumentItemContainer<T> : IDocumentItemContainer
 		where T : IDocumentItem
 		{
-			IEnumerable<T> Children { get; }
+			new IEnumerable<T> Children { get; }
 
 			void AddChild(T child);
 			void RemoveChild(T child);
@@ -2090,7 +2090,7 @@ namespace Telerik.JustMock.Tests
 		public interface IVersioned2 : IVersioned
 		{
 			[DispId(1)]
-			string Identity { [DispId(1)] get; [DispId(1)] set; }
+			new string Identity { [DispId(1)] get; [DispId(1)] set; }
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]

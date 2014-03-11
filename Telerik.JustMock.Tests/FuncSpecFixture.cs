@@ -230,7 +230,6 @@ namespace Telerik.JustMock.Tests
 		[TestMethod, TestCategory("Lite"), TestCategory("FuncSpec"), TestCategory("Recursive")]
 		public void ShouldEvaluateConstantMockExpressionsEarly()
 		{
-			int a = 5;
 			var mock = Mock.CreateLike<IFuncSpecced>(me => me.InnerElement == Mock.Create<IFuncSpecced>());
 			Assert.Same(mock.InnerElement, mock.InnerElement);
 		}

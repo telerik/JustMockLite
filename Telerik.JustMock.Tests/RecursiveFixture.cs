@@ -238,7 +238,7 @@ namespace Telerik.JustMock.Tests
 
 		public interface IRegionLookup : IDictionary<string, object>
 		{
-			object this[string regionName] { get; }
+			new object this[string regionName] { get; }
 			event EventHandler CollectionChanged;
 		}
 
