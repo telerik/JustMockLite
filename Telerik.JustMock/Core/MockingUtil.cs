@@ -742,6 +742,11 @@ namespace Telerik.JustMock.Core
 			return String.Join(separator, objects.ToArray());
 		}
 
+		public static string EscapeFormatString(this string formatStr)
+		{
+			return formatStr.Replace("{", "{{").Replace("}", "}}");
+		}
+
 		public static void RaiseEventThruReflection(object instance, EventInfo evt, object[] args)
 		{
 			MethodInfo raise;

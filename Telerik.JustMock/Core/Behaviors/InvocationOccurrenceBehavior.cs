@@ -86,7 +86,7 @@ namespace Telerik.JustMock.Core.Behaviors
 				calls);
 
 			if (expression != null)
-				message += String.Format("\nArrange expression: {0}", expression);
+				message += String.Format("\nArrange expression: {0}", expression).EscapeFormatString();
 
 			MockingContext.Fail(message);
 		}
