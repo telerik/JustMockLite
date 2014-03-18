@@ -23,6 +23,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
+using System.Runtime.ConstrainedExecution;
 using Telerik.JustMock.Core.Context;
 using Telerik.JustMock.Diagnostics;
 using Telerik.JustMock.Setup;
@@ -399,6 +400,11 @@ namespace Telerik.JustMock.Core
 			if (AllowedMockableTypes.List.Contains(type))
 				return;
 
+			if (typeof(CriticalFinalizerObject).IsAssignableFrom(type))
+			{
+				MockException.ThrowUnsafeTypeException(type);
+			}
+
 			var hasUnmockableInstanceMembers =
 				type.Assembly == typeof(object).Assembly
 				&& type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
@@ -434,6 +440,7 @@ namespace Telerik.JustMock.Core
 				|| type == typeof(FieldInfo)
 				|| type == typeof(PropertyInfo)
 				|| type == typeof(EventInfo)
+				|| type == typeof(System.CannotUnloadAppDomainException)
 				|| Nullable.GetUnderlyingType(type) != null)
 				return false;
 

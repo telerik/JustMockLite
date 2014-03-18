@@ -44,7 +44,7 @@ namespace Telerik.JustMock
 
 		internal static void ThrowUnsafeTypeException(Type type)
 		{
-			throw new MockException(String.Format("Cannot mock type '{0}' due to CLR limitations or because it might be unsafe. You could still try mocking this member by adding the line 'Telerik.JustMock.Setup.AllowedMockableTypes.Add<{0}>();' to your test but mind that this might result in a hard crash of the CLR runtime.", type));
+			throw new MockException(String.Format("Cannot mock type '{0}' because it might be unsafe. You could still create a mock with Behavior.CallOriginal. Alternatively, you could still try mocking this member by adding the line 'Telerik.JustMock.Setup.AllowedMockableTypes.Add<{0}>();' to your test but mind that this might result in a hard crash of the CLR runtime.", type));
 		}
 	}
 }

@@ -23,7 +23,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
-using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading;
 using Telerik.JustMock.Core.Behaviors;
@@ -611,9 +610,6 @@ namespace Telerik.JustMock.Core
 			if (KnownUnmockableTypes.Contains(type)
 				|| typeof(Delegate).IsAssignableFrom(type))
 				throw new MockException("Cannot create mock for type due to CLR limitations.");
-
-			if (typeof(CriticalFinalizerObject).IsAssignableFrom(type))
-				throw new MockException("Cannot create mock for sensitive types.");
 
 			if (checkSafety)
 				ProfilerInterceptor.CheckIfSafeToInterceptWholesale(type);
