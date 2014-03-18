@@ -17,7 +17,8 @@
 
 using System;
 using System.Linq;
-
+using System.Collections.Generic;
+using System.IO;
 
 #if !NUNIT
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -219,6 +220,22 @@ namespace Telerik.JustMock.Tests
 			var mock = Mock.Create<IFooProvider>();
 			Mock.Arrange(() => mock.TheFoo.Submit());
 			Mock.Assert(() => mock.TheFoo, Occurs.Never());
+		}
+
+		public interface IContainerResolver
+		{
+			T Resolve<T>(Dictionary<string, object> data);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Occurrence"), TestCategory("Bug")]
+		public void ShouldArrangeAndAssertExpressionInvolvingCollectionInitializerSyntax()
+		{
+			IContainerResolver containerResolver = Mock.Create<IContainerResolver>();
+
+			Mock.Arrange(() => containerResolver.Resolve<DirectoryInfo>(new Dictionary<string, object> { { "path", @"pptestRoot\DrivesData\TestFamily" } })).Returns(new DirectoryInfo("ss")).OccursOnce();
+
+			var ex = Assert.Throws<AssertFailedException>(() => Mock.Assert(containerResolver));
+			Assert.True(ex.Message.Contains("Occurrence expectation failed."));
 		}
 	}
 }
