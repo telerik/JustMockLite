@@ -88,7 +88,7 @@ namespace Telerik.JustMock.Core
 					throw new MockException("Cannot mock method with __arglist.");
 
 				if (uninterceptedMethods.Contains(value))
-					throw new MockException("Cannot mock Object.Equals, Object.ReferenceEquals or Finalize");
+					throw new MockException("Cannot mock Object..ctor, Object.Equals, Object.ReferenceEquals or Finalize");
 
 				var asMethodInfo = value as MethodInfo;
 				if (asMethodInfo != null)

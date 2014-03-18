@@ -51,6 +51,8 @@ namespace Telerik.JustMock.Expectations
 
 		protected void ProcessReturnsValue(TReturn value)
 		{
+			this.CheckNotConstructorArrangement();
+
 			this.ProcessDoInstead(new Func<TReturn>(() => value), false);
 
 			if ((object) value != null)
@@ -63,8 +65,19 @@ namespace Telerik.JustMock.Expectations
 
 		private void ProcessReturnsCollection(IEnumerable collection)
 		{
-			var mock = ((IMethodMock)this);
+			this.CheckNotConstructorArrangement();
+
+			var mock = (IMethodMock)this;
 			mock.Behaviors.Add(new MockCollectionBehavior(typeof(TReturn), mock.Repository, collection));
+		}
+
+		private void CheckNotConstructorArrangement()
+		{
+			var mock = (IMethodMock)this;
+			if (mock.CallPattern.Method.IsConstructor)
+			{
+				throw new MockException("Arranging the return value of a constructor call is not supported.");
+			}
 		}
 	}
 }
