@@ -122,12 +122,12 @@ namespace Telerik.JustMock
 			
 			var eventStubs = new EventStubsBehavior();
 			mixins.Add(eventStubs.CreateMixin());
-			fallbackBehaviors.Add(eventStubs);
 
 			switch (behavior)
 			{
 				case Behavior.RecursiveLoose:
 				case Behavior.Loose:
+					fallbackBehaviors.Add(eventStubs);
 					fallbackBehaviors.Add(new PropertyStubsBehavior());
 					fallbackBehaviors.Add(new CallOriginalObjectMethodsBehavior());
 					fallbackBehaviors.Add(new RecursiveMockingBehavior(behavior == Behavior.RecursiveLoose ? RecursiveMockingBehaviorType.ReturnMock : RecursiveMockingBehaviorType.ReturnDefault));
@@ -135,6 +135,7 @@ namespace Telerik.JustMock
 					fallbackBehaviors.Add(new ExecuteConstructorBehavior());
 					break;
 				case Behavior.Strict:
+					fallbackBehaviors.Add(eventStubs);
 					fallbackBehaviors.Add(new RecursiveMockingBehavior(RecursiveMockingBehaviorType.OnlyDuringAnalysis));
 					fallbackBehaviors.Add(new StaticConstructorMockBehavior());
 					fallbackBehaviors.Add(new ExecuteConstructorBehavior());
@@ -143,6 +144,7 @@ namespace Telerik.JustMock
 					break;
 				case Behavior.CallOriginal:
 					fallbackBehaviors.Add(new CallOriginalBehavior());
+					fallbackBehaviors.Add(eventStubs);
 					fallbackBehaviors.Add(new RecursiveMockingBehavior(RecursiveMockingBehaviorType.OnlyDuringAnalysis));
 					fallbackBehaviors.Add(new StaticConstructorMockBehavior());
 					fallbackBehaviors.Add(new ExecuteConstructorBehavior());
