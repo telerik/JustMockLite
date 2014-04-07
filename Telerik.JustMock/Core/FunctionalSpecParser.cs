@@ -113,11 +113,11 @@ namespace Telerik.JustMock.Core
 							}
 						}
 
-						var callPattern = Expression.Lambda(expr.Left);
+						var callPattern = Expression.Lambda(arrangement);
 						Expression<Action<IReturnArranger>> arrangeReturnTempl = a => a.ArrangeReturn<int>(null, null);
 						var arrangeMethodTempl = ((MethodCallExpression)arrangeReturnTempl.Body).Method.GetGenericMethodDefinition();
-						var arrangeMethod = arrangeMethodTempl.MakeGenericMethod(expr.Left.Type);
-						var returnLambda = Expression.Lambda(Expression.Convert(action, expr.Left.Type), parameters);
+						var arrangeMethod = arrangeMethodTempl.MakeGenericMethod(arrangement.Type);
+						var returnLambda = Expression.Lambda(Expression.Convert(action, arrangement.Type), parameters);
 						arrangeMethod.Invoke(arranger, new object[] { callPattern, returnLambda });
 					}
 					break;

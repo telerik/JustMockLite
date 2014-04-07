@@ -210,7 +210,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldNotCallOriginalImplementationIfReturnValueArranged()
 		{
 			var mock = Mock.Create<DontCallOriginal>(Behavior.CallOriginal);
-			Mock.Arrange(() => mock.CallMe()).Returns(1);           
+			Mock.Arrange(() => mock.CallMe()).Returns(1);
 			Assert.Equal(1, mock.CallMe());
 		}
 

@@ -234,5 +234,17 @@ namespace Telerik.JustMock.Tests
 			var mock = Mock.CreateLike<IFuncSpecced>(me => me.InnerElement == Mock.Create<IFuncSpecced>());
 			Assert.Same(mock.InnerElement, mock.InnerElement);
 		}
+
+		public interface IByteProperty
+		{
+			byte Prop { get; }
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("FuncSpec")]
+		public void ShouldArrangeByteReturnValue()
+		{
+			var instance = Mock.CreateLike<IByteProperty>(o => o.Prop == 1);
+			Assert.Equal(1, instance.Prop);
+		}
 	}
 }
