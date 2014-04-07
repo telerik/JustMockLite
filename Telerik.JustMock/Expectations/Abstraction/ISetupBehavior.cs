@@ -30,5 +30,20 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// for similar type call, the flow of setups will be maintained.
 		/// </remarks>
 		IAssertable InSequence();
+
+		/// <summary>
+		/// Specifies that the arrangement will be respected regardless of the thread
+		/// on which the call to the arranged member happens.
+		/// </summary>
+		/// <remarks>
+		/// This is only needed for arrangements of static members. Arrangements on
+		/// instance members are always respected, regardless of the current thread.
+		/// 
+		/// Cross-thread arrangements are active as long as the current context
+		/// (test method) is on the call stack. Be careful when arranging
+		/// static members cross-thread because the effects of the arrangement may
+		/// affect and even crash the testing framework.
+		/// </remarks>
+		IAssertable OnAllThreads();
 	}
 }

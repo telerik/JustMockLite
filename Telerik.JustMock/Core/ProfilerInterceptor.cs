@@ -50,6 +50,8 @@ namespace Telerik.JustMock.Core
 		private static readonly Action<bool> setIsInterceptionSetup;
 		private static readonly Action<RuntimeTypeHandle> runClassConstructor;
 
+		private static readonly Dictionary<MethodBase, List<MocksRepository>> globalInterceptors = new Dictionary<MethodBase, List<MocksRepository>>();
+
 		[ThreadStatic]
 		private static int surrogateReentrancyCounter;
 
@@ -73,6 +75,17 @@ namespace Telerik.JustMock.Core
 
 				var mockMixin = MocksRepository.GetMockMixinFromInvocation(invocation);
 				var repo = mockMixin != null ? mockMixin.Repository : MockingContext.ResolveRepository(UnresolvedContextBehavior.CreateNewContextual);
+
+				if (repo == null)
+				{
+					lock (globalInterceptors)
+					{
+						List<MocksRepository> repos;
+						if (globalInterceptors.TryGetValue(method, out repos))
+							repo = repos.Last();
+					}
+				}
+
 				if (repo != null)
 				{
 					DebugView.TraceEvent(IndentLevel.Dispatch, () => String.Format("Intercepted profiler call: {0}", invocation.InputToString()));
@@ -282,6 +295,30 @@ namespace Telerik.JustMock.Core
 					arrangedTypesArray[arrayIndex] = (byte)(arrangedTypesArray[arrayIndex] | arrayMask);
 				else
 					arrangedTypesArray[arrayIndex] = (byte)(arrangedTypesArray[arrayIndex] & ~arrayMask);
+			}
+		}
+
+		internal static void RegisterGlobalInterceptor(MethodBase method, MocksRepository repo)
+		{
+			lock (globalInterceptors)
+			{
+				List<MocksRepository> repos;
+				if (!globalInterceptors.TryGetValue(method, out repos))
+				{
+					globalInterceptors[method] = repos = new List<MocksRepository>();
+				}
+				repos.Add(repo);
+			}
+		}
+
+		internal static void UnregisterGlobalInterceptor(MethodBase method, MocksRepository repo)
+		{
+			lock (globalInterceptors)
+			{
+				var repos = globalInterceptors[method];
+				repos.Remove(repo);
+				if (repos.Count == 0)
+					globalInterceptors.Remove(method);
 			}
 		}
 

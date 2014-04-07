@@ -167,6 +167,7 @@ namespace Telerik.JustMock.Core
 		private readonly Dictionary<KeyValuePair<object, object>, object> valueStore = new Dictionary<KeyValuePair<object, object>, object>();
 		private readonly HashSet<Type> arrangedTypes = new HashSet<Type>();
 		private readonly HashSet<Type> disabledTypes = new HashSet<Type>();
+		private readonly HashSet<MethodBase> globallyInterceptedMethods = new HashSet<MethodBase>();
 
 		private readonly List<IMatcher> matchersInContext = new List<IMatcher>();
 
@@ -293,11 +294,18 @@ namespace Telerik.JustMock.Core
 			}
 		}
 
-
 		internal void Retire()
 		{
 			this.IsRetired = true;
 			this.Reset();
+		}
+
+		internal void InterceptGlobally(MethodBase method)
+		{
+			if (globallyInterceptedMethods.Add(method))
+			{
+				ProfilerInterceptor.RegisterGlobalInterceptor(method, this);
+			}
 		}
 
 		internal void Reset()
@@ -306,6 +314,9 @@ namespace Telerik.JustMock.Core
 				ProfilerInterceptor.EnableInterception(type, false, this);
 			this.arrangedTypes.Clear();
 			this.staticMixinDatabase.Clear();
+			foreach (var method in this.globallyInterceptedMethods)
+				ProfilerInterceptor.UnregisterGlobalInterceptor(method, this);
+			this.globallyInterceptedMethods.Clear();
 
 			lock (externalMixinDatabase)
 			{

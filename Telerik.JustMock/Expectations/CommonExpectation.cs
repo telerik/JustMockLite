@@ -65,6 +65,11 @@ namespace Telerik.JustMock.Expectations
 			get { return ((IMethodMock)this).Repository; }
 		}
 
+		private CallPattern CallPattern
+		{
+			get { return ((IMethodMock)this).CallPattern; }
+		}
+
 		internal IMockMixin Mock
 		{
 			get { return ((IMethodMock)this).Mock; }
@@ -397,9 +402,18 @@ namespace Telerik.JustMock.Expectations
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 				{
-					(this as IMethodMock).CallPattern.InstanceMatcher = new AnyMatcher();
-					(this as IMethodMock).CallPattern.MethodMockNode.ReattachMethodMock();
+					this.CallPattern.InstanceMatcher = new AnyMatcher();
+					this.CallPattern.MethodMockNode.ReattachMethodMock();
 					return (TContainer)(object)this;
+				});
+		}
+
+		public IAssertable OnAllThreads()
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+				{
+					this.Repository.InterceptGlobally(this.CallPattern.Method);
+					return this;
 				});
 		}
 	}
