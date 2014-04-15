@@ -168,9 +168,6 @@
     <Compile Include="..\Telerik.JustMock\AutoMock\AutoMockSettings.cs">
       <Link>AutoMock\AutoMockSettings.cs</Link>
     </Compile>
-    <Compile Include="..\Telerik.JustMock\AutoMock\CreateSingletonParameter.cs">
-      <Link>AutoMock\CreateSingletonParameter.cs</Link>
-    </Compile>
     <Compile Include="..\Telerik.JustMock\AutoMock\MockingContainer.cs">
       <Link>AutoMock\MockingContainer.cs</Link>
     </Compile>
@@ -1692,7 +1689,7 @@
       <FlavorProperties GUID="{A1591282-1198-4647-A2B1-27E5FF5F6F3B}">
         <SilverlightProjectProperties />
       </FlavorProperties>
-      <UserProperties ProjectLinkReference="0749ebc2-4e83-4960-bf28-1ff5c2deb2b9" ProjectLinkerExcludeFilter="\\?desktop(\\.*)?$;\\?silverlight(\\.*)?$;\.desktop;\.silverlight;\.xaml;^service references(\\.*)?$;\.clientconfig;^web references(\\.*)?$" />
+      <UserProperties ProjectLinkerExcludeFilter="\\?desktop(\\.*)?$;\\?silverlight(\\.*)?$;\.desktop;\.silverlight;\.xaml;^service references(\\.*)?$;\.clientconfig;^web references(\\.*)?$" ProjectLinkReference="0749ebc2-4e83-4960-bf28-1ff5c2deb2b9" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>
