@@ -124,7 +124,7 @@ namespace Telerik.JustMock.AutoMock
 		/// </returns>
 		public FuncExpectation<object> Arrange<TInterface>(Expression<Func<TInterface, object>> expression)
 		{
-			return ProfilerInterceptor.GuardInternal(() => this.Get<TInterface>(new CreateSingletonParameter()).Arrange(expression));
+			return ProfilerInterceptor.GuardInternal(() => this.Get<TInterface>().Arrange(expression));
 		}
 
 		/// <summary>
@@ -140,7 +140,7 @@ namespace Telerik.JustMock.AutoMock
 		/// </returns>
 		public ActionExpectation Arrange<TInterface>(Expression<Action<TInterface>> expression)
 		{
-			return ProfilerInterceptor.GuardInternal(() => this.Get<TInterface>(new CreateSingletonParameter()).Arrange(expression));
+			return ProfilerInterceptor.GuardInternal(() => this.Get<TInterface>().Arrange(expression));
 		}
 
 		/// <summary>
@@ -167,7 +167,7 @@ namespace Telerik.JustMock.AutoMock
 		/// <param name="expression">Target expression.</param>
 		public void Assert<TService>(Expression<Action<TService>> expression)
 		{
-			ProfilerInterceptor.GuardInternal(() => this.Get<TService>(new CreateSingletonParameter()).Assert(expression));
+			ProfilerInterceptor.GuardInternal(() => this.Get<TService>().Assert(expression));
 		}
 
 		/// <summary>
@@ -177,7 +177,7 @@ namespace Telerik.JustMock.AutoMock
 		/// <param name="expression">Target expression</param>
 		public void Assert<TService>(Expression<Func<TService, object>> expression)
 		{
-			ProfilerInterceptor.GuardInternal(() => this.Get<TService>(new CreateSingletonParameter()).Assert(expression));
+			ProfilerInterceptor.GuardInternal(() => this.Get<TService>().Assert(expression));
 		}
 
 		/// <summary>
@@ -186,7 +186,7 @@ namespace Telerik.JustMock.AutoMock
 		/// <typeparam name="TService">Service type.</typeparam>
 		public void Assert<TService>()
 		{
-			ProfilerInterceptor.GuardInternal(() => this.Get<TService>(new CreateSingletonParameter()).Assert());
+			ProfilerInterceptor.GuardInternal(() => this.Get<TService>().Assert());
 		}
 
 		/// <summary>
@@ -208,7 +208,7 @@ namespace Telerik.JustMock.AutoMock
 		/// <param name="occurs">Specifies the number of times a mock call should occur.</param>
 		public void Assert<TService>(Expression<Func<TService, object>> expression, Occurs occurs)
 		{
-			ProfilerInterceptor.GuardInternal(() => this.Get<TService>(new CreateSingletonParameter()).Assert(expression, occurs));
+			ProfilerInterceptor.GuardInternal(() => this.Get<TService>().Assert(expression, occurs));
 		}
 
 		/// <summary>
@@ -219,7 +219,7 @@ namespace Telerik.JustMock.AutoMock
 		/// <param name="occurs">Specifies the number of times a mock call should occur.</param>
 		public void Assert<TService>(Expression<Action<TService>> expression, Occurs occurs)
 		{
-			ProfilerInterceptor.GuardInternal(() => this.Get<TService>(new CreateSingletonParameter()).Assert(expression, occurs));
+			ProfilerInterceptor.GuardInternal(() => this.Get<TService>().Assert(expression, occurs));
 		}
 
 		/// <summary>

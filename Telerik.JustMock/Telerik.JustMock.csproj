@@ -87,7 +87,6 @@
     <Compile Include="Analytics\EQATEC\JustMockEqatecAnalyticsTracker.cs" />
     <Compile Include="Analytics\IAnalyticsTracker.cs" />
     <Compile Include="AutoMock\AutoMockSettings.cs" />
-    <Compile Include="AutoMock\CreateSingletonParameter.cs" />
     <Compile Include="AutoMock\MockingContainer.cs" />
     <Compile Include="AutoMock\MockResolver.cs" />
     <Compile Include="AutoMock\NinjectMockSyntaxExtensions.cs" />

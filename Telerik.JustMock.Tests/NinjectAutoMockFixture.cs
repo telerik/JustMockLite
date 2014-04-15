@@ -244,5 +244,26 @@ namespace Telerik.JustMock.Tests
 			// assert that specifying an invalid constructor throws
 			Assert.Throws<MockException>(() => new MockingContainer<VariousCtors>(new AutoMockSettings { ConstructorArgTypes = new[] { typeof(ICalendar) } }));
 		}
+
+		public interface IService { }
+		
+		public class Module
+		{
+			public IService service;
+
+			public Module(IService service)
+			{
+				this.service = service;
+			}
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+		public void ShouldMakeSingletonExplicitlyRequestedServices()
+		{
+			var container = new MockingContainer<Module>();
+			var s1 = container.Get<IService>();
+			var s2 = container.Instance.service;
+			Assert.Same(s1, s2);
+		}
 	}
 }

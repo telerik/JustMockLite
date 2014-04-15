@@ -63,7 +63,7 @@ namespace Telerik.JustMock.AutoMock
 		{
 			var binding = new Binding(request.Service);
 			AttachToBinding(binding, request.Service);
-			binding.ScopeCallback = request.Parameters.OfType<CreateSingletonParameter>().Any()
+			binding.ScopeCallback = request.Target == null
 				? StandardScopeCallbacks.Singleton
 				: StandardScopeCallbacks.Transient;
 
