@@ -317,5 +317,46 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(6, value);
 			Assert.Equal(5, result);
 		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Returns")]
+		public void ShouldInterpretNullReturnsDelegateAsNullReturnsValue()
+		{
+			var test = Mock.Create<Entity>(Behavior.CallOriginal);
+			
+			Mock.Arrange(() => test.AsReference()).Returns<object>(null);
+			Assert.Null(test.AsReference());
+
+			Mock.Arrange(() => test.AsNullable()).Returns<int?>(null);
+			Assert.Null(test.AsNullable());
+
+			Assert.Throws<MockException>(() => Mock.Arrange(() => test.AsInt()).Returns<object>(null));
+
+			Mock.Arrange(() => test.Throw()).DoInstead(null);
+			test.Throw();
+			//didn't throw
+		}
+
+		public class Entity
+		{
+			public virtual int AsInt()
+			{
+				return 1;
+			}
+
+			public virtual object AsReference()
+			{
+				return new object();
+			}
+
+			public virtual int? AsNullable()
+			{
+				return 1;
+			}
+
+			public virtual void Throw()
+			{
+				throw new Exception();
+			}
+		}
 	}
 }

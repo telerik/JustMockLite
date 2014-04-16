@@ -85,6 +85,18 @@ namespace Telerik.JustMock.Expectations
 
 		protected void ProcessDoInstead(Delegate delg, bool ignoreDelegateReturnValue)
 		{
+			if (delg == null)
+			{
+				var returnType = CallPattern.Method.GetReturnType();
+				if (returnType == typeof(void))
+					returnType = typeof(object);
+				if (returnType.IsValueType && Nullable.GetUnderlyingType(returnType) == null)
+					throw new MockException(String.Format("Cannot return null value for non-nullable return type '{0}'.", returnType));
+
+				delg = Expression.Lambda(typeof(Func<>).MakeGenericType(returnType),
+					Expression.Constant(null, returnType)).Compile();
+			}
+
 			this.behaviors.Add(new ImplementationOverrideBehavior(delg, ignoreDelegateReturnValue));
 		}
 
