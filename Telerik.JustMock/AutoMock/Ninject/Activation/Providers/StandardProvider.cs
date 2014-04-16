@@ -24,6 +24,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Providers
 {
     using System.Reflection;
     using Telerik.JustMock.AutoMock.Ninject.Selection.Heuristics;
+	using Telerik.JustMock.Core;
 
     /// <summary>
     /// The standard provider for types, which activates instances via a <see cref="IPipeline"/>.
@@ -94,7 +95,8 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Providers
 
             var directive = bestDirectives.Single();
             var arguments = directive.Targets.Select(target => this.GetValue(context, target)).ToArray();
-            return directive.Injector(arguments);
+            var injector = directive.Injector;
+            return ProfilerInterceptor.GuardExternal(() => injector(arguments));
         }
 
         /// <summary>

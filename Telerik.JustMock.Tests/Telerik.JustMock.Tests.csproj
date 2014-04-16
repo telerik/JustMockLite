@@ -74,7 +74,6 @@
   <ItemGroup>
     <Compile Include="Assert.cs" />
     <Compile Include="AssertionFixture.cs" />
-    <Compile Include="AutoMockFixture.cs" />
     <Compile Include="BehaviorFixture.cs" />
     <Compile Include="ConstructorFixture.cs" />
     <Compile Include="Coverage\DoInsteadFixture.cs">
@@ -118,10 +117,6 @@
     <ProjectReference Include="..\Telerik.JustMock.DemoLib\Telerik.JustMock.DemoLib.csproj">
       <Project>{1F725764-5FB5-475D-9BF2-355F073E3233}</Project>
       <Name>Telerik.JustMock.DemoLib</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Telerik.JustMock.Container\Telerik.JustMock.Container.csproj">
-      <Project>{780F30EF-9715-4FA4-A4CD-7410F86D0853}</Project>
-      <Name>Telerik.JustMock.Container</Name>
     </ProjectReference>
     <ProjectReference Include="..\Telerik.JustMock\Telerik.JustMock.csproj">
       <Project>{0749EBC2-4E83-4960-BF28-1FF5C2DEB2B9}</Project>

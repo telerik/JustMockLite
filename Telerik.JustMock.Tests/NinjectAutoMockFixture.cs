@@ -265,5 +265,132 @@ namespace Telerik.JustMock.Tests
 			var s2 = container.Instance.service;
 			Assert.Same(s1, s2);
 		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+		public void ShouldAssertRaisesAgainstMethod()
+		{
+			var container = new MockingContainer<Executor>();
+
+			bool raised = false;
+
+			container.Arrange<IExecutor>(x => x.Submit()).Raises(() => container.Get<IExecutor>().Done += null, EventArgs.Empty);
+
+			container.Get<IExecutor>().Done += delegate { raised = true; };
+
+			container.Instance.Submit();
+
+			Assert.True(raised);
+		}
+
+		public class Executor
+		{
+			public Executor(IExecutor executor)
+			{
+				this.executor = executor;
+			}
+
+			public void Submit()
+			{
+				this.executor.Submit();
+			}
+
+			private IExecutor executor;
+		}
+
+		public interface IExecutor
+		{
+			event EventHandler<EventArgs> Done;
+			event EventHandler Executed;
+			void Submit();
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+		public void ShouldAssertMockingNestedDependency()
+		{
+			var container = new MockingContainer<Foo>();
+			container.Bind<Bar>().ToSelf();
+
+			container.Arrange<IUnitOfWork>(uow => uow.DoWork()).MustBeCalled();
+
+			Assert.Throws<AssertFailedException>(() => container.Assert());
+
+			container.Instance.DoWork();
+
+			container.Assert();
+		}
+
+		public class Foo
+		{
+			public Foo(Bar bar)
+			{
+				this.bar = bar;
+			}
+
+			public void DoWork()
+			{
+				this.bar.DoWork();
+			}
+
+			private readonly Bar bar;
+		}
+
+		public class Bar
+		{
+			public Bar(IUnitOfWork unitOfWork)
+			{
+				this.unitOfWork = unitOfWork;
+			}
+
+			public void DoWork()
+			{
+				this.unitOfWork.DoWork();
+			}
+
+			private readonly IUnitOfWork unitOfWork;
+		}
+
+		public interface IUnitOfWork
+		{
+			void DoWork();
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+		public void ShouldResolveTargetTypeWithInterfaceAndConcreteDependencies()
+		{
+			var container = new MockingContainer<Unit>();
+
+			container.Arrange<IUnitOfWork>(uow => uow.DoWork()).MustBeCalled();
+
+			// this is where it resolves.
+			container.Instance.DoWork();
+
+			container.Assert();
+		}
+
+		public class Unit
+		{
+			public Unit(IUnitOfWork unitOfWork, WorkItem workItem)
+			{
+				this.unitOfWork = unitOfWork;
+				this.workItem = workItem;
+			}
+
+			public void DoWork()
+			{
+				workItem.DoWork();
+				unitOfWork.DoWork();
+			}
+
+			private readonly IUnitOfWork unitOfWork;
+			private readonly WorkItem workItem;
+		}
+
+		public class WorkItem
+		{
+			public void DoWork()
+			{
+
+			}
+		}
 	}
 }

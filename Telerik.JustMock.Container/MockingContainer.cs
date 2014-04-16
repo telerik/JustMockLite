@@ -31,6 +31,7 @@ namespace Telerik.JustMock.Container
 	/// Entry-point class for auto mocking.
 	/// </summary>
 	/// <typeparam name="T">The type of the mocked class.</typeparam>
+	[Obsolete]
 	public class MockingContainer<T> where T : class
 	{
 		private readonly IServiceLocator serviceLocator;

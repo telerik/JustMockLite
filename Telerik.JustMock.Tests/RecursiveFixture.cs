@@ -18,10 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
-#if !SILVERLIGHT
-using Telerik.JustMock.Container;
-#endif
+using Telerik.JustMock.AutoMock;
 
 #if !NUNIT
 using Microsoft.VisualStudio.TestTools.UnitTesting;

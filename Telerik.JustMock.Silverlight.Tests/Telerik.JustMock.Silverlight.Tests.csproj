@@ -145,9 +145,6 @@
     <Compile Include="..\Telerik.JustMock.Tests\AssertionFixture.cs">
       <Link>AssertionFixture.cs</Link>
     </Compile>
-    <Compile Include="..\Telerik.JustMock.Tests\AutoMockFixture.cs">
-      <Link>AutoMockFixture.cs</Link>
-    </Compile>
     <Compile Include="..\Telerik.JustMock.Tests\BehaviorFixture.cs">
       <Link>BehaviorFixture.cs</Link>
     </Compile>
@@ -268,7 +265,7 @@
       <FlavorProperties GUID="{A1591282-1198-4647-A2B1-27E5FF5F6F3B}">
         <SilverlightProjectProperties />
       </FlavorProperties>
-      <UserProperties ProjectLinkReference="83f0c270-db35-4b80-beda-5aed79c0fb2d" ProjectLinkerExcludeFilter="\\?desktop(\\.*)?$;\\?silverlight(\\.*)?$;\.desktop;\.silverlight;\.xaml;^service references(\\.*)?$;\.clientconfig;^web references(\\.*)?$" />
+      <UserProperties ProjectLinkerExcludeFilter="\\?desktop(\\.*)?$;\\?silverlight(\\.*)?$;\.desktop;\.silverlight;\.xaml;^service references(\\.*)?$;\.clientconfig;^web references(\\.*)?$" ProjectLinkReference="83f0c270-db35-4b80-beda-5aed79c0fb2d" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>
