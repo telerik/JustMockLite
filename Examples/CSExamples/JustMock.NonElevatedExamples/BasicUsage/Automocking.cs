@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Telerik.JustMock;
-using Telerik.JustMock.Container;
+using Telerik.JustMock.AutoMock;
 
 namespace JustMock.NonElevatedExamples.BasicUsage.Automocking
 {

@@ -62,9 +62,6 @@
     <Reference Include="Telerik.JustMock">
       <HintPath>..\..\..\..\..\..\..\..\..\Program Files (x86)\Telerik\JustMock\Libraries\Telerik.JustMock.dll</HintPath>
     </Reference>
-    <Reference Include="Telerik.JustMock.Container">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files (x86)\Telerik\JustMock\Libraries\Telerik.JustMock.Container.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Import Include="System" />
