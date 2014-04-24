@@ -26,6 +26,7 @@ using TestInitialize = NUnit.Framework.SetUpAttribute;
 using TestCleanup = NUnit.Framework.TearDownAttribute;
 #endif
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Telerik.JustMock.Core;
@@ -243,6 +244,48 @@ namespace Telerik.JustMock.Tests
 		{
 			var instance = Mock.CreateLike<IByteProperty>(o => o.Prop == 1);
 			Assert.Equal(1, instance.Prop);
+		}
+
+		public abstract class ToStringTester
+		{
+			public abstract int Execute(IDisposable disp);
+
+			public virtual string DisplayName { get; set; }
+
+			public override string ToString()
+			{
+				throw new Exception();
+			}
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("FuncSpec")]
+		public void ShouldRespectToStringArrangementWhenConvertingExpressionToString()
+		{
+			var param = Mock.Create<IDisposable>();
+			var mock = Mock.CreateLike<ToStringTester>(x =>
+				x.ToString() == "safe"
+				&& x.DisplayName == "foo"
+				&& x.Execute(param) == 5);
+
+			Assert.Equal("safe", mock.ToString());
+			Assert.Equal("foo", mock.DisplayName);
+			Assert.Equal(5, mock.Execute(param));
+
+			GC.KeepAlive(DebugView.FullTrace);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("FuncSpec")]
+		public void ShouldNotThrowWhenConvertingExpressionToString()
+		{
+			var param = Mock.Create<IDisposable>();
+			var mock = Mock.CreateLike<ToStringTester>(x =>
+				x.DisplayName == "foo"
+				&& x.Execute(param) == 5);
+
+			Assert.Equal("foo", mock.DisplayName);
+			Assert.Equal(5, mock.Execute(param));
+
+			GC.KeepAlive(DebugView.FullTrace);
 		}
 	}
 }
