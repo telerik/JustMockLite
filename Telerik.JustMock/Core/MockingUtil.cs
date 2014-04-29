@@ -248,6 +248,7 @@ namespace Telerik.JustMock.Core
 					}
 					catch (MemberAccessException ex)
 					{
+						GC.KeepAlive(ex);
 						return MockingUtil.CreateInstance(type, args);
 					}
 				});

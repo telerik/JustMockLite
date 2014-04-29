@@ -104,7 +104,7 @@ namespace Telerik.JustMock.Core.Behaviors
 							{
 								mock = replicator.CreateSimilarMock(repository, returnType, null, true, null);
 							}
-							catch (MockException ex)
+							catch (MockException)
 							{ }
 						}
 					}

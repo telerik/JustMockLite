@@ -1551,6 +1551,9 @@
     <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IReturnCollection.cs">
       <Link>Expectations\Abstraction\IReturnCollection.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IReturns.cs">
+      <Link>Expectations\Abstraction\IReturns.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\ISetupBehavior.cs">
       <Link>Expectations\Abstraction\ISetupBehavior.cs</Link>
     </Compile>
@@ -1559,6 +1562,9 @@
     </Compile>
     <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IWaitDuration.cs">
       <Link>Expectations\Abstraction\IWaitDuration.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IWhen.cs">
+      <Link>Expectations\Abstraction\IWhen.cs</Link>
     </Compile>
     <Compile Include="..\Telerik.JustMock\Expectations\ActionExpectation.cs">
       <Link>Expectations\ActionExpectation.cs</Link>
@@ -1689,7 +1695,7 @@
       <FlavorProperties GUID="{A1591282-1198-4647-A2B1-27E5FF5F6F3B}">
         <SilverlightProjectProperties />
       </FlavorProperties>
-      <UserProperties ProjectLinkerExcludeFilter="\\?desktop(\\.*)?$;\\?silverlight(\\.*)?$;\.desktop;\.silverlight;\.xaml;^service references(\\.*)?$;\.clientconfig;^web references(\\.*)?$" ProjectLinkReference="0749ebc2-4e83-4960-bf28-1ff5c2deb2b9" />
+      <UserProperties ProjectLinkReference="0749ebc2-4e83-4960-bf28-1ff5c2deb2b9" ProjectLinkerExcludeFilter="\\?desktop(\\.*)?$;\\?silverlight(\\.*)?$;\.desktop;\.silverlight;\.xaml;^service references(\\.*)?$;\.clientconfig;^web references(\\.*)?$" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

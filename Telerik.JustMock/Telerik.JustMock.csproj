@@ -536,6 +536,16 @@
     </Compile>
     <Compile Include="Core\FunctionalSpecParser.cs" />
     <Compile Include="Analytics\JustMockInformation.cs" />
+    <Compile Include="Expectations\Abstraction\IReturns.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IReturns.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Expectations\Abstraction\IWhen.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IWhen.tt</DependentUpon>
+    </Compile>
     <Compile Include="MockAssertionFailedException.cs" />
     <Compile Include="Param.cs" />
     <Compile Include="PrivateAccessor.cs">
@@ -628,6 +638,14 @@
       <LastGenOutput>Arg.part.cs</LastGenOutput>
     </None>
     <None Include="Core\DynamicProxy\Castle.DynamicProxy\DynProxy.snk" />
+    <None Include="Expectations\Abstraction\IReturns.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>IReturns.cs</LastGenOutput>
+    </None>
+    <None Include="Expectations\Abstraction\IWhen.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>IWhen.cs</LastGenOutput>
+    </None>
     <None Include="Expectations\CommonExpectation.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>CommonExpectation.partial.cs</LastGenOutput>
@@ -664,7 +682,6 @@
   <ItemGroup>
     <None Include="Resources\EQATEC.Analytics.MonitorSL.dll" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

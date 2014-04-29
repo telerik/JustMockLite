@@ -1,4 +1,4 @@
-/*
+﻿/*
  JustMock Lite
  Copyright © 2010-2014 Telerik AD
 
@@ -15,18 +15,28 @@
    limitations under the License.
 */
 
+<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#@ include file="..\\..\\TextBuilder.include"#>
+
+/*  Auto generated */
+
 using System;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace Telerik.JustMock.Expectations.Abstraction
 {
-	public interface IIgnorable<TContainer> : IWhen<TContainer>
+	/// <summary>
+	/// Interface containing overloads of the When method.
+	/// </summary>
+	/// <typeparam name="TContainer"></typeparam>
+	public interface IWhen<TContainer>
 	{
-		/// <summary>
-		/// Specifies to ignore any argument for the target call.
-		/// </summary>
-		/// <returns>Func or Action Container</returns>
-		TContainer IgnoreArguments();
+<# for (var i = 1; i <= MaxFuncArity; ++i) { #>
 
 		/// <summary>
 		/// Specifies an additional condition that must be true for this arrangement to be
@@ -37,6 +47,10 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// </summary>
 		/// <param name="condition">A function that should return 'true' when this
 		/// arrangement should be considered and 'false' if this arrangement doesn't match the user criteria.</param>
-		TContainer When(Func<bool> condition);
+<# for (var j = 1; j <= i; ++j) { #>
+		/// <typeparam name="T<#= j #>">Type of the <#= GetNumberNames()[j-1] #> parameter of the anonymous method that this delegate encapsulates</typeparam>
+<# } #>
+		TContainer When<<#= String.Join(", ", Enumerable.Range(1, i).Select(t => "T" + t)) #>>(Func<<#= String.Join("", Enumerable.Range(1, i).Select(t => "T" + t + ", ")) #>bool> condition);
+<# } #>
 	}
 }

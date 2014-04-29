@@ -28,7 +28,7 @@ namespace Telerik.JustMock.Expectations
 	/// <summary>
 	/// Defines expectation for a <see cref="IQueryable"/> collection.
 	/// </summary>
-	public class CollectionExpectation<TReturn> : CommonExpectation<IFunc<TReturn>>, IReturnCollection
+	public class CollectionExpectation<TReturn> : CommonExpectation<FuncExpectation<TReturn>>, IReturnCollection
 	{
 		internal CollectionExpectation() {}
 

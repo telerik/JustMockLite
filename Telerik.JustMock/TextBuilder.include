@@ -19,6 +19,8 @@
 <#@ import namespace="System.Text" #>
 
 <#+
+	public const int MaxFuncArity = 16;
+
 	public class TextBuilder
 	{
 		public TextBuilder()

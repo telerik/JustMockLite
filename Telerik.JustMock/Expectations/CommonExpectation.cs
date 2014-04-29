@@ -34,7 +34,7 @@ namespace Telerik.JustMock.Expectations
 	{
 		private readonly List<IBehavior> behaviors = new List<IBehavior>();
 		private readonly InvocationOccurrenceBehavior occurences;
-		private Func<bool> acceptCondition = MethodMockDefaults.AcceptAlways;
+		private ImplementationOverrideBehavior acceptCondition;
 
 		MocksRepository IMethodMock.Repository { get; set; }
 
@@ -46,15 +46,15 @@ namespace Telerik.JustMock.Expectations
 		ICollection<IBehavior> IMethodMock.Behaviors { get { return this.behaviors; } }
 		InvocationOccurrenceBehavior IMethodMock.OccurencesBehavior { get { return this.occurences; } }
 		string IMethodMock.ArrangementExpression { get; set; }
-		
-		Func<bool> IMethodMock.AcceptCondition
+
+		ImplementationOverrideBehavior IMethodMock.AcceptCondition
 		{
 			get { return this.acceptCondition; }
 			set
 			{
 				if (value == null)
 					throw new ArgumentNullException("value");
-				if (this.acceptCondition != MethodMockDefaults.AcceptAlways)
+				if (this.acceptCondition != null)
 					throw new MockException("Condition already specified.");
 				this.acceptCondition = value;
 			}
@@ -98,17 +98,6 @@ namespace Telerik.JustMock.Expectations
 			}
 
 			this.behaviors.Add(new ImplementationOverrideBehavior(delg, ignoreDelegateReturnValue));
-		}
-
-		protected void ApplyIgnoreArguments()
-		{
-			var callPattern = ((IMethodMock) this).CallPattern;
-			for (int i = 0; i < callPattern.ArgumentMatchers.Count; i++)
-			{
-				callPattern.ArgumentMatchers[i] = new AnyMatcher();
-			}
-
-			callPattern.MethodMockNode.ReattachMethodMock();
 		}
 
 		/// <summary>
@@ -427,6 +416,49 @@ namespace Telerik.JustMock.Expectations
 					this.Repository.InterceptGlobally(this.CallPattern.Method);
 					return this;
 				});
+		}
+
+		/// <summary>
+		/// Specifies an additional condition that must be true for this arrangement to be
+		/// considered when the arranged member is called. This condition is evaluated in addition
+		/// to the conditions imposed by any argument matchers in the arrangement.
+		/// 
+		/// This method allows a more general way of matching arrangements than argument matchers do.
+		/// </summary>
+		/// <param name="condition">A function that should return 'true' when this
+		/// arrangement should be considered and 'false' if this arrangement doesn't match the user criteria.</param>
+		public TContainer When(Func<bool> condition)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				this.SetAcceptCondition(condition);
+				return (TContainer)(object)this;
+			});
+		}
+
+		private void SetAcceptCondition(Delegate condition)
+		{
+			((IMethodMock)this).AcceptCondition = new ImplementationOverrideBehavior(condition, false);
+		}
+
+		/// <summary>
+		/// Specifies to ignore any argument for the target call.
+		/// </summary>
+		/// <returns>Func or Action Container</returns>
+		public TContainer IgnoreArguments()
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				var callPattern = ((IMethodMock)this).CallPattern;
+				for (int i = 0; i < callPattern.ArgumentMatchers.Count; i++)
+				{
+					callPattern.ArgumentMatchers[i] = new AnyMatcher();
+				}
+
+				callPattern.MethodMockNode.ReattachMethodMock();
+
+				return (TContainer)(object)this;
+			});
 		}
 	}
 }

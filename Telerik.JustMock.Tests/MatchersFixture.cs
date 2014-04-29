@@ -410,5 +410,17 @@ namespace Telerik.JustMock.Tests
 
 			Mock.Assert(mock);
 		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
+		public void ShouldDisregardMethodArgumentsInWhenClause()
+		{
+			var mock = Mock.Create<IFoo>(Behavior.Loose);
+			bool execute = false;
+			Mock.Arrange(() => mock.Echo(Arg.AnyString)).When(() => execute).Returns("aaa");
+
+			Assert.Null(mock.Echo("xxx"));
+			execute = true;
+			Assert.Equal("aaa", mock.Echo("xxx"));
+		}
 	}
 }

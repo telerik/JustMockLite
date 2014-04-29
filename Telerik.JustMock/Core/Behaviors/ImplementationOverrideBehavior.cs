@@ -38,10 +38,10 @@ namespace Telerik.JustMock.Core.Behaviors
 				: MockingUtil.MakeProcCaller(implementationOverride);
 		}
 
-		public void Process(Invocation invocation)
+		public object CallOverride(Invocation invocation)
 		{
 			var args = implementationOverride.Method.GetParameters().Length > 0 && invocation.Args != null ? invocation.Args : Empty;
-			
+
 			var paramsCount = invocation.Method.GetParameters().Length;
 			var implementationParamsCount = implementationOverride.Method.GetParameters().Length;
 
@@ -58,25 +58,31 @@ namespace Telerik.JustMock.Core.Behaviors
 
 			try
 			{
+				object returnValue = null;
 				if (implementationOverride.Method.ReturnType != typeof(void))
 				{
 					var invoker = (Func<object[], Delegate, object>)this.overrideInvoker;
-					var returnValue = ProfilerInterceptor.GuardExternal(() => invoker(args, this.implementationOverride));
-					if (!this.ignoreDelegateReturnValue)
-						invocation.ReturnValue = returnValue;
+					returnValue = ProfilerInterceptor.GuardExternal(() => invoker(args, this.implementationOverride));
 				}
 				else
 				{
 					var invoker = (Action<object[], Delegate>)this.overrideInvoker;
 					ProfilerInterceptor.GuardExternal(() => invoker(args, this.implementationOverride));
 				}
-
-				invocation.UserProvidedImplementation = true;
+				return returnValue;
 			}
 			catch (InvalidCastException ex)
 			{
 				throw new MockException("The implementation callback has an incorrect signature", ex);
 			}
+		}
+
+		public void Process(Invocation invocation)
+		{
+			var returnValue = CallOverride(invocation);
+			if (implementationOverride.Method.ReturnType != typeof(void) && !this.ignoreDelegateReturnValue)
+				invocation.ReturnValue = returnValue;
+			invocation.UserProvidedImplementation = true;
 		}
 	}
 }

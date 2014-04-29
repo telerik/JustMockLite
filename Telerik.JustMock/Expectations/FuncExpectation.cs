@@ -84,36 +84,5 @@ namespace Telerik.JustMock.Expectations
 					return this;
 				});
 		}
-
-		/// <summary>
-		/// Specifies to ignore any argument for the target call.
-		/// </summary>
-		/// <returns>Func or Action Container</returns>
-		public FuncExpectation<TReturn> IgnoreArguments()
-		{
-			return ProfilerInterceptor.GuardInternal(() =>
-				{
-					this.ApplyIgnoreArguments();
-					return this;
-				});
-		}
-
-		/// <summary>
-		/// Specifies an additional condition that must be true for this arrangement to be
-		/// considered when the arranged member is called. This condition is evaluated in addition
-		/// to the conditions imposed by any argument matchers in the arrangement.
-		/// 
-		/// This method allows a more general way of matching arrangements than argument matchers do.
-		/// </summary>
-		/// <param name="condition">A function that should return 'true' when this
-		/// arrangement should be considered and 'false' if this arrangement doesn't match the user criteria.</param>
-		public FuncExpectation<TReturn> When(Func<bool> condition)
-		{
-			return ProfilerInterceptor.GuardInternal(() =>
-			{
-				((IMethodMock)this).AcceptCondition = condition;
-				return this;
-			});
-		}
 	}
 }

@@ -1476,7 +1476,7 @@ namespace Telerik.JustMock.Core
 				methodMockNodes.AddRange(results);
 			}
 
-			var methodMock = GetMethodMockFromNodes(methodMockNodes);
+			var methodMock = GetMethodMockFromNodes(methodMockNodes, invocation);
 			if (methodMock == null)
 			{
 				DebugView.TraceEvent(IndentLevel.MethodMatch, () => "No arrangement chosen");
@@ -1532,15 +1532,19 @@ namespace Telerik.JustMock.Core
 			return true;
 		}
 
-		private IMethodMock GetMethodMockFromNodes(List<MethodMockMatcherTreeNode> methodMockNodes)
+		private IMethodMock GetMethodMockFromNodes(List<MethodMockMatcherTreeNode> methodMockNodes, Invocation invocation)
 		{
 			if (methodMockNodes.Count == 0)
 				return null;
 
 			var resultsQ =
 				from node in methodMockNodes
-				orderby node.Id                           
-				select new { node.MethodMock, Acceptable = new Lazy<bool>(node.MethodMock.AcceptCondition) };
+				orderby node.Id
+				select new
+				{
+					node.MethodMock,
+					Acceptable = new Lazy<bool>(() => node.MethodMock.AcceptCondition == null || (bool) node.MethodMock.AcceptCondition.CallOverride(invocation))
+				};
 
 			var resultList = resultsQ.ToList();
 

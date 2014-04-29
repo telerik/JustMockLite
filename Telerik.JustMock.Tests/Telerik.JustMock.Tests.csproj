@@ -91,6 +91,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
+    <Compile Include="Coverage\WhenFixture.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WhenFixture.tt</DependentUpon>
+    </Compile>
     <Compile Include="EventsFixture.cs" />
     <Compile Include="FluentFixture.cs" />
     <Compile Include="FuncSpecFixture.cs" />
@@ -140,8 +145,11 @@
       <LastGenOutput>ReturnsFixture.cs</LastGenOutput>
     </None>
     <None Include="Coverage\TestBuilder.include" />
+    <None Include="Coverage\WhenFixture.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>WhenFixture.cs</LastGenOutput>
+    </None>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

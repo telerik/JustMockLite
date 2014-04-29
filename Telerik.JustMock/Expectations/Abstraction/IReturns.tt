@@ -1,0 +1,55 @@
+﻿/*
+ JustMock Lite
+ Copyright © 2010-2014 Telerik AD
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
+<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#@ include file="..\\..\\TextBuilder.include"#>
+
+<#
+	int count = 16;
+#>
+
+/*  Auto generated */
+
+using System;
+using System.Collections.Generic;
+
+namespace Telerik.JustMock.Expectations.Abstraction
+{
+	/// <summary>
+	/// Interface containing overloads of the Returns method.
+	/// </summary>
+	/// <typeparam name="TReturn"></typeparam>
+	public interface IReturns<TReturn>
+	{
+<# for (var i = 1; i <= count; ++i) { #>
+
+		/// <summary>
+		/// Specifies the delegate to evaluate and return value for the expected member.
+		/// </summary>
+<# for (var j = 1; j <= i; ++j) { #>
+		/// <typeparam name="T<#= j #>">Type of the <#= GetNumberNames()[j-1] #> parameter of the anonymous method that this delegate encapsulates</typeparam>
+<# } #>
+		/// <returns>Reference to <see cref="IAssertable"/> interface.</returns>
+		IAssertable Returns<<#= String.Join(", ", Enumerable.Range(1, i).Select(t => "T" + t)) #>>(Func<<#= String.Join("", Enumerable.Range(1, i).Select(t => "T" + t + ", ")) #>TReturn> func);
+<# } #>
+	}
+}

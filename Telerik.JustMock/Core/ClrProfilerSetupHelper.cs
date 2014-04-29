@@ -91,7 +91,7 @@ namespace Telerik.JustMock.Core
 				CheckRegistryLocation(UserEnvironmentKeyName, "global user environment", locationsBuilder);
 				CheckProcessEnvironment(locationsBuilder);
 			}
-			catch(Exception ex)
+			catch(Exception)
 			{
 			}
 

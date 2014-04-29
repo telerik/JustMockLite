@@ -31,11 +31,6 @@ namespace Telerik.JustMock.Core
 		string ArrangementExpression { get; set;}
 		bool IsSequential { get; set; }
 		bool IsUsed { get; set; }
-		Func<bool> AcceptCondition { get; set; }
-	}
-
-	internal static class MethodMockDefaults
-	{
-		public static readonly Func<bool> AcceptAlways = () => true;
+		ImplementationOverrideBehavior AcceptCondition { get; set; }
 	}
 }

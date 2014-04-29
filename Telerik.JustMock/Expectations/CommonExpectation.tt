@@ -15,6 +15,8 @@
    limitations under the License.
 */
 
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text" #>
 <#@ output extension=".partial.cs" #>
@@ -66,6 +68,28 @@ namespace Telerik.JustMock.Expectations
 					return (TContainer) (object) this;
 				});
 		}<#}#>
+<# for (var i = 1; i <= MaxFuncArity; ++i) { #>
 		
+		/// <summary>
+		/// Specifies an additional condition that must be true for this arrangement to be
+		/// considered when the arranged member is called. This condition is evaluated in addition
+		/// to the conditions imposed by any argument matchers in the arrangement.
+		/// 
+		/// This method allows a more general way of matching arrangements than argument matchers do.
+		/// </summary>
+		/// <param name="condition">A function that should return 'true' when this
+		/// arrangement should be considered and 'false' if this arrangement doesn't match the user criteria.</param>
+<# for (var j = 1; j <= i; ++j) { #>
+		/// <typeparam name="T<#= j #>">Type of the <#= GetNumberNames()[j-1] #> parameter of the anonymous method that this delegate encapsulates</typeparam>
+<# } #>
+		public TContainer When<<#= String.Join(", ", Enumerable.Range(1, i).Select(t => "T" + t)) #>>(Func<<#= String.Join("", Enumerable.Range(1, i).Select(t => "T" + t + ", ")) #>bool> condition)
+		{
+			return ProfilerInterceptor.GuardInternal(() => 
+				{
+					this.SetAcceptCondition(condition);
+					return (TContainer) (object) this;
+				});
+		}
+<# } #>
 	}
 }
