@@ -34,8 +34,8 @@ namespace Telerik.JustMock.Core.Behaviors
 
 	internal class RecursiveMockingBehavior : IBehavior
 	{
-		private readonly Dictionary<KeyValuePair<object, MethodBase>, object> mocks
-			= new Dictionary<KeyValuePair<object, MethodBase>, object>();
+		private readonly Dictionary<MethodBase, List<KeyValuePair<object, object>>> mocks
+			= new Dictionary<MethodBase, List<KeyValuePair<object, object>>>();
 
 		private readonly RecursiveMockingBehaviorType type;
 
@@ -53,9 +53,16 @@ namespace Telerik.JustMock.Core.Behaviors
 			if (returnType == typeof(void) || returnType.IsValueType)
 				return;
 
-			var key = new KeyValuePair<object, MethodBase>(invocation.Instance, invocation.Method);
-			object mock;
-			if (!mocks.TryGetValue(key, out mock))
+			object mock = null;
+			List<KeyValuePair<object, object>> mocksList;
+			if (mocks.TryGetValue(invocation.Method, out mocksList))
+			{
+				// can't put the key part in a Dictionary,
+				// because we can't be sure that GetHashCode() works
+				mock = mocksList.FirstOrDefault(kvp => Equals(kvp.Key, invocation.Instance)).Value;
+			}
+
+			if (mock == null)
 			{
 				var parentMock = MocksRepository.GetMockMixinFromInvocation(invocation);
 				var repository = parentMock.Repository;
@@ -113,7 +120,12 @@ namespace Telerik.JustMock.Core.Behaviors
 				if (mock == null)
 					return;
 				
-				mocks.Add(key, mock);
+				if (mocksList == null)
+				{
+					mocksList = new List<KeyValuePair<object, object>>();
+					mocks.Add(invocation.Method, mocksList);
+				}
+				mocksList.Add(new KeyValuePair<object, object>(invocation.Instance, mock));
 
 				var mockMixin = MocksRepository.GetMockMixin(mock, null);
 				if (parentMock != null && mockMixin != null)
