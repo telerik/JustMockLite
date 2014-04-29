@@ -98,6 +98,33 @@ namespace Telerik.JustMock
 		}
 
 		/// <summary>
+		/// Calls the type's static constructor. The static constructor can be executed even when the runtime
+		/// has already called it as part of type's initialization.
+		/// </summary>
+		/// <param name="forceCall">
+		/// When 'false', the static constructor will not be called if it has already run as part of
+		/// type initialization. When 'true', the static constructor will be called unconditionally.
+		/// If the type is not yet initialized and 'true' is given, the static constructor will be run
+		/// twice.
+		/// </param>
+		public void CallStaticConstructor(bool forceCall)
+		{
+			ProfilerInterceptor.GuardInternal(() =>
+			{
+				if (forceCall)
+				{
+					var staticCtor = this.type.GetMember(".cctor", BindingFlags.Static | BindingFlags.NonPublic).FirstOrDefault() as MethodBase;
+					if (staticCtor != null)
+						this.CallMethod(staticCtor);
+				}
+				else
+				{
+					ProfilerInterceptor.RunClassConstructor(this.type.TypeHandle);
+				}
+			});
+		}
+
+		/// <summary>
 		/// Gets the value returned by the indexer (<code>this[T index]</code> in C#) for the specified index value.
 		/// </summary>
 		/// <param name="index">The index argument to pass to the indexer.</param>
