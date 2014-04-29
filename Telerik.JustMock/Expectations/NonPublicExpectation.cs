@@ -44,7 +44,21 @@ namespace Telerik.JustMock.Expectations
 				var mockedProperty = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
 					.FirstOrDefault(property => property.Name == memberName);
 				if (mockedProperty != null)
-					mockedMethod = returnType == typeof(void) ? mockedProperty.GetSetMethod(true) : mockedProperty.GetGetMethod(true);
+				{
+					var getter = mockedProperty.GetGetMethod(true);
+					if (getter.ArgumentsMatchSignature(args))
+						mockedMethod = getter;
+
+					if (mockedMethod == null)
+					{
+						var setter = mockedProperty.GetSetMethod(true);
+						if (setter.ArgumentsMatchSignature(args))
+							mockedMethod = setter;
+					}
+
+					if (mockedMethod == null)
+						throw new ArgumentException(String.Format("Found property '{0}' on type '{1}' but the passed arguments match the signature neither of the getter nor the setter.", memberName, type));
+				}
 			}
 
 			if (mockedMethod == null)
