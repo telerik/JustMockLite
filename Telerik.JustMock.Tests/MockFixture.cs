@@ -2368,6 +2368,23 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(10, mock.GetFace1());
 			Assert.Equal(0, mock.GetFace2());
 		}
+
+		public class StaticCtor
+		{
+			public static bool called;
+
+			static StaticCtor()
+			{
+				called = true;
+			}
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+		public void ShouldCallStaticConstructorWhenCreatingMock()
+		{
+			var mock = Mock.Create<StaticCtor>();
+			Assert.True(StaticCtor.called);
+		}
 	}
 
 	internal abstract class InternalAbstract
