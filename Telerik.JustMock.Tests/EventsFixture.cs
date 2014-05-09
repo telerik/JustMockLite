@@ -276,6 +276,24 @@ namespace Telerik.JustMock.Tests
 			Mock.Assert(doc);
 		}
 
+		[TestMethod, TestCategory("Lite"), TestCategory("Events")]
+		public void ShouldRaiseEventWithNullEventArgsArgument()
+		{
+			var doc = Mock.Create<IDocument>();
+			EventArgs args = EventArgs.Empty;
+			doc.IsDirtyChanged += (o, e) => args = e;
+			Mock.Raise(() => doc.IsDirtyChanged += null, null);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Events")]
+		public void ShouldThrowIncompatibleSignatureExceptionWhenExpectedArgumentsDontMatch()
+		{
+			var doc = Mock.Create<IDocument>();
+			doc.IsDirtyChanged += (o, e) => { };
+			Assert.Throws<MockException>(() => Mock.Raise(() => doc.IsDirtyChanged += null));
+			Assert.Throws<MockException>(() => Mock.Raise(() => doc.IsDirtyChanged += null, 1, 2));
+		}
+
 #if NUNIT
 		[TestMethod, TestCategory("Lite"), TestCategory("Events")]
 		[TestCaseSource("DummyTestCaseSource")]

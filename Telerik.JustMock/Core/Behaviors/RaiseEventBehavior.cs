@@ -63,6 +63,11 @@ namespace Telerik.JustMock.Core.Behaviors
 			if (evt == null)
 				throw new MockException("Unable to deduce which event was specified in the parameter.");
 
+			if (args == null)
+			{
+				args = new object[] { null };
+			}
+
 			if (args.Length == 1
 				&& (evt.EventHandlerType.IsGenericType && evt.EventHandlerType.GetGenericTypeDefinition() == typeof(EventHandler<>)
 					|| evt.EventHandlerType == typeof(EventHandler)

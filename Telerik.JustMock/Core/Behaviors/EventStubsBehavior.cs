@@ -75,6 +75,18 @@ namespace Telerik.JustMock.Core.Behaviors
 
 			if (existing != null)
 			{
+				try
+				{
+					object state;
+					Type.DefaultBinder.BindToMethod(BindingFlags.Default, new[] { existing.Method }, ref delegateArguments, null, null, null, out state);
+				}
+				catch (MissingMethodException ex)
+				{
+					throw new MockException(String.Format("Event signature {0} is incompatible with argument types ({1})",
+						existing.Method, String.Join(", ", delegateArguments.Select(x => x != null ? x.GetType().ToString() : "null").ToArray())
+						), ex);
+				}
+
 				var invoker = MockingUtil.MakeProcCaller(existing);
 				ProfilerInterceptor.GuardExternal(() => invoker(delegateArguments, existing));
 			}
