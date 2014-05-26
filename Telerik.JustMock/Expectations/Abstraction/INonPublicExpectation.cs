@@ -114,6 +114,24 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <param name="args">Method arguments</param>
 		void Assert(object target, string memberName, Occurs occurs, params object[] args);
 
+		/// <summary>
+		/// Returns the number of times the specified member was called.
+		/// </summary>
+		/// <param name="target">Target mock</param>
+		/// <param name="method">Method taken from reflection</param>
+		/// <param name="args">Method arguments<</param>
+		/// <returns>Number of calls.</returns>
+		int GetTimesCalled(object target, MethodInfo method, params object[] args);
+
+		/// <summary>
+		/// Returns the number of times the specified member was called.
+		/// </summary>
+		/// <param name="target">Target mock</param>
+		/// <param name="memberName">Name of the member</param>
+		/// <param name="args">Method arguments<</param>
+		/// <returns>Number of calls.</returns>
+		int GetTimesCalled(object target, string memberName, params object[] args);
+
 #if !LITE_EDITION
 		/// <summary>
 		/// Arranges a method for mocking.
@@ -251,6 +269,22 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <param name="args">Method arguments</param>
 		void Assert(MethodInfo method, params object[] args);
 
+		/// <summary>
+		/// Returns the number of times the specified member was called.
+		/// </summary>
+		/// <param name="method">Target method</param>
+		/// <param name="args">Method arguments</param>
+		/// <returns>Number of calls.</returns>
+		int GetTimesCalled(MethodInfo method, params object[] args);
+
+		/// <summary>
+		/// Returns the number of times the specified member was called.
+		/// </summary>
+		/// <param name="type">Type of the target</param>
+		/// <param name="memberName">Name of the member</param>
+		/// <param name="args">Method arguments</param>
+		/// <returns>Number of calls.</returns>
+		int GetTimesCalled(Type type, string memberName, params object[] args);
 #endif
 
 		/// <summary>

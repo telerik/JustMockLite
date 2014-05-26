@@ -836,12 +836,38 @@ namespace Telerik.JustMock.Core
 		}
 #endif
 
-		private void AssertForCallPattern(CallPattern callPattern, Args args, Occurs occurs)
+		internal int GetTimesCalled(Expression expression, Args args)
+		{
+			var callPattern = new CallPattern();
+			ConvertExpressionToCallPattern(expression, callPattern);
+			int callsCount;
+			CountMethodMockInvocations(callPattern, args, out callsCount);
+			return callsCount;
+		}
+
+		internal int GetTimesCalledFromAction(Action action, Args args)
+		{
+			var callPattern = ConvertActionToCallPattern(action);
+			int callsCount;
+			CountMethodMockInvocations(callPattern, args, out callsCount);
+			return callsCount;
+		}
+
+		internal int GetTimesCalledFromMethodInfo(object instance, MethodInfo method, object[] arguments)
+		{
+			var callPattern = ConvertMethodInfoToCallPattern(instance, method, arguments);
+			int callsCount;
+			CountMethodMockInvocations(callPattern, null, out callsCount);
+			return callsCount;
+		}
+
+		private HashSet<IMethodMock> CountMethodMockInvocations(CallPattern callPattern, Args args, out int callsCount)
 		{
 			if (callPattern.IsDerivedFromObjectEquals)
 				throw new MockException("Cannot assert calls to methods derived from Object.Equals");
 
 			PreserveRefOutValuesBehavior.ReplaceRefOutArgsWithAnyMatcher(callPattern);
+
 			if (args != null)
 			{
 				if (args.IsIgnored)
@@ -857,7 +883,7 @@ namespace Telerik.JustMock.Core
 			}
 
 			MethodInfoMatcherTreeNode root;
-			int callsCount = 0;
+			callsCount = 0;
 			var mocks = new HashSet<IMethodMock>();
 			var method = GetMethodFromCallPattern(callPattern);
 			if (invocationTreeRoots.TryGetValue(method, out root))
@@ -869,7 +895,13 @@ namespace Telerik.JustMock.Core
 					mocks.Add(mock);
 				}
 			}
+			return mocks;
+		}
 
+		private void AssertForCallPattern(CallPattern callPattern, Args args, Occurs occurs)
+		{
+			int callsCount;
+			var mocks = CountMethodMockInvocations(callPattern, args, out callsCount);
 			if (occurs != null)
 			{
 				InvocationOccurrenceBehavior.Assert(occurs.LowerBound, occurs.UpperBound, callsCount, null);
