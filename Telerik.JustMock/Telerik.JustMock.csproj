@@ -67,11 +67,6 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EQATEC.Analytics.Monitor, Version=3.0.206.0, Culture=neutral, PublicKeyToken=213c7c68adb58a17, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Lib\EQATEC\EQATEC.Analytics.Monitor.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.XML" />
@@ -81,11 +76,6 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Abstraction\IFluentConfig.cs" />
-    <Compile Include="Analytics\AnalyticsConfiguration.cs" />
-    <Compile Include="Analytics\AnalyticsData.cs" />
-    <Compile Include="Analytics\CompositeAnalyticsTracker.cs" />
-    <Compile Include="Analytics\EQATEC\JustMockEqatecAnalyticsTracker.cs" />
-    <Compile Include="Analytics\IAnalyticsTracker.cs" />
     <Compile Include="Args.Matching.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -540,7 +530,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Core\FunctionalSpecParser.cs" />
-    <Compile Include="Analytics\JustMockInformation.cs" />
     <Compile Include="Expectations\Abstraction\IReturns.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -556,7 +545,6 @@
     <Compile Include="PrivateAccessor.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Analytics\SystemInformation.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -684,12 +672,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\EQATEC.Analytics.Monitor.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\EQATEC.Analytics.MonitorSL.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

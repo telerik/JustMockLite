@@ -19,7 +19,6 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using Telerik.JustMock.Abstraction;
-using Telerik.JustMock.Analytics;
 using Telerik.JustMock.Core;
 using Telerik.JustMock.Core.Behaviors;
 using Telerik.JustMock.Core.Context;
@@ -41,17 +40,6 @@ namespace Telerik.JustMock
 			if (-1 == typeof(object).Assembly.FullName.IndexOf("PublicKeyToken=7cec85d7bea7798e", StringComparison.InvariantCultureIgnoreCase))
 			{
 				throw new InvalidOperationException("Telerik.JustMock.Silverlight should only be used inside the Silverlight runtime. For all other runtimes reference Telerik.JustMock instead.");
-			}
-#endif
-
-#if !LITE_EDITION
-			if (!MockingUtil.IsMetro())
-			{
-				try
-				{
-					AnalyticsTracker.Instance.CreateDefaultTracker(AnalyticsConfiguration.EnableAnalytics);
-				}
-				catch { }
 			}
 #endif
 		}
