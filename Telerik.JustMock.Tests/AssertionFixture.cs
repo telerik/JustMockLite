@@ -921,6 +921,55 @@ namespace Telerik.JustMock.Tests
 
 			Mock.Assert(() => thing.Foo(new object()), Args.Ignore(), Occurs.Once());
 		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+		public void ShouldGetTimesCalledOfFunction()
+		{
+			var mock = Mock.Create<IFoo>();
+			var x = mock.Value;
+			Assert.Equal(1, Mock.GetTimesCalled(() => mock.Value));
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+		public void ShouldGetTimesCalledOfVoidMethod()
+		{
+			var mock = Mock.Create<IFoo>();
+			mock.VoidCall();
+			Assert.Equal(1, Mock.GetTimesCalled(() => mock.VoidCall()));
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+		public void ShouldGetTimesCalledOfFunctionWithArgs()
+		{
+			var mock = Mock.Create<IFoo>();
+			mock.Echo(5);
+			Assert.Equal(1, Mock.GetTimesCalled(() => mock.Echo(0), Args.Ignore()));
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+		public void ShouldGetTimesCalledOfVoidMethodWithArgs()
+		{
+			var mock = Mock.Create<IFoo>();
+			mock.Execute("aaa");
+			Assert.Equal(1, Mock.GetTimesCalled(() => mock.Execute(null), Args.Ignore()));
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+		public void ShouldGetTimesCalledOfSetter()
+		{
+			var mock = Mock.Create<IFoo>();
+			mock.Value = 10;
+			Assert.Equal(1, Mock.GetTimesSetCalled(() => mock.Value = 10));
+			Assert.Equal(0, Mock.GetTimesSetCalled(() => mock.Value = 20));
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+		public void ShouldGetTimesCalledOfSetterWithArgs()
+		{
+			var mock = Mock.Create<IFoo>();
+			mock.Value = 10;
+			Assert.Equal(1, Mock.GetTimesSetCalled(() => mock.Value = 0, Args.Ignore()));
+		}
 	}
 
 #if !NUNIT

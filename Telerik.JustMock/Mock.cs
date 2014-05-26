@@ -415,7 +415,69 @@ namespace Telerik.JustMock
 			});
 		}
 
- 
+		/// <summary>
+		/// Returns the number of times the specified member was called.
+		/// </summary>
+		/// <param name="expression">The action to inspect</param>
+		/// <returns>Number of calls</returns>
+		public static int GetTimesCalled<TReturn>(Expression<Func<TReturn>> expression)
+		{
+			return ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.GetTimesCalled(expression, null));
+		}
+
+		/// <summary>
+		/// Returns the number of times the specified member was called.
+		/// </summary>
+		/// <param name="expression">The action to inspect</param>
+		/// <param name="args">Specifies to ignore the instance and/or arguments during assertion.</param>
+		/// <returns>Number of calls</returns>
+		public static int GetTimesCalled<TReturn>(Expression<Func<TReturn>> expression, Args args)
+		{
+			return ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.GetTimesCalled(expression, args));
+		}
+
+		/// <summary>
+		/// Returns the number of times the specified member was called.
+		/// </summary>
+		/// <param name="expression">The action to inspect</param>
+		/// <returns>Number of calls</returns>
+		public static int GetTimesCalled(Expression<Action> expression)
+		{
+			return ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.GetTimesCalled(expression, null));
+		}
+
+		/// <summary>
+		/// Returns the number of times the specified member was called.
+		/// </summary>
+		/// <param name="expression">The action to inspect</param>
+		/// <param name="args">Specifies to ignore the instance and/or arguments during assertion.</param>
+		/// <returns>Number of calls</returns>
+		public static int GetTimesCalled(Expression<Action> expression, Args args)
+		{
+			return ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.GetTimesCalled(expression, args));
+		}
+
+		/// <summary>
+		/// Returns the number of times the specified setter or event subscription method was called.
+		/// </summary>
+		/// <param name="action">The setter or event subscription method to inspect</param>
+		/// <returns>Number of calls</returns>
+		public static int GetTimesSetCalled(Action action)
+		{
+			return ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.GetTimesCalledFromAction(action, null));
+		}
+
+		/// <summary>
+		/// Returns the number of times the specified setter or event subscription method was called.
+		/// </summary>
+		/// <param name="action">The setter or event subscription method to inspect</param>
+		/// <param name="args">Specifies to ignore the instance and/or arguments during assertion.</param>
+		/// <returns>Number of calls</returns>
+		public static int GetTimesSetCalled(Action action, Args args)
+		{
+			return ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.GetTimesCalledFromAction(action, args));
+		}
+
 		/// <summary>
 		/// Create a mocked instance from specified real constructor with <see cref="Behavior.RecursiveLoose"/> behavior.
 		/// </summary>
