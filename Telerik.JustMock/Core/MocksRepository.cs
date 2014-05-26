@@ -870,16 +870,32 @@ namespace Telerik.JustMock.Core
 
 			if (args != null)
 			{
-				if (args.IsIgnored)
+				if (args.Filter != null)
+				{
+					if (args.IsIgnored == null)
+					{
+						args.IsIgnored = true;
+					}
+					if (!callPattern.Method.IsStatic
+						&& args.IsInstanceIgnored == null
+						&& args.Filter.Method.GetParameters().Length == callPattern.Method.GetParameters().Length + 1)
+					{
+						args.IsInstanceIgnored = true;
+					}
+				}
+
+				if (args.IsIgnored == true)
 				{
 					for (int i = 0; i < callPattern.ArgumentMatchers.Count; i++)
 						callPattern.ArgumentMatchers[i] = new AnyMatcher();
 				}
 
-				if (args.IsInstanceIgnored)
+				if (args.IsInstanceIgnored == true)
 				{
 					callPattern.InstanceMatcher = new AnyMatcher();
 				}
+
+				callPattern.Filter = args.Filter;
 			}
 
 			MethodInfoMatcherTreeNode root;
@@ -1475,18 +1491,18 @@ namespace Telerik.JustMock.Core
 			MethodInfoMatcherTreeNode funcRoot = null;
 			if (!invocation.InArrange)
 			{
-			if (!invocationTreeRoots.TryGetValue(callPattern.Method, out funcRoot))
-			{
-				funcRoot = new MethodInfoMatcherTreeNode(callPattern.Method);
-				invocationTreeRoots.Add(callPattern.Method, funcRoot);
-			}
+				if (!invocationTreeRoots.TryGetValue(callPattern.Method, out funcRoot))
+				{
+					funcRoot = new MethodInfoMatcherTreeNode(callPattern.Method);
+					invocationTreeRoots.Add(callPattern.Method, funcRoot);
+				}
 			}
 
 			var methodMock = DispatchInvocationToArrangements(callPattern, invocation);
 
 			if (!invocation.InArrange)
 			{
-			funcRoot.AddOrUpdateOccurence(callPattern, methodMock);
+				funcRoot.AddOrUpdateOccurence(callPattern, methodMock);
 			}
 
 			return methodMock != null;

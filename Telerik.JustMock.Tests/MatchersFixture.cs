@@ -16,6 +16,7 @@
 */
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -38,10 +39,9 @@ namespace Telerik.JustMock.Tests
 	{
 		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
 		public void ShouldMatchAnyParameterValue()
-
 		{
 			var foo = Mock.Create<IFoo>();
-			
+
 			Mock.Arrange(() => foo.Echo(Arg.IsAny<string>())).Returns("pong");
 			Mock.Arrange(() => foo.Echo(Arg.IsAny<int>())).Returns(1);
 
@@ -59,7 +59,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Arrange(() => foo.Echo(Arg.Matches<int>(x => x >= 5 && x < 10))).Returns(2);
 			Mock.Arrange(() => foo.Echo(Arg.Matches<int>(x => x > 10))).Returns(3);
 
-			Assert.Equal(1, foo.Echo(3)); 
+			Assert.Equal(1, foo.Echo(3));
 			Assert.Equal(2, foo.Echo(5));
 			Assert.Equal(3, foo.Echo(12));
 			Assert.Equal(2, foo.Echo(7));
@@ -103,7 +103,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IFoo>();
 			Mock.Arrange(() => foo.Echo(Arg.NullOrEmpty)).Occurs(2);
-			
+
 			foo.Echo(string.Empty);
 			foo.Echo(null);
 
@@ -143,7 +143,7 @@ namespace Telerik.JustMock.Tests
 			var foo = Mock.Create<IFoo>();
 
 			bool called = false;
-			
+
 			Mock.Arrange(() => foo.Submit<string>(string.Empty, Arg.IsAny<Func<string, string>>()))
 				.DoInstead(() => called = true);
 
@@ -174,7 +174,7 @@ namespace Telerik.JustMock.Tests
 			var entity = new Entity { Prop2 = expected };
 
 			Mock.Arrange(() => foo.GetByID(42, Arg.IsAny<Expression<Func<Entity, object>>>(), Arg.IsAny<Expression<Func<Entity, object>>>())).Returns(entity);
-		   
+
 			//Act
 			string result = foo.GetByID(42, x => x.Prop1, x => x.Prop2).Prop2;
 
@@ -226,7 +226,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldInferIgnoreInstanceFromNewExpression()
 		{
 			Mock.Arrange(() => new Foo().Echo(5)).Returns(5);
-			
+
 			var differentMock = Mock.Create<Foo>();
 			Assert.Equal(5, differentMock.Echo(5));
 		}
@@ -331,7 +331,7 @@ namespace Telerik.JustMock.Tests
 			{
 				return null;
 			}
-  
+
 			public Foo GetSelf()
 			{
 				throw new NotImplementedException();
@@ -350,7 +350,7 @@ namespace Telerik.JustMock.Tests
 
 		public interface IArgument
 		{
-			string Name {get;}
+			string Name { get; }
 		}
 
 		public interface IFoo
@@ -421,6 +421,40 @@ namespace Telerik.JustMock.Tests
 			Assert.Null(mock.Echo("xxx"));
 			execute = true;
 			Assert.Equal("aaa", mock.Echo("xxx"));
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Matchers"), TestCategory("Assertion")]
+		public void ShouldAssertUsingCustomMatcherOnConcreteInstance()
+		{
+			var mock = Mock.Create<IComparer<int>>();
+			mock.Compare(1, 5);
+			mock.Compare(2, 2);
+			mock.Compare(1, 1);
+			mock.Compare(3, 1);
+
+			var mock2 = Mock.Create<IComparer<int>>();
+			mock2.Compare(5, 5);
+
+			Mock.Assert(() => mock.Compare(0, 0),
+				Args.Matching((int a, int b) => a == b),
+				Occurs.Exactly(2));
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Matchers"), TestCategory("Assertion")]
+		public void ShouldAssertUsingCustomMatcherOnAnyInstance()
+		{
+			var mock = Mock.Create<IComparer<int>>();
+			mock.Compare(1, 5);
+			mock.Compare(2, 2);
+			mock.Compare(1, 1);
+			mock.Compare(3, 1);
+
+			var mock2 = Mock.Create<IComparer<int>>();
+			mock2.Compare(5, 5);
+
+			Mock.Assert(() => mock.Compare(0, 0),
+				Args.Matching((IComparer<int> _this, int a, int b) => a == b && _this != null),
+				Occurs.Exactly(3));
 		}
 	}
 }
