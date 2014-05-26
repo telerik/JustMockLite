@@ -192,6 +192,16 @@ namespace Telerik.JustMock.Tests
 			Mock.NonPublic.Assert(baz, targetMethod);
 		}
 
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("Assertion")]
+		public void ShouldGetTimesCalledOfNonPublicMethod()
+		{
+			var mock = Mock.Create<Bar>();
+			Mock.NonPublic.MakePrivateAccessor(mock).CallMethod("MethodToMock");
+
+			Assert.Equal(1, Mock.NonPublic.GetTimesCalled(mock, "MethodToMock"));
+			Assert.Equal(1, Mock.NonPublic.GetTimesCalled(mock, typeof(Bar).GetMethod("MethodToMock", BindingFlags.NonPublic | BindingFlags.Instance)));
+		}
+
 		public class Bar
 		{
 			protected virtual void MethodToMock()

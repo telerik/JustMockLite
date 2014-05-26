@@ -86,6 +86,11 @@
     <Compile Include="Analytics\CompositeAnalyticsTracker.cs" />
     <Compile Include="Analytics\EQATEC\JustMockEqatecAnalyticsTracker.cs" />
     <Compile Include="Analytics\IAnalyticsTracker.cs" />
+    <Compile Include="Args.Matching.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Args.Matching.tt</DependentUpon>
+    </Compile>
     <Compile Include="AutoMock\AutoMockSettings.cs" />
     <Compile Include="AutoMock\MockingContainer.cs" />
     <Compile Include="AutoMock\MockResolver.cs" />
@@ -636,6 +641,10 @@
     <None Include="Arg.part.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Arg.part.cs</LastGenOutput>
+    </None>
+    <None Include="Args.Matching.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Args.Matching.cs</LastGenOutput>
     </None>
     <None Include="Core\DynamicProxy\Castle.DynamicProxy\DynProxy.snk" />
     <None Include="Expectations\Abstraction\IReturns.tt">

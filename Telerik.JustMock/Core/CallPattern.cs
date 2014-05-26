@@ -38,9 +38,11 @@ namespace Telerik.JustMock.Core
 
 		public MethodMockMatcherTreeNode MethodMockNode;
 		public IMatcher InstanceMatcher;
-		private MethodBase method;
 		public List<IMatcher> ArgumentMatchers = new List<IMatcher>();
 
+		public Delegate Filter;
+
+		private MethodBase method;
 		public MethodBase Method
 		{
 			get

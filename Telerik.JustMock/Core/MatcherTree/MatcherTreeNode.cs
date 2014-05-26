@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Telerik.JustMock.Diagnostics;
 
 namespace Telerik.JustMock.Core.MatcherTree
@@ -125,7 +126,7 @@ namespace Telerik.JustMock.Core.MatcherTree
 
 			if (child != null)
 			{
-				child.AddOrUpdateOccurenceInternal(callPattern, depth +1, mock);
+				child.AddOrUpdateOccurenceInternal(callPattern, depth + 1, mock);
 			}
 			else
 			{
@@ -137,7 +138,8 @@ namespace Telerik.JustMock.Core.MatcherTree
 		{
 			if (depth == callPattern.ArgumentMatchers.Count+1)
 			{
-				var resultNode = this.Children.Cast<OccurrencesMatcherTreeNode>();
+				var resultNode = this.Children.Cast<OccurrencesMatcherTreeNode>()
+					.Where(node => NodeMatchesFilter(callPattern, node));
 				results.AddRange(resultNode);
 				return;
 			}
@@ -148,6 +150,45 @@ namespace Telerik.JustMock.Core.MatcherTree
 			{
 				child.GetOccurencesInternal(callPattern, depth+1, results);
 			}
+		}
+
+		private static bool NodeMatchesFilter(CallPattern callPattern, IMatcherTreeNode node)
+		{
+			var filter = callPattern.Filter;
+			if (filter == null)
+				return true;
+
+			var args = new List<object>();
+			var nodeIter = node;
+			while (nodeIter != null)
+			{
+				var valueMatcher = nodeIter.Matcher as IValueMatcher;
+				if (valueMatcher != null)
+				{
+					args.Add(valueMatcher.Value);
+				}
+				nodeIter = nodeIter.Parent;
+			}
+
+			if (!callPattern.Method.IsStatic && filter.Method.GetParameters().Length + 1 == args.Count)
+			{
+				args.RemoveAt(args.Count - 1);
+			}
+
+			args.Reverse();
+			var argsArray = args.ToArray();
+
+			object state;
+			Type.DefaultBinder.BindToMethod(BindingFlags.Default, new[] { filter.Method }, ref argsArray, null, null, null, out state);
+
+			var filterFunc = MockingUtil.MakeFuncCaller(filter);
+			var isMatch = (bool) ProfilerInterceptor.GuardExternal(() => filterFunc(argsArray, filter));
+
+			DebugView.TraceEvent(IndentLevel.Matcher, () => String.Format("Matcher predicate {0} call to {2} with arguments ({1})",
+				isMatch ? "passed" : "rejected", String.Join(", ", args.Select(x => x.ToString()).ToArray()),
+				callPattern.Method));
+
+			return isMatch;
 		}
 
 		private IEnumerable<MatcherTreeNode> GetMatchingChildren(IMatcher matcher, MatchingOptions options, int depth)
