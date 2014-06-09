@@ -540,6 +540,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>IWhen.tt</DependentUpon>
     </Compile>
+    <Compile Include="Mock.Arrange.cs" />
+    <Compile Include="Mock.Assert.cs" />
+    <Compile Include="Mock.SetupStatic.cs" />
     <Compile Include="MockAssertionFailedException.cs" />
     <Compile Include="Param.cs" />
     <Compile Include="PrivateAccessor.cs">
@@ -602,10 +605,10 @@
     <Compile Include="Core\MatcherTree\ValueMatcher.cs" />
     <Compile Include="Trial\JustMockExpiredException.cs" />
     <Compile Include="Mock.cs" />
-    <Compile Include="Mock.Part.cs">
+    <Compile Include="Mock.VisualBasic2008.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>Mock.Part.tt</DependentUpon>
+      <DependentUpon>Mock.VisualBasic2008.tt</DependentUpon>
     </Compile>
     <Compile Include="MockException.cs" />
     <Compile Include="Occurs.cs" />
@@ -655,9 +658,10 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Func.cs</LastGenOutput>
     </None>
-    <None Include="Mock.Part.tt">
+    <Compile Include="Mock.Create.cs" />
+    <None Include="Mock.VisualBasic2008.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Mock.Part.cs</LastGenOutput>
+      <LastGenOutput>Mock.VisualBasic2008.cs</LastGenOutput>
     </None>
     <None Include="../Solution Items/snkey_lite.snk">
       <Link>snkey_lite.snk</Link>

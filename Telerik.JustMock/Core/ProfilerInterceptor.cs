@@ -36,7 +36,6 @@ namespace Telerik.JustMock.Core
 		public static bool IsInterceptionEnabled { get; set; }
 		public static readonly Func<Type, object> GetUninitializedObjectImpl;
 		public static readonly Func<string, byte[], object> CreateStrongNameAssemblyNameImpl;
-		public static readonly Func<Type, object> CreateInstanceImpl;
 		public static readonly Func<Type, object[], object> CreateInstanceWithArgsImpl;
 
 		private static readonly Type bridge;
