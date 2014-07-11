@@ -43,7 +43,7 @@ namespace Telerik.JustMock.Core.Behaviors
 			var iqueryableType = typeof(IQueryable<>).MakeGenericType(elementType);
 
 			IEnumerable list;
-			if (ilistType.IsAssignableFrom(sourceType))
+			if (typeof(ICollection).IsAssignableFrom(sourceType))
 			{
 				list = collection;
 			}
