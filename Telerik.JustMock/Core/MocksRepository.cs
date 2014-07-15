@@ -370,7 +370,7 @@ namespace Telerik.JustMock.Core
 				}
 				else
 				{
-					invocation.CallOriginal = true;
+					invocation.CallOriginal = CallOriginalBehavior.ShouldCallOriginal(invocation);
 				}
 			}
 

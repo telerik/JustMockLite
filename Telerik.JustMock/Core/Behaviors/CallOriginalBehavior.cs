@@ -24,12 +24,16 @@ namespace Telerik.JustMock.Core.Behaviors
 	{
 		public void Process(Invocation invocation)
 		{
-			if ((!invocation.Recording || invocation.RetainBehaviorDuringRecording)
-				&& !invocation.UserProvidedImplementation)
+			if (ShouldCallOriginal(invocation) && !invocation.UserProvidedImplementation)
 			{
 				invocation.UserProvidedImplementation = true;
 				invocation.CallOriginal = true;
 			}
+		}
+
+		public static bool ShouldCallOriginal(Invocation invocation)
+		{
+			return !invocation.Recording || invocation.RetainBehaviorDuringRecording;
 		}
 	}
 }
