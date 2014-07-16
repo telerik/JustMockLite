@@ -415,6 +415,17 @@ namespace Telerik.JustMock.Core
 
 				EnableInterception(type);
 
+				if (!ProfilerInterceptor.IsProfilerAttached)
+				{
+					settings.AdditionalMockedInterfaces =
+						(settings.AdditionalMockedInterfaces ?? Enumerable.Empty<Type>())
+						.Concat(
+							type.GetInterfaces()
+							.Where(intf => generator.ProxyBuilder.ModuleScope.Internals.IsAccessible(intf)))
+						.Distinct()
+						.ToArray();
+				}
+
 				var mockMixinImpl = CreateMockMixin(type, settings.SupplementaryBehaviors, settings.FallbackBehaviors, settings.MockConstructorCall);
 
 				var options = new ProxyGenerationOptions();
@@ -961,7 +972,19 @@ namespace Telerik.JustMock.Core
 				var type = mockMixin != null ? mockMixin.DeclaringType : valueType;
 				if (!type.IsInterface && method.DeclaringType.IsAssignableFrom(type))
 				{
-					method = MockingUtil.GetConcreteImplementer(method, type);
+					var concreteMethod = MockingUtil.GetConcreteImplementer(method, type);
+#if !SILVERLIGHT
+					if (!concreteMethod.IsInheritable() && !ProfilerInterceptor.IsProfilerAttached)
+					{
+						var reimplementedInterfaceMethod = (MethodInfo) method.GetInheritanceChain().Last();
+						if (reimplementedInterfaceMethod.DeclaringType.IsInterface
+							&& generator.ProxyBuilder.ModuleScope.Internals.IsAccessible(reimplementedInterfaceMethod.DeclaringType))
+						{
+							concreteMethod = reimplementedInterfaceMethod;
+						}
+					}
+#endif
+					method = concreteMethod;
 				}
 			}
 
@@ -1419,11 +1442,21 @@ namespace Telerik.JustMock.Core
 			if (ProfilerInterceptor.IsProfilerAttached)
 				return;
 
+			if (!IsInterceptableByDynamicProxy(instanceMatcher, method))
+				ProfilerInterceptor.ThrowElevatedMockingException(method);
+		}
+
+		private static bool IsInterceptableByDynamicProxy(IMatcher instanceMatcher, MethodBase method)
+		{
 			var valueMatcher = instanceMatcher as IValueMatcher;
 			bool instanceIsntProxy = valueMatcher != null && !(valueMatcher.Value is IMockMixin);
+			if (instanceIsntProxy)
+				return false;
 
-			if (!method.IsInheritable() || instanceIsntProxy)
-				ProfilerInterceptor.ThrowElevatedMockingException(method);
+			if (method.IsInheritable())
+				return true;
+
+			return false;
 		}
 
 		internal void EnableInterception(Type typeToIntercept)

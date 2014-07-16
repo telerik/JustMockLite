@@ -22,7 +22,11 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 	[DebuggerDisplay("argument {Type}")]
 	internal class ArgumentReference : TypeReference
 	{
-	    public ArgumentReference(Type argumentType, object defaultValue = null)
+		public ArgumentReference(Type argumentType)
+			: this(argumentType, DBNull.Value)
+		{ }
+
+	    public ArgumentReference(Type argumentType, object defaultValue)
 			: base(argumentType)
 		{
             this.DefaultValue = defaultValue;

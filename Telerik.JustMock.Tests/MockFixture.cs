@@ -27,7 +27,6 @@ using TestCleanup = NUnit.Framework.TearDownAttribute;
 #endif
 
 #if LITE_EDITION
-using Telerik.JustMock.Core;
 #if !SILVERLIGHT
 using Telerik.JustMock.DemoLibSigned;
 #endif
@@ -40,6 +39,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
+using Telerik.JustMock.Core;
 
 namespace Telerik.JustMock.Tests
 {
@@ -2152,7 +2152,7 @@ namespace Telerik.JustMock.Tests
 		}
 #endif
 
-#if LITE_EDITION
+#if LITE_EDITION && SILVERLIGHT
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldThrowWhenArrangingSealedMethod()
 		{
@@ -2385,6 +2385,89 @@ namespace Telerik.JustMock.Tests
 			var mock = Mock.Create<StaticCtor>();
 			Assert.True(StaticCtor.called);
 		}
+
+#if LITE_EDITION && !SILVERLIGHT
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+		public void ShouldMockNoninheritableInterfaceMembers()
+		{
+			var mock = Mock.Create<PrivateInterface>(Behavior.CallOriginal);
+
+			Assert.Throws<InvalidOperationException>(() => ((IJustDoThat)mock).DoThat());
+			Mock.Arrange(() => mock.DoThat()).DoNothing();
+			((IJustDoThat)mock).DoThat();
+
+			Assert.Throws<InvalidOperationException>(() => ((IJustDoIt)mock).JustDoIt());
+			Mock.Arrange(() => ((IJustDoIt)mock).JustDoIt()).DoNothing();
+			((IJustDoIt)mock).JustDoIt();
+
+			Assert.Throws<InvalidOperationException>(() => ((Scope.IImplementable)mock).Do());
+			Mock.Arrange(() => ((Scope.IImplementable)mock).Do()).DoNothing();
+			((Scope.IImplementable)mock).Do();
+
+			Assert.Throws<InvalidOperationException>(() => ((Scope.IImplementable2)mock).Do());
+			Mock.Arrange(() => ((Scope.IImplementable2)mock).Do()).DoNothing();
+			((Scope.IImplementable2)mock).Do();
+
+			Assert.Throws<ElevatedMockingException>(() => Mock.Arrange(() => ((INonImplementable)mock).Do()).DoNothing());
+			Assert.Throws<InvalidOperationException>(() => ((INonImplementable)mock).Do());
+		}
+
+		public interface IJustDoIt
+		{
+			void JustDoIt();
+		}
+
+		public interface IJustDoThat
+		{
+			void DoThat();
+		}
+
+		private interface INonImplementable
+		{
+			void Do();
+		}
+
+		internal class Scope
+		{
+			public interface IImplementable
+			{
+				void Do();
+			}
+
+			protected internal interface IImplementable2
+			{
+				void Do();
+			}
+		}
+
+		public class PrivateInterface : IJustDoIt, IJustDoThat, INonImplementable, Scope.IImplementable, Scope.IImplementable2
+		{
+			void IJustDoIt.JustDoIt()
+			{
+				throw new InvalidOperationException();
+			}
+
+			public void DoThat()
+			{
+				throw new InvalidOperationException();
+			}
+
+			void INonImplementable.Do()
+			{
+				throw new InvalidOperationException();
+			}
+
+			void Scope.IImplementable.Do()
+			{
+				throw new InvalidOperationException();
+			}
+
+			void Scope.IImplementable2.Do()
+			{
+				throw new InvalidOperationException();
+			}
+		}
+#endif
 	}
 
 	internal abstract class InternalAbstract

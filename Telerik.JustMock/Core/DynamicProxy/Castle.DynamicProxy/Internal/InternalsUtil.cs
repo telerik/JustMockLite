@@ -14,13 +14,13 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 {
+	using System;
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Reflection;
 	using System.Runtime.CompilerServices;
-
-    using Telerik.JustMock.Core.Castle.Core.Internal;
-    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+	using Telerik.JustMock.Core.Castle.Core.Internal;
+	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
 
     internal static class InternalsUtilExtensions
     {
@@ -105,6 +105,21 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 				return true;
 			}
 			return false;
+		}
+
+		public bool IsAccessible(Type type)
+		{
+			if (!type.IsNested)
+			{
+				return type.IsPublic || this.IsInternalToDynamicProxy(type.Assembly);
+			}
+			else
+			{
+				return IsAccessible(type.DeclaringType)
+					&& (type.IsNestedPublic
+						|| this.IsInternalToDynamicProxy(type.Assembly)
+							&& (type.IsNestedAssembly || type.IsNestedFamORAssem));
+			}
 		}
 	}
 }
