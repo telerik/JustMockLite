@@ -17,7 +17,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Telerik.JustMock.Core;
 
 namespace Telerik.JustMock.Setup

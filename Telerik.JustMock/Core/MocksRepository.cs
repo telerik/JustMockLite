@@ -32,6 +32,7 @@ using Telerik.JustMock.Core.Context;
 using Telerik.JustMock.Core.Expressions;
 using Telerik.JustMock.Core.MatcherTree;
 using Telerik.JustMock.Core.Recording;
+using Telerik.JustMock.Core.TransparentProxy;
 using Telerik.JustMock.Diagnostics;
 
 namespace Telerik.JustMock.Core
@@ -82,7 +83,7 @@ namespace Telerik.JustMock.Core
 
 		internal static IMockMixin GetMockMixin(object obj, Type objType)
 		{
-			var asMixin = obj as IMockMixin;
+			var asMixin = GetMockMixinFromTrueMock(obj);
 			if (asMixin != null)
 				return asMixin;
 
@@ -103,6 +104,15 @@ namespace Telerik.JustMock.Core
 				}
 			}
 			return asMixin;
+		}
+
+		private static IMockMixin GetMockMixinFromTrueMock(object mock)
+		{
+			var asMixin = MockingProxy.GetMockMixin(mock);
+			if (asMixin != null)
+				return asMixin;
+
+			return mock as IMockMixin;
 		}
 
 		private static IMockMixin GetMixinFromExternalDatabase(object obj, Type type)
@@ -284,7 +294,7 @@ namespace Telerik.JustMock.Core
 
 				foreach (var mockRef in parentRepository.controlledMocks)
 				{
-					var mixin = mockRef.Target as IMockMixin;
+					var mixin = GetMockMixinFromTrueMock(mockRef.Target);
 					if (mixin != null)
 					{
 						mixin.Repository = this;
@@ -322,7 +332,7 @@ namespace Telerik.JustMock.Core
 			{
 				foreach (var mockRef in this.controlledMocks)
 				{
-					var mock = mockRef.Target as IMockMixin;
+					var mock = GetMockMixinFromTrueMock(mockRef.Target);
 					if (mock != null && mock.ExternalizedMock != null && mock.Originator == this)
 					{
 						externalMixinDatabase.RemoveAll(kvp => kvp.Value == mock);
@@ -415,7 +425,9 @@ namespace Telerik.JustMock.Core
 
 				EnableInterception(type);
 
-				if (!ProfilerInterceptor.IsProfilerAttached)
+				bool canCreateProxy = !type.IsSealed;
+
+				if (!ProfilerInterceptor.IsProfilerAttached && canCreateProxy)
 				{
 					settings.AdditionalMockedInterfaces =
 						(settings.AdditionalMockedInterfaces ?? Enumerable.Empty<Type>())
@@ -452,16 +464,20 @@ namespace Telerik.JustMock.Core
 					|| hasAdditionalInterfaces
 					|| isCoclass
 					|| type.IsAbstract || type.IsInterface
-					|| !ProfilerInterceptor.IsProfilerAttached || !ProfilerInterceptor.TypeSupportsInstrumentation(type)
 					|| !settings.MockConstructorCall
-					|| hasAdditionalProxyTypeAttributes;
+					|| hasAdditionalProxyTypeAttributes
+					|| !ProfilerInterceptor.IsProfilerAttached
+					|| !ProfilerInterceptor.TypeSupportsInstrumentation(type);
 
-				bool canCreateProxy = !type.IsSealed;
+				var createTransparentProxy = MockingProxy.CanCreate(type) && !ProfilerInterceptor.IsProfilerAttached;
+
 				Exception proxyFailure = null;
 				object instance = null;
 				if (canCreateProxy && shouldCreateProxy)
 				{
-					var interceptor = new DynamicProxyInterceptor(this);
+					var interceptor = createTransparentProxy
+						? (IInterceptor) new StandardInterceptor()
+						: new DynamicProxyInterceptor(this);
 #if SILVERLIGHT
 					options.Hook = new ProxyGenerationHook(false, settings.InterceptorFilter);
 #else
@@ -543,7 +559,7 @@ namespace Telerik.JustMock.Core
 					if (hasAdditionalInterfaces)
 						throw new MockException(String.Format("Type '{0}' is not accessible for inheritance. Cannot create mock object implementing the specified additional interfaces.", type));
 
-					if (!ProfilerInterceptor.IsProfilerAttached)
+					if (!ProfilerInterceptor.IsProfilerAttached && !createTransparentProxy)
 						ProfilerInterceptor.ThrowElevatedMockingException(type);
 
 					if (settings.MockConstructorCall && type.IsValueType)
@@ -569,7 +585,10 @@ namespace Telerik.JustMock.Core
 						instance = MockingUtil.GetUninitializedObject(type);
 					}
 
-					mockMixin = CreateExternalMockMixin(type, instance, settings.Mixins, settings.SupplementaryBehaviors, settings.FallbackBehaviors);
+					if (!createTransparentProxy)
+					{
+						mockMixin = CreateExternalMockMixin(type, instance, settings.Mixins, settings.SupplementaryBehaviors, settings.FallbackBehaviors);
+					}
 				}
 				else
 				{
@@ -578,6 +597,15 @@ namespace Telerik.JustMock.Core
 
 				if (type.IsClass)
 					GC.SuppressFinalize(instance);
+
+				if (createTransparentProxy)
+				{
+					if (mockMixin == null)
+					{
+						mockMixin = mockMixinImpl;
+					}
+					instance = MockingProxy.CreateProxy(instance, new DynamicProxyInterceptor(this), mockMixin);
+				}
 
 				mockMixin.IsInstanceConstructorMocked = settings.MockConstructorCall;
 
@@ -1442,21 +1470,16 @@ namespace Telerik.JustMock.Core
 			if (ProfilerInterceptor.IsProfilerAttached)
 				return;
 
-			if (!IsInterceptableByDynamicProxy(instanceMatcher, method))
-				ProfilerInterceptor.ThrowElevatedMockingException(method);
-		}
-
-		private static bool IsInterceptableByDynamicProxy(IMatcher instanceMatcher, MethodBase method)
-		{
 			var valueMatcher = instanceMatcher as IValueMatcher;
-			bool instanceIsntProxy = valueMatcher != null && !(valueMatcher.Value is IMockMixin);
-			if (instanceIsntProxy)
-				return false;
+			if (valueMatcher == null)
+				return;
 
-			if (method.IsInheritable())
-				return true;
+			var instance = valueMatcher.Value;
+			if (MockingProxy.CanIntercept(instance, method))
+				return;
 
-			return false;
+			if (!(instance is IMockMixin) || !method.IsInheritable())
+				ProfilerInterceptor.ThrowElevatedMockingException(method);
 		}
 
 		internal void EnableInterception(Type typeToIntercept)

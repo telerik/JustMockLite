@@ -525,6 +525,8 @@
     <Compile Include="Core\Recording\IRecorder.cs" />
     <Compile Include="Core\MocksRepository.cs" />
     <Compile Include="Core\RepositorySharedContext.cs" />
+    <Compile Include="Core\TransparentProxy\MockingProxy.cs" />
+    <Compile Include="Core\TransparentProxy\ProxyInvocation.cs" />
     <Compile Include="DebugView.cs" />
     <Compile Include="DisableAutomaticRepositoryResetAttribute.cs">
       <SubType>Code</SubType>
