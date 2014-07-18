@@ -305,7 +305,7 @@ namespace Telerik.JustMock.Tests
 
 		public delegate object DoDelegate(ref int a);
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Returns")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Returns"), TestCategory("OutRef")]
 		public void ShouldReturnUsingCustomDelegate()
 		{
 			var mock = Mock.Create<IRefReturns>();

@@ -1374,12 +1374,22 @@ namespace Telerik.JustMock.Core
 				{
 					return new TypeMatcher(argExpr.Type);
 				}
-				else if (argAttribute.GetType() == typeof(RefArgAttribute))
+				else if (argAttribute.GetType() == typeof(RefArgAttribute) || argAttribute.GetType() == typeof(OutArgAttribute))
 				{
-					var refCall = (MethodCallExpression)((MemberExpression)argExpr).Expression;
+					var asMemberExpr = argExpr as MemberExpression;
+					if (asMemberExpr != null)
+					{
+						argExpr = asMemberExpr.Expression;
+					}
+					var refCall = (MethodCallExpression)argExpr;
 					var actualArg = refCall.Arguments[0];
+					var memberExpr = actualArg as MemberExpression;
+					if (memberExpr != null && typeof(Expression).IsAssignableFrom(memberExpr.Type) && memberExpr.Expression.Type.DeclaringType == typeof(ArgExpr))
+					{
+						actualArg = (Expression) actualArg.EvaluateExpression();
+					}
 					var argMatcher = CreateMatcherForArgument(actualArg);
-					argMatcher.ProtectRefOut = true;
+					argMatcher.ProtectRefOut = argAttribute.GetType() == typeof(RefArgAttribute);
 					return argMatcher;
 				}
 				else

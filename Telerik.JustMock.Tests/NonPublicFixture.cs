@@ -79,6 +79,28 @@ namespace Telerik.JustMock.Tests
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
+		public void ShouldMockOverloadUsingConcreteValues()
+		{
+			var foo = Mock.Create<Foo>(Behavior.CallOriginal);
+
+			bool called = false, called2 = false;
+
+			Mock.NonPublic
+				.Arrange(foo, "ExecuteProtected", 10, ArgExpr.IsNull<FooDerived>())
+				.DoInstead(() => called = true);
+
+			Mock.NonPublic
+				.Arrange(foo, "ExecuteProtected", ArgExpr.IsNull<FooDerived>(), 10)
+				.DoInstead(() => called2 = true);
+
+			foo.Execute(10, null);
+			foo.Execute(null, 10);
+
+			Assert.True(called);
+			Assert.True(called2);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
 		public void ShouldThrowArgumentExpectionForNullArguments()
 		{
 			var foo = Mock.Create<Foo>(Behavior.CallOriginal);
@@ -141,13 +163,13 @@ namespace Telerik.JustMock.Tests
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
-		public void ShouldThrowArgumentExcpetionForMethodSpecification()
+		public void ShouldThrowMissingMethodExceptionForMethodSpecification()
 		{
 			var foo = Mock.Create<Foo>(Behavior.CallOriginal);
-			Assert.Throws<ArgumentException>(() =>  Mock.NonPublic.Arrange(foo, "ExecuteProtected"));
+			Assert.Throws<MissingMethodException>(() => Mock.NonPublic.Arrange(foo, "ExecuteProtected"));
 		}
-	  
-		#if !SILVERLIGHT
+
+#if !SILVERLIGHT
 
 		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
 		public void ShouldCreateMockFromClassHavingAbstractInternalMethodInBase()
@@ -170,11 +192,11 @@ namespace Telerik.JustMock.Tests
 			var baz = Mock.Create<Baz>(Behavior.CallOriginal);
 
 			const string targetMethod = "MethodToMock";
-			
+
 			Mock.NonPublic.Arrange(baz, targetMethod).DoNothing();
 
 			baz.MethodToTest();
-		 
+
 			Mock.NonPublic.Assert(baz, targetMethod);
 		}
 
@@ -233,10 +255,10 @@ namespace Telerik.JustMock.Tests
 				}
 			}
 
-			private StringBuilder builder; 
+			private StringBuilder builder;
 		}
 
-		#endif
+#endif
 
 		internal abstract class FooAbstract
 		{
@@ -250,12 +272,12 @@ namespace Telerik.JustMock.Tests
 
 		public class Foo
 		{
-			protected virtual void ExecuteProtected(int arg1, Foo foo)
+			protected virtual void ExecuteProtected(Foo foo, int arg1)
 			{
 				throw new NotImplementedException();
 			}
 
-			protected virtual void ExecuteProtected(Foo foo, int arg1)
+			protected virtual void ExecuteProtected(int arg1, Foo foo)
 			{
 				throw new NotImplementedException();
 			}
@@ -273,6 +295,11 @@ namespace Telerik.JustMock.Tests
 			public virtual void Execute(int arg1, Foo foo)
 			{
 				ExecuteProtected(arg1, foo);
+			}
+
+			public virtual void Execute(Foo foo, int arg1)
+			{
+				ExecuteProtected(foo, arg1);
 			}
 
 			protected virtual void Load()
@@ -297,6 +324,71 @@ namespace Telerik.JustMock.Tests
 			{
 				return IntValue * 2;
 			}
+		}
+
+		public class FooDerived : Foo
+		{
+
+		}
+
+		public class RefTest
+		{
+			protected virtual void Test(string arg1, ref string asd)
+			{
+
+			}
+
+			public void ExecuteTest(ref string asd)
+			{
+				this.Test("test1", ref asd);
+			}
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
+		public void ShouldArrangeNonPublicUsingByRefArgumentWithMatcher()
+		{
+			var foo = Mock.Create<RefTest>(Behavior.CallOriginal);
+			Mock.NonPublic.Arrange(foo, "Test", ArgExpr.IsAny<string>(), ArgExpr.Ref(ArgExpr.IsAny<string>())).MustBeCalled();
+			string asd = "asd";
+			foo.ExecuteTest(ref asd);
+			Mock.Assert(foo);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
+		public void ShouldArrangeNonPublicUsingByRefArgumentWithConstant()
+		{
+			int call = 1;
+			int callA = 0, callB = 0;
+
+			var foo = Mock.Create<RefTest>(Behavior.CallOriginal);
+			Mock.NonPublic.Arrange(foo, "Test", ArgExpr.IsAny<string>(), ArgExpr.Ref(ArgExpr.IsAny<string>())).DoInstead(() => callB = call++);
+			Mock.NonPublic.Arrange(foo, "Test", ArgExpr.IsAny<string>(), ArgExpr.Ref("asd")).DoInstead(() => callA = call++);
+
+			string input = "asd";
+			foo.ExecuteTest(ref input);
+			input = "foo";
+			foo.ExecuteTest(ref input);
+
+			Assert.Equal(1, callA);
+			Assert.Equal(2, callB);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
+		public void ShouldArrangeNonPublicUsingByRefArgumentAsOutputParameter()
+		{
+			var foo = Mock.Create<RefTest>(Behavior.CallOriginal);
+			Mock.NonPublic.Arrange(foo, "Test", ArgExpr.IsAny<string>(), ArgExpr.Out("asd"));
+
+			string input = "";
+			foo.ExecuteTest(ref input);
+			Assert.Equal("asd", input);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
+		public void ShouldNotArrangeNonPublicUsingContantArgumentWhereByRefIsExpected()
+		{
+			var foo = Mock.Create<RefTest>(Behavior.CallOriginal);
+			Assert.Throws<MissingMethodException>(() => Mock.NonPublic.Arrange(foo, "Test", ArgExpr.IsAny<string>(), "asd"));
 		}
 	}
 }
