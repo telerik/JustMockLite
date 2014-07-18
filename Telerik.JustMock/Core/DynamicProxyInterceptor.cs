@@ -52,7 +52,7 @@ namespace Telerik.JustMock.Core
 				DebugView.TraceEvent(IndentLevel.Dispatch, () => String.Format("Intercepted DP call: {0}", mockInvocation.InputToString()));
 				DebugView.PrintStackTrace();
 
-				var mock = MocksRepository.GetMockMixin(invocation.Proxy, invocation.Method.DeclaringType);
+				var mock = MocksRepository.GetMockMixinFromInvocation(mockInvocation);
 				var repo = mock != null ? mock.Repository : this.constructionRepo;
 
 				lock (repo)
