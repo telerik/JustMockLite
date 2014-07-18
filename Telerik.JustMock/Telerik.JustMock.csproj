@@ -274,6 +274,7 @@
     <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Serialization\CacheMappingsAttribute.cs" />
     <Compile Include="Core\Lazy.cs" />
     <Compile Include="Core\MatcherTree\MatcherNodeAndParent.cs" />
+    <Compile Include="Core\MatcherTree\OutArgAttribute.cs" />
     <Compile Include="Core\MatcherTree\RefArgAttribute.cs" />
     <Compile Include="Core\ThreadLocalProperty.cs" />
     <Compile Include="Core\Context\XUnitMockingContextResolver.cs" />

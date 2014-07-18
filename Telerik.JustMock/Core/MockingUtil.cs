@@ -26,6 +26,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using Telerik.JustMock.Core.Castle.DynamicProxy;
+using Telerik.JustMock.Core.MatcherTree;
 using Telerik.JustMock.Core.Recording;
 
 namespace Telerik.JustMock.Core
@@ -111,13 +112,13 @@ namespace Telerik.JustMock.Core
 
 			var generics = new Dictionary<Type, Type>();
 			var genericArgs = method.GetGenericArguments();
-			Type[] parsedArgs = ParseArguments(parameters, args);
+			var argTypes = GetTypesFromArguments(args);
 
 			if (method.ContainsGenericParameters)
 			{
 				for (int i = 0; i < parameters.Length; ++i)
 				{
-					if (!GetGenericsTypesFromActualType(parameters[i].ParameterType, parsedArgs[i], generics))
+					if (!GetGenericsTypesFromActualType(parameters[i].ParameterType, argTypes[i], generics))
 						return false;
 				}
 
@@ -128,7 +129,7 @@ namespace Telerik.JustMock.Core
 			{
 				for (int i = 0; i < parameters.Length; ++i)
 				{
-					if (!parsedArgs[i].IsAssignableFrom(parameters[i].ParameterType))
+					if (!parameters[i].ParameterType.IsAssignableFrom(argTypes[i]))
 						return false;
 				}
 			}
@@ -136,21 +137,27 @@ namespace Telerik.JustMock.Core
 			return true;
 		}
 
-		public static Type[] ParseArguments(ParameterInfo[] parameters, object[] args)
+		public static Type[] GetTypesFromArguments(object[] args)
 		{
-			var result = new Type[parameters.Length];
+			var result = new Type[args.Length];
 
-			for (int i = 0; i < parameters.Length; ++i)
+			for (int i = 0; i < args.Length; ++i)
 			{
 				var arg = args[i];
 				if (arg == null)
-					throw new ArgumentException("Cannot use 'null' as an argument to find non-public member. Use ArgExpr.IsNull<T>() instead.");
-				var type = parameters[i].ParameterType;
+					throw new ArgumentException("Cannot use 'null' as an argument to find a non-public member. Use ArgExpr.IsNull<T>() instead.");
 
 				var methodCall = arg as MethodCallExpression;
 				if (methodCall != null)
 				{
 					var matcherMethod = methodCall.Method;
+					if (Attribute.IsDefined(matcherMethod, typeof(OutArgAttribute)))
+					{
+						var argType = matcherMethod.ReturnType;
+						result[i] = argType.MakeByRefType();
+						continue;
+					}
+					
 					if (Attribute.IsDefined(matcherMethod, typeof(ArgMatcherAttribute)))
 					{
 						var argType = matcherMethod.ReturnType;
@@ -158,8 +165,15 @@ namespace Telerik.JustMock.Core
 						continue;
 					}
 				}
+				var fieldExpr = arg as MemberExpression;
+				if (fieldExpr != null && Attribute.IsDefined(fieldExpr.Member, typeof(RefArgAttribute)))
+				{
+					var innerExprValue = (fieldExpr.Expression as MethodCallExpression).Arguments[0].EvaluateExpression();
+					result[i] = GetTypesFromArguments(new[] { innerExprValue })[0].MakeByRefType();
+					continue;
+				}
 
-				result[i] = type;
+				result[i] = arg.GetType();
 			}
 
 			return result;
@@ -295,7 +309,7 @@ namespace Telerik.JustMock.Core
 			{
 				var generics = new Dictionary<Type, Type>();
 				var parameters = method.GetParameters();
-				var parsedArgs = MockingUtil.ParseArguments(parameters, args);
+				var parsedArgs = MockingUtil.GetTypesFromArguments(args);
 				for (int i = 0; i < args.Length; i++)
 				{
 					MockingUtil.GetGenericsTypesFromActualType(parameters[i].ParameterType, parsedArgs[i], generics);

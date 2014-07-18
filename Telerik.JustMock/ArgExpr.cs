@@ -18,6 +18,7 @@
 using System;
 using System.Linq.Expressions;
 using Telerik.JustMock.Core;
+using Telerik.JustMock.Core.MatcherTree;
 
 namespace Telerik.JustMock
 {
@@ -73,7 +74,7 @@ namespace Telerik.JustMock
 		}
 
 		/// <summary>
-		/// Matches a value for out argument
+		/// Returns a value from a ref or out argument
 		/// </summary>
 		/// <typeparam name="T">Type for the argument</typeparam>
 		/// <param name="value">Value to match.</param>
@@ -82,9 +83,15 @@ namespace Telerik.JustMock
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
-				Expression<Func<T>> expr = () => value;
+				Expression<Func<T>> expr = () => OutArg(value);
 				return expr.Body;
 			});
+		}
+
+		[OutArg]
+		private static T OutArg<T>(T value)
+		{
+			return value;
 		}
 	
 		/// <summary>
@@ -97,7 +104,7 @@ namespace Telerik.JustMock
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
-				Expression<Func<T>> expr = () => value;
+				Expression<Func<T>> expr = () => Arg.Ref<T>(value).Value;
 				return expr.Body;
 			});
 		}

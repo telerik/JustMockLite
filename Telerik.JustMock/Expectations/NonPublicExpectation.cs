@@ -54,12 +54,12 @@ namespace Telerik.JustMock.Expectations
 					}
 
 					if (mockedMethod == null)
-						throw new ArgumentException(String.Format("Found property '{0}' on type '{1}' but the passed arguments match the signature neither of the getter nor the setter.", memberName, type));
+						throw new MissingMethodException(String.Format("Found property '{0}' on type '{1}' but the passed arguments match the signature neither of the getter nor the setter.", memberName, type));
 				}
 			}
 
 			if (mockedMethod == null)
-				throw new ArgumentException(String.Format("Method '{0}' not found on type {1}", memberName, type));
+				throw new MissingMethodException(String.Format("Method '{0}' not found on type {1}", memberName, type));
 
 			if (mockedMethod.ContainsGenericParameters)
 			{
