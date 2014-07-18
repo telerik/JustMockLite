@@ -161,20 +161,6 @@ namespace Telerik.JustMock.Tests
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
-		public void ShouldImplicitlyArrangeSeparateInstances()
-		{
-			var container = new MockingContainer<TransactionService>();
-
-			var inst = container.Instance;
-			Assert.NotNull(inst.From);
-			Assert.NotNull(inst.To);
-			Assert.NotNull(inst.BillingAccount);
-
-			Assert.NotSame(inst.From, inst.To);
-			Assert.NotSame(inst.From, inst.BillingAccount);
-		}
-
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
 		public void ShouldArrangeMultipleInstancesSeparatelyByParameterName()
 		{
 			var container = new MockingContainer<TransactionService>();
@@ -391,6 +377,14 @@ namespace Telerik.JustMock.Tests
 			{
 
 			}
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+		public void ShouldAssertOccurrenceFromContainerWithoutPriorArrangement()
+		{
+			var c = new MockingContainer<Unit>();
+			c.Instance.DoWork();
+			c.Assert<IUnitOfWork>(x => x.DoWork());
 		}
 	}
 }
