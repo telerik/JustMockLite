@@ -793,26 +793,77 @@ namespace Telerik.JustMock.Core
 
 		public static string GetShortCSharpName(this Type type)
 		{
-			string name = type.ToString();
-			switch (name)
+			if (type.IsGenericType)
 			{
-				case "System.Boolean": name = "bool"; break;
-				case "System.Byte": name = "byte"; break;
-				case "System.SByte": name = "sbyte"; break;
-				case "System.Char": name = "char"; break;
-				case "System.Int16": name = "short"; break;
-				case "System.UInt16": name = "ushort"; break;
-				case "System.Int32": name = "int"; break;
-				case "System.UInt32": name = "uint"; break;
-				case "System.Int64": name = "long"; break;
-				case "System.UInt64": name = "ulong"; break;
-				case "System.Single": name = "float"; break;
-				case "System.Double": name = "double"; break;
-				case "System.Decimal": name = "decimal"; break;
-				case "System.String": name = "string"; break;
-				case "System.Object": name = "object"; break;
+				return String.Format("{0}<{1}>", StripNamespacePortion(type.Name),
+					String.Join(", ", type.GetGenericArguments().Select(GetShortCSharpName).ToArray()));
 			}
-			return name;
+			else
+			{
+				string name = type.ToString();
+				switch (name)
+				{
+					case "System.Boolean": return "bool";
+					case "System.Byte": return "byte";
+					case "System.SByte": return "sbyte";
+					case "System.Char": return "char";
+					case "System.Int16": return "short";
+					case "System.UInt16": return "ushort";
+					case "System.Int32": return "int";
+					case "System.UInt32": return "uint";
+					case "System.Int64": return "long";
+					case "System.UInt64": return "ulong";
+					case "System.Single": return "float";
+					case "System.Double": return "double";
+					case "System.Decimal": return "decimal";
+					case "System.String": return "string";
+					case "System.Object": return "object";
+				}
+				return StripNamespacePortion(name);
+			}
+		}
+
+		public static string GetShortVisualBasicName(this Type type)
+		{
+			if (type.IsGenericType)
+			{
+				return String.Format("{0}(Of {1})", StripNamespacePortion(type.Name),
+					String.Join(", ", type.GetGenericArguments().Select(GetShortVisualBasicName).ToArray()));
+			}
+			else
+			{
+				string name = type.ToString();
+				switch (name)
+				{
+					case "System.Boolean": return "Boolean";
+					case "System.Byte": return "Byte";
+					case "System.SByte": return "SByte";
+					case "System.Char": return "Char";
+					case "System.Int16": return "Short";
+					case "System.UInt16": return "UShort";
+					case "System.Int32": return "Integer";
+					case "System.UInt32": return "UInteger";
+					case "System.Int64": return "Long";
+					case "System.UInt64": return "ULong";
+					case "System.Single": return "Single";
+					case "System.Double": return "Double";
+					case "System.Decimal": return "Decimal";
+					case "System.String": return "String";
+					case "System.DateTime": return "Date";
+					case "System.Object": return "Object";
+				}
+				return StripNamespacePortion(name);
+			}
+		}
+
+		private static string StripNamespacePortion(string typeName)
+		{
+			var backtick = typeName.LastIndexOf('`');
+			if (backtick != -1)
+				typeName = typeName.Substring(0, backtick);
+
+			var dot = typeName.LastIndexOf('.');
+			return dot != -1 ? typeName.Substring(dot + 1) : typeName;
 		}
 
 		public static bool IsInheritable(this MethodBase method)

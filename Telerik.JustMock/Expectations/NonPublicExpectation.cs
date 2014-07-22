@@ -16,8 +16,10 @@
 */
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using Telerik.JustMock.Core;
 using Telerik.JustMock.Core.Behaviors;
 using Telerik.JustMock.Core.Context;
@@ -54,12 +56,12 @@ namespace Telerik.JustMock.Expectations
 					}
 
 					if (mockedMethod == null)
-						throw new MissingMethodException(String.Format("Found property '{0}' on type '{1}' but the passed arguments match the signature neither of the getter nor the setter.", memberName, type));
+						throw new MissingMethodException(BuildMissingMethodMessage(type, mockedProperty, memberName));
 				}
 			}
 
 			if (mockedMethod == null)
-				throw new MissingMethodException(String.Format("Method '{0}' not found on type {1}", memberName, type));
+				throw new MissingMethodException(BuildMissingMethodMessage(type, null, memberName));
 
 			if (mockedMethod.ContainsGenericParameters)
 			{
@@ -72,6 +74,88 @@ namespace Telerik.JustMock.Expectations
 			}
 
 			return mockedMethod;
+		}
+
+		private static string BuildMissingMethodMessage(Type type, PropertyInfo property, string memberName)
+		{
+			var sb = new StringBuilder();
+			sb.AppendLine(
+				property != null
+				? String.Format("Found property '{0}' on type '{1}' but the passed arguments match the signature neither of the getter nor the setter.", memberName, type)
+				: String.Format("Method '{0}' with the given signature was not found on type {1}", memberName, type));
+
+			var methods = new List<MethodInfo>();
+
+			if (property != null)
+			{
+				var getter = property.GetGetMethod();
+				if (getter != null)
+					methods.Add(getter);
+				var setter = property.GetSetMethod();
+				if (setter != null)
+					methods.Add(setter);
+			}
+
+			methods.AddRange(
+				type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static)
+				.Where(m => m.Name == memberName));
+
+			if (methods.Count == 0)
+			{
+				sb.AppendLine("No methods or properties found with the given name.");
+			}
+			else
+			{
+				sb.AppendLine("Review the available methods in the message below and optionally paste the appropriate arrangement snippet.");
+				for (int i = 0; i < methods.Count; ++i)
+				{
+					sb.AppendLine("----------");
+					var method = methods[i];
+					sb.AppendLine(String.Format("Method {0}: {1}", i + 1, method));
+					sb.AppendLine("C#: " + FormatMethodArrangementExpression(method, SourceLanguage.CSharp));
+					sb.AppendLine("VB: " + FormatMethodArrangementExpression(method, SourceLanguage.VisualBasic));
+				}
+			}
+
+			return sb.ToString();
+		}
+
+		private static string FormatMethodArrangementExpression(MethodBase method, SourceLanguage language)
+		{
+			return String.Format("Mock.NonPublic.Arrange{0}({1}\"{2}\"{3});",
+				FormatGenericArg(method.GetReturnType(), language),
+				method.IsStatic ? String.Empty : "mock, ",
+				method.Name,
+				String.Join("", method.GetParameters().Select(p => ", " + FormatMethodParameterMatcher(p.ParameterType, language)).ToArray()));
+		}
+
+		private static string FormatMethodParameterMatcher(Type paramType, SourceLanguage language)
+		{
+			if (paramType.IsByRef)
+			{
+				return String.Format("ArgExpr.Ref({0})", FormatMethodParameterMatcher(paramType.GetElementType(), language));
+			}
+			else
+			{
+				return String.Format("ArgExpr.IsAny{0}()", FormatGenericArg(paramType, language));
+			}
+		}
+
+		private static string FormatGenericArg(Type type, SourceLanguage language)
+		{
+			if (type == typeof(void))
+			{
+				return String.Empty;
+			}
+			switch (language)
+			{
+				case SourceLanguage.CSharp:
+					return String.Format("<{0}>", type.GetShortCSharpName());
+				case SourceLanguage.VisualBasic:
+					return String.Format("(Of {0})", type.GetShortVisualBasicName());
+				default:
+					throw new ArgumentOutOfRangeException("language");
+			}
 		}
 
 		private static MethodInfo FindMethodByName(Type type, Type returnType, string memberName, object[] args)

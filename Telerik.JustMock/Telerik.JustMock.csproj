@@ -276,6 +276,7 @@
     <Compile Include="Core\MatcherTree\MatcherNodeAndParent.cs" />
     <Compile Include="Core\MatcherTree\OutArgAttribute.cs" />
     <Compile Include="Core\MatcherTree\RefArgAttribute.cs" />
+    <Compile Include="Core\SourceLanguage.cs" />
     <Compile Include="Core\ThreadLocalProperty.cs" />
     <Compile Include="Core\Context\XUnitMockingContextResolver.cs" />
     <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\AbstractInvocation.cs" />

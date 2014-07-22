@@ -16,6 +16,7 @@
 */
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -389,6 +390,50 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<RefTest>(Behavior.CallOriginal);
 			Assert.Throws<MissingMethodException>(() => Mock.NonPublic.Arrange(foo, "Test", ArgExpr.IsAny<string>(), "asd"));
+		}
+
+		public abstract class WeirdSignature
+		{
+			protected abstract int Do(int a, string b, ref object c, IEnumerable<int> d);
+			protected abstract void Do(bool b);
+			protected abstract DateTime Do(DateTime dateTime);
+			protected static void Do(int d) { }
+			protected static int Do(char e) { return 0; }
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
+		public void ShouldProvideHelpfulExceptionMessageWhenNonPublicMethodIsMissing()
+		{
+			var foo = Mock.Create<WeirdSignature>();
+			var exception = Assert.Throws<MissingMethodException>(() => Mock.NonPublic.Arrange(foo, "Do"));
+			var message = exception.Message;
+			Assert.Equal("Method 'Do' with the given signature was not found on type Telerik.JustMock.Tests.NonPublicFixture+WeirdSignature\r\n" +
+"Review the available methods in the message below and optionally paste the appropriate arrangement snippet.\r\n" +
+"----------\r\n" +
+"Method 1: Int32 Do(Int32, System.String, System.Object ByRef, System.Collections.Generic.IEnumerable`1[System.Int32])\r\n" +
+"C#: Mock.NonPublic.Arrange<int>(mock, \"Do\", ArgExpr.IsAny<int>(), ArgExpr.IsAny<string>(), ArgExpr.Ref(ArgExpr.IsAny<object>()), ArgExpr.IsAny<IEnumerable<int>>());\r\n" +
+"VB: Mock.NonPublic.Arrange(Of Integer)(mock, \"Do\", ArgExpr.IsAny(Of Integer)(), ArgExpr.IsAny(Of String)(), ArgExpr.Ref(ArgExpr.IsAny(Of Object)()), ArgExpr.IsAny(Of IEnumerable(Of Integer))());\r\n" +
+"----------\r\n" +
+"Method 2: Void Do(Boolean)\r\n" +
+"C#: Mock.NonPublic.Arrange(mock, \"Do\", ArgExpr.IsAny<bool>());\r\n" +
+"VB: Mock.NonPublic.Arrange(mock, \"Do\", ArgExpr.IsAny(Of Boolean)());\r\n" +
+"----------\r\n" +
+"Method 3: System.DateTime Do(System.DateTime)\r\n" +
+"C#: Mock.NonPublic.Arrange<DateTime>(mock, \"Do\", ArgExpr.IsAny<DateTime>());\r\n" +
+"VB: Mock.NonPublic.Arrange(Of Date)(mock, \"Do\", ArgExpr.IsAny(Of Date)());\r\n" +
+"----------\r\n" +
+"Method 4: Void Do(Int32)\r\n" +
+"C#: Mock.NonPublic.Arrange(\"Do\", ArgExpr.IsAny<int>());\r\n" +
+"VB: Mock.NonPublic.Arrange(\"Do\", ArgExpr.IsAny(Of Integer)());\r\n" +
+"----------\r\n" +
+"Method 5: Int32 Do(Char)\r\n" +
+"C#: Mock.NonPublic.Arrange<int>(\"Do\", ArgExpr.IsAny<char>());\r\n" +
+"VB: Mock.NonPublic.Arrange(Of Integer)(\"Do\", ArgExpr.IsAny(Of Char)());\r\n", message);
+
+			var exception2 = Assert.Throws<MissingMethodException>(() => Mock.NonPublic.Arrange(foo, "Dont"));
+			var message2 = exception2.Message;
+			Assert.Equal("Method 'Dont' with the given signature was not found on type Telerik.JustMock.Tests.NonPublicFixture+WeirdSignature\r\n" +
+				"No methods or properties found with the given name.\r\n", message2);
 		}
 	}
 }
