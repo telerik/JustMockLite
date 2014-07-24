@@ -529,7 +529,7 @@
     <Compile Include="Core\TransparentProxy\MockingProxy.cs" />
     <Compile Include="Core\TransparentProxy\ProxyInvocation.cs" />
     <Compile Include="DebugView.cs" />
-    <Compile Include="DisableAutomaticRepositoryResetAttribute.cs">
+    <Compile Include="Setup\DisableAutomaticRepositoryResetAttribute.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Core\FunctionalSpecParser.cs" />
@@ -546,7 +546,7 @@
     <Compile Include="Mock.Arrange.cs" />
     <Compile Include="Mock.Assert.cs" />
     <Compile Include="Mock.SetupStatic.cs" />
-    <Compile Include="MockAssertionFailedException.cs" />
+    <Compile Include="Core\MockAssertionFailedException.cs" />
     <Compile Include="Param.cs" />
     <Compile Include="PrivateAccessor.cs">
       <SubType>Code</SubType>
@@ -613,10 +613,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Mock.VisualBasic2008.tt</DependentUpon>
     </Compile>
-    <Compile Include="MockException.cs" />
+    <Compile Include="Core\MockException.cs" />
     <Compile Include="Occurs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RangeExpression.cs" />
+    <Compile Include="RangeKind.cs" />
     <Compile Include="Core\CallPattern.cs" />
     <Compile Include="Core\Invocation.cs" />
     <Compile Include="Core\Context\MockingContext.cs" />
