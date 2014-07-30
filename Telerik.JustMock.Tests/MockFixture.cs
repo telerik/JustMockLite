@@ -667,21 +667,6 @@ namespace Telerik.JustMock.Tests
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
-		public void ShouldAssertMockBasedOnArrayElements()
-		{
-			string expected = "bar";
-			string argument = "foo";
-
-			var target = Mock.Create<IParams>();
-
-			Mock.Arrange(() => target.ExecuteArray(new string[]{ argument, "baz" })).Returns(expected);
-
-			string ret = target.ExecuteArray(new string[] { argument, "baz" });
-
-			Assert.Equal(expected, ret);
-		}
-
-		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldAssertParamArrayWithMatcherAndConcreteValue()
 		{
 			string expected = "bar";

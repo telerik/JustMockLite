@@ -296,6 +296,99 @@ namespace Telerik.JustMock.Tests
 			Assert.Throws<AssertFailedException>(() => Mock.Assert(() => mock.Echo(Arg.IsInRange(10, 200, RangeKind.Inclusive))));
 		}
 
+		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
+		public void ShouldCompareBuiltinCollectionArgumentsElementwise()
+		{
+			string expected = "bar";
+			string argument = "foo";
+
+			var target = Mock.Create<IParams>();
+
+			Mock.Arrange(() => target.ExecuteArray(new string[] { argument, "baz" })).Returns(expected);
+			string ret = target.ExecuteArray(new string[] { argument, "baz" });
+			Assert.Equal(expected, ret);
+
+			Mock.Arrange(() => target.ExecuteArray(new List<string> { argument, "baz" })).Returns(expected);
+			ret = target.ExecuteArray(new List<string> { argument, "baz" });
+			Assert.Equal(expected, ret);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
+		public void ShouldMatchUserDefinedColletionArgumentsByReference()
+		{
+			var target = Mock.Create<IParams>();
+			var s1 = new StringVector();
+			var s2 = new StringVector();
+			Mock.Arrange(() => target.ExecuteArray(s1)).Returns("1");
+			Mock.Arrange(() => target.ExecuteArray(s2)).Returns("2");
+			Assert.Equal("1", target.ExecuteArray(s1));
+			Assert.Equal("2", target.ExecuteArray(s2));
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
+		public void ShouldNotMatchUserDefinedColletionArgumentsWithBuiltinCollectionElementwise()
+		{
+			var target = Mock.Create<IParams>();
+			var s1 = new StringVector();
+			Mock.Arrange(() => target.ExecuteArray(s1)).Returns("1");
+			Assert.Equal("", target.ExecuteArray(new string[0]));
+		}
+
+		public class StringVector : ICollection<string>
+		{
+			#region ICollection<string>
+			public void Add(string item)
+			{
+				throw new InvalidOperationException();
+			}
+
+			public void Clear()
+			{
+				throw new InvalidOperationException();
+			}
+
+			public bool Contains(string item)
+			{
+				throw new InvalidOperationException();
+			}
+
+			public void CopyTo(string[] array, int arrayIndex)
+			{
+				throw new InvalidOperationException();
+			}
+
+			public int Count
+			{
+				get { throw new InvalidOperationException(); }
+			}
+
+			public bool IsReadOnly
+			{
+				get { throw new InvalidOperationException(); }
+			}
+
+			public bool Remove(string item)
+			{
+				throw new InvalidOperationException();
+			}
+
+			public IEnumerator<string> GetEnumerator()
+			{
+				throw new InvalidOperationException();
+			}
+
+			System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+			{
+				throw new InvalidOperationException();
+			}
+			#endregion
+		}
+
+		public interface IParams
+		{
+			string ExecuteArray(IEnumerable<string> arg);
+		}
+
 		public class Entity
 		{
 			public string Prop1 { get; set; }
