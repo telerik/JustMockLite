@@ -67,9 +67,14 @@ namespace Telerik.JustMock.Core.MatcherTree
 
 			if (this.Value != null && valueMatcher.Value != null)
 			{
-				var thisEnumerableType = this.Value.GetType().GetImplementationOfGenericInterface(typeof(IEnumerable<>));
-				var otherEnumerableType = valueMatcher.Value.GetType().GetImplementationOfGenericInterface(typeof(IEnumerable<>));
-				if (thisEnumerableType != null && thisEnumerableType == otherEnumerableType)
+				var thisType = this.Value.GetType();
+				var otherType = valueMatcher.Value.GetType();
+				var thisEnumerableType = thisType.GetImplementationOfGenericInterface(typeof(IEnumerable<>));
+				var otherEnumerableType = otherType.GetImplementationOfGenericInterface(typeof(IEnumerable<>));
+				if (thisEnumerableType != null
+					&& thisEnumerableType == otherEnumerableType
+					&& IsSystemCollection(thisType)
+					&& IsSystemCollection(otherType))
 				{
 					var elementType = thisEnumerableType.GetGenericArguments()[0];
 					var sequenceEqualsMethod = typeof(Enumerable).GetMethods()
@@ -80,6 +85,12 @@ namespace Telerik.JustMock.Core.MatcherTree
 			}
 
 			return false;
+		}
+
+		private static bool IsSystemCollection(Type type)
+		{
+			return type.FullName.StartsWith("System.Collections.") && type.IsClass && !type.IsAbstract
+				 || type.IsArray;
 		}
 
 		public override Expression ToExpression(Type argumentType)
