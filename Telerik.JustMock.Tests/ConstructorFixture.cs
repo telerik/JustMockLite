@@ -70,6 +70,17 @@ namespace Telerik.JustMock.Tests
 			var downloadDateCompleted = Mock.Create<System.IO.IsolatedStorage.IsolatedStorageFile>();
 			Assert.NotNull(downloadDateCompleted != null);
 		}
+
+		[TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
+		public void ShouldFutureMockConstructorWithArg()
+		{
+			long? arg = null;
+			Mock.Arrange(() => new CtorLongArg(Arg.AnyLong)).DoInstead<long>(x => arg = x);
+
+			new CtorLongArg(100);
+			Assert.True(arg.Value == 100);
+		}
+
 #endif
 
 		public class Foo
