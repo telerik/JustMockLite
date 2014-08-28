@@ -776,6 +776,29 @@ namespace Telerik.JustMock.Tests
 			Assert.True(ex.Message.Contains("--no calls--"));
 		}
 
+		public abstract class AbstractCUT
+		{
+			public void A() { this.DoA(); }
+			public abstract void DoA();
+
+			public void B() { this.DoB(); }
+			protected abstract void DoB();
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+		public void ShouldAssertAbstractMethodExercisedOnAbstractCUT()
+		{
+			var target = Mock.Create<AbstractCUT>(Behavior.CallOriginal);
+
+			Mock.Arrange(() => target.DoA()).DoNothing();
+			target.A();
+			Mock.Assert(() => target.DoA(), Occurs.Once());
+
+			Mock.NonPublic.Arrange(target, "DoB").DoNothing();
+			target.B();
+			Mock.NonPublic.Assert(target, "DoB", Occurs.Once());
+		}
+
 		public class FooWithSetThatThows
 		{
 			public virtual int Value
