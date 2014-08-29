@@ -18,7 +18,7 @@
 using System;
 using System.Linq;
 
-namespace Telerik.JustMock
+namespace Telerik.JustMock.Core
 {
 	/// <summary>
 	/// Mock exception.

@@ -18,7 +18,7 @@
 using System;
 using System.Linq;
 
-namespace Telerik.JustMock
+namespace Telerik.JustMock.Setup
 {
 	/// <summary>
 	/// Used to disable the automatic generation of calls to Mock.Reset() in test methods by the profiler.
