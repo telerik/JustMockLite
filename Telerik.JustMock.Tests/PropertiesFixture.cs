@@ -16,6 +16,7 @@
 */
 
 using System;
+using Telerik.JustMock.Core;
 
 #if !NUNIT
 using System.Collections.Generic;

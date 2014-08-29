@@ -1466,6 +1466,12 @@
     <Compile Include="..\Telerik.JustMock\Core\MatcherTree\ValueMatcher.cs">
       <Link>Core\MatcherTree\ValueMatcher.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MockAssertionFailedException.cs">
+      <Link>Core\MockAssertionFailedException.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MockException.cs">
+      <Link>Core\MockException.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Core\MockingUtil.cs">
       <Link>Core\MockingUtil.cs</Link>
     </Compile>
@@ -1495,9 +1501,6 @@
     </Compile>
     <Compile Include="..\Telerik.JustMock\DebugView.cs">
       <Link>DebugView.cs</Link>
-    </Compile>
-    <Compile Include="..\Telerik.JustMock\DisableAutomaticRepositoryResetAttribute.cs">
-      <Link>DisableAutomaticRepositoryResetAttribute.cs</Link>
     </Compile>
     <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IAction.cs">
       <Link>Expectations\Abstraction\IAction.cs</Link>
@@ -1601,12 +1604,6 @@
     <Compile Include="..\Telerik.JustMock\Mock.VisualBasic2008.cs">
       <Link>Mock.VisualBasic2008.cs</Link>
     </Compile>
-    <Compile Include="..\Telerik.JustMock\MockAssertionFailedException.cs">
-      <Link>MockAssertionFailedException.cs</Link>
-    </Compile>
-    <Compile Include="..\Telerik.JustMock\MockException.cs">
-      <Link>MockException.cs</Link>
-    </Compile>
     <Compile Include="..\Telerik.JustMock\Occurs.cs">
       <Link>Occurs.cs</Link>
     </Compile>
@@ -1621,6 +1618,9 @@
     </Compile>
     <Compile Include="..\Telerik.JustMock\Resources.Designer.cs">
       <Link>Resources.Designer.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Setup\DisableAutomaticRepositoryResetAttribute.cs">
+      <Link>Setup\DisableAutomaticRepositoryResetAttribute.cs</Link>
     </Compile>
     <Compile Include="..\Telerik.JustMock\Setup\FluentConfig.cs">
       <Link>Setup\FluentConfig.cs</Link>
@@ -1689,7 +1689,7 @@
       <FlavorProperties GUID="{A1591282-1198-4647-A2B1-27E5FF5F6F3B}">
         <SilverlightProjectProperties />
       </FlavorProperties>
-      <UserProperties ProjectLinkReference="0749ebc2-4e83-4960-bf28-1ff5c2deb2b9" ProjectLinkerExcludeFilter="\\?desktop(\\.*)?$;\\?silverlight(\\.*)?$;\.desktop;\.silverlight;\.xaml;^service references(\\.*)?$;\.clientconfig;^web references(\\.*)?$" />
+      <UserProperties ProjectLinkerExcludeFilter="\\?desktop(\\.*)?$;\\?silverlight(\\.*)?$;\.desktop;\.silverlight;\.xaml;^service references(\\.*)?$;\.clientconfig;^web references(\\.*)?$" ProjectLinkReference="0749ebc2-4e83-4960-bf28-1ff5c2deb2b9" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

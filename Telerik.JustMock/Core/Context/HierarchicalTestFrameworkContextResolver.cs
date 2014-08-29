@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using Telerik.JustMock.Setup;
 
 namespace Telerik.JustMock.Core.Context
 {

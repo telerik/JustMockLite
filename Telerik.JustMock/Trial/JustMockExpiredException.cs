@@ -17,6 +17,7 @@
 
 using System;
 using System.Linq;
+using Telerik.JustMock.Core;
 
 namespace Telerik.JustMock.Trial
 {

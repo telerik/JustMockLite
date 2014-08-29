@@ -41,7 +41,7 @@ namespace Telerik.JustMock.Core.Behaviors
 	}
 }
 
-namespace Telerik.JustMock
+namespace Telerik.JustMock.Core
 {
 	public class StrictMockException : MockException
 	{

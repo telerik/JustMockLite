@@ -19,6 +19,7 @@ using System;
 using System.Linq;
 using Telerik.JustMock.AutoMock;
 using Telerik.JustMock.AutoMock.Ninject;
+using Telerik.JustMock.Core;
 
 #if !NUNIT
 using Microsoft.VisualStudio.TestTools.UnitTesting;
