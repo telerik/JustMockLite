@@ -6,7 +6,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,6 @@
 
 using System;
 using System.Collections;
-using System.Linq;
 
 namespace Telerik.JustMock.Core.Behaviors
 {
@@ -27,7 +26,7 @@ namespace Telerik.JustMock.Core.Behaviors
 
 		public MockCollectionBehavior(Type resultCollection, MocksRepository repo, IEnumerable collection)
 		{
-			this.collection = (IEnumerable) MockCollection.Create(resultCollection, repo, null, collection);
+			this.collection = (IEnumerable)MockCollection.Create(resultCollection, repo, null, collection);
 		}
 
 		public void Process(Invocation invocation)
