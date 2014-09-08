@@ -22,7 +22,7 @@ namespace Telerik.JustMock.Core.Behaviors
 	{
 		public void Process(Invocation invocation)
 		{
-			if (ShouldCallOriginal(invocation) && !invocation.UserProvidedImplementation)
+			if (ShouldCallOriginal(invocation))
 			{
 				invocation.UserProvidedImplementation = true;
 				invocation.CallOriginal = true;
