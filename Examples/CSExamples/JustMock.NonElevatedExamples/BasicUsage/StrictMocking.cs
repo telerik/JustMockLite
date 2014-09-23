@@ -18,6 +18,7 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Telerik.JustMock;
+using Telerik.JustMock.Core;
 
 namespace JustMock.NonElevatedExamples.BasicUsage.StrictMocking
 {

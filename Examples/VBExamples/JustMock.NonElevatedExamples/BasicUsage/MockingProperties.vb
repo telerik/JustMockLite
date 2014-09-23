@@ -15,6 +15,7 @@
 
 Imports System.Text
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
+Imports Telerik.JustMock.Core
 
 
 Namespace JustMock.NonElevatedExamples.BasicUsage.MockingProperties
