@@ -155,7 +155,7 @@ namespace Telerik.JustMock.Tests
 
 			list.Add(foo);
 
-			if(list.Contains(foo))
+			if (list.Contains(foo))
 			{
 				list.Remove(foo);
 			}
@@ -165,7 +165,7 @@ namespace Telerik.JustMock.Tests
 		[TestMethod, TestCategory("Lite"), TestCategory("Misc")]
 		public void ShouldBeAbleToCallBaseForGenericMethod()
 		{
-			var facade  = Mock.Create<TestFacade>();
+			var facade = Mock.Create<TestFacade>();
 
 			Mock.Arrange(() => facade.Done<ContentItem>()).CallOriginal();
 
@@ -199,7 +199,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<FooGeneric>();
 			Mock.Arrange(() => foo.Echo<int, int>(10)).CallOriginal();
-			Assert.Throws<ArgumentException>(() => foo.Echo<int,int>(10));
+			Assert.Throws<ArgumentException>(() => foo.Echo<int, int>(10));
 		}
 
 		[TestMethod, TestCategory("Lite"), Description("Reported Issue")]
@@ -236,7 +236,7 @@ namespace Telerik.JustMock.Tests
 		[TestMethod, TestCategory("Lite"), Description("Issue")]
 		public void ShouldBeToSubscribeEventForStrictMock()
 		{
-			 new EventContainer(Mock.Create<IInterface>(Behavior.Strict));
+			new EventContainer(Mock.Create<IInterface>(Behavior.Strict));
 		}
 
 		[TestMethod, TestCategory("Lite"), Description("Issue")]
@@ -264,7 +264,7 @@ namespace Telerik.JustMock.Tests
 		public class EventContainer
 		{
 			public bool Result = false;
-		   
+
 			private IInterface @interface = null;
 
 			public int NumberOfTimesCalled { get; set; }
@@ -318,7 +318,7 @@ namespace Telerik.JustMock.Tests
 
 		}
 
-		public interface IFacade<TParaentFacade>{}
+		public interface IFacade<TParaentFacade> { }
 
 		public class TestFacade
 		{
@@ -387,9 +387,9 @@ namespace Telerik.JustMock.Tests
 		[TestMethod, TestCategory("Lite"), TestCategory("Misc")]
 		public void ShouldMockClassWithInterfaceConstraints()
 		{
-			var container = Mock.Create <FakeContainer<Product>>();
+			var container = Mock.Create<FakeContainer<Product>>();
 
-			Mock.Arrange(()=> container.Do<Product>()).MustBeCalled();
+			Mock.Arrange(() => container.Do<Product>()).MustBeCalled();
 
 			container.Do<Product>();
 		}
@@ -400,7 +400,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var container = Mock.Create<IContainer>();
 			var called = false;
-			
+
 			Mock.Arrange(() => container.Resolve(Arg.IsAny<IDatabase>())).DoInstead(() => called = true);
 
 			var database = Mock.Create<IDatabase>();
@@ -452,27 +452,27 @@ namespace Telerik.JustMock.Tests
 			Assert.Null(exmpleMock.GetMeAllFoos());
 		}
 
-		#if !SILVERLIGHT
+#if !SILVERLIGHT
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Misc")]
 		public void ShouldMockInternalMemberFromBaseClass()
 		{
 			var id = Guid.NewGuid();
-			
+
 			var manager = Mock.Create<IContentManager>();
 			var facade = Mock.Create<BlogFacade>(Behavior.CallOriginal);
-			
+
 			Mock.Arrange(() => facade.ContentManager).Returns(manager);
-		  
+
 			Mock.Arrange(() => manager.GetItem(Arg.IsAny<Type>(), Arg.AnyGuid))
 				.Returns(new Product()).MustBeCalled();
-			
+
 			facade.LoadItem(id);
-			
+
 			Mock.Assert(facade.ContentManager);
 		}
 
-		#endif
+#endif
 
 
 		[TestMethod, TestCategory("Lite"), Description("Issue asserting params of object[]")]
@@ -501,7 +501,7 @@ namespace Telerik.JustMock.Tests
 		}
 
 
-		#if !SILVERLIGHT
+#if !SILVERLIGHT
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Misc")]
 		public void ShouldBeAbleToMockInternalProtectedVirtualMember()
@@ -528,7 +528,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(foo.Name, expected);
 		}
 
-		#endif
+#endif
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Misc")]
 		public void ShouldExecuteEqualsDuringAssertWithMockArgument()
@@ -550,7 +550,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Arrange(() => fileReader.ReadFile(@"C:\Foo\Categories.txt")).IgnoreArguments().OccursNever();
 
 			fileReader.FileExists(@"C:\Foo\Categories.txt");
-			
+
 			Mock.Assert(fileReader);
 		}
 
@@ -559,18 +559,18 @@ namespace Telerik.JustMock.Tests
 		{
 			string userName = "Bob";
 			string password = "Password";
-		   
+
 			ILoginService service = Mock.Create<ILoginService>();
 			Mock.Arrange(() => service.ValidateUser(userName, password)).Returns(5).OccursOnce();
 			Mock.Arrange(() => service.ValidateUser("foo", "bar")).OccursNever();
-			
+
 			SecurityHandler handler = new SecurityHandler(service);
-			
+
 			bool loggedIn = handler.LoginUser(userName, password);
-			
+
 			Assert.True(loggedIn);
 			Assert.Equal(handler.UserID, 5);
-			
+
 			Mock.Assert(service);
 		}
 
@@ -590,7 +590,7 @@ namespace Telerik.JustMock.Tests
 			{
 				throw new ArgumentException("Failed");
 			}
-		} 
+		}
 
 		public class SecurityHandler
 		{
@@ -603,7 +603,7 @@ namespace Telerik.JustMock.Tests
 				_service.DatabaseName = "NorthWind";
 			}
 
-		  
+
 			public bool LoginUser(string userName, string password)
 			{
 				UserID = _service.ValidateUser(userName, password);
@@ -660,7 +660,7 @@ namespace Telerik.JustMock.Tests
 
 			Mock.Arrange(() => fakereader.EOF).Returns(true).OccursOnce();
 			Mock.Arrange(() => fakereader.ReadOuterXml()).Returns("aaa").OccursNever();
-		
+
 			using (fakereader)
 			{
 				if (!fakereader.EOF)
@@ -734,7 +734,7 @@ namespace Telerik.JustMock.Tests
 		public interface ITestInterface
 		{
 			void DoStuff(byte[] bytes);
-		} 
+		}
 
 		public class Foo<TEntity>
 		{
@@ -774,7 +774,7 @@ namespace Telerik.JustMock.Tests
 			bool EOF { get; }
 			string ReadOuterXml();
 		}
- 
+
 		public class DummyExpression
 		{
 			public virtual object Evaluate(int arg1, string myString)
@@ -888,7 +888,7 @@ namespace Telerik.JustMock.Tests
 
 		public interface IContainer
 		{
-			void Resolve(object obj);    
+			void Resolve(object obj);
 		}
 
 		public class FakeContainer<T> where T : class
@@ -962,7 +962,7 @@ namespace Telerik.JustMock.Tests
 		{
 			// dummy interface.
 		}
-	   
+
 		public interface ISomething<T>
 		{
 			void DoSomething<U>() where U : T;

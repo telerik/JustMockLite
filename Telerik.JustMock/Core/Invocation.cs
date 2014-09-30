@@ -16,7 +16,6 @@
 */
 
 using System;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -25,12 +24,25 @@ namespace Telerik.JustMock.Core
 	public sealed class Invocation
 	{
 		private MethodBase method;
+		private object[] args;
 
 		private object returnValue;
 		private bool isReturnValueSet;
 
 		internal object Instance { get; set; }
-		internal object[] Args { get; set; }
+
+		internal object[] Args
+		{
+			get { return this.args; }
+			set
+			{
+				if (this.args != null)
+				{
+					throw new InvalidOperationException("Settings Args again is not allowed");
+				}
+				this.args = value;
+			}
+		}
 
 		internal object ReturnValue
 		{

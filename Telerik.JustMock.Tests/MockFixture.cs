@@ -213,8 +213,8 @@ namespace Telerik.JustMock.Tests
 			Mock.Arrange(() => foo.GetString("x")).CallOriginal();
 			Mock.Arrange(() => foo.GetString("y")).Returns("z");
 
-			Assert.Equal(foo.GetString("x"), "x");
-			Assert.Equal(foo.GetString("y"), "z");
+			Assert.Equal("x", foo.GetString("x"));
+			Assert.Equal("z", foo.GetString("y"));
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
