@@ -270,7 +270,6 @@ namespace Telerik.JustMock.Core
 
 		public static object GetUninitializedObject(Type type)
 		{
-
 #if SILVERLIGHT
 			return ProfilerInterceptor.GetUninitializedObjectImpl(type);
 #else

@@ -32,32 +32,37 @@ namespace Telerik.JustMock.Core
 {
 	internal static class ProfilerInterceptor
 	{
-		public static bool IsProfilerAttached { [DebuggerHidden] get { return bridge != null; } }
-		public static bool IsInterceptionEnabled { get; set; }
-		public static readonly Func<Type, object> GetUninitializedObjectImpl;
-		public static readonly Func<string, byte[], object> CreateStrongNameAssemblyNameImpl;
-		public static readonly Func<Type, object[], object> CreateInstanceWithArgsImpl;
+		private static bool DispatchInvocation(Invocation invocation)
+		{
+			var mockMixin = MocksRepository.GetMockMixinFromInvocation(invocation);
+			var repo = mockMixin != null ? mockMixin.Repository : MockingContext.ResolveRepository(UnresolvedContextBehavior.CreateNewContextual);
 
-		private static readonly Type bridge;
-		private static readonly Func<string/*module mvid or name (SL)*/, int /*typedef token*/, int /*id*/> GetTypeIdImpl;
-		private static readonly Dictionary<Type, int> enabledInterceptions = new Dictionary<Type, int>();
-		private static readonly byte[] arrangedTypesArray = new byte[100000];
-		private static readonly object mutex = new object();
-		private static readonly Func<int> getReentrancyCounter;
-		private static readonly Action<int> setReentrancyCounter;
-		private static readonly Func<bool> getIsInterceptionSetup;
-		private static readonly Action<bool> setIsInterceptionSetup;
-		private static readonly Action<RuntimeTypeHandle> runClassConstructor;
+			if (repo == null)
+				repo = TryFindGlobalInterceptor(invocation.Method);
+			if (repo == null)
+				return false;
 
-		private static readonly Dictionary<MethodBase, List<MocksRepository>> globalInterceptors = new Dictionary<MethodBase, List<MocksRepository>>();
+			DebugView.TraceEvent(IndentLevel.Dispatch, () => String.Format("Intercepted profiler call: {0}", invocation.InputToString()));
+			DebugView.PrintStackTrace();
 
-		[ThreadStatic]
-		private static int surrogateReentrancyCounter;
+			lock (repo)
+			{
+				repo.DispatchInvocation(invocation);
+			}
 
-		[ThreadStatic]
-		private static bool isFinalizerThread;
+			if (invocation.CallOriginal)
+			{
+				DebugView.TraceEvent(IndentLevel.DispatchResult, () => "Calling original implementation");
+			}
+			else if (invocation.IsReturnValueSet)
+			{
+				DebugView.TraceEvent(IndentLevel.DispatchResult, () => String.Format("Returning value '{0}'", invocation.ReturnValue));
+			}
 
-		private static bool Intercept(RuntimeTypeHandle typeHandle, RuntimeMethodHandle methodHandle, object[] data)
+			return true;
+		}
+
+		private static bool InterceptCall(RuntimeTypeHandle typeHandle, RuntimeMethodHandle methodHandle, object[] data)
 		{
 			if (!IsInterceptionEnabled || isFinalizerThread)
 				return true;
@@ -70,41 +75,23 @@ namespace Telerik.JustMock.Core
 				if (method.DeclaringType == null)
 					return true;
 
-				var invocation = CreateInvocation(data, method);
-
-				var mockMixin = MocksRepository.GetMockMixinFromInvocation(invocation);
-				var repo = mockMixin != null ? mockMixin.Repository : MockingContext.ResolveRepository(UnresolvedContextBehavior.CreateNewContextual);
-
-				if (repo == null)
-					repo = TryFindGlobalInterceptor(method);
-
-				if (repo != null)
+				if (method == skipMethodInterceptionOnce)
 				{
-					DebugView.TraceEvent(IndentLevel.Dispatch, () => String.Format("Intercepted profiler call: {0}", invocation.InputToString()));
-					DebugView.PrintStackTrace();
-					
-					lock (repo)
-					{
-						repo.DispatchInvocation(invocation);
-					}
+					skipMethodInterceptionOnce = null;
+					return true;
+				}
 
+				var invocation = new Invocation(data[0], method, data.Skip(2).ToArray());
+
+				if (DispatchInvocation(invocation))
+				{
+					data[1] = invocation.ReturnValue;
 					int methodArgsCount = method.GetParameters().Length;
 					for (int i = 0; i < methodArgsCount; ++i)
-						data[i + 1] = invocation.Args[i];
-					data[data.Length - 1] = invocation.ReturnValue;
-
-					if (invocation.CallOriginal)
-					{
-						DebugView.TraceEvent(IndentLevel.DispatchResult, () => "Calling original implementation");
-					}
-					else if (invocation.IsReturnValueSet)
-					{
-						DebugView.TraceEvent(IndentLevel.DispatchResult, () => String.Format("Returning value '{0}'", invocation.ReturnValue));
-					}
+						data[i + 2] = invocation.Args[i];
 
 					return invocation.CallOriginal;
 				}
-
 				return true;
 			}
 			finally
@@ -113,15 +100,38 @@ namespace Telerik.JustMock.Core
 			}
 		}
 
-		private static Invocation CreateInvocation(object[] data, MethodBase method)
+		private static object InterceptNewobj(RuntimeTypeHandle typeHandle, RuntimeMethodHandle methodHandle, object[] data)
 		{
-			var invocation = new Invocation();
-			object instance = data[0];
-			invocation.Instance = instance;
+			if (!IsInterceptionEnabled || isFinalizerThread)
+				return null;
 
-			invocation.Method = method;
-			invocation.Args = data.Skip(1).Take(method.GetParameters().Length).ToArray();
-			return invocation;
+			try
+			{
+				ReentrancyCounter++;
+
+				var method = MethodBase.GetMethodFromHandle(methodHandle, typeHandle);
+
+				var invocation = new Invocation(MockingUtil.GetUninitializedObject(method.DeclaringType), method, data ?? new object[0]);
+
+				if (DispatchInvocation(invocation))
+				{
+					if (invocation.CallOriginal)
+					{
+						skipMethodInterceptionOnce = method;
+						return null;
+					}
+					if (invocation.IsReturnValueSet && invocation.ReturnValue != null)
+					{
+						return invocation.ReturnValue;
+					}
+					return invocation.Instance;
+				}
+				return null;
+			}
+			finally
+			{
+				ReentrancyCounter--;
+			}
 		}
 
 		static ProfilerInterceptor()
@@ -161,13 +171,13 @@ namespace Telerik.JustMock.Core
 			MethodInfo getProfilerVersion = bridge.GetMethod("GetProfilerVersion");
 			if (getProfilerVersion == null)
 				throw new MockException("Telerik.CodeWeaver.Profiler.dll is old.\nRegister the updated version.");
-	
+
 			string profilerVersion = (string)getProfilerVersion.Invoke(null, null);
 			Debug.Assert(null != profilerVersion);
 			var codeWeaverAssemblyVersion = new Version(profilerVersion);
 			int comparison = justMockAssemblyVersion.CompareTo(codeWeaverAssemblyVersion);
 
-			if (comparison != 0)			
+			if (comparison != 0)
 			{
 				string baseMessage = string.Format("Telerik.JustMock.dll version: {0}\nTelerik.CodeWeaver.Profiler.dll version: {1}\n",
 					justMockAssemblyVersion.ToString(),
@@ -194,10 +204,14 @@ namespace Telerik.JustMock.Core
 					FinalizerThreadIdentifier.Identify();
 
 					var processInvocationType = typeof(object).Assembly.GetType("Telerik.JustMock.ProcessInvocationDelegate");
-					Func<RuntimeTypeHandle, RuntimeMethodHandle, object[], bool> interceptAsAction = Intercept;
-					var intercept = Delegate.CreateDelegate(processInvocationType, interceptAsAction.Method);
+					Func<RuntimeTypeHandle, RuntimeMethodHandle, object[], bool> interceptCallAsAction = InterceptCall;
+					var interceptCallDelegate = Delegate.CreateDelegate(processInvocationType, interceptCallAsAction.Method);
+					bridge.GetField("ProcessInvocation").SetValue(null, interceptCallDelegate);
 
-					bridge.GetField("ProcessInvocation").SetValue(null, intercept);
+					var processNewobjType = typeof(object).Assembly.GetType("Telerik.JustMock.ProcessNewobjDelegate");
+					Func<RuntimeTypeHandle, RuntimeMethodHandle, object[], object> interceptNewobjAsAction = InterceptNewobj;
+					var interceptNewobjDelegate = Delegate.CreateDelegate(processNewobjType, interceptNewobjAsAction.Method);
+					bridge.GetField("ProcessNewobj").SetValue(null, interceptNewobjDelegate);
 
 					var arrangedTypesField = bridge.GetField("ArrangedTypesArray");
 					arrangedTypesField.SetValue(null, arrangedTypesArray);
@@ -206,7 +220,7 @@ namespace Telerik.JustMock.Core
 				}
 			}
 		}
-  
+
 		public static int ReentrancyCounter
 		{
 			[DebuggerHidden]
@@ -229,7 +243,7 @@ namespace Telerik.JustMock.Core
 #if DEBUG
 		private static readonly Dictionary<MocksRepository, HashSet<Type>> typesEnabledByRepo = new Dictionary<MocksRepository, HashSet<Type>>();
 
-		#endif
+#endif
 		public static void EnableInterception(Type type, bool enabled, MocksRepository behalf)
 		{
 			if (IsProfilerAttached)
@@ -282,7 +296,7 @@ namespace Telerik.JustMock.Core
 
 				var typeId = GetTypeId(type);
 				var arrayIndex = typeId >> 3;
-				var arrayMask = 1 << (typeId & ((1<<3)-1));
+				var arrayMask = 1 << (typeId & ((1 << 3) - 1));
 				if (enabledInAnyRepository)
 					arrangedTypesArray[arrayIndex] = (byte)(arrangedTypesArray[arrayIndex] | arrayMask);
 				else
@@ -409,7 +423,7 @@ namespace Telerik.JustMock.Core
 			if (bridge == null)
 				ProfilerInterceptor.ThrowElevatedMockingException();
 			var method = bridge.GetMethod(bridgeMethodName);
-			delg = (T) (object) Delegate.CreateDelegate(typeof(T), method);
+			delg = (T)(object)Delegate.CreateDelegate(typeof(T), method);
 		}
 
 		public static void WrapCallToDelegate<T>(string wrappedDelegateFieldName, out T delg)
@@ -502,7 +516,7 @@ namespace Telerik.JustMock.Core
 		{
 			var fieldType = assignee.FieldType;
 
-			var action = MockingUtil.CreateDynamicMethodWithVisibilityChecks(typeof(void), new[]{fieldType}, il =>
+			var action = MockingUtil.CreateDynamicMethodWithVisibilityChecks(typeof(void), new[] { fieldType }, il =>
 				{
 					il.Emit(OpCodes.Ldarg_0);
 					il.Emit(OpCodes.Stsfld, assignee);
@@ -540,5 +554,33 @@ namespace Telerik.JustMock.Core
 				throw new Trial.JustMockExpiredException();
 			}
 		}
+
+		public static bool IsProfilerAttached { [DebuggerHidden] get { return bridge != null; } }
+		public static bool IsInterceptionEnabled { get; set; }
+		public static readonly Func<Type, object> GetUninitializedObjectImpl;
+		public static readonly Func<string, byte[], object> CreateStrongNameAssemblyNameImpl;
+		public static readonly Func<Type, object[], object> CreateInstanceWithArgsImpl;
+
+		private static readonly Type bridge;
+		private static readonly Func<string/*module mvid or name (SL)*/, int /*typedef token*/, int /*id*/> GetTypeIdImpl;
+		private static readonly Dictionary<Type, int> enabledInterceptions = new Dictionary<Type, int>();
+		private static readonly byte[] arrangedTypesArray = new byte[100000];
+		private static readonly object mutex = new object();
+		private static readonly Func<int> getReentrancyCounter;
+		private static readonly Action<int> setReentrancyCounter;
+		private static readonly Func<bool> getIsInterceptionSetup;
+		private static readonly Action<bool> setIsInterceptionSetup;
+		private static readonly Action<RuntimeTypeHandle> runClassConstructor;
+
+		private static readonly Dictionary<MethodBase, List<MocksRepository>> globalInterceptors = new Dictionary<MethodBase, List<MocksRepository>>();
+
+		[ThreadStatic]
+		private static int surrogateReentrancyCounter;
+
+		[ThreadStatic]
+		private static bool isFinalizerThread;
+
+		[ThreadStatic]
+		private static MethodBase skipMethodInterceptionOnce;
 	}
 }

@@ -6,7 +6,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+	 http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,15 +16,15 @@
 */
 
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using Telerik.JustMock.AutoMock;
 using Telerik.JustMock.AutoMock.Ninject;
+using Telerik.JustMock.AutoMock.Ninject.Parameters;
 using Telerik.JustMock.Core;
 
 #if !NUNIT
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-#else   
+#else
 using NUnit.Framework;
 using TestCategory = NUnit.Framework.CategoryAttribute;
 using TestClass = NUnit.Framework.TestFixtureAttribute;
@@ -233,7 +233,7 @@ namespace Telerik.JustMock.Tests
 		}
 
 		public interface IService { }
-		
+
 		public class Module
 		{
 			public IService service;
@@ -386,6 +386,32 @@ namespace Telerik.JustMock.Tests
 			var c = new MockingContainer<Unit>();
 			c.Instance.DoWork();
 			c.Assert<IUnitOfWork>(x => x.DoWork());
+		}
+
+		public class DisposableContainer : IDisposable
+		{
+			public IList<IDisposable> Disposables;
+
+			public DisposableContainer(IList<IDisposable> disposables)
+			{
+				this.Disposables = disposables;
+			}
+
+			public void Dispose()
+			{
+				this.Disposables.Clear();
+			}
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+		public void ShouldInjectContainers()
+		{
+			var c = new MockingContainer<DisposableContainer>();
+			var disposables = new List<IDisposable> { Mock.Create<IDisposable>(), Mock.Create<IDisposable>() };
+			var i = c.Get<DisposableContainer>(new ConstructorArgument("disposables", disposables));
+			i.Dispose();
+
+			Assert.Equal(0, disposables.Count);
 		}
 	}
 }

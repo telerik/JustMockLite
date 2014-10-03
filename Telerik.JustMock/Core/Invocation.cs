@@ -16,7 +16,6 @@
 */
 
 using System;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -29,8 +28,9 @@ namespace Telerik.JustMock.Core
 		private object returnValue;
 		private bool isReturnValueSet;
 
-		internal object Instance { get; set; }
-		internal object[] Args { get; set; }
+		internal object Instance { get; private set; }
+
+		internal object[] Args { get; private set; }
 
 		internal object ReturnValue
 		{
@@ -55,6 +55,14 @@ namespace Telerik.JustMock.Core
 		internal MocksRepository Repository { get; set; }
 
 		internal Action ExceptionThrower { get; set; }
+
+		internal Invocation(object instance, MethodBase method, object[] args)
+		{
+			this.Instance = instance;
+			this.Method = method;
+			this.Args = args;
+		}
+
 		internal void ThrowExceptionIfNecessary()
 		{
 			if (ExceptionThrower != null)
@@ -67,7 +75,7 @@ namespace Telerik.JustMock.Core
 			{
 				return this.method;
 			}
-			set
+			private set
 			{
 				if (value != null)
 				{

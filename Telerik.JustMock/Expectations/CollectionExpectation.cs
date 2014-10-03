@@ -30,7 +30,7 @@ namespace Telerik.JustMock.Expectations
 	/// </summary>
 	public class CollectionExpectation<TReturn> : CommonExpectation<FuncExpectation<TReturn>>, IReturnCollection
 	{
-		internal CollectionExpectation() {}
+		internal CollectionExpectation() { }
 
 #if !LITE_EDITION
 
@@ -51,11 +51,11 @@ namespace Telerik.JustMock.Expectations
 
 		protected void ProcessReturnsValue(TReturn value)
 		{
-			this.CheckNotConstructorArrangement();
+			this.CheckConstructorArrangement();
 
 			this.ProcessDoInstead(new Func<TReturn>(() => value), false);
 
-			if ((object) value != null)
+			if ((object)value != null)
 			{
 				var mock = MocksRepository.GetMockMixin(value, typeof(TReturn));
 				if (mock != null && this.Mock != null)
@@ -65,18 +65,27 @@ namespace Telerik.JustMock.Expectations
 
 		private void ProcessReturnsCollection(IEnumerable collection)
 		{
-			this.CheckNotConstructorArrangement();
+			this.CheckConstructorArrangement();
 
 			var mock = (IMethodMock)this;
 			mock.Behaviors.Add(new MockCollectionBehavior(typeof(TReturn), mock.Repository, collection));
 		}
 
-		private void CheckNotConstructorArrangement()
+		private void CheckConstructorArrangement()
 		{
 			var mock = (IMethodMock)this;
-			if (mock.CallPattern.Method.IsConstructor)
+			var method = mock.CallPattern.Method;
+			if (!method.IsConstructor)
+				return;
+
+			if (method.GetParameters().Any(p => p.ParameterType == typeof(IntPtr)))
 			{
-				throw new MockException("Arranging the return value of a constructor call is not supported.");
+				throw new MockException("Arranging the return value of a constructor that has an IntPtr argument is not supported.");
+			}
+
+			if (method.DeclaringType.IsValueType)
+			{
+				throw new MockException("Arranging the return value of a constructor call is not supported for value types.");
 			}
 		}
 	}
