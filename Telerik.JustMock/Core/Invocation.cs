@@ -24,25 +24,13 @@ namespace Telerik.JustMock.Core
 	public sealed class Invocation
 	{
 		private MethodBase method;
-		private object[] args;
 
 		private object returnValue;
 		private bool isReturnValueSet;
 
-		internal object Instance { get; set; }
+		internal object Instance { get; private set; }
 
-		internal object[] Args
-		{
-			get { return this.args; }
-			set
-			{
-				if (this.args != null)
-				{
-					throw new InvalidOperationException("Settings Args again is not allowed");
-				}
-				this.args = value;
-			}
-		}
+		internal object[] Args { get; private set; }
 
 		internal object ReturnValue
 		{
@@ -67,6 +55,14 @@ namespace Telerik.JustMock.Core
 		internal MocksRepository Repository { get; set; }
 
 		internal Action ExceptionThrower { get; set; }
+
+		internal Invocation(object instance, MethodBase method, object[] args)
+		{
+			this.Instance = instance;
+			this.Method = method;
+			this.Args = args;
+		}
+
 		internal void ThrowExceptionIfNecessary()
 		{
 			if (ExceptionThrower != null)
@@ -79,7 +75,7 @@ namespace Telerik.JustMock.Core
 			{
 				return this.method;
 			}
-			set
+			private set
 			{
 				if (value != null)
 				{

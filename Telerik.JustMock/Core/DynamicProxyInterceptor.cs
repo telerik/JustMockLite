@@ -16,7 +16,6 @@
 */
 
 using System;
-using System.Linq;
 using Telerik.JustMock.Core.Castle.DynamicProxy;
 using Telerik.JustMock.Diagnostics;
 
@@ -42,12 +41,7 @@ namespace Telerik.JustMock.Core
 			bool callOriginal = false;
 			ProfilerInterceptor.GuardInternal(() =>
 			{
-				var mockInvocation = new Invocation
-				{
-					Args = invocation.Arguments,
-					Method = invocation.GetConcreteMethod(),
-					Instance = invocation.Proxy,
-				};
+				var mockInvocation = new Invocation(invocation.Proxy, invocation.GetConcreteMethod(), invocation.Arguments);
 
 				DebugView.TraceEvent(IndentLevel.Dispatch, () => String.Format("Intercepted DP call: {0}", mockInvocation.InputToString()));
 				DebugView.PrintStackTrace();
@@ -76,7 +70,7 @@ namespace Telerik.JustMock.Core
 			if (callOriginal)
 				CallOriginal(invocation, true);
 		}
-  
+
 		private void CallOriginal(IInvocation invocation, bool throwOnFail)
 		{
 			try

@@ -81,12 +81,7 @@ namespace Telerik.JustMock.Core
 					return true;
 				}
 
-				var invocation = new Invocation
-				{
-					Method = method,
-					Instance = data[0],
-					Args = data.Skip(2).ToArray()
-				};
+				var invocation = new Invocation(data[0], method, data.Skip(2).ToArray());
 
 				if (DispatchInvocation(invocation))
 				{
@@ -116,12 +111,7 @@ namespace Telerik.JustMock.Core
 
 				var method = MethodBase.GetMethodFromHandle(methodHandle, typeHandle);
 
-				var invocation = new Invocation
-				{
-					Method = method,
-					Instance = MockingUtil.GetUninitializedObject(method.DeclaringType),
-					Args = data ?? new object[0]
-				};
+				var invocation = new Invocation(MockingUtil.GetUninitializedObject(method.DeclaringType), method, data ?? new object[0]);
 
 				if (DispatchInvocation(invocation))
 				{
