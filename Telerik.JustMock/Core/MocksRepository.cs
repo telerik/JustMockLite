@@ -52,9 +52,9 @@ namespace Telerik.JustMock.Core
 
 	public sealed class MocksRepository
 	{
-		private static readonly List<KeyValuePair<object, IMockMixin>> externalMixinDatabase = new List<KeyValuePair<object,IMockMixin>>();
+		private static readonly List<KeyValuePair<object, IMockMixin>> externalMixinDatabase = new List<KeyValuePair<object, IMockMixin>>();
 		private static readonly Dictionary<object, IMockMixin> externalReferenceMixinDatabase = new Dictionary<object, IMockMixin>(ByRefComparer<object>.Instance);
-		
+
 		private readonly Dictionary<Type, IMockMixin> staticMixinDatabase = new Dictionary<Type, IMockMixin>();
 
 		internal static readonly HashSet<Type> KnownUnmockableTypes = new HashSet<Type>
@@ -165,7 +165,7 @@ namespace Telerik.JustMock.Core
 		{
 			return Object.Equals(queryObj, objInRegistry); // no guard - Object.Equals on a value type can't get intercepted
 		}
-  
+
 		internal static IMockMixin GetMockMixinFromInvocation(Invocation invocation)
 		{
 			return GetMockMixin(invocation.Instance, invocation.Method.DeclaringType);
@@ -201,7 +201,7 @@ namespace Telerik.JustMock.Core
 		{
 			get
 			{
-				return this.isRetired 
+				return this.isRetired
 						|| !this.creatingThread.IsAlive
 						|| (this.parentRepository != null && this.parentRepository.IsRetired);
 			}
@@ -252,12 +252,12 @@ namespace Telerik.JustMock.Core
 
 			ProfilerInterceptor.IsInterceptionEnabled = true;
 		}
-  
+
 		private MethodInfoMatcherTreeNode DeepCopy(MethodInfoMatcherTreeNode root)
 		{
-			var newRoot = (MethodInfoMatcherTreeNode) root.Clone();
+			var newRoot = (MethodInfoMatcherTreeNode)root.Clone();
 			Queue<MatcherNodeAndParent> queue = new Queue<MatcherNodeAndParent>();
-			foreach(var child in root.Children)
+			foreach (var child in root.Children)
 				queue.Enqueue(new MatcherNodeAndParent(child, newRoot));
 
 			while (queue.Count > 0)
@@ -476,7 +476,7 @@ namespace Telerik.JustMock.Core
 				if (canCreateProxy && shouldCreateProxy)
 				{
 					var interceptor = createTransparentProxy
-						? (IInterceptor) new StandardInterceptor()
+						? (IInterceptor)new StandardInterceptor()
 						: new DynamicProxyInterceptor(this);
 #if SILVERLIGHT
 					options.Hook = new ProxyGenerationHook(false, settings.InterceptorFilter);
@@ -550,7 +550,7 @@ namespace Telerik.JustMock.Core
 					}
 				}
 				var mockMixin = instance as IMockMixin;
-				
+
 				if (instance == null)
 				{
 					if (type.IsInterface || type.IsAbstract)
@@ -689,7 +689,7 @@ namespace Telerik.JustMock.Core
 
 			EnableInterception(type);
 		}
-  
+
 		private MockMixin CreateMockMixin(Type declaringType, IEnumerable<IBehavior> supplementaryBehaviors, IEnumerable<IBehavior> fallbackBehaviors, bool mockConstructorCall)
 		{
 			var mockMixin = new MockMixin
@@ -983,7 +983,7 @@ namespace Telerik.JustMock.Core
 				AssertBehaviorsForMocks(mocks, occurs != null);
 			}
 		}
-  
+
 		private MethodBase GetMethodFromCallPattern(CallPattern callPattern)
 		{
 			var method = callPattern.Method as MethodInfo;
@@ -1004,7 +1004,7 @@ namespace Telerik.JustMock.Core
 #if !SILVERLIGHT
 					if (!concreteMethod.IsInheritable() && !ProfilerInterceptor.IsProfilerAttached)
 					{
-						var reimplementedInterfaceMethod = (MethodInfo) method.GetInheritanceChain().Last();
+						var reimplementedInterfaceMethod = (MethodInfo)method.GetInheritanceChain().Last();
 						if (reimplementedInterfaceMethod.DeclaringType.IsInterface
 							&& generator.ProxyBuilder.ModuleScope.Internals.IsAccessible(reimplementedInterfaceMethod.DeclaringType))
 						{
@@ -1017,7 +1017,7 @@ namespace Telerik.JustMock.Core
 			}
 
 			if (method.DeclaringType != method.ReflectedType)
-				method = (MethodInfo) MethodBase.GetMethodFromHandle(method.MethodHandle, method.DeclaringType.TypeHandle);
+				method = (MethodInfo)MethodBase.GetMethodFromHandle(method.MethodHandle, method.DeclaringType.TypeHandle);
 
 			return method;
 		}
@@ -1115,6 +1115,12 @@ namespace Telerik.JustMock.Core
 				var newExpr = (NewExpression)expr;
 
 				method = newExpr.Constructor;
+
+				if (method == null && newExpr.Type.IsValueType)
+				{
+					throw new MockException("Empty constructor of value type is not associated with runnable code and cannot be intercepted.");
+				}
+
 				target = null;
 				args = newExpr.Arguments.ToArray();
 			}
@@ -1265,12 +1271,12 @@ namespace Telerik.JustMock.Core
 				if (Attribute.IsDefined(lastParameter, typeof(ParamArrayAttribute)) && args.Last() is NewArrayExpression)
 				{
 					hasParams = true;
-					var paramsArg = (NewArrayExpression) args.Last();
+					var paramsArg = (NewArrayExpression)args.Last();
 					args = args.Take(args.Length - 1).Concat(paramsArg.Expressions).ToArray();
 					if (paramsArg.Expressions.Count == 1)
 						hasSingleValueInParams = true;
 				}
-			
+
 				foreach (var argument in args)
 				{
 					callPattern.ArgumentMatchers.Add(CreateMatcherForArgument(argument));
@@ -1290,7 +1296,7 @@ namespace Telerik.JustMock.Core
 					}
 					else
 					{
-						var paramMatchers = callPattern.ArgumentMatchers.Skip(paramsCount - 1).Take(callPattern.ArgumentMatchers.Count - paramsCount+1);
+						var paramMatchers = callPattern.ArgumentMatchers.Skip(paramsCount - 1).Take(callPattern.ArgumentMatchers.Count - paramsCount + 1);
 						callPattern.ArgumentMatchers = callPattern.ArgumentMatchers.Take(paramsCount - 1).ToList();
 						callPattern.ArgumentMatchers.Add(new ParamsMatcher(paramMatchers.ToArray()));
 					}
@@ -1386,7 +1392,7 @@ namespace Telerik.JustMock.Core
 					var memberExpr = actualArg as MemberExpression;
 					if (memberExpr != null && typeof(Expression).IsAssignableFrom(memberExpr.Type) && memberExpr.Expression.Type.DeclaringType == typeof(ArgExpr))
 					{
-						actualArg = (Expression) actualArg.EvaluateExpression();
+						actualArg = (Expression)actualArg.EvaluateExpression();
 					}
 					var argMatcher = CreateMatcherForArgument(actualArg);
 					argMatcher.ProtectRefOut = argAttribute.GetType() == typeof(RefArgAttribute);
@@ -1464,7 +1470,7 @@ namespace Telerik.JustMock.Core
 
 			PreserveRefOutValuesBehavior.Attach(methodMock);
 			ConstructorMockBehavior.Attach(methodMock);
-			
+
 			MethodInfoMatcherTreeNode funcRoot;
 			if (!arrangementTreeRoots.TryGetValue(method, out funcRoot))
 			{
@@ -1474,7 +1480,7 @@ namespace Telerik.JustMock.Core
 
 			funcRoot.AddChild(methodMock.CallPattern, methodMock, this.sharedContext.GetNextArrangeId());
 		}
-  
+
 		private void CheckMethodInterceptorAvailable(IMatcher instanceMatcher, MethodBase method)
 		{
 			if (ProfilerInterceptor.IsProfilerAttached)
@@ -1657,7 +1663,7 @@ namespace Telerik.JustMock.Core
 				select new
 				{
 					node.MethodMock,
-					Acceptable = new Lazy<bool>(() => node.MethodMock.AcceptCondition == null || (bool) node.MethodMock.AcceptCondition.CallOverride(invocation))
+					Acceptable = new Lazy<bool>(() => node.MethodMock.AcceptCondition == null || (bool)node.MethodMock.AcceptCondition.CallOverride(invocation))
 				};
 
 			var resultList = resultsQ.ToList();
@@ -1791,7 +1797,7 @@ namespace Telerik.JustMock.Core
 				if (ReferenceEquals(this, obj)) return true;
 				if (obj.GetType() != this.GetType()) return false;
 
-				var other = (ProxyGenerationHook) obj;
+				var other = (ProxyGenerationHook)obj;
 				return this.myMockConstructors == other.myMockConstructors
 					&& ((this.myInterceptorFilter == null && other.myInterceptorFilter == null)
 						|| ExpressionComparer.AreEqual(this.myInterceptorFilter, other.myInterceptorFilter));
