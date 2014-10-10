@@ -103,10 +103,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>WhenFixture.tt</DependentUpon>
     </Compile>
+    <Compile Include="DelegateFixture.cs" />
     <Compile Include="EventsFixture.cs" />
     <Compile Include="FluentFixture.cs" />
     <Compile Include="FuncSpecFixture.cs" />
     <Compile Include="InOrderFixture.cs" />
+    <Compile Include="MarshalByRefFixture.cs" />
     <Compile Include="MatchersFixture.cs" />
     <Compile Include="MiscFixture.cs" />
     <Compile Include="MockFixture.cs" />
