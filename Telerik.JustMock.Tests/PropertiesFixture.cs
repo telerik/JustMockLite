@@ -16,18 +16,16 @@
 */
 
 using System;
+using System.Collections.Generic;
 using Telerik.JustMock.Core;
 
 #if !NUNIT
-using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 #else
-using NUnit.Framework;
 using TestCategory = NUnit.Framework.CategoryAttribute;
 using TestClass = NUnit.Framework.TestFixtureAttribute;
 using TestMethod = NUnit.Framework.TestAttribute;
-using TestInitialize = NUnit.Framework.SetUpAttribute;
-using TestCleanup = NUnit.Framework.TearDownAttribute;
+
 #endif
 
 namespace Telerik.JustMock.Tests
@@ -78,7 +76,7 @@ namespace Telerik.JustMock.Tests
 
 			Assert.Throws<MockException>(() => foo.Value = 2);
 		}
-	 
+
 		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
 		public void SHouldAssertPropertySetUsingMatcher()
 		{
@@ -111,7 +109,7 @@ namespace Telerik.JustMock.Tests
 
 			Mock.ArrangeSet(() => { foo[0] = Arg.Matches<string>(x => x.Equals("ping")); });
 			Mock.ArrangeSet(() => { foo[1] = Arg.IsAny<string>(); });
-		   
+
 			foo[0] = "ping";
 			foo[1] = "pong";
 		}
@@ -140,8 +138,8 @@ namespace Telerik.JustMock.Tests
 		{
 			bool expected = false;
 			var foo = Mock.Create<IFoo>(Behavior.Strict);
-			Mock.ArrangeSet(() => { foo.Value = 1; }).DoInstead(() => expected  = true);
-		   
+			Mock.ArrangeSet(() => { foo.Value = 1; }).DoInstead(() => expected = true);
+
 			foo.Value = 1;
 
 			Assert.True(expected);
@@ -215,8 +213,27 @@ namespace Telerik.JustMock.Tests
 
 			if (project.Parent == null)
 				project.Parent = new Foo();
-		   
+
 			Assert.NotNull(project.Parent);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
+		public void ShouldSetStringPropertyToNull()
+		{
+			var mock = Mock.Create<IAutomockedProperties>();
+			mock.Name = null;
+			mock.Array = null;
+			mock.Items = null;
+			Assert.Null(mock.Name);
+			Assert.Null(mock.Array);
+			Assert.Null(mock.Items);
+		}
+
+		public interface IAutomockedProperties
+		{
+			string Name { get; set; }
+			int[] Array { get; set; }
+			IEnumerable<int> Items { get; set; }
 		}
 
 		public class Foo
@@ -242,12 +259,12 @@ namespace Telerik.JustMock.Tests
 
 		public interface IProject : ISolutionItem
 		{
-			 
+
 		}
 
 		public interface IIndexedFoo
 		{
-			string this[int key] { get; set; }  
+			string this[int key] { get; set; }
 		}
 
 		public interface IFoo

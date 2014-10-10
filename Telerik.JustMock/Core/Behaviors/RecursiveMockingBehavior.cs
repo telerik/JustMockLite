@@ -46,7 +46,7 @@ namespace Telerik.JustMock.Core.Behaviors
 
 		public void Process(Invocation invocation)
 		{
-			if (invocation.ReturnValue != null)
+			if (invocation.IsReturnValueSet)
 				return;
 
 			var returnType = invocation.Method.GetReturnType();
@@ -119,7 +119,7 @@ namespace Telerik.JustMock.Core.Behaviors
 
 				if (mock == null)
 					return;
-				
+
 				if (mocksList == null)
 				{
 					mocksList = new List<KeyValuePair<object, object>>();
