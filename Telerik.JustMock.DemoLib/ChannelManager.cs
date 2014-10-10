@@ -6,7 +6,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,27 +16,24 @@
 */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Net;
 
 namespace Telerik.JustMock.DemoLib
 {
-    public class ChannelManager
-    {
-        internal static IPAddress Address { get; set; }
+	public class ChannelManager
+	{
+		internal static IPAddress Address { get; set; }
 
-        public static void Open()
-        {
-            ChannelManager.Address = IPAddress.Parse("10.10.1.1");
+		public static void Open()
+		{
+			ChannelManager.Address = IPAddress.Parse("10.10.1.1");
 
-            var address = ChannelManager.Address;
+			var address = ChannelManager.Address;
 
-            if (address != null)
-            {
-                throw new Exception("Invalid IP address");
-            }
-        }
-    }
+			if (address != null)
+			{
+				throw new Exception("Invalid IP address");
+			}
+		}
+	}
 }

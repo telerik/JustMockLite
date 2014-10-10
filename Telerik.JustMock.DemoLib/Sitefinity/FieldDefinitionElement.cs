@@ -6,7 +6,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,49 +16,46 @@
 */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Telerik.Sitefinity.Web.UI.Fields.Config
 {
-    public abstract class FieldDefinitionElement: IFieldDefinition
-    {
-        public string ControlDefinitionName
-        {
-            get;
-            set;
-        }
+	public abstract class FieldDefinitionElement : IFieldDefinition
+	{
+		public string ControlDefinitionName
+		{
+			get;
+			set;
+		}
 
-        public string ViewName
-        {
-            get;
-            set;
-        }
+		public string ViewName
+		{
+			get;
+			set;
+		}
 
-        public DefinitionBase GetDefinition()
-        {
-            throw new NotImplementedException();
-        }
-    }
+		public DefinitionBase GetDefinition()
+		{
+			throw new NotImplementedException();
+		}
+	}
 
-    public interface IFieldDefinition : IDefinition
-    {
-        string ControlDefinitionName { get; set; }
+	public interface IFieldDefinition : IDefinition
+	{
+		string ControlDefinitionName { get; set; }
 
-        string ViewName { get; set; }
-    }
+		string ViewName { get; set; }
+	}
 
-    public interface IDefinition
-    {
-        DefinitionBase GetDefinition();
-    }
+	public interface IDefinition
+	{
+		DefinitionBase GetDefinition();
+	}
 
-    public abstract class DefinitionBase : IDefinition
-    {
-        public DefinitionBase GetDefinition()
-        {
-            return null;
-        }
-    }
+	public abstract class DefinitionBase : IDefinition
+	{
+		public DefinitionBase GetDefinition()
+		{
+			return null;
+		}
+	}
 }

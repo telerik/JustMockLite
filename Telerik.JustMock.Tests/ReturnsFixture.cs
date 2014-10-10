@@ -6,7 +6,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -74,7 +74,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(iFoo.Execute("x"), "y");
 			Assert.Equal(iFoo.Execute("x", "y"), "z");
 		}
-	 
+
 		[TestMethod, TestCategory("Lite"), TestCategory("Returns")]
 		public void ShouldReturnNullIfSepcified()
 		{
@@ -102,10 +102,10 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IFoo>();
 
-			Mock.Arrange(() => foo.Execute("ping")).Returns((Func<string>) null).MustBeCalled();
-			
+			Mock.Arrange(() => foo.Execute("ping")).Returns((Func<string>)null).MustBeCalled();
+
 			Assert.Null(foo.Execute("ping"));
-		   
+
 			Mock.Assert(foo);
 		}
 
@@ -165,7 +165,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var iFoo = Mock.Create<IFoo>();
 			Mock.Arrange(() => iFoo.Execute("x", "y", "z", "a"))
-				.Returns((string s1, string s2, string s3, string s4) => s1 + s2 + s3 + s4 );
+				.Returns((string s1, string s2, string s3, string s4) => s1 + s2 + s3 + s4);
 			Assert.Equal(iFoo.Execute("x", "y", "z", "a"), "xyza");
 		}
 
@@ -173,7 +173,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldReturnNullForArrayWhenSpecified()
 		{
 			var foo = Mock.Create<IFoo>();
-			Mock.Arrange(() => foo.Children).Returns((IFoo[]) null);
+			Mock.Arrange(() => foo.Children).Returns((IFoo[])null);
 			Assert.Null(foo.Children);
 		}
 
@@ -227,7 +227,7 @@ namespace Telerik.JustMock.Tests
 
 			int Value { get; set; }
 
-			IFoo [] Children { get; set; } 
+			IFoo[] Children { get; set; }
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Returns")]
@@ -245,7 +245,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldReturnManyValuesAndThenThrow()
 		{
 			var mock = Mock.Create<IFoo>();
-			Mock.Arrange(() => mock.Value).ReturnsMany(new[] {1, 2, 3}, AfterLastValue.ThrowAssertionFailed);
+			Mock.Arrange(() => mock.Value).ReturnsMany(new[] { 1, 2, 3 }, AfterLastValue.ThrowAssertionFailed);
 
 			Assert.Equal(1, mock.Value);
 			Assert.Equal(2, mock.Value);
@@ -322,7 +322,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldInterpretNullReturnsDelegateAsNullReturnsValue()
 		{
 			var test = Mock.Create<Entity>(Behavior.CallOriginal);
-			
+
 			Mock.Arrange(() => test.AsReference()).Returns<object>(null);
 			Assert.Null(test.AsReference());
 

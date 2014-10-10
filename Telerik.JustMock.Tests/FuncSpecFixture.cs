@@ -6,7 +6,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,11 +26,8 @@ using TestInitialize = NUnit.Framework.SetUpAttribute;
 using TestCleanup = NUnit.Framework.TearDownAttribute;
 #endif
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using Telerik.JustMock.Core;
 
 namespace Telerik.JustMock.Tests

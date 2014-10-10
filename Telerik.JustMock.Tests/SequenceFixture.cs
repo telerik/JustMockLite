@@ -6,7 +6,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,9 +16,7 @@
 */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+
 
 #if !NUNIT
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -46,7 +44,7 @@ namespace Telerik.JustMock.Tests
 
 			Mock.Arrange(() => iFoo.Execute("foo")).Returns("hello").InSequence();
 			Mock.Arrange(() => iFoo.Execute(Arg.IsAny<string>())).Throws(new ArgumentException()).InSequence();
-			
+
 			Assert.Equal(iFoo.Execute("foo"), "hello");
 			Assert.Throws<ArgumentException>(() => iFoo.Execute("crash"));
 		}
@@ -55,7 +53,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldAssertMulitipleSetupWithSameCall()
 		{
 			var foo = Mock.Create<IFoo>();
-			
+
 			Mock.Arrange(() => foo.GetIntValue()).Returns(1).InSequence();
 			Mock.Arrange(() => foo.GetIntValue()).Returns(2).InSequence();
 			Mock.Arrange(() => foo.GetIntValue()).Returns(3).InSequence();
@@ -63,7 +61,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(foo.GetIntValue(), 1);
 			Assert.Equal(foo.GetIntValue(), 2);
 			Assert.Equal(foo.GetIntValue(), 3);
-	   
+
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Sequence")]
@@ -186,7 +184,7 @@ namespace Telerik.JustMock.Tests
 
 		public interface IBar
 		{
-			   
+
 		}
 	}
 }

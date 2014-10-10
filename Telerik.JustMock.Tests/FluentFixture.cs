@@ -6,7 +6,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,7 +32,6 @@ using AssertionException = NUnit.Framework.AssertionException;
 #endif
 
 using Telerik.JustMock.Helpers;
-using System.Reflection;
 
 namespace Telerik.JustMock.Tests
 {
@@ -51,10 +50,10 @@ namespace Telerik.JustMock.Tests
 			//Act
 			var handler = new DataFileHandler(fileReader);
 			var parent = handler.GetDirectoryParent(baseDir, 4);
-			
+
 			//Assert
 			Assert.Equal(@"C:\Foo\", parent);
-			
+
 			fileReader.Assert();
 		}
 
@@ -95,7 +94,7 @@ namespace Telerik.JustMock.Tests
 
 			fileReader.Path = expected;
 
-			Assert.Throws<MockException> ( () => fileReader.Path = "abc");
+			Assert.Throws<MockException>(() => fileReader.Path = "abc");
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Fluent")]
@@ -198,7 +197,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldAssertOccursNever()
 		{
 			var foo = Mock.Create<IFoo>();
-		   
+
 			Mock.Arrange(() => foo.Submit()).OccursNever();
 
 			Mock.Assert(foo);
@@ -214,7 +213,7 @@ namespace Telerik.JustMock.Tests
 			foo.Submit();
 			foo.Submit();
 			foo.Submit();
-			
+
 			Mock.Assert(foo);
 		}
 
@@ -237,7 +236,7 @@ namespace Telerik.JustMock.Tests
 			var foo = Mock.Create<IFoo>();
 
 			Mock.Arrange(() => foo.Submit()).OccursNever();
-			
+
 			Mock.Assert(() => foo.Submit());
 		}
 
@@ -245,10 +244,10 @@ namespace Telerik.JustMock.Tests
 		public void ShouldAsssertOcurrenceWhenAppliedWithCallOriginal()
 		{
 			var foo = Mock.Create<Foo>(Behavior.CallOriginal);
-			
-			Mock.Arrange(() => foo.Submit()).OccursOnce();   
-	 
-			Assert.Throws<AssertionException>(() => Mock.Assert(() => foo.Submit()));    
+
+			Mock.Arrange(() => foo.Submit()).OccursOnce();
+
+			Assert.Throws<AssertionException>(() => Mock.Assert(() => foo.Submit()));
 		}
 
 
@@ -350,7 +349,7 @@ namespace Telerik.JustMock.Tests
 			var mock = Mock.Create<IDataProcessor>();
 			Mock.Arrange(() => mock.Process(Arg.AnyString)).DoNothing();
 
-			var data = new string[] {"abc"};
+			var data = new string[] { "abc" };
 			mock.Process(data[0]);
 
 			Mock.Assert(() => mock.Process(data[0]), Occurs.Once());
@@ -378,7 +377,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldFailToChainReturnsCallToActionExpectationFromNonPublicInterface()
 		{
 			var mock = Mock.Create<IGuidResolver>();
-			Assert.Throws<MockException>(() => Mock.NonPublic.Arrange(mock, "GetGuid", ArgExpr.IsNull<string>()).Returns((Guid?) new Guid()));
+			Assert.Throws<MockException>(() => Mock.NonPublic.Arrange(mock, "GetGuid", ArgExpr.IsNull<string>()).Returns((Guid?)new Guid()));
 		}
 	}
 }

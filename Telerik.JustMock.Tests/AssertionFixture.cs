@@ -6,7 +6,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -55,14 +55,14 @@ namespace Telerik.JustMock.Tests
 		public void ShouldThrowForNotInvokedAndNotArranged()
 		{
 			var foo = Mock.Create<IFoo>();
-			Assert.Throws<AssertionException>(() =>  Mock.Assert(()=> foo.VoidCall()));
+			Assert.Throws<AssertionException>(() => Mock.Assert(() => foo.VoidCall()));
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
 		public void ShouldAssertCallWithSetup()
 		{
-			 var foo = Mock.Create<IFoo>();
-		
+			var foo = Mock.Create<IFoo>();
+
 			Mock.Arrange(() => foo.VoidCall()).DoNothing();
 
 			foo.VoidCall();
@@ -101,7 +101,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldAssertOnlyTheSpecifiedOne()
 		{
 			var foo = Mock.Create<Foo>();
-			
+
 			Mock.Arrange(() => foo.Echo(1)).Returns(10).MustBeCalled();
 			Mock.Arrange(() => foo.Echo(2)).Returns(11).MustBeCalled();
 
@@ -116,7 +116,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<Foo>();
 			Mock.Arrange(() => foo.Echo(1)).Returns(10);
-			
+
 			foo.Echo(1);
 
 			Mock.AssertAll(foo);
@@ -128,7 +128,7 @@ namespace Telerik.JustMock.Tests
 			var foo = Mock.Create<Foo>();
 
 			foo.Value = true;
-			
+
 			Mock.AssertAll(foo);
 		}
 
@@ -149,7 +149,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<Foo>();
 			Mock.Arrange(() => foo.Echo(1)).Returns(10);
-			Assert.Throws<AssertionException>(() =>  Mock.AssertAll(foo));
+			Assert.Throws<AssertionException>(() => Mock.AssertAll(foo));
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
@@ -168,9 +168,9 @@ namespace Telerik.JustMock.Tests
 		public void ShouldAssertExpecationRecursively()
 		{
 			var bar = Mock.Create<Bar>();
-		  
+
 			Mock.Arrange(() => bar.Echo(1)).Returns(2).MustBeCalled();
-			
+
 			var foo = Mock.Create<Foo>();
 
 			Mock.Arrange(() => foo.GetBar()).Returns(bar);
@@ -308,7 +308,7 @@ namespace Telerik.JustMock.Tests
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
 		public void ShouldThrowForInvalidAssertionWithMatcher()
-		{ 
+		{
 			var foo = Mock.Create<IFoo>();
 
 			Mock.Arrange(() => foo.Execute(Arg.IsAny<int>(), Arg.IsAny<int>())).Returns((int id, int i) => i);
@@ -416,8 +416,8 @@ namespace Telerik.JustMock.Tests
 			var foo = Mock.Create<IFooIndexed>();
 
 			Mock.ArrangeSet(() => foo[0] = "ping");
-			
-			Assert.Throws<AssertionException> (() =>  Mock.AssertSet(() => foo[0] = "ping"));
+
+			Assert.Throws<AssertionException>(() => Mock.AssertSet(() => foo[0] = "ping"));
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
@@ -451,8 +451,9 @@ namespace Telerik.JustMock.Tests
 
 			Mock.ArrangeSet(() => foo[0] = "ping");
 
-			Assert.Throws<AssertionException>(() => { 
-				Mock.AssertSet(() => foo[0] = Arg.Matches<string>(x => x.StartsWith("p"))); 
+			Assert.Throws<AssertionException>(() =>
+			{
+				Mock.AssertSet(() => foo[0] = Arg.Matches<string>(x => x.StartsWith("p")));
 			});
 		}
 
@@ -667,9 +668,9 @@ namespace Telerik.JustMock.Tests
 			var foo = Mock.Create<Foo>();
 
 			Mock.Arrange(() => foo.Echo(1)).Returns((int arg) => arg).Occurs(2);
-			
+
 			foo.Echo(1);
-		   
+
 			Assert.Throws<AssertionException>(() => Mock.Assert(() => foo.Echo(Arg.AnyInt)));
 		}
 
@@ -683,8 +684,9 @@ namespace Telerik.JustMock.Tests
 
 			foo.Echo(1);
 			foo.Echo(2);
-	  
-			Assert.Throws<AssertionException>(() => {
+
+			Assert.Throws<AssertionException>(() =>
+			{
 
 				Mock.Assert(() => foo.Echo(Arg.AnyInt));
 			});
@@ -802,8 +804,8 @@ namespace Telerik.JustMock.Tests
 		{
 			public virtual int Value
 			{
-				get { return value;}
-				set { throw new NotImplementedException();}
+				get { return value; }
+				set { throw new NotImplementedException(); }
 			}
 			private readonly int value;
 		}
@@ -830,7 +832,7 @@ namespace Telerik.JustMock.Tests
 		}
 
 
-		public class FooExrepssion 
+		public class FooExrepssion
 		{
 			public virtual void Update(IEnumerable<string> arguments)
 			{
@@ -880,7 +882,7 @@ namespace Telerik.JustMock.Tests
 
 		public class Foo
 		{
-			public virtual  int Echo(int input)
+			public virtual int Echo(int input)
 			{
 				return input;
 			}

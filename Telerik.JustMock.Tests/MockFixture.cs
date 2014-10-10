@@ -6,7 +6,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -68,7 +68,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var provider = Mock.Create<IServiceProvider>();
 
-			Mock.Arrange(() => provider.GetService(typeof (IFooService))).Returns(new FooService());
+			Mock.Arrange(() => provider.GetService(typeof(IFooService))).Returns(new FooService());
 
 			Assert.True(provider.GetService(typeof(IFooService)) is FooService);
 		}
@@ -156,7 +156,7 @@ namespace Telerik.JustMock.Tests
 				.DoInstead((int arg1) => { expected = arg1; })
 				.Returns(() => expected);
 
-		   Assert.Equal(foo.Echo(10), expected);
+			Assert.Equal(foo.Echo(10), expected);
 		}
 
 
@@ -202,7 +202,7 @@ namespace Telerik.JustMock.Tests
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldThrowIfArgumentsPassedForInterface()
 		{
-			Assert.Throws<ArgumentException>(() =>  Mock.Create<IFoo>(25, true));
+			Assert.Throws<ArgumentException>(() => Mock.Create<IFoo>(25, true));
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
@@ -264,7 +264,7 @@ namespace Telerik.JustMock.Tests
 			var iFoo = Mock.Create<IFoo>();
 
 			Mock.Arrange(() => iFoo.JustCall()).DoNothing();
-			
+
 			iFoo.JustCall();
 		}
 
@@ -363,7 +363,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldAssertBaseCallWithGuid()
 		{
 			var foo = Mock.Create<FooBase>();
-			
+
 			Mock.Arrange(() => foo.GetGuid()).CallOriginal();
 
 			Assert.Equal(foo.GetGuid(), default(Guid));
@@ -397,9 +397,9 @@ namespace Telerik.JustMock.Tests
 		public void ShouldMockObject_GetHashCodeMethod()
 		{
 			var foo = Mock.Create<FooBase>();
-			
+
 			Mock.Arrange(() => foo.GetHashCode()).Returns(1);
-		  
+
 			Assert.Equal(1, foo.GetHashCode());
 		}
 
@@ -442,7 +442,7 @@ namespace Telerik.JustMock.Tests
 
 			Mock.Arrange(() => foo.Execute("ping")).Returns("pong");
 			Mock.Arrange(() => foo.Execute(Arg.IsAny<string>())).Returns("pong");
-			
+
 			Assert.Equal(foo.Execute("nothing"), "pong");
 		}
 
@@ -577,7 +577,7 @@ namespace Telerik.JustMock.Tests
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
-		public  void ShouldAssertGenericVoidCalls()
+		public void ShouldAssertGenericVoidCalls()
 		{
 			var genericClass = Mock.Create<FooGeneric<int>>();
 
@@ -596,7 +596,7 @@ namespace Telerik.JustMock.Tests
 			var genericClass = Mock.Create<FooGeneric>();
 
 			Mock.Arrange(() => genericClass.Get<int, int>(1)).Returns(10);
-			
+
 			Assert.Equal(genericClass.Get<int, int>(1), 10);
 		}
 
@@ -630,7 +630,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var fooGen = Mock.Create<FooGeneric>();
 
-			int expected  = 10;
+			int expected = 10;
 
 			Mock.Arrange(() => fooGen.Execute<int, int>(out expected)).Returns(0);
 
@@ -743,7 +743,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldCreateMockFromRealCtorWithParams()
 		{
 			// the following line should not throw any argument exception.
-			var realItem = Mock.Create(() => new RealItem("hello", 10, 20), 
+			var realItem = Mock.Create(() => new RealItem("hello", 10, 20),
 				Behavior.CallOriginal);
 
 			Assert.Equal("hello", realItem.Text);
@@ -753,25 +753,25 @@ namespace Telerik.JustMock.Tests
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldAssertMixins()
 		{
-			var realItem = Mock.Create<RealItem>(x => 
-			{ 
+			var realItem = Mock.Create<RealItem>(x =>
+			{
 				x.Implements<IDisposable>();
 				x.CallConstructor(() => new RealItem(0));
 			});
 			var iDispose = realItem as IDisposable;
-   
+
 			iDispose.Dispose();
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldImplementDependentInterfacesWhenTopIsSpecified()
 		{
-			var realItem = Mock.Create<RealItem>(x => 
-			{ 
+			var realItem = Mock.Create<RealItem>(x =>
+			{
 				x.Implements<IFooImplemted>();
 				x.CallConstructor(() => new RealItem(0));
 			});
-  
+
 			Assert.NotNull(realItem as IFoo);
 		}
 
@@ -857,11 +857,11 @@ namespace Telerik.JustMock.Tests
 		{
 			var param = Mock.Create<IParams>();
 
-			Mock.Arrange(() => 
+			Mock.Arrange(() =>
 				param.ExecuteArrayWithString(Arg.AnyString, Arg.IsAny<Dictionary<string, object>>()))
 				.MustBeCalled();
 
-			param.ExecuteArrayWithString("xxx", new Dictionary<string,object>());
+			param.ExecuteArrayWithString("xxx", new Dictionary<string, object>());
 
 			Mock.Assert(param);
 		}
@@ -1039,7 +1039,7 @@ namespace Telerik.JustMock.Tests
 			Mock.ArrangeSet(() => b_object.b_string_set_get = string.Empty).DoNothing().MustBeCalled();
 
 			b_object.b_string_set_get = string.Empty;
-		   
+
 			Mock.Assert(b_object);
 		}
 
@@ -1050,7 +1050,7 @@ namespace Telerik.JustMock.Tests
 
 			Guid goodGuid = Guid.NewGuid();
 			Guid badGuid = Guid.NewGuid();
-			
+
 			Mock.Arrange(() => foo.CallMeOnce(true, goodGuid)).OccursOnce();
 
 			foo.CallMeOnce(true, goodGuid);
@@ -1348,7 +1348,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(10, mock.Data);
 			if (Mock.IsProfilerEnabled)
 				Assert.Same(typeof(Poco), mock.GetType());
-		}         
+		}
 #elif !LITE_EDITION
 		[TestMethod, TestCategory("Elevated"), TestCategory("Mock")]
 		public void ShouldNotCreateProxyIfNotNecessary()
@@ -1426,7 +1426,7 @@ namespace Telerik.JustMock.Tests
 			}
 		}
 
-		public enum SubdivisionTypeCode : byte 
+		public enum SubdivisionTypeCode : byte
 		{
 			None = 255,
 			State = 0,
@@ -1506,7 +1506,7 @@ namespace Telerik.JustMock.Tests
 		}
 
 		public struct Size
-		{ 
+		{
 		}
 
 		public interface IRule
@@ -1523,7 +1523,7 @@ namespace Telerik.JustMock.Tests
 
 		public interface IProject : IProjectItemContainer
 		{
-			IEnumerable<IProjectItem> Items { get;}
+			IEnumerable<IProjectItem> Items { get; }
 			void AddChild();
 		}
 
@@ -1692,7 +1692,7 @@ namespace Telerik.JustMock.Tests
 		{
 			public void Do()
 			{
-				
+
 			}
 		}
 
@@ -1738,7 +1738,7 @@ namespace Telerik.JustMock.Tests
 				}
 			}
 		}
-	   
+
 		public class FooParam
 		{
 			public virtual int GetDevicesInLocations(int arg1, bool bExclude, params MesssageBox[] box)
@@ -1916,7 +1916,7 @@ namespace Telerik.JustMock.Tests
 			bool FindOne(params ICriteria[] criteria);
 		}
 
-	   
+
 		public interface IBar
 		{
 			int Echo(int value);
@@ -2043,7 +2043,7 @@ namespace Telerik.JustMock.Tests
 			private string strValue;
 			private int intValue;
 			private bool boolValue;
-		} 
+		}
 
 		#endregion
 
@@ -2127,7 +2127,7 @@ namespace Telerik.JustMock.Tests
 								.AsParallel()
 								.Select(x => generator.Generate())
 								.ToArray();
- 
+
 			// didn't throw
 		}
 
@@ -2196,7 +2196,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var mock = Mock.Create<Action<int, string>>();
 			mock(10, null);
-			
+
 			var declTypeName = mock.Method.DeclaringType.Name;
 			Assert.True(declTypeName.Contains("Action"));
 			Assert.True(declTypeName.Contains("Int32"));
@@ -2343,7 +2343,8 @@ namespace Telerik.JustMock.Tests
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldFilterInterceptors()
 		{
-			var mock = Mock.Create<ITwoFace>(conf => {
+			var mock = Mock.Create<ITwoFace>(conf =>
+			{
 				conf.SetInterceptorFilter(mi => mi.Name == "GetFace1");
 			});
 
@@ -2416,7 +2417,7 @@ namespace Telerik.JustMock.Tests
 
 			int b = 40, c;
 			var result = mock.Method(5, ref b, out c);
-			
+
 			Assert.Equal(123, result);
 			Assert.Equal(50, b);
 			Assert.Equal(100, c);
@@ -2432,7 +2433,7 @@ namespace Telerik.JustMock.Tests
 			}
 
 			public void Nothing()
-			{}
+			{ }
 
 			public void Throw()
 			{
@@ -2467,9 +2468,9 @@ namespace Telerik.JustMock.Tests
 		{
 			public T Method<T>(T a, ref T b, out T c, Func<T, T, T> mult)
 			{
-				b = mult(a, (T) Convert.ChangeType(10, typeof(T)));
-				c = mult(a, (T) Convert.ChangeType(20, typeof(T)));
-				return (T) Convert.ChangeType(123, typeof(T));
+				b = mult(a, (T)Convert.ChangeType(10, typeof(T)));
+				c = mult(a, (T)Convert.ChangeType(20, typeof(T)));
+				return (T)Convert.ChangeType(123, typeof(T));
 			}
 
 			public void Throw()

@@ -6,7 +6,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Telerik.JustMock.AutoMock;
 using Telerik.JustMock.Core;
 
 #if !NUNIT
@@ -41,7 +40,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldAssertNestedPropertySetups()
 		{
 			var foo = Mock.Create<IFoo>();
-			
+
 			Mock.Arrange(() => foo.Bar.Value).Returns(10);
 
 			Assert.Equal(10, foo.Bar.Value);
@@ -68,7 +67,7 @@ namespace Telerik.JustMock.Tests
 
 			Assert.Equal(foo.Bar.Do("x"), "xit");
 			Assert.Equal(foo.Bar1.Baz.Do("y"), "yit");
-	   }
+		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Recursive")]
 		public void ShouldAssertNestedSetupForSimilarRootAndSimilarMethods()
@@ -135,7 +134,7 @@ namespace Telerik.JustMock.Tests
 
 			Mock.Arrange(() => foo.Bar.Echo()).CallOriginal();
 
-			Assert.Equal(10, foo.Bar.Echo());    
+			Assert.Equal(10, foo.Bar.Echo());
 		}
 
 #endif

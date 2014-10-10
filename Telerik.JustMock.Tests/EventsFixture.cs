@@ -6,7 +6,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,7 +19,6 @@ using System;
 using Telerik.JustMock.Core;
 
 #if !NUNIT
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException;
 #else
@@ -101,7 +100,7 @@ namespace Telerik.JustMock.Tests
 			var executor = Mock.Create<IExecutor<int>>();
 
 			Mock.Arrange(() => executor.Execute(Arg.IsAny<string>()))
-				.Raises(() => executor.Done += null, (string s) => new FooArgs{Value = s});
+				.Raises(() => executor.Done += null, (string s) => new FooArgs { Value = s });
 
 			FooArgs args = null;
 			executor.Done += (sender, e) => args = e;
@@ -158,12 +157,12 @@ namespace Telerik.JustMock.Tests
 		[TestMethod, TestCategory("Lite"), TestCategory("Events")]
 		public void ShouldAssertRaiseAndReturnForFuncCallWithOneArg()
 		{
-			var executor = Mock.Create <IExecutor<int>>();
+			var executor = Mock.Create<IExecutor<int>>();
 
 			Mock.Arrange(() => executor.Echo(Arg.IsAny<string>()))
-			.Raises(() => executor.Done += null, (string s) => new FooArgs {Value = s})
-			.Returns( (string s) => s);
-		   
+			.Raises(() => executor.Done += null, (string s) => new FooArgs { Value = s })
+			.Returns((string s) => s);
+
 			FooArgs args = null;
 			executor.Done += (sender, e) => args = e;
 
@@ -202,7 +201,7 @@ namespace Telerik.JustMock.Tests
 				acutal = args.Value;
 			};
 
-			Mock.Raise(() => executor.Done+= null, new FooArgs(expected));
+			Mock.Raise(() => executor.Done += null, new FooArgs(expected));
 
 			Assert.Equal(expected, acutal);
 		}
@@ -222,7 +221,7 @@ namespace Telerik.JustMock.Tests
 			};
 
 			Mock.Raise(() => foo.CustomEvent += null, expected);
-			Assert.Equal(expected, acutal);            
+			Assert.Equal(expected, acutal);
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Events"), TestCategory("MockingContext")]
@@ -393,13 +392,13 @@ namespace Telerik.JustMock.Tests
 		}
 
 		public delegate void CustomEvent(string value);
-		public delegate void EchoEvent(bool echoed); 
+		public delegate void EchoEvent(bool echoed);
 
 		public class SolutionService : ISolutionService
 		{
 			public event EventHandler<ProjectEventArgs> ProjectAdded;
 		}
-		
+
 		#endregion
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Events"), TestCategory("NonPublic")]

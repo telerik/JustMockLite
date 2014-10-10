@@ -6,7 +6,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,9 +15,8 @@
    limitations under the License.
 */
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
+
 
 #if !NUNIT
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -102,8 +101,8 @@ namespace Telerik.JustMock.Tests
 
 			foo.Value = 10;
 			foo.Value = 11;
-	  
-			Mock.Assert(foo); 
+
+			Mock.Assert(foo);
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
@@ -137,7 +136,7 @@ namespace Telerik.JustMock.Tests
 			string password = "Password";
 			int userID = 5;
 			var cart = new List<string> { "Foo", "Bar" };
-		  
+
 			var userServiceMock = Mock.Create<IUserValidationService>();
 			var shoppingCartServiceMock = Mock.Create<IShoppingCartService>();
 

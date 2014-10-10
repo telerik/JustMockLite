@@ -6,7 +6,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,7 +29,7 @@ using TestMethod = NUnit.Framework.TestAttribute;
 using TestInitialize = NUnit.Framework.SetUpAttribute;
 using TestCleanup = NUnit.Framework.TearDownAttribute;
 using TestCategory = NUnit.Framework.CategoryAttribute;
-#endif  
+#endif
 
 namespace Telerik.JustMock.Tests
 {
@@ -63,9 +63,9 @@ namespace Telerik.JustMock.Tests
 		public void ShouldAssertMessageForNoSetupOnString()
 		{
 			var foo = Mock.Create<IFoo>(Behavior.Strict);
-			
+
 			string expected = "All calls on Telerik.JustMock.Tests.BehaviorFixture+IFoo should be arranged first.";
-			string actual =   Assert.Throws<MockException>(() => foo.GetGuid()).Message;
+			string actual = Assert.Throws<MockException>(() => foo.GetGuid()).Message;
 
 			Assert.Equal(expected, actual);
 		}
@@ -184,7 +184,7 @@ namespace Telerik.JustMock.Tests
 
 		public interface IMatrix
 		{
-			int[,,] GetMultidimensionalArray();
+			int[, ,] GetMultidimensionalArray();
 		}
 #endif
 
