@@ -281,6 +281,19 @@ namespace Telerik.JustMock.Core
 #endif
 		}
 
+		public static object TryGetUninitializedObject(Type type)
+		{
+#if SILVERLIGHT
+			return ProfilerInterceptor.GetUninitializedObjectImpl(type);
+#else
+			if (type == typeof(string)
+				|| typeof(ContextBoundObject).IsAssignableFrom(type)
+				|| type.IsAbstract || type.IsInterface)
+				return null;
+			return FormatterServices.GetUninitializedObject(type);
+#endif
+		}
+
 		internal static Type GetTypeFrom(string fullName)
 		{
 			var type = AppDomain.CurrentDomain

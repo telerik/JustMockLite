@@ -1518,7 +1518,7 @@ namespace Telerik.JustMock.Core
 
 				var handle = typeToIntercept.TypeHandle;
 				this.disabledTypes.Add(typeof(RuntimeHelpers));
-				ProfilerInterceptor.GuardExternal(() => ProfilerInterceptor.RunClassConstructor(handle));
+				ProfilerInterceptor.RunClassConstructor(handle);
 				this.disabledTypes.Remove(typeof(RuntimeHelpers));
 			}
 		}
