@@ -19,7 +19,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Security;
 using Telerik.JustMock.Core.MatcherTree;
 
 namespace Telerik.JustMock.Core
@@ -51,55 +50,73 @@ namespace Telerik.JustMock.Core
 			}
 			set
 			{
-				var methodImpl = value.GetMethodImplementationFlags();
-				if ((((methodImpl & MethodImplAttributes.InternalCall) != 0
-					   || (methodImpl & MethodImplAttributes.CodeTypeMask) != MethodImplAttributes.IL)
-					  && value.Module.Assembly == typeof(object).Assembly)
-					  && !value.IsInheritable())
-					throw new MockException("Cannot mock a method that is implemented internally by the CLR.");
-
-				if (!value.IsInheritable() && !ProfilerInterceptor.TypeSupportsInstrumentation(value.DeclaringType))
-					throw new MockException(String.Format("Cannot mock non-inheritable member '{0}' on type '{1}' due to CLR limitations.", value, value.DeclaringType));
-
-				if ((value.Attributes & MethodAttributes.PinvokeImpl) != 0)
-				{
-					if (!ProfilerInterceptor.IsProfilerAttached)
-						throw new MockException("The profiler must be enabled to mock DllImport methods.");
-
-					string fullName = value.DeclaringType.FullName + "." + value.Name;
-					if ((value.Attributes & MethodAttributes.HasSecurity) != 0)
-						throw new MockException(string.Format("DllImport method {0} cannot be mocked because it has security information attached.", fullName));
-					
-					// method could be the profiler generated shadow method or is inside an assembly which doesn't contain managed code (valid RVA)
-					throw new MockException(string.Format("DllImport method {0} cannot be mocked due to internal limitation.", fullName));
-				}
-				
-				var sigTypes = value.GetParameters().Select(p => p.ParameterType).Concat(new[] { value.GetReturnType() });
-				if (sigTypes.Any(sigType =>
-					{
-						while (sigType.IsByRef || sigType.IsArray)
-							sigType = sigType.GetElementType();
-						return sigType.IsPointer || sigType == typeof(TypedReference);
-					}))
-					throw new MockException("Mocking methods with pointers or TypedReference in their signature is not supported.");
-
-				if (value.GetReturnType().IsByRef)
-					throw new MockException("Cannot mock method with by-ref return value.");
-
-				if (value.CallingConvention == CallingConventions.VarArgs)
-					throw new MockException("Cannot mock method with __arglist.");
-
-				if (uninterceptedMethods.Contains(value))
-					throw new MockException("Cannot mock Object..ctor, Object.Equals, Object.ReferenceEquals or Finalize");
-
-				var asMethodInfo = value as MethodInfo;
-				if (asMethodInfo != null)
-				{
-					if (uninterceptedMethods.Contains(asMethodInfo.GetBaseDefinition()))
-						throw new MockException("Cannot mock Object.Equals, Object.ReferenceEquals or Finalize");
-				}
-
+				CheckMethodCompatibility(value);
+				CheckInstrumentationAvailability(value);
 				this.method = value;
+			}
+		}
+
+		private static void CheckMethodCompatibility(MethodBase value)
+		{
+			var sigTypes = value.GetParameters().Select(p => p.ParameterType).Concat(new[] { value.GetReturnType() });
+			if (sigTypes.Any(sigType =>
+			{
+				while (sigType.IsByRef || sigType.IsArray)
+					sigType = sigType.GetElementType();
+				return sigType.IsPointer || sigType == typeof(TypedReference);
+			}))
+				throw new MockException("Mocking methods with pointers or TypedReference in their signature is not supported.");
+
+			if (value.GetReturnType().IsByRef)
+				throw new MockException("Cannot mock method with by-ref return value.");
+
+			if (value.CallingConvention == CallingConventions.VarArgs)
+				throw new MockException("Cannot mock method with __arglist.");
+		}
+
+		private static bool IsInterceptedAtTheCallSite(MethodBase method)
+		{
+			return method.IsConstructor;
+		}
+
+		private static void CheckInstrumentationAvailability(MethodBase value)
+		{
+			if (IsInterceptedAtTheCallSite(value))
+			{
+				return;
+			}
+
+			var methodImpl = value.GetMethodImplementationFlags();
+			if ((((methodImpl & MethodImplAttributes.InternalCall) != 0
+				   || (methodImpl & MethodImplAttributes.CodeTypeMask) != MethodImplAttributes.IL)
+				  && value.Module.Assembly == typeof(object).Assembly)
+				  && !value.IsInheritable())
+				throw new MockException("Cannot mock a method that is implemented internally by the CLR.");
+
+			if (!value.IsInheritable() && !ProfilerInterceptor.TypeSupportsInstrumentation(value.DeclaringType))
+				throw new MockException(String.Format("Cannot mock non-inheritable member '{0}' on type '{1}' due to CLR limitations.", value, value.DeclaringType));
+
+			if ((value.Attributes & MethodAttributes.PinvokeImpl) != 0)
+			{
+				if (!ProfilerInterceptor.IsProfilerAttached)
+					throw new MockException("The profiler must be enabled to mock DllImport methods.");
+
+				string fullName = value.DeclaringType.FullName + "." + value.Name;
+				if ((value.Attributes & MethodAttributes.HasSecurity) != 0)
+					throw new MockException(string.Format("DllImport method {0} cannot be mocked because it has security information attached.", fullName));
+
+				// method could be the profiler generated shadow method or is inside an assembly which doesn't contain managed code (valid RVA)
+				throw new MockException(string.Format("DllImport method {0} cannot be mocked due to internal limitation.", fullName));
+			}
+
+			if (uninterceptedMethods.Contains(value))
+				throw new MockException("Cannot mock Object..ctor, Object.Equals, Object.ReferenceEquals or Finalize");
+
+			var asMethodInfo = value as MethodInfo;
+			if (asMethodInfo != null)
+			{
+				if (uninterceptedMethods.Contains(asMethodInfo.GetBaseDefinition()))
+					throw new MockException("Cannot mock Object.Equals, Object.ReferenceEquals or Finalize");
 			}
 		}
 
@@ -130,7 +147,7 @@ namespace Telerik.JustMock.Core
 			var result = new CallPattern();
 			result.Method = method;
 			result.InstanceMatcher = new AnyMatcher();
-			result.ArgumentMatchers.AddRange(Enumerable.Repeat((IMatcher) new AnyMatcher(), method.GetParameters().Length));
+			result.ArgumentMatchers.AddRange(Enumerable.Repeat((IMatcher)new AnyMatcher(), method.GetParameters().Length));
 			result.AdjustForExtensionMethod();
 			return result;
 		}

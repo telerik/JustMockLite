@@ -33,9 +33,9 @@ namespace Telerik.JustMock.Core
 {
 	internal static class MockingUtil
 	{
-		public static readonly object[] NoObjects = {};
+		public static readonly object[] NoObjects = { };
 
-		public const BindingFlags AllMembers = BindingFlags.Public | BindingFlags.NonPublic |  BindingFlags.Static | BindingFlags.Instance;
+		public const BindingFlags AllMembers = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
 
 		public static bool IsExtensionMethod(this MethodBase method)
 		{
@@ -157,7 +157,7 @@ namespace Telerik.JustMock.Core
 						result[i] = argType.MakeByRefType();
 						continue;
 					}
-					
+
 					if (Attribute.IsDefined(matcherMethod, typeof(ArgMatcherAttribute)))
 					{
 						var argType = matcherMethod.ReturnType;
@@ -275,6 +275,8 @@ namespace Telerik.JustMock.Core
 #else
 			if (typeof(ContextBoundObject).IsAssignableFrom(type))
 				throw new MockException("Cannot mock constructors of ContextBoundObject descendants.");
+			if (type == typeof(string))
+				return string.Empty;
 			return FormatterServices.GetUninitializedObject(type);
 #endif
 		}
@@ -429,7 +431,7 @@ namespace Telerik.JustMock.Core
 		public static Type GetUnproxiedType(object instance)
 		{
 			var type = instance.GetType();
-			return type.IsProxy() ? ((IMockMixin) instance).DeclaringType : type;
+			return type.IsProxy() ? ((IMockMixin)instance).DeclaringType : type;
 		}
 
 		/// <summary>
@@ -764,7 +766,7 @@ namespace Telerik.JustMock.Core
 		public static void RaiseEventThruReflection(object instance, EventInfo evt, object[] args)
 		{
 			MethodInfo raise;
-			
+
 			if ((raise = evt.GetRaiseMethod(true)) != null)
 			{
 				if (!raise.IsStatic && instance == null)
