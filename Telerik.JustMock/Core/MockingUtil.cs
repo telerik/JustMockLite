@@ -286,10 +286,11 @@ namespace Telerik.JustMock.Core
 #if SILVERLIGHT
 			return ProfilerInterceptor.GetUninitializedObjectImpl(type);
 #else
-			if (type == typeof(string)
-				|| typeof(ContextBoundObject).IsAssignableFrom(type)
+			if (typeof(ContextBoundObject).IsAssignableFrom(type)
 				|| type.IsAbstract || type.IsInterface)
 				return null;
+			if (type == typeof(string))
+				return string.Empty;
 			return FormatterServices.GetUninitializedObject(type);
 #endif
 		}

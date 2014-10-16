@@ -32,7 +32,6 @@ namespace Telerik.JustMock.Core
 			typeof(object).GetMethod("Equals", BindingFlags.Public | BindingFlags.Static),
 			typeof(object).GetMethod("ReferenceEquals", BindingFlags.Public | BindingFlags.Static),
 			typeof(object).GetMethod("Finalize", BindingFlags.NonPublic | BindingFlags.Instance),
-			typeof(object).GetConstructor(Type.EmptyTypes),
 		};
 
 		public MethodMockMatcherTreeNode MethodMockNode;
@@ -48,17 +47,24 @@ namespace Telerik.JustMock.Core
 			{
 				return this.method;
 			}
-			set
-			{
-				CheckMethodCompatibility(value);
-				CheckInstrumentationAvailability(value);
-				this.method = value;
-			}
 		}
 
-		private static void CheckMethodCompatibility(MethodBase value)
+		public void SetMethod(MethodBase method, bool checkCompatibility)
 		{
-			var sigTypes = value.GetParameters().Select(p => p.ParameterType).Concat(new[] { value.GetReturnType() });
+			if (checkCompatibility)
+			{
+				if (method == typeof(object).GetConstructor(Type.EmptyTypes))
+					DebugView.TraceEvent(Diagnostics.IndentLevel.Warning, () => "System.Object constructor will be intercepted only in 'new' expressions, i.e. 'new object()'.");
+
+				CheckMethodCompatibility(method);
+				CheckInstrumentationAvailability(method);
+			}
+			this.method = method;
+		}
+
+		private static void CheckMethodCompatibility(MethodBase method)
+		{
+			var sigTypes = method.GetParameters().Select(p => p.ParameterType).Concat(new[] { method.GetReturnType() });
 			if (sigTypes.Any(sigType =>
 			{
 				while (sigType.IsByRef || sigType.IsArray)
@@ -67,10 +73,10 @@ namespace Telerik.JustMock.Core
 			}))
 				throw new MockException("Mocking methods with pointers or TypedReference in their signature is not supported.");
 
-			if (value.GetReturnType().IsByRef)
+			if (method.GetReturnType().IsByRef)
 				throw new MockException("Cannot mock method with by-ref return value.");
 
-			if (value.CallingConvention == CallingConventions.VarArgs)
+			if (method.CallingConvention == CallingConventions.VarArgs)
 				throw new MockException("Cannot mock method with __arglist.");
 		}
 
@@ -132,7 +138,7 @@ namespace Telerik.JustMock.Core
 		internal CallPattern Clone()
 		{
 			var newCallPattern = new CallPattern();
-			newCallPattern.Method = this.Method;
+			newCallPattern.method = this.method;
 			newCallPattern.InstanceMatcher = this.InstanceMatcher;
 			for (int i = 0; i < this.ArgumentMatchers.Count; i++)
 			{
@@ -145,7 +151,7 @@ namespace Telerik.JustMock.Core
 		internal static CallPattern CreateUniversalCallPattern(MethodBase method)
 		{
 			var result = new CallPattern();
-			result.Method = method;
+			result.SetMethod(method, checkCompatibility: true);
 			result.InstanceMatcher = new AnyMatcher();
 			result.ArgumentMatchers.AddRange(Enumerable.Repeat((IMatcher)new AnyMatcher(), method.GetParameters().Length));
 			result.AdjustForExtensionMethod();
