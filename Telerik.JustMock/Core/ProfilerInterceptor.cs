@@ -111,7 +111,7 @@ namespace Telerik.JustMock.Core
 
 				var method = MethodBase.GetMethodFromHandle(methodHandle, typeHandle);
 
-				var invocation = new Invocation(MockingUtil.GetUninitializedObject(method.DeclaringType), method, data ?? new object[0]);
+				var invocation = new Invocation(MockingUtil.TryGetUninitializedObject(method.DeclaringType), method, data ?? new object[0]);
 
 				if (DispatchInvocation(invocation))
 				{
@@ -441,9 +441,9 @@ namespace Telerik.JustMock.Core
 		public static void RunClassConstructor(RuntimeTypeHandle typeHandle)
 		{
 			if (runClassConstructor != null && !SecuredReflectionMethods.HasReflectionPermission)
-				runClassConstructor(typeHandle);
+				GuardExternal(() => runClassConstructor(typeHandle));
 			else
-				RuntimeHelpers.RunClassConstructor(typeHandle);
+				GuardExternal(() => RuntimeHelpers.RunClassConstructor(typeHandle));
 		}
 
 		public static void CheckIfSafeToInterceptWholesale(Type type)

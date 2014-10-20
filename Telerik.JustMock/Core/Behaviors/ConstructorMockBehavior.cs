@@ -16,7 +16,6 @@
 */
 
 using System;
-using System.Linq;
 using System.Reflection;
 using Telerik.JustMock.Core.MatcherTree;
 
@@ -39,10 +38,17 @@ namespace Telerik.JustMock.Core.Behaviors
 		public static void Attach(IMethodMock methodMock)
 		{
 			var callPattern = methodMock.CallPattern;
-			if (!(callPattern.Method is ConstructorInfo) || callPattern.Method.IsStatic || !(callPattern.InstanceMatcher is AnyMatcher))
+			if (!(callPattern.Method is ConstructorInfo)
+				|| callPattern.Method.IsStatic
+				|| !(callPattern.InstanceMatcher is AnyMatcher)
+				|| typeof(string) == callPattern.Method.DeclaringType
+#if !SILVERLIGHT
+				|| typeof(ContextBoundObject).IsAssignableFrom(callPattern.Method.DeclaringType)
+#endif
+				)
 				return;
 
 			methodMock.Behaviors.Add(new ConstructorMockBehavior());
-		}           
+		}
 	}
 }

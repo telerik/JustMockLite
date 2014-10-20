@@ -1024,7 +1024,7 @@ namespace Telerik.JustMock.Core
 
 		private void ConvertInvocationToCallPattern(Invocation invocation, CallPattern callPattern)
 		{
-			callPattern.Method = invocation.Method;
+			callPattern.SetMethod(invocation.Method, checkCompatibility: false);
 			callPattern.InstanceMatcher = new ReferenceMatcher(invocation.Instance);
 
 			var args = invocation.Args;
@@ -1052,7 +1052,7 @@ namespace Telerik.JustMock.Core
 			if (lastInvocation == null)
 				throw new MockException("The specified action did not call a mocked method.");
 
-			callPattern.Method = lastInvocation.Method;
+			callPattern.SetMethod(lastInvocation.Method, checkCompatibility: true);
 			callPattern.InstanceMatcher = new ReferenceMatcher(lastInvocation.Instance);
 
 			var matchers = this.matchersInContext;
@@ -1260,7 +1260,7 @@ namespace Telerik.JustMock.Core
 
 			// now we have the method part of the call pattern
 			Debug.Assert(method != null);
-			callPattern.Method = method;
+			callPattern.SetMethod(method, checkCompatibility: true);
 
 			//Finally, construct the arguments part of the call pattern.
 			bool hasParams = false;
@@ -1427,8 +1427,8 @@ namespace Telerik.JustMock.Core
 					method.IsStatic ? new ReferenceMatcher(null)
 					: instance == null ? (IMatcher)new AnyMatcher()
 					: new ReferenceMatcher(instance),
-				Method = method,
 			};
+			callPattern.SetMethod(method, checkCompatibility: true);
 			foreach (var arg in arguments)
 				callPattern.ArgumentMatchers.Add(CreateMatcherForArgument(arg));
 
@@ -1518,7 +1518,7 @@ namespace Telerik.JustMock.Core
 
 				var handle = typeToIntercept.TypeHandle;
 				this.disabledTypes.Add(typeof(RuntimeHelpers));
-				ProfilerInterceptor.GuardExternal(() => ProfilerInterceptor.RunClassConstructor(handle));
+				ProfilerInterceptor.RunClassConstructor(handle);
 				this.disabledTypes.Remove(typeof(RuntimeHelpers));
 			}
 		}
