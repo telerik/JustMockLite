@@ -14,7 +14,8 @@ using TestCleanup = NUnit.Framework.TearDownAttribute;
 
 namespace Telerik.JustMock.Tests
 {
-	class DelegateFixture
+	[TestClass]
+	public class DelegateFixture
 	{
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("Delegate")]
 		public void ShouldCreateMockDelegate()
