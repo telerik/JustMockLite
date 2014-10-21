@@ -141,7 +141,7 @@ namespace Telerik.JustMock.Expectations
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 				{
-					IWaitDuration wait = (IWaitDuration)args.FirstOrDefault(obj => obj != null && typeof(IWaitDuration).IsAssignableFrom(obj.GetType()));
+					IWaitDuration wait = args.OfType<IWaitDuration>().FirstOrDefault();
 					if (wait != null)
 					{
 						args = args.Where(obj => obj != wait).ToArray();
