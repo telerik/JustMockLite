@@ -320,6 +320,8 @@ namespace Telerik.JustMock.Core
 
 		internal void Reset()
 		{
+			DebugView.TraceEvent(IndentLevel.Configuration, () => String.Format("Resetting mock repository related to {0}.", this.method));
+
 			foreach (var type in this.arrangedTypes)
 				ProfilerInterceptor.EnableInterception(type, false, this);
 			this.arrangedTypes.Clear();

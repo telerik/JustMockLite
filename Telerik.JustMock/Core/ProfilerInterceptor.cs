@@ -274,6 +274,8 @@ namespace Telerik.JustMock.Core
 
 				bool enabledInAnyRepository;
 
+				DebugView.TraceEvent(IndentLevel.Configuration, () => String.Format("Interception of type {0} is now {1}", type, enabled ? "on" : "off"));
+
 				lock (enabledInterceptions)
 				{
 					var hasKey = enabledInterceptions.ContainsKey(type);

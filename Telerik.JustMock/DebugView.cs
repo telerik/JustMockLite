@@ -142,7 +142,7 @@ namespace Telerik.JustMock
 
 			GC.KeepAlive(CurrentState); // for coverage testing
 		}
-  
+
 		private static string AsIndent(this IndentLevel traceLevel)
 		{
 			return "".Join(Enumerable.Repeat("    ", (int)traceLevel));
@@ -175,6 +175,7 @@ namespace Telerik.JustMock.Diagnostics
 	{
 		Dispatch = 0,
 		Warning = 0,
+		Configuration = 0,
 		MethodMatch = 1,
 		DispatchResult = 1,
 		Matcher = 2,
