@@ -840,6 +840,15 @@ namespace Telerik.JustMock.Core
 			}
 		}
 
+		internal void AssertIgnoreInstance(Type type, bool ignoreMethodMockOccurrences)
+		{
+			using (MockingContext.BeginFailureAggregation())
+			{
+				var methodMocks = GetMethodMocksFromObject(null, type);
+				AssertBehaviorsForMocks(methodMocks.Select(m => m.MethodMock), ignoreMethodMockOccurrences);
+			}
+		}
+
 #if VISUALBASIC
 		internal Expression<Action> ConvertDelegateAndArgumentsToExpression(Delegate delg, object[] args)
 		{
@@ -1525,22 +1534,34 @@ namespace Telerik.JustMock.Core
 			}
 		}
 
-		private List<MethodMockMatcherTreeNode> GetMethodMocksFromObject(object mock)
+		private List<MethodMockMatcherTreeNode> GetMethodMocksFromObject(object mock, Type mockType = null)
 		{
 			var methodMocks = new List<MethodMockMatcherTreeNode>();
 			var visitedMocks = new List<object>(); // can't be HashSet because we can't depend on GetHashCode being implemented properly
-			GetMethodMocksFromObjectInternal(mock, methodMocks, visitedMocks);
+			GetMethodMocksFromObjectInternal(mock, mockType, methodMocks, visitedMocks);
 			return methodMocks;
 		}
 
-		private void GetMethodMocksFromObjectInternal(object mock, List<MethodMockMatcherTreeNode> methodMocks, List<object> visitedMocks)
+		private void GetMethodMocksFromObjectInternal(object mock, Type mockType, List<MethodMockMatcherTreeNode> methodMocks, List<object> visitedMocks)
 		{
 			if (visitedMocks.Contains(mock))
 				return;
 			visitedMocks.Add(mock);
 
-			var instanceMatcher = new ValueMatcher(mock);
-			foreach (var funcRoot in arrangementTreeRoots.Values.Where(x => x.Children[0].Matcher.Matches(instanceMatcher)))
+			IMatcher instanceMatcher;
+			Func<MethodInfoMatcherTreeNode, bool> rootMatcher;
+			if (mockType != null)
+			{
+				instanceMatcher = new AnyMatcher();
+				rootMatcher = node => mockType.IsAssignableFrom(node.MethodInfo.DeclaringType);
+			}
+			else
+			{
+				instanceMatcher = new ValueMatcher(mock);
+				rootMatcher = node => node.Children[0].Matcher.Matches(instanceMatcher);
+			}
+
+			foreach (var funcRoot in arrangementTreeRoots.Values.Where(rootMatcher))
 			{
 				var callPattern = CallPattern.CreateUniversalCallPattern(funcRoot.MethodInfo);
 				callPattern.InstanceMatcher = instanceMatcher;
@@ -1549,11 +1570,14 @@ namespace Telerik.JustMock.Core
 				methodMocks.AddRange(results);
 			}
 
-			var mockMixin = GetMockMixin(mock, null);
-			if (mockMixin != null)
+			if (mock != null)
 			{
-				foreach (var dependentMock in mockMixin.DependentMocks)
-					GetMethodMocksFromObjectInternal(dependentMock, methodMocks, visitedMocks);
+				var mockMixin = GetMockMixin(mock, null);
+				if (mockMixin != null)
+				{
+					foreach (var dependentMock in mockMixin.DependentMocks)
+						GetMethodMocksFromObjectInternal(dependentMock, null, methodMocks, visitedMocks);
+				}
 			}
 		}
 
