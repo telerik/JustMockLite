@@ -30,7 +30,7 @@ namespace Telerik.JustMock.Core.Context
 		protected readonly Dictionary<string, Assembly> frameworkAssemblies;
 
 		public abstract MocksRepository ResolveRepository(UnresolvedContextBehavior unresolvedContextBehavior);
-		
+
 		public abstract bool RetireRepository();
 
 		public MockingContextResolverBase(string assertFailedExceptionTypeName, params string[] frameworkAssemblyNames)
@@ -47,25 +47,26 @@ namespace Telerik.JustMock.Core.Context
 				throw new MockException(String.Format("{0} did not resolve the framework assemblies.", this.GetType()));
 		}
 
-		public Action<string> GetFailMethod()
+		public Action<string, Exception> GetFailMethod()
 		{
 			var assertionFailedExceptionType = this.FindType(assertFailedExceptionTypeName);
 			var factoryExpr = CreateExceptionFactory(assertionFailedExceptionType);
 			var factory = factoryExpr.Compile();
 
-			return message =>
+			return (message, innerException) =>
 			{
-				var exception = factory(message);
+				var exception = factory(message, innerException);
 				throw exception;
 			};
 		}
 
-		protected virtual Expression<Func<string, Exception>> CreateExceptionFactory(Type assertionException)
+		protected virtual Expression<Func<string, Exception, Exception>> CreateExceptionFactory(Type assertionException)
 		{
-			var exceptionCtor = assertionException.GetConstructor(new[] { typeof(string) });
+			var exceptionCtor = assertionException.GetConstructor(new[] { typeof(string), typeof(Exception) });
 			var messageParam = Expression.Parameter(typeof(string), "message");
-			var newException = Expression.New(exceptionCtor, messageParam);
-			return (Expression<Func<string, Exception>>) Expression.Lambda(typeof(Func<string, Exception>), newException, messageParam);
+			var innerExceptionParam = Expression.Parameter(typeof(Exception), "innerException");
+			var newException = Expression.New(exceptionCtor, messageParam, innerExceptionParam);
+			return (Expression<Func<string, Exception, Exception>>)Expression.Lambda(typeof(Func<string, Exception, Exception>), newException, messageParam, innerExceptionParam);
 		}
 
 		protected Type FindType(string assemblyAndTypeName)

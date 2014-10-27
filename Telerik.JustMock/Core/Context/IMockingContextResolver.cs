@@ -25,6 +25,6 @@ namespace Telerik.JustMock.Core.Context
 
 		bool RetireRepository();
 
-		Action<string> GetFailMethod();
+		Action<string, Exception> GetFailMethod();
 	}
 }
