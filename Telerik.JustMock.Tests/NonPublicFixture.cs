@@ -166,7 +166,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldThrowMissingMethodExceptionForMethodSpecification()
 		{
 			var foo = Mock.Create<Foo>(Behavior.CallOriginal);
-			Assert.Throws<MissingMethodException>(() => Mock.NonPublic.Arrange(foo, "ExecuteProtected"));
+			Assert.Throws<MissingMemberException>(() => Mock.NonPublic.Arrange(foo, "ExecuteProtected"));
 		}
 
 #if !SILVERLIGHT
@@ -385,10 +385,10 @@ namespace Telerik.JustMock.Tests
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
-		public void ShouldNotArrangeNonPublicUsingContantArgumentWhereByRefIsExpected()
+		public void ShouldNotArrangeNonPublicUsingConstantArgumentWhereByRefIsExpected()
 		{
 			var foo = Mock.Create<RefTest>(Behavior.CallOriginal);
-			Assert.Throws<MissingMethodException>(() => Mock.NonPublic.Arrange(foo, "Test", ArgExpr.IsAny<string>(), "asd"));
+			Assert.Throws<MissingMemberException>(() => Mock.NonPublic.Arrange(foo, "Test", ArgExpr.IsAny<string>(), "asd"));
 		}
 
 		public abstract class WeirdSignature
@@ -404,35 +404,87 @@ namespace Telerik.JustMock.Tests
 		public void ShouldProvideHelpfulExceptionMessageWhenNonPublicMethodIsMissing()
 		{
 			var foo = Mock.Create<WeirdSignature>();
-			var exception = Assert.Throws<MissingMethodException>(() => Mock.NonPublic.Arrange(foo, "Do"));
+			var exception = Assert.Throws<MissingMemberException>(() => Mock.NonPublic.Arrange(foo, "Do"));
 			var message = exception.Message;
 			Assert.Equal("Method 'Do' with the given signature was not found on type Telerik.JustMock.Tests.NonPublicFixture+WeirdSignature\r\n" +
 "Review the available methods in the message below and optionally paste the appropriate arrangement snippet.\r\n" +
 "----------\r\n" +
 "Method 1: Int32 Do(Int32, System.String, System.Object ByRef, System.Collections.Generic.IEnumerable`1[System.Int32])\r\n" +
 "C#: Mock.NonPublic.Arrange<int>(mock, \"Do\", ArgExpr.IsAny<int>(), ArgExpr.IsAny<string>(), ArgExpr.Ref(ArgExpr.IsAny<object>()), ArgExpr.IsAny<IEnumerable<int>>());\r\n" +
-"VB: Mock.NonPublic.Arrange(Of Integer)(mock, \"Do\", ArgExpr.IsAny(Of Integer)(), ArgExpr.IsAny(Of String)(), ArgExpr.Ref(ArgExpr.IsAny(Of Object)()), ArgExpr.IsAny(Of IEnumerable(Of Integer))());\r\n" +
+"VB: Mock.NonPublic.Arrange(Of Integer)(mock, \"Do\", ArgExpr.IsAny(Of Integer)(), ArgExpr.IsAny(Of String)(), ArgExpr.Ref(ArgExpr.IsAny(Of Object)()), ArgExpr.IsAny(Of IEnumerable(Of Integer))())\r\n" +
 "----------\r\n" +
 "Method 2: Void Do(Boolean)\r\n" +
 "C#: Mock.NonPublic.Arrange(mock, \"Do\", ArgExpr.IsAny<bool>());\r\n" +
-"VB: Mock.NonPublic.Arrange(mock, \"Do\", ArgExpr.IsAny(Of Boolean)());\r\n" +
+"VB: Mock.NonPublic.Arrange(mock, \"Do\", ArgExpr.IsAny(Of Boolean)())\r\n" +
 "----------\r\n" +
 "Method 3: System.DateTime Do(System.DateTime)\r\n" +
 "C#: Mock.NonPublic.Arrange<DateTime>(mock, \"Do\", ArgExpr.IsAny<DateTime>());\r\n" +
-"VB: Mock.NonPublic.Arrange(Of Date)(mock, \"Do\", ArgExpr.IsAny(Of Date)());\r\n" +
+"VB: Mock.NonPublic.Arrange(Of Date)(mock, \"Do\", ArgExpr.IsAny(Of Date)())\r\n" +
 "----------\r\n" +
 "Method 4: Void Do(Int32)\r\n" +
 "C#: Mock.NonPublic.Arrange(\"Do\", ArgExpr.IsAny<int>());\r\n" +
-"VB: Mock.NonPublic.Arrange(\"Do\", ArgExpr.IsAny(Of Integer)());\r\n" +
+"VB: Mock.NonPublic.Arrange(\"Do\", ArgExpr.IsAny(Of Integer)())\r\n" +
 "----------\r\n" +
 "Method 5: Int32 Do(Char)\r\n" +
 "C#: Mock.NonPublic.Arrange<int>(\"Do\", ArgExpr.IsAny<char>());\r\n" +
-"VB: Mock.NonPublic.Arrange(Of Integer)(\"Do\", ArgExpr.IsAny(Of Char)());\r\n", message);
+"VB: Mock.NonPublic.Arrange(Of Integer)(\"Do\", ArgExpr.IsAny(Of Char)())\r\n", message);
 
-			var exception2 = Assert.Throws<MissingMethodException>(() => Mock.NonPublic.Arrange(foo, "Dont"));
+			var exception2 = Assert.Throws<MissingMemberException>(() => Mock.NonPublic.Arrange(foo, "Dont"));
 			var message2 = exception2.Message;
 			Assert.Equal("Method 'Dont' with the given signature was not found on type Telerik.JustMock.Tests.NonPublicFixture+WeirdSignature\r\n" +
 				"No methods or properties found with the given name.\r\n", message2);
+		}
+
+		public abstract class NonPublicOverloads
+		{
+			protected abstract int NotOverloaded(int a, out object b);
+
+			protected abstract int Overloaded(int a);
+			protected abstract int Overloaded(string a);
+
+			protected abstract int Prop { set; }
+
+			public int CallNotOverloaded(int a, out object b)
+			{
+				return NotOverloaded(a, out b);
+			}
+
+			public int SetProp
+			{
+				set { Prop = value; }
+			}
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
+		public void ShouldQuickArrangeNonPublicNonOverloadedMethod()
+		{
+			var mock = Mock.Create<NonPublicOverloads>(Behavior.CallOriginal);
+
+			Mock.NonPublic.Arrange<int>(mock, "NotOverloaded").Returns(5);
+
+			object b;
+			var result = mock.CallNotOverloaded(5, out b);
+
+			Assert.Equal(5, result);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
+		public void ShouldQuickArrangeNonPublicSetter()
+		{
+			var mock = Mock.Create<NonPublicOverloads>(Behavior.CallOriginal);
+			bool called = false;
+			Mock.NonPublic.Arrange(mock, "Prop").DoInstead(() => called = true);
+
+			mock.SetProp = 5;
+
+			Assert.True(called);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
+		public void ShouldFailToQuickArrangeNonPublicOverloadedMethods()
+		{
+			var mock = Mock.Create<NonPublicOverloads>();
+			Assert.Throws<MissingMemberException>(() => Mock.NonPublic.Arrange<int>(mock, "Overloaded"));
 		}
 	}
 }

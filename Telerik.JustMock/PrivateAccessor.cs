@@ -46,7 +46,7 @@ namespace Telerik.JustMock
 		/// <param name="instance">The instance to wrap.</param>
 		public PrivateAccessor(object instance)
 			: this(instance, instance.GetType())
-		{}
+		{ }
 
 		/// <summary>
 		/// Creates a new <see cref="PrivateAccessor"/> wrapping the given type. Can be used to access the static members of a type.
@@ -61,7 +61,7 @@ namespace Telerik.JustMock
 		private PrivateAccessor(object instance, Type type)
 		{
 			this.instance = instance;
-			this.type = type;
+			this.type = type.IsProxy() ? type.BaseType : type;
 		}
 
 		/// <summary>
@@ -169,7 +169,7 @@ namespace Telerik.JustMock
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
-					var prop = ResolveProperty(name, indexArgs);
+					var prop = ResolveProperty(name, indexArgs, value, getter: false);
 					ProfilerInterceptor.GuardExternal(() => SecuredReflectionMethods.SetProperty(prop, this.instance, value, indexArgs));
 				});
 		}
@@ -207,24 +207,30 @@ namespace Telerik.JustMock
 		private void CheckMemberInfo(string kind, string name, MemberInfo mi)
 		{
 			if (mi == null)
-				throw new MissingMemberException(String.Format("Couldn't find '{0}' '{1}' on type '{2}'.", kind, name, this.type));
+				throw new MissingMemberException(String.Format("Couldn't find {0} '{1}' on type '{2}'.", kind, name, this.type));
 		}
 
-		private PropertyInfo ResolveProperty(string name, object[] indexArgs)
+		private PropertyInfo ResolveProperty(string name, object[] indexArgs, object setterValue = null, bool getter = true)
 		{
 			var candidates = type.GetAllProperties().Where(prop => prop.Name == name).ToArray();
 			if (candidates.Length == 1)
 				return candidates[0];
 
-			var getters = candidates
-				.Select(prop => prop.GetGetMethod(true))
+			if (!getter)
+			{
+				Array.Resize(ref indexArgs, indexArgs.Length + 1);
+				indexArgs[indexArgs.Length - 1] = setterValue;
+			}
+
+			var propMethods = candidates
+				.Select(prop => getter ? prop.GetGetMethod(true) : prop.GetSetMethod(true))
 				.Where(m => m != null && CanCall(m))
 				.ToArray();
 
 			indexArgs = indexArgs ?? MockingUtil.NoObjects;
 			object state;
-			var foundGetter = Type.DefaultBinder.BindToMethod(MockingUtil.AllMembers, getters, ref indexArgs, null, null, null, out state);
-			return candidates.First(prop => prop.GetGetMethod(true) == foundGetter);
+			var foundGetter = Type.DefaultBinder.BindToMethod(MockingUtil.AllMembers, propMethods, ref indexArgs, null, null, null, out state);
+			return candidates.First(prop => (getter ? prop.GetGetMethod(true) : prop.GetSetMethod(true)) == foundGetter);
 		}
 
 		private FieldInfo ResolveField(string name)
