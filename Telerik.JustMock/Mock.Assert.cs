@@ -227,10 +227,7 @@ namespace Telerik.JustMock
 		/// <param name="mocked">Target instance</param>
 		public static void Assert<T>(T mocked)
 		{
-			ProfilerInterceptor.GuardInternal(() =>
-			{
-				MockingContext.CurrentRepository.Assert(mocked);
-			});
+			ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.Assert(mocked));
 		}
 
 		/// <summary>
@@ -240,10 +237,25 @@ namespace Telerik.JustMock
 		/// <param name="mocked">Target instance</param>
 		public static void AssertAll<T>(T mocked)
 		{
-			ProfilerInterceptor.GuardInternal(() =>
-			{
-				MockingContext.CurrentRepository.AssertAll(mocked);
-			});
+			ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.AssertAll(mocked));
+		}
+
+		/// <summary>
+		/// Asserts all expectation on the given type
+		/// </summary>
+		/// <param name="type">The type which declared the methods to assert.</param>
+		public static void Assert(Type type)
+		{
+			ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.AssertIgnoreInstance(type, ignoreMethodMockOccurrences: false));
+		}
+
+		/// <summary>
+		/// Asserts all expectation on the given type
+		/// </summary>
+		/// <typeparam name="T">The type which declared the methods to assert.</typeparam>
+		public static void Assert<T>()
+		{
+			ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.AssertIgnoreInstance(typeof(T), ignoreMethodMockOccurrences: false));
 		}
 
 		/// <summary>
