@@ -21,7 +21,7 @@ using System.Collections.Generic;
 namespace Telerik.JustMock.Expectations.Abstraction
 {
 	/// <summary>
-	/// Interface containing Func type method expecatations.
+	/// Interface containing Func type method expectations.
 	/// </summary>
 	/// <typeparam name="TReturn"></typeparam>
 	public interface IFunc<TReturn> : IThrows<IFunc<TReturn>>, IReturns<TReturn>, IAssertable
@@ -50,12 +50,12 @@ namespace Telerik.JustMock.Expectations.Abstraction
 #if !LITE_EDITION
 
 		/// <summary>
-		/// Returns a enumerable collecton for the target query.
+		/// Returns a enumerable collection for the target query.
 		/// </summary>
 		/// <typeparam name="TArg">Argument type</typeparam>
 		/// <typeparam name="TReturn">Return type for the collection</typeparam>
 		/// <param name="funcExpectation">Defines the setup instance under which the collection will be set.</param>
-		/// <param name="collection">Enumerable colleciton</param>
+		/// <param name="collection">Enumerable collection</param>
 		/// <returns>Instance of <see cref="IAssertable"/></returns>
 		IAssertable ReturnsCollection<TArg>(IEnumerable<TArg> collection);
 #endif

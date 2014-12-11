@@ -26,7 +26,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 	public interface IWaitDuration
 	{
 		/// <summary>
-		/// Number of miliseconds to wait for executing the event.
+		/// Number of milliseconds to wait for executing the event.
 		/// </summary>
 		int Miliseconds { get; }
 	}

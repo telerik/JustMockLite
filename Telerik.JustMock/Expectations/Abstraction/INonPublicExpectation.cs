@@ -30,8 +30,8 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// </summary>
 		/// <param name="target">Target instance</param>
 		/// <param name="memberName">Member name</param>
-		/// <param name="args">Mehtod arguments</param>
-		/// <returns>Refernce to setup actions calls</returns>
+		/// <param name="args">Method arguments</param>
+		/// <returns>Reference to setup actions calls</returns>
 		ActionExpectation Arrange(object target, string memberName, params object[] args);
 
 		/// <summary>
@@ -40,7 +40,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <param name="target">Target instance</param>
 		/// <param name="method">Method to setup taken from reflection.</param>
 		/// <param name="args">Method arguments</param>
-		/// <returns>Refernce to setup actions calls</returns>
+		/// <returns>Reference to setup actions calls</returns>
 		ActionExpectation Arrange(object target, MethodInfo method, params object[] args);
 
 		/// <summary>
@@ -59,7 +59,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <param name="target">Target instance</param>
 		/// <param name="method">Method to setup taken from reflection.</param>
 		/// <param name="args">Method arguments</param>
-		/// <returns>Refernce to setup actions calls</returns>
+		/// <returns>Reference to setup actions calls</returns>
 		FuncExpectation<TReturn> Arrange<TReturn>(object target, MethodInfo method, params object[] args);
 
 		/// <summary>
@@ -256,7 +256,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <summary>
 		/// Asserts the specified member that it is called as expected.
 		/// </summary>
-		/// <typeparam name="TReturn">Sepcify the return type method</typeparam>
+		/// <typeparam name="TReturn">Specify the return type method</typeparam>
 		/// <param name="targetType">Type of the target</param>
 		/// <param name="memberName">Name of the member</param>
 		/// <param name="args">Method arguments</param>

@@ -23,7 +23,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 	public interface ISetupBehavior
 	{
 		/// <summary>
-		/// Specifies that justmock should invoke different mock instance for each setup.
+		/// Specifies that JustMock should invoke different mock instance for each setup.
 		/// </summary>
 		/// <remarks>
 		/// When this modifier is applied

@@ -36,7 +36,7 @@ namespace Telerik.JustMock.Expectations
 		}
 
 		/// <summary>
-		/// Number of miliseconds to wait for executing the event.
+		/// Number of milliseconds to wait for executing the event.
 		/// </summary>
 		public int Miliseconds
 		{

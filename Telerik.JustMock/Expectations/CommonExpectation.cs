@@ -28,7 +28,7 @@ using Telerik.JustMock.Expectations.Abstraction;
 namespace Telerik.JustMock.Expectations
 {
 	/// <summary>
-	/// Implements common expecations.
+	/// Implements common expectations.
 	/// </summary>
 	public partial class CommonExpectation<TContainer> : IAction<TContainer>, IInstanceScope<TContainer>, IMethodMock
 	{
@@ -369,7 +369,7 @@ namespace Telerik.JustMock.Expectations
 		#endregion
 
 		/// <summary>
-		/// Specifies that justmock should invoke different mock instance for each setup.
+		/// Specifies that JustMock should invoke different mock instance for each setup.
 		/// </summary>
 		/// <remarks>
 		/// When this modifier is applied

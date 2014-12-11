@@ -24,14 +24,14 @@ using Telerik.JustMock.Expectations.Abstraction;
 namespace Telerik.JustMock.Expectations
 {
 	/// <summary>
-	/// Defines the expectation for a sepcific method.
+	/// Defines the expectation for a specific method.
 	/// </summary>
 	public partial class FuncExpectation<TReturn> : CollectionExpectation<TReturn>, IFunc<TReturn>, IIgnorable<FuncExpectation<TReturn>>
 	{
 		internal FuncExpectation() {}
 	   
 		/// <summary>
-		/// Defines the return value for a sepecific method expecation.
+		/// Defines the return value for a specific method expectation.
 		/// </summary>
 		/// <param name="value">any object value</param>
 		/// <returns></returns>
@@ -62,7 +62,7 @@ namespace Telerik.JustMock.Expectations
 		/// Specifies the function to evaluate and return.
 		/// </summary>
 		/// <param name="func">Target function to evaluate</param>
-		/// <returns>Refarence to <see cref="IAssertable"/> interface</returns>
+		/// <returns>Reference to <see cref="IAssertable"/> interface</returns>
 		public IAssertable Returns(Func<TReturn> func)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>

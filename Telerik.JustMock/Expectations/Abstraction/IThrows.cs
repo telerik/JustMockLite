@@ -22,20 +22,20 @@ namespace Telerik.JustMock.Expectations.Abstraction
 	public interface IThrows<TContainer>
 	{
 		/// <summary>
-		/// Throws a the specified expection for target call.
+		/// Throws a the specified exception for target call.
 		/// </summary>
 		/// <param name="exception"></param>
 		/// <returns></returns>
 		IAssertable Throws(Exception exception);
 
 		/// <summary>
-		/// Throws a the specified expection for target call.
+		/// Throws a the specified exception for target call.
 		/// </summary>
 		/// <returns></returns>
 		IAssertable Throws<TException>() where TException : Exception;
 
 		/// <summary>
-		/// Throws a the specified expection for target call.
+		/// Throws a the specified exception for target call.
 		/// </summary>
 		/// <returns></returns>
 		IAssertable Throws<TException>(params object[] args) where TException : Exception;
