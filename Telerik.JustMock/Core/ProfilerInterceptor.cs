@@ -242,7 +242,6 @@ namespace Telerik.JustMock.Core
 
 #if DEBUG
 		private static readonly Dictionary<MocksRepository, HashSet<Type>> typesEnabledByRepo = new Dictionary<MocksRepository, HashSet<Type>>();
-
 #endif
 		public static void EnableInterception(Type type, bool enabled, MocksRepository behalf)
 		{
@@ -299,11 +298,23 @@ namespace Telerik.JustMock.Core
 				var typeId = GetTypeId(type);
 				var arrayIndex = typeId >> 3;
 				var arrayMask = 1 << (typeId & ((1 << 3) - 1));
-				if (enabledInAnyRepository)
-					arrangedTypesArray[arrayIndex] = (byte)(arrangedTypesArray[arrayIndex] | arrayMask);
-				else
-					arrangedTypesArray[arrayIndex] = (byte)(arrangedTypesArray[arrayIndex] & ~arrayMask);
+				lock (arrangedTypesArray)
+				{
+					if (enabledInAnyRepository)
+						arrangedTypesArray[arrayIndex] = (byte)(arrangedTypesArray[arrayIndex] | arrayMask);
+					else
+						arrangedTypesArray[arrayIndex] = (byte)(arrangedTypesArray[arrayIndex] & ~arrayMask);
+				}
 			}
+		}
+
+		// for calling in the debugger
+		public static bool IsTypeIntercepted(Type type)
+		{
+			var typeId = GetTypeId(type);
+			var arrayIndex = typeId >> 3;
+			var arrayMask = 1 << (typeId & ((1 << 3) - 1));
+			return (arrangedTypesArray[arrayIndex] & arrayMask) != 0;
 		}
 
 		internal static void RegisterGlobalInterceptor(MethodBase method, MocksRepository repo)
