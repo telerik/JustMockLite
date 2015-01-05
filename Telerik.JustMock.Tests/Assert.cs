@@ -19,7 +19,11 @@ using System;
 
 
 #if !NUNIT
+#if !PORTABLE
 using FrameworkAssert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
+#else
+using FrameworkAssert = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.Assert;
+#endif
 #else
 using FrameworkAssert = NUnit.Framework.Assert;
 #endif

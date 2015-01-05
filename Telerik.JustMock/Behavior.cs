@@ -22,7 +22,6 @@ using System.Reflection;
 using System.Reflection.Emit;
 using Telerik.JustMock.Core;
 using Telerik.JustMock.Core.Behaviors;
-using Telerik.JustMock.Core.Castle.DynamicProxy;
 using Telerik.JustMock.Setup;
 
 namespace Telerik.JustMock

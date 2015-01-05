@@ -1,0 +1,478 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C2D60458-D2F4-40D7-9BFD-01DD75A8D1BF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Telerik.JustMock</RootNamespace>
+    <AssemblyName>Telerik.JustMock.Portable</AssemblyName>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile>Profile328</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;LITE_EDITION;PORTABLE;SILVERLIGHT</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;LITE_EDITION;PORTABLE;SILVERLIGHT</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\ARM\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;LITE_EDITION;PORTABLE;SILVERLIGHT</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>ARM</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM'">
+    <OutputPath>bin\ARM\Release\</OutputPath>
+    <DefineConstants>TRACE;LITE_EDITION;PORTABLE;SILVERLIGHT</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>ARM</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- A reference to the entire .NET Framework is automatically included -->
+    <EmbeddedResource Include="..\Telerik.JustMock\Resources.resx">
+      <Link>Resources.resx</Link>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources1.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Abstraction\IFluentConfig.cs">
+      <Link>Abstraction\IFluentConfig.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Action.cs">
+      <Link>Action.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Arg.cs">
+      <Link>Arg.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Arg.part.cs">
+      <Link>Arg.part.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\ArgExpr.cs">
+      <Link>ArgExpr.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Args.cs">
+      <Link>Args.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Args.Matching.cs">
+      <Link>Args.Matching.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Behavior.cs">
+      <Link>Behavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Constructor.cs">
+      <Link>Constructor.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\AllowedMockableTypes.cs">
+      <Link>Core\AllowedMockableTypes.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\ArrangeMethodAttribute.cs">
+      <Link>Core\ArrangeMethodAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\CallOriginalBehavior.cs">
+      <Link>Core\Behaviors\CallOriginalBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\CallOriginalObjectMethodsBehavior.cs">
+      <Link>Core\Behaviors\CallOriginalObjectMethodsBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\ConstructorMockBehavior.cs">
+      <Link>Core\Behaviors\ConstructorMockBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\DelegatedImplementationBehavior.cs">
+      <Link>Core\Behaviors\DelegatedImplementationBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\EventStubsBehavior.cs">
+      <Link>Core\Behaviors\EventStubsBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\ExecuteConstructorBehavior.cs">
+      <Link>Core\Behaviors\ExecuteConstructorBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\IBehavior.cs">
+      <Link>Core\Behaviors\IBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\IMockReplicator.cs">
+      <Link>Core\Behaviors\IMockReplicator.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\ImplementationOverrideBehavior.cs">
+      <Link>Core\Behaviors\ImplementationOverrideBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\InOrderBehavior.cs">
+      <Link>Core\Behaviors\InOrderBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\InvocationOccurrenceBehavior.cs">
+      <Link>Core\Behaviors\InvocationOccurrenceBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\MixinAttribute.cs">
+      <Link>Core\Behaviors\MixinAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\MockCollection.cs">
+      <Link>Core\Behaviors\MockCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\MockCollectionBehavior.cs">
+      <Link>Core\Behaviors\MockCollectionBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\PreserveRefOutValuesBehavior.cs">
+      <Link>Core\Behaviors\PreserveRefOutValuesBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\PropertyStubsBehavior.cs">
+      <Link>Core\Behaviors\PropertyStubsBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\RaiseEventBehavior.cs">
+      <Link>Core\Behaviors\RaiseEventBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\RecursiveMockingBehavior.cs">
+      <Link>Core\Behaviors\RecursiveMockingBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\StaticConstructorMockBehavior.cs">
+      <Link>Core\Behaviors\StaticConstructorMockBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\StrictBehavior.cs">
+      <Link>Core\Behaviors\StrictBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\ThrowExceptionBehavior.cs">
+      <Link>Core\Behaviors\ThrowExceptionBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\ByRefComparer.cs">
+      <Link>Core\ByRefComparer.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\CallPattern.cs">
+      <Link>Core\CallPattern.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\ClrProfilerSetupHelper.cs">
+      <Link>Core\ClrProfilerSetupHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Context\IMockingContextResolver.cs">
+      <Link>Core\Context\IMockingContextResolver.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Context\MockingContext.cs">
+      <Link>Core\Context\MockingContext.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\DynamicProxyInterceptor.cs">
+      <Link>Core\DynamicProxyInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\DynamicProxy\Castle.Core\Internal\WeakKey.cs">
+      <Link>Core\DynamicProxy\Castle.Core\Internal\WeakKey.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\DynamicProxy\Castle.Core\Internal\WeakKeyComparer.cs">
+      <Link>Core\DynamicProxy\Castle.Core\Internal\WeakKeyComparer.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\DynamicProxy\Castle.Core\Internal\WeakKeyDictionary.cs">
+      <Link>Core\DynamicProxy\Castle.Core\Internal\WeakKeyDictionary.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\DynamicProxy\Castle.Core\ReferenceEqualityComparer.cs">
+      <Link>Core\DynamicProxy\Castle.Core\ReferenceEqualityComparer.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\DynamicProxy\Castle.DynamicProxy\IInterceptor.cs">
+      <Link>Core\DynamicProxy\Castle.DynamicProxy\IInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\DynamicProxy\Castle.DynamicProxy\IInvocation.cs">
+      <Link>Core\DynamicProxy\Castle.DynamicProxy\IInvocation.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\ElevatedMockingException.cs">
+      <Link>Core\ElevatedMockingException.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Expressions\ExpressionComparer.cs">
+      <Link>Core\Expressions\ExpressionComparer.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Expressions\ExpressionReducer.cs">
+      <Link>Core\Expressions\ExpressionReducer.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Expressions\ExpressionReplacer.cs">
+      <Link>Core\Expressions\ExpressionReplacer.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Expressions\ExpressionVisitor.cs">
+      <Link>Core\Expressions\ExpressionVisitor.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Expressions\ScopedDictionary.cs">
+      <Link>Core\Expressions\ScopedDictionary.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\ExpressionUtil.cs">
+      <Link>Core\ExpressionUtil.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\FunctionalSpecParser.cs">
+      <Link>Core\FunctionalSpecParser.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\IMethodMock.cs">
+      <Link>Core\IMethodMock.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\IMockFactory.cs">
+      <Link>Core\IMockFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Invocation.cs">
+      <Link>Core\Invocation.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Lazy.cs">
+      <Link>Core\Lazy.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MatcherTree\AnyMatcher.cs">
+      <Link>Core\MatcherTree\AnyMatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MatcherTree\ArgIgnoreAttribute.cs">
+      <Link>Core\MatcherTree\ArgIgnoreAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MatcherTree\ArgMatcherAttribute.cs">
+      <Link>Core\MatcherTree\ArgMatcherAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MatcherTree\CategoricalMatcherBase.cs">
+      <Link>Core\MatcherTree\CategoricalMatcherBase.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MatcherTree\IMatcher.cs">
+      <Link>Core\MatcherTree\IMatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MatcherTree\IMatcherTreeNode.cs">
+      <Link>Core\MatcherTree\IMatcherTreeNode.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MatcherTree\MatcherNodeAndParent.cs">
+      <Link>Core\MatcherTree\MatcherNodeAndParent.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MatcherTree\MatcherTreeNode.cs">
+      <Link>Core\MatcherTree\MatcherTreeNode.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MatcherTree\MethodInfoMatcherTreeNode.cs">
+      <Link>Core\MatcherTree\MethodInfoMatcherTreeNode.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MatcherTree\MethodMockMatcherTreeNode.cs">
+      <Link>Core\MatcherTree\MethodMockMatcherTreeNode.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MatcherTree\OccurrencesMatcherTreeNode.cs">
+      <Link>Core\MatcherTree\OccurrencesMatcherTreeNode.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MatcherTree\OutArgAttribute.cs">
+      <Link>Core\MatcherTree\OutArgAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MatcherTree\ParamsMatcher.cs">
+      <Link>Core\MatcherTree\ParamsMatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MatcherTree\PredicateMatcher.cs">
+      <Link>Core\MatcherTree\PredicateMatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MatcherTree\RangeMatcher.cs">
+      <Link>Core\MatcherTree\RangeMatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MatcherTree\RefArgAttribute.cs">
+      <Link>Core\MatcherTree\RefArgAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MatcherTree\ReferenceMatcher.cs">
+      <Link>Core\MatcherTree\ReferenceMatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MatcherTree\StringNullOrEmptyMatcher.cs">
+      <Link>Core\MatcherTree\StringNullOrEmptyMatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MatcherTree\TypeMatcher.cs">
+      <Link>Core\MatcherTree\TypeMatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MatcherTree\ValueMatcher.cs">
+      <Link>Core\MatcherTree\ValueMatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MockAssertionFailedException.cs">
+      <Link>Core\MockAssertionFailedException.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MockException.cs">
+      <Link>Core\MockException.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MockingUtil.cs">
+      <Link>Core\MockingUtil.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MockMixin.cs">
+      <Link>Core\MockMixin.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MocksRepository.cs">
+      <Link>Core\MocksRepository.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\ProxyFailureException.cs">
+      <Link>Core\ProxyFailureException.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Recording\DelegatingRecorder.cs">
+      <Link>Core\Recording\DelegatingRecorder.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Recording\IRecorder.cs">
+      <Link>Core\Recording\IRecorder.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\RepositorySharedContext.cs">
+      <Link>Core\RepositorySharedContext.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\SourceLanguage.cs">
+      <Link>Core\SourceLanguage.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\ThreadLocalProperty.cs">
+      <Link>Core\ThreadLocalProperty.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\DebugView.cs">
+      <Link>DebugView.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IAction.cs">
+      <Link>Expectations\Abstraction\IAction.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IAssertable.cs">
+      <Link>Expectations\Abstraction\IAssertable.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IDoInstead.cs">
+      <Link>Expectations\Abstraction\IDoInstead.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IFunc.cs">
+      <Link>Expectations\Abstraction\IFunc.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IIgnorable.cs">
+      <Link>Expectations\Abstraction\IIgnorable.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IInstanceScope.cs">
+      <Link>Expectations\Abstraction\IInstanceScope.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IMustBeCalled.cs">
+      <Link>Expectations\Abstraction\IMustBeCalled.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\INonPublicExpectation.cs">
+      <Link>Expectations\Abstraction\INonPublicExpectation.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IOccurrence.cs">
+      <Link>Expectations\Abstraction\IOccurrence.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IOrder.cs">
+      <Link>Expectations\Abstraction\IOrder.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IReturnCollection.cs">
+      <Link>Expectations\Abstraction\IReturnCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IReturns.cs">
+      <Link>Expectations\Abstraction\IReturns.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\ISetupBehavior.cs">
+      <Link>Expectations\Abstraction\ISetupBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IThrows.cs">
+      <Link>Expectations\Abstraction\IThrows.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IWhen.cs">
+      <Link>Expectations\Abstraction\IWhen.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\ActionExpectation.cs">
+      <Link>Expectations\ActionExpectation.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\CollectionExpectation.cs">
+      <Link>Expectations\CollectionExpectation.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\CommonExpectation.cs">
+      <Link>Expectations\CommonExpectation.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\CommonExpectation.partial.cs">
+      <Link>Expectations\CommonExpectation.partial.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\FuncExpectation.cs">
+      <Link>Expectations\FuncExpectation.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\FuncExpectation.partial.cs">
+      <Link>Expectations\FuncExpectation.partial.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\NonPublicExpectation.cs">
+      <Link>Expectations\NonPublicExpectation.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\ReturnArranger.cs">
+      <Link>Expectations\ReturnArranger.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Func.cs">
+      <Link>Func.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Helpers\FluentHelper.cs">
+      <Link>Helpers\FluentHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Helpers\MultipleReturnValueChainHelper.cs">
+      <Link>Helpers\MultipleReturnValueChainHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Mock.Arrange.cs">
+      <Link>Mock.Arrange.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Mock.Assert.cs">
+      <Link>Mock.Assert.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Mock.Create.cs">
+      <Link>Mock.Create.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Mock.cs">
+      <Link>Mock.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Mock.SetupStatic.cs">
+      <Link>Mock.SetupStatic.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Mock.VisualBasic2008.cs">
+      <Link>Mock.VisualBasic2008.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Occurs.cs">
+      <Link>Occurs.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Param.cs">
+      <Link>Param.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\PrivateAccessor.cs">
+      <Link>PrivateAccessor.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\RangeKind.cs">
+      <Link>RangeKind.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Setup\DisableAutomaticRepositoryResetAttribute.cs">
+      <Link>Setup\DisableAutomaticRepositoryResetAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Setup\FluentConfig.cs">
+      <Link>Setup\FluentConfig.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Setup\IMockingBehaviorConfiguration.cs">
+      <Link>Setup\IMockingBehaviorConfiguration.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\StaticConstructor.cs">
+      <Link>StaticConstructor.cs</Link>
+    </Compile>
+    <Compile Include="Core\Context\LocalMockingContextResolver.cs" />
+    <Compile Include="Core\Glue\CustomAttributeBuilder.cs" />
+    <Compile Include="Core\Glue\DispIdAttribute.cs" />
+    <Compile Include="Core\Glue\MissingMethodException.cs" />
+    <Compile Include="Core\Glue\ParameterModifier.cs" />
+    <Compile Include="Core\Glue\SerializableAttribute.cs" />
+    <Compile Include="Core\Glue\TypedReference.cs" />
+    <Compile Include="Core\MockingUtil.Glue.cs" />
+    <Compile Include="Core\ProfilerInterceptor.cs" />
+    <Compile Include="Core\StaticProxy\ProxyAttribute.cs" />
+    <Compile Include="Core\StaticProxy\ProxyInvocation.cs" />
+    <Compile Include="Core\StaticProxy\ProxySourceRegistry.cs" />
+    <Compile Include="Core\StaticProxy\StaticProxyMockFactory.cs" />
+    <Compile Include="Core\TransparentProxy\MockingProxy.cs" />
+    <Compile Include="MockedTypeAttribute.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Core\MockingUtil.CodeGen.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

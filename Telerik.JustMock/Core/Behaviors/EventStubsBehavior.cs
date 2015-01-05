@@ -78,7 +78,7 @@ namespace Telerik.JustMock.Core.Behaviors
 				try
 				{
 					object state;
-					Type.DefaultBinder.BindToMethod(BindingFlags.Default, new[] { existing.Method }, ref delegateArguments, null, null, null, out state);
+					MockingUtil.BindToMethod(MockingUtil.Default, new[] { existing.Method }, ref delegateArguments, null, null, null, out state);
 				}
 				catch (MissingMethodException ex)
 				{

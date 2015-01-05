@@ -78,7 +78,7 @@ namespace Telerik.JustMock.Core.Behaviors
 			}
 			else
 			{
-				return repo.Create(resultCollectionType, null, Behavior.Loose, Type.EmptyTypes, null,
+				return repo.Create(resultCollectionType, null, Behavior.Loose, MockingUtil.EmptyTypes, null,
 					null, null, new List<IBehavior> { listBehavior, queryableBehavior });
 			}
 		}

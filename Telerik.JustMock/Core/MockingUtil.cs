@@ -25,17 +25,17 @@ using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
-using Telerik.JustMock.Core.Castle.DynamicProxy;
 using Telerik.JustMock.Core.MatcherTree;
 using Telerik.JustMock.Core.Recording;
 
 namespace Telerik.JustMock.Core
 {
-	internal static class MockingUtil
+	internal static partial class MockingUtil
 	{
 		public static readonly object[] NoObjects = { };
 
 		public const BindingFlags AllMembers = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
+		public const BindingFlags Default = (BindingFlags)0;
 
 		public static bool IsExtensionMethod(this MethodBase method)
 		{
@@ -231,7 +231,7 @@ namespace Telerik.JustMock.Core
 			}
 
 			object state;
-			var ctor = (ConstructorInfo)Type.DefaultBinder.BindToMethod(BindingFlags.Default,
+			var ctor = (ConstructorInfo)MockingUtil.BindToMethod(MockingUtil.Default,
 				constructorInfos, ref args, null, null, null, out state);
 
 			var ctorParameters = ctor.GetParameters();
@@ -244,6 +244,7 @@ namespace Telerik.JustMock.Core
 					args[i] = Convert.ChangeType(args[i], paramType, System.Globalization.CultureInfo.CurrentCulture);
 			}
 
+#if !PORTABLE
 			var newCall = MockingUtil.CreateDynamicMethod<Func<object[], object>>(il =>
 				{
 					il.UnpackArgArray(OpCodes.Ldarg_0, ctor);
@@ -266,6 +267,9 @@ namespace Telerik.JustMock.Core
 						return MockingUtil.CreateInstance(type, args);
 					}
 				});
+#else
+			return MockingUtil.CreateInstance(type, args);
+#endif
 		}
 
 		public static object GetUninitializedObject(Type type)
@@ -297,6 +301,7 @@ namespace Telerik.JustMock.Core
 
 		internal static Type GetTypeFrom(string fullName)
 		{
+#if !PORTABLE
 			var type = AppDomain.CurrentDomain
 								.GetAssemblies()
 								.SelectMany(asm => asm.GetLoadableTypes())
@@ -304,6 +309,9 @@ namespace Telerik.JustMock.Core
 			if (type == null)
 				throw new ArgumentException(String.Format("Type '{0}' not found", fullName), "fullName");
 			return type;
+#else
+			return Type.GetType(fullName, throwOnError: false);
+#endif
 		}
 
 		public static IEnumerable<Type> GetLoadableTypes(this Assembly assembly)
@@ -427,7 +435,7 @@ namespace Telerik.JustMock.Core
 
 		public static bool IsCompilerGenerated(this MemberInfo member)
 		{
-			return member.Name.Contains('<')
+			return member.Name.Contains("<")
 				|| Attribute.IsDefined(member, typeof(CompilerGeneratedAttribute))
 				|| (member.DeclaringType != null && member.DeclaringType.IsCompilerGenerated());
 		}
@@ -448,102 +456,6 @@ namespace Telerik.JustMock.Core
 			return type.IsProxy() ? ((IMockMixin)instance).DeclaringType : type;
 		}
 
-		/// <summary>
-		/// Create a delegate to a function that takes a object[] as a parameter and a delegate,
-		/// unpacks the array and calls the delegate by substituting the array members for its parameters.
-		/// It mimics what MethodInfo.Invoke does, but in JustMock it's a bad idea to call reflection
-		/// methods within a GuardExternal block! GuardExternal blocks should do *minimum* amount of work.
-		/// </summary>
-		public static Action<object[], Delegate> MakeProcCaller(Delegate delg)
-		{
-			return (Action<object[], Delegate>)MakeDelegateInvoker(delg, true);
-		}
-
-		/// <summary>
-		/// Create a delegate to a function that takes a object[] as a parameter and a delegate,
-		/// unpacks the array and calls the delegate by substituting the array members for its parameters.
-		/// It mimics what MethodInfo.Invoke does, but in JustMock it's a bad idea to call reflection
-		/// methods within a GuardExternal block! GuardExternal blocks should do *minimum* amount of work.
-		/// </summary>
-		public static Func<object[], Delegate, object> MakeFuncCaller(Delegate delg)
-		{
-			return (Func<object[], Delegate, object>)MakeDelegateInvoker(delg, false);
-		}
-
-		private static Delegate MakeDelegateInvoker(Delegate delg, bool discardReturnValue)
-		{
-			var invokeMethod = delg.GetType().GetMethod("Invoke");
-			var retType = discardReturnValue ? typeof(void) : invokeMethod.ReturnType;
-
-			var proc = CreateDynamicMethod(retType == typeof(void) ? typeof(Action<object[], Delegate>) : typeof(Func<object[], Delegate, object>),
-				il =>
-				{
-					var locals = il.UnpackArgArray(OpCodes.Ldarg_0, invokeMethod);
-
-					il.Emit(OpCodes.Ldarg_1);
-					il.Emit(OpCodes.Castclass, delg.GetType());
-					il.PushArgArray(invokeMethod);
-
-					il.Emit(OpCodes.Callvirt, invokeMethod);
-
-					if (retType == typeof(void) && invokeMethod.ReturnType != typeof(void))
-						il.Emit(OpCodes.Pop);
-					else if (retType != typeof(void) && retType.IsValueType)
-						il.Emit(OpCodes.Box, retType);
-
-					il.PackArgArray(OpCodes.Ldarg_0, invokeMethod, locals);
-
-					il.Emit(OpCodes.Ret);
-				});
-
-			return proc;
-		}
-
-		private static LocalBuilder[] UnpackArgArray(this ILGenerator il, OpCode ldArray, MethodBase method)
-		{
-			var parameters = method.GetParameters();
-			var argCount = parameters.Length;
-			var locals = parameters.Select(p => il.DeclareLocal(p.ParameterType.IsByRef ? p.ParameterType.GetElementType() : p.ParameterType)).ToArray();
-			for (int i = 0; i < argCount; ++i)
-			{
-				il.Emit(ldArray);
-				il.Emit(OpCodes.Ldc_I4, i);
-				il.Emit(OpCodes.Ldelem_Ref);
-				il.Emit(locals[i].LocalType.IsValueType ? OpCodes.Unbox_Any : OpCodes.Castclass, locals[i].LocalType);
-				il.Emit(OpCodes.Stloc, i);
-			}
-			return locals;
-		}
-
-		private static void PushArgArray(this ILGenerator il, MethodBase method)
-		{
-			var parameters = method.GetParameters();
-			var argCount = parameters.Length;
-
-			for (int i = 0; i < argCount; ++i)
-			{
-				il.Emit(parameters[i].ParameterType.IsByRef ? OpCodes.Ldloca : OpCodes.Ldloc, i);
-			}
-		}
-
-		private static void PackArgArray(this ILGenerator il, OpCode ldArray, MethodBase method, LocalBuilder[] locals)
-		{
-			var parameters = method.GetParameters();
-			var argCount = parameters.Length;
-
-			for (int i = 0; i < argCount; ++i)
-			{
-				if (!parameters[i].ParameterType.IsByRef)
-					continue;
-
-				il.Emit(ldArray);
-				il.Emit(OpCodes.Ldc_I4, i);
-				il.Emit(OpCodes.Ldloc, i);
-				if (locals[i].LocalType.IsValueType)
-					il.Emit(OpCodes.Box, locals[i].LocalType);
-				il.Emit(OpCodes.Stelem_Ref);
-			}
-		}
 
 		public static bool IsImplementedBy(this MethodInfo interfaceMethod, MethodBase implMethod)
 		{
@@ -571,57 +483,14 @@ namespace Telerik.JustMock.Core
 			var assemblyName = new AssemblyName(name);
 			if (keyPair != null)
 				assemblyName.KeyPair = new StrongNameKeyPair(keyPair);
-#else
+#elif !PORTABLE
 			var assemblyName = keyPair == null || !ProfilerInterceptor.IsProfilerAttached
 				? new AssemblyName(name)
 				: (AssemblyName) ProfilerInterceptor.CreateStrongNameAssemblyNameImpl(name, keyPair);
+#else
+			var assemblyName = new AssemblyName(name);
 #endif
 			return assemblyName;
-		}
-
-		public static TDelegateType CreateDynamicMethod<TDelegateType>(Action<ILGenerator> ilGen)
-		{
-			return (TDelegateType)(object)CreateDynamicMethod(typeof(TDelegateType), ilGen);
-		}
-
-		public static Delegate CreateDynamicMethod(Type delegateType, Action<ILGenerator> ilGen)
-		{
-			var invokeMethod = delegateType.GetMethod("Invoke");
-			var returnType = invokeMethod.ReturnType;
-			var parameterTypes = invokeMethod.GetParameters().Select(p => p.ParameterType).ToArray();
-
-#if SILVERLIGHT
-			var method = CreateDynamicMethodWithVisibilityChecks(returnType, parameterTypes, ilGen);
-			return Delegate.CreateDelegate(delegateType, method);
-#else
-			var method = new DynamicMethod("DynamicMethod_" + Guid.NewGuid().ToString("N"), returnType, parameterTypes, true);
-			ilGen(method.GetILGenerator());
-			return method.CreateDelegate(delegateType);
-#endif
-		}
-
-		private static ModuleBuilder moduleBuilder;
-		public static ModuleBuilder ModuleBuilder
-		{
-			get
-			{
-				if (moduleBuilder == null)
-					moduleBuilder = new ModuleScope().ObtainDynamicModuleWithStrongName();
-
-				return moduleBuilder;
-			}
-		}
-
-		public static MethodInfo CreateDynamicMethodWithVisibilityChecks(Type returnType, Type[] parameterTypes, Action<ILGenerator> ilGen)
-		{
-			var type = ModuleBuilder.DefineType("DynamicType_" + Guid.NewGuid().ToString("N"), TypeAttributes.Public);
-			var methodBuilder = type.DefineMethod("Proc", MethodAttributes.Public | MethodAttributes.Static,
-				returnType, parameterTypes);
-
-			ilGen(methodBuilder.GetILGenerator());
-
-			var constructedType = type.CreateType();
-			return constructedType.GetMethod("Proc");
 		}
 
 		public static bool SafeEquals(object a, object b)
@@ -767,7 +636,11 @@ namespace Telerik.JustMock.Core
 
 		public static bool IsExtern(this MethodBase method)
 		{
+#if !PORTABLE
 			return (method.GetMethodImplementationFlags() & MethodImplAttributes.InternalCall) == MethodImplAttributes.InternalCall;
+#else
+			return false;
+#endif
 		}
 
 		public static string Join(this string separator, IEnumerable<object> objects)

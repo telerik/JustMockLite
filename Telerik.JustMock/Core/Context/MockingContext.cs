@@ -17,7 +17,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -78,14 +77,26 @@ namespace Telerik.JustMock.Core.Context
 
 		public static string GetStackTrace(string indent)
 		{
+#if !PORTABLE
 #if !SILVERLIGHT
-			var skipCount = new StackTrace().GetFrames().TakeWhile(frame => frame.GetMethod().DeclaringType.Assembly == typeof(DebugView).Assembly).Count();
-			var trace = new StackTrace(skipCount, true);
+			var skipCount = new System.Diagnostics.StackTrace().GetFrames().TakeWhile(frame => frame.GetMethod().DeclaringType.Assembly == typeof(DebugView).Assembly).Count();
+			var trace = new System.Diagnostics.StackTrace(skipCount, true).ToString();
 #else
-			var trace = new StackTrace();
+			var trace = new System.Diagnostics.StackTrace().ToString();
+#endif
+#else
+			string trace = null;
+			try
+			{
+				throw new Exception();
+			}
+			catch (Exception ex)
+			{
+				trace = ex.StackTrace;
+			}
 #endif
 
-			return "\n".Join(trace.ToString()
+			return "\n".Join(trace
 					.Split('\n')
 					.Select(p => indent + p.Trim()));
 		}
@@ -116,6 +127,7 @@ namespace Telerik.JustMock.Core.Context
 
 		static MockingContext()
 		{
+#if !PORTABLE
 			if (MSTestMockingContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new MSTestMockingContextResolver());
 			if (NUnitMockingContextResolver.IsAvailable)
@@ -126,6 +138,7 @@ namespace Telerik.JustMock.Core.Context
 				registeredContextResolvers.Add(new MSpecContextResolver());
 			if (MbUnitContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new MbUnitContextResolver());
+#endif
 
 			foreach (var resolver in registeredContextResolvers)
 			{
@@ -135,7 +148,7 @@ namespace Telerik.JustMock.Core.Context
 			}
 
 			if (failThrower == null)
-				failThrower = (msg, innerException) => { throw new MockAssertionFailedException(msg, innerException); };
+				failThrower = LocalMockingContextResolver.GetFailMethod();
 		}
 
 		private static void Fail(string msg)

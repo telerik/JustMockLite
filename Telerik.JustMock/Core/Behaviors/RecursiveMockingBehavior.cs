@@ -92,6 +92,7 @@ namespace Telerik.JustMock.Core.Behaviors
 
 					if (mock == null && mustReturnAMock)
 					{
+#if !LITE_EDITION
 						var stackTrace = new StackTrace();
 						var methodCallingArrange = stackTrace.EnumerateFrames()
 							.SkipWhile(m => !Attribute.IsDefined(m, typeof(ArrangeMethodAttribute)))
@@ -100,6 +101,7 @@ namespace Telerik.JustMock.Core.Behaviors
 
 						if (methodCallingArrange != null && invocation.Method.DeclaringType.IsAssignableFrom(methodCallingArrange.DeclaringType))
 							return;
+#endif
 
 						if (typeof(String) == returnType)
 						{

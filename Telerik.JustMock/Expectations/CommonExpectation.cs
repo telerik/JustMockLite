@@ -133,7 +133,7 @@ namespace Telerik.JustMock.Expectations
 			var evt = Repository.ParseAddHandlerAction(eventExpression, out instance);
 			this.behaviors.Add(new RaiseEventBehavior(instance, evt, eventArgumentsFactoryFactory(instance)));
 		}
-  
+
 		///<summary>
 		/// Raises the expected with sepecic arguments
 		///</summary>
@@ -141,16 +141,20 @@ namespace Telerik.JustMock.Expectations
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 				{
+#if !PORTABLE
 					IWaitDuration wait = args.OfType<IWaitDuration>().FirstOrDefault();
 					if (wait != null)
 					{
 						args = args.Where(obj => obj != wait).ToArray();
 					}
+#endif
 
 					this.ProcessRaises(eventExpression, instance => new Func<object[]>(() =>
 						{
+#if !PORTABLE
 							if (wait != null)
 								Thread.Sleep(wait.Miliseconds);
+#endif
 							return args;
 						}));
 					return (TContainer)(object)this;
@@ -364,7 +368,7 @@ namespace Telerik.JustMock.Expectations
 		public void OccursNever()
 		{
 			ProfilerInterceptor.GuardInternal(() => occurences.SetBounds(0, 0));
-		} 
+		}
 
 		#endregion
 

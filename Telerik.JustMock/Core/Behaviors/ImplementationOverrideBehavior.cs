@@ -34,7 +34,7 @@ namespace Telerik.JustMock.Core.Behaviors
 			this.implementationOverride = implementationOverride;
 
 			this.overrideInvoker = implementationOverride.Method.ReturnType != typeof(void)
-				? (Delegate) MockingUtil.MakeFuncCaller(implementationOverride)
+				? (Delegate)MockingUtil.MakeFuncCaller(implementationOverride)
 				: MockingUtil.MakeProcCaller(implementationOverride);
 		}
 

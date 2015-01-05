@@ -16,7 +16,11 @@
 */
 
 #if !NUNIT
+#if !PORTABLE
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+#else
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
+#endif
 #else
 using NUnit.Framework;
 using TestCategory = NUnit.Framework.CategoryAttribute;
@@ -44,7 +48,7 @@ using Telerik.JustMock.Core;
 namespace Telerik.JustMock.Tests
 {
 	/// <summary>
-	/// Validates Mock capablities
+	/// Validates Mock capabilities
 	/// </summary>
 	[TestClass]
 	public class MockFixture
@@ -255,7 +259,7 @@ namespace Telerik.JustMock.Tests
 		public void MockObjectShouldBeAssignableToMockedInterface()
 		{
 			var iFoo = Mock.Create<IFoo>();
-			Assert.True(typeof(IFoo).IsAssignableFrom(iFoo.GetType()));
+			Assert.True(iFoo is IFoo);
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
@@ -380,7 +384,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldAssertBaseForImplemetedInterface()
 		{
 			var implemented = Mock.Create<IFooImplemted>();
-			Assert.True(typeof(IFoo).IsAssignableFrom(implemented.GetType()));
+			Assert.True(implemented is IFoo);
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
@@ -1039,7 +1043,7 @@ namespace Telerik.JustMock.Tests
 			Assert.NotNull(project);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), Description("issue")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void PropertySetShouldThrowExceptionWhenNameHasSet_Literal()
 		{
 			var b_object = Mock.Create<B>();
@@ -1051,7 +1055,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Assert(b_object);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), Description("issue")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldNotAffectAssertionForInvalidAsserts()
 		{
 			var foo = Mock.Create<IFoo>();
@@ -1087,7 +1091,7 @@ namespace Telerik.JustMock.Tests
 			Assert.True(ruleList.Contains(mockRule1));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), Description("Issue")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldAssertMethodWithKeyValuePairTypeArgument()
 		{
 			var presenter = Mock.Create<InteractiveKioskPresenter>(Behavior.CallOriginal);
@@ -1098,7 +1102,7 @@ namespace Telerik.JustMock.Tests
 			presenter.ShowControl(new KeyValuePair<IKioskPart, IKioskWellInfo>(key, val));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), Description("Issue")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldAssertMethodWithStructTypeArgument()
 		{
 			var presenter = Mock.Create<InteractiveKioskPresenter>(Behavior.CallOriginal);
@@ -1150,7 +1154,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Assert(() => foo.Baz["TestName"], Occurs.Once());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), Description("issue")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldNotSkipBaseInterfaceWhenSomeMembersAreSame()
 		{
 			var loanString = Mock.Create<ILoanStringField>();
@@ -2248,6 +2252,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(5, mock.A);
 		}
 
+#if !PORTABLE
 		public interface ITwoFace
 		{
 			int GetFace1();
@@ -2268,6 +2273,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(10, mock.GetFace1());
 			Assert.Equal(0, mock.GetFace2());
 		}
+#endif
 
 		public class StaticCtor
 		{
