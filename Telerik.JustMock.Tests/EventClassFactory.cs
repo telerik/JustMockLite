@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 
-namespace Telerik.JustMock.DemoLib
+namespace Telerik.JustMock.Tests
 {
 	public static class EventClassFactory
 	{

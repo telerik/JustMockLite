@@ -104,6 +104,7 @@
       <DependentUpon>WhenFixture.tt</DependentUpon>
     </Compile>
     <Compile Include="DelegateFixture.cs" />
+    <Compile Include="EventClassFactory.cs" />
     <Compile Include="EventsFixture.cs" />
     <Compile Include="FluentFixture.cs" />
     <Compile Include="FuncSpecFixture.cs" />

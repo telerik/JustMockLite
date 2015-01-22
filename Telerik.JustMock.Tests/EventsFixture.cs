@@ -16,10 +16,10 @@
 */
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using Telerik.JustMock.Core;
-using Telerik.JustMock.DemoLib;
 
 #if !NUNIT
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -32,7 +32,6 @@ using TestMethod = NUnit.Framework.TestAttribute;
 using TestInitialize = NUnit.Framework.SetUpAttribute;
 using TestCleanup = NUnit.Framework.TearDownAttribute;
 using AssertionException = NUnit.Framework.AssertionException;
-using System.Collections.Generic;
 #endif
 
 namespace Telerik.JustMock.Tests
@@ -300,6 +299,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(5, actualValue);
 		}
 
+#if !SILVERLIGHT
 		[TestMethod, TestCategory("Lite"), TestCategory("Events")]
 		public void ShouldRetainArrangementsInEventHandlerFromPrivateAccessorForEventWithRaiseMethod()
 		{
@@ -316,6 +316,7 @@ namespace Telerik.JustMock.Tests
 
 			Assert.Equal(5, actualValue);
 		}
+#endif
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Events")]
 		public void ShouldAssertEventHandlerAddingOccurrence()
@@ -355,7 +356,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Raise(() => this.solutionService.ProjectAdded += null, new ProjectEventArgs(null));
 		}
 
-		private IEnumerable<TestCaseData> DummyTestCaseSource = new [] { new TestCaseData(null), new TestCaseData(null) };
+		private IEnumerable<TestCaseData> DummyTestCaseSource = new[] { new TestCaseData(null), new TestCaseData(null) };
 
 #endif
 

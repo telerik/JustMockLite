@@ -98,7 +98,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChannelManager.cs" />
-    <Compile Include="EventClassFactory.cs" />
     <Compile Include="ExpressionNode.cs" />
     <Compile Include="ExpressionVisitorNode.cs" />
     <Compile Include="FooInternal.cs" />
