@@ -204,6 +204,20 @@ namespace Telerik.JustMock
 				});
 		}
 
+		/// <summary>
+		/// Raises the specified event passing the given arguments to the handlers.
+		/// </summary>
+		/// <param name="name">The name of the event to raise.</param>
+		/// <param name="eventArgs">Arguments to pass to the event handlers. Must match the event handler signature exactly.</param>
+		public void RaiseEvent(string name, params object[] eventArgs)
+		{
+			ProfilerInterceptor.GuardInternal(() =>
+				{
+					var evt = this.type.GetEvent(name, MockingUtil.AllMembers);
+					MockingUtil.RaiseEventThruReflection(this.instance, evt, eventArgs);
+				});
+		}
+
 		private void CheckMemberInfo(string kind, string name, MemberInfo mi)
 		{
 			if (mi == null)

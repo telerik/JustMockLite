@@ -786,7 +786,8 @@ namespace Telerik.JustMock.Core
 				if (!raise.IsStatic && instance == null)
 					throw new MockException("Unable to deduce the instance on which to raise the event");
 
-				SecuredReflectionMethods.Invoke(raise, instance, args);
+				//TODO: don't call reflection methods in GuardExternal when the profiler is working
+				ProfilerInterceptor.GuardExternal(() => SecuredReflectionMethods.Invoke(raise, instance, args));
 			}
 			else
 			{
@@ -799,9 +800,17 @@ namespace Telerik.JustMock.Core
 					if (!field.IsStatic && instance == null)
 						throw new MockException("Unable to deduce the instance on which to raise the event");
 
-					var invokeMethod = field.FieldType.GetMethod("Invoke", BindingFlags.Instance | BindingFlags.Public);
-					var handler = SecuredReflectionMethods.GetField(field, instance);
-					SecuredReflectionMethods.Invoke(invokeMethod, handler, args);
+					var handler = (Delegate)SecuredReflectionMethods.GetField(field, instance);
+					if (ProfilerInterceptor.IsProfilerAttached)
+					{
+						var invoker = MockingUtil.MakeProcCaller(handler);
+						ProfilerInterceptor.GuardExternal(() => invoker(args, handler));
+					}
+					else
+					{
+						var invokeMethod = field.FieldType.GetMethod("Invoke", BindingFlags.Instance | BindingFlags.Public);
+						ProfilerInterceptor.GuardExternal(() => SecuredReflectionMethods.Invoke(invokeMethod, handler, args));
+					}
 				}
 			}
 		}

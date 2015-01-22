@@ -16,7 +16,10 @@
 */
 
 using System;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using Telerik.JustMock.Core;
+using Telerik.JustMock.DemoLib;
 
 #if !NUNIT
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -258,10 +261,60 @@ namespace Telerik.JustMock.Tests
 		[TestMethod, TestCategory("Lite"), TestCategory("Events")]
 		public void ShouldRetainArrangementsInRaiseDelegate()
 		{
-			var activeDocument = Mock.Create<IDocument>();
+			var activeDocument = Mock.Create<IDocument>(Behavior.Loose);
 			var activeView = Mock.Create<IDocumentView>();
 			Mock.Arrange(() => activeView.Document).Returns(activeDocument);
 			Mock.Raise(() => activeView.Document.IsDirtyChanged += null, EventArgs.Empty);
+		}
+
+		public interface IHasEvent
+		{
+			event Action StuffHappened;
+			int Value { get; }
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Events")]
+		public void ShouldRetainArrangementsInMockEventHandler()
+		{
+			var mock = Mock.Create<IHasEvent>();
+			Mock.Arrange(() => mock.Value).Returns(5);
+			int actualValue = 0;
+			mock.StuffHappened += () => actualValue = mock.Value;
+
+			Mock.Raise(() => mock.StuffHappened += null);
+
+			Assert.Equal(5, actualValue);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Events")]
+		public void ShouldRetainArrangementsInEventHandlerFromPrivateAccessor()
+		{
+			var mock = Mock.Create<IHasEvent>();
+			Mock.Arrange(() => mock.Value).Returns(5);
+			int actualValue = 0;
+			var coll = new ObservableCollection<object>();
+			coll.CollectionChanged += (o, e) => actualValue = mock.Value;
+
+			new PrivateAccessor(coll).RaiseEvent("CollectionChanged", coll, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+
+			Assert.Equal(5, actualValue);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Events")]
+		public void ShouldRetainArrangementsInEventHandlerFromPrivateAccessorForEventWithRaiseMethod()
+		{
+			var mock = Mock.Create<IHasEvent>();
+			Mock.Arrange(() => mock.Value).Returns(5);
+			int actualValue = 0;
+
+			var type = EventClassFactory.CreateClassWithEventWithRaiseMethod();
+			var obj = Activator.CreateInstance(type);
+			Action probe = () => actualValue = mock.Value;
+			type.GetField("Probe").SetValue(obj, probe);
+
+			new PrivateAccessor(obj).RaiseEvent("StuffHappened");
+
+			Assert.Equal(5, actualValue);
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Events")]
