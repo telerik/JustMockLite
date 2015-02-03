@@ -19,7 +19,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Microsoft.Win32;
 
@@ -74,67 +73,79 @@ namespace Telerik.JustMock.Core
 		private const string SystemEnvironmentKeyName = @"HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment";
 		private const string UserEnvironmentKeyName = @"HKEY_CURRENT_USER\Environment";
 
-		private const string CorSilverlightProfilerKey = "CORECLR_PROFILER";
 		private const string CorGeneralProfilerKey = "COR_PROFILER";
-		private const string CorSilverlightEnableProfilingKey = "CORECLR_ENABLE_PROFILING";
 		private const string CorGeneralEnableProfilingKey = "COR_ENABLE_PROFILING";
+
+		private const string ProcessEnvironmentLocationDescription = "process environment";
+		private const string CurrentUserLocationDescription = "current user registry setting";
+		private const string CurrentUser32LocationDescription = "current user 32-bit registry setting";
+		private const string SystemEnvironmentLocationDescription = "global system environment";
+		private const string UserEnvironmentLocationDescription = "global user environment";
 
 		public static string GetEnabledProfilersLocations()
 		{
 			var locationsBuilder = new StringBuilder("\n");
 
-			try
-			{
-				CheckRegistryLocation(NetFxCurrentUserKeyName, "current user registry setting", locationsBuilder);
-				CheckRegistryLocation(NetFxCurrentUserKeyNameX32, "current user 32-bit registry setting", locationsBuilder);
-				CheckRegistryLocation(SystemEnvironmentKeyName, "global system environment", locationsBuilder);
-				CheckRegistryLocation(UserEnvironmentKeyName, "global user environment", locationsBuilder);
-				CheckProcessEnvironment(locationsBuilder);
-			}
-			catch(Exception)
-			{
-			}
+			CheckRegistryLocation(NetFxCurrentUserKeyName, CurrentUserLocationDescription, locationsBuilder);
+			CheckRegistryLocation(NetFxCurrentUserKeyNameX32, CurrentUser32LocationDescription, locationsBuilder);
+			CheckRegistryLocation(SystemEnvironmentKeyName, SystemEnvironmentLocationDescription, locationsBuilder);
+			CheckRegistryLocation(UserEnvironmentKeyName, UserEnvironmentLocationDescription, locationsBuilder);
+			CheckProcessEnvironment(locationsBuilder);
 
 			return locationsBuilder.ToString().TrimEnd();
 		}
 
 		private static void CheckRegistryLocation(string keyName, string locationDescription, StringBuilder locationsBuilder)
 		{
-			var profiler = Registry.GetValue(keyName, CorGeneralProfilerKey, null);
-			var enableProfiling = Registry.GetValue(keyName, CorGeneralEnableProfilingKey, null);
-
-			if ((profiler != null || enableProfiling != null))
+			try
 			{
-				AddLocation(profiler != null ? profiler.ToString() : string.Empty, locationDescription, locationsBuilder);
+				var profiler = Registry.GetValue(keyName, CorGeneralProfilerKey, null);
+				var enableProfiling = Registry.GetValue(keyName, CorGeneralEnableProfilingKey, null);
+
+				if (profiler != null || enableProfiling != null)
+				{
+					AddLocation(profiler != null ? profiler.ToString() : null, locationDescription, locationsBuilder);
+				}
+			}
+			catch
+			{
+				AddError(locationDescription, locationsBuilder);
 			}
 		}
 
 		private static void CheckProcessEnvironment(StringBuilder locationsBuilder)
 		{
-			var profiler = Environment.GetEnvironmentVariable(CorGeneralProfilerKey);
-			var enableProfiling = Environment.GetEnvironmentVariable(CorGeneralEnableProfilingKey);
-			if (!String.IsNullOrEmpty(profiler) || !String.IsNullOrEmpty(enableProfiling))
+			try
 			{
-				AddLocation(profiler ?? "", "process environment", locationsBuilder);
+				var profiler = Environment.GetEnvironmentVariable(CorGeneralProfilerKey);
+				var enableProfiling = Environment.GetEnvironmentVariable(CorGeneralEnableProfilingKey);
+				if (!String.IsNullOrEmpty(profiler) || !String.IsNullOrEmpty(enableProfiling))
+				{
+					AddLocation(profiler, ProcessEnvironmentLocationDescription, locationsBuilder);
+				}
+			}
+			catch
+			{
+				AddError(ProcessEnvironmentLocationDescription, locationsBuilder);
 			}
 		}
 
 		private static void AddLocation(string profiler, string locationDescription, StringBuilder locationsBuilder)
 		{
-			string profilerName = null;
+			string profilerName = profiler ?? string.Empty;
 			try
 			{
 				KnownProfilerGuids.TryGetValue(new Guid(profiler), out profilerName);
 			}
-			catch { }
+			catch
+			{ }
 
-			if (profilerName == null)
-				profilerName = profiler.ToString();
+			locationsBuilder.AppendLine(string.Format("* {0} (from {1})", profilerName, locationDescription));
+		}
 
-			if (!profilerName.Contains("JustMock"))
-			{
-				locationsBuilder.AppendLine(string.Format("* {0} (from {1})", profilerName, locationDescription));
-			}
+		private static void AddError(string locationDescription, StringBuilder locationsBuilder)
+		{
+			locationsBuilder.AppendLine(string.Format("// check failed for {0}", locationDescription));
 		}
 	}
 }
