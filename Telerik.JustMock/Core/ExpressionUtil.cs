@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Telerik.JustMock.Core.Castle.Core;
 
 namespace Telerik.JustMock.Core
 {
@@ -50,7 +51,7 @@ namespace Telerik.JustMock.Core
 			}
 
 			var lambda = Expression.Lambda(Expression.Convert(expr, typeof(object)));
-			var delg = (Func<object>) lambda.Compile();
+			var delg = (Func<object>)lambda.Compile();
 
 			return ProfilerInterceptor.GuardExternal(delg);
 		}
@@ -63,20 +64,19 @@ namespace Telerik.JustMock.Core
 
 		public static string ConvertMockExpressionToString(Expression expr)
 		{
-			var cleanedExpr = ReplaceClosuresWithIdentifiers(expr);
-			var str = cleanedExpr.ToString().Replace("__variable__.", "");
-			return str;
-		}
+			string result = expr.Type.ToString();
 
-		private static LambdaExpression ReplaceClosuresWithIdentifiers(Expression expr)
-		{
-			var replacer = new ClosureWithParameterReplacer();
+			var replacer = new ClosureWithSafeParameterReplacer();
 			var lambda = expr as LambdaExpression;
 			if (lambda != null)
 				expr = lambda.Body;
 			expr = replacer.Visit(expr);
-			var identLambda = MakeVoidLambda(expr, replacer.Parameters);
-			return identLambda;
+			var cleanedExpr = MakeVoidLambda(expr, replacer.Parameters);
+
+			result = cleanedExpr.ToString();
+			result = replacer.CleanExpressionString(result);
+
+			return result;
 		}
 
 		private static LambdaExpression MakeVoidLambda(Expression body, List<ParameterExpression> parameters)
@@ -106,23 +106,65 @@ namespace Telerik.JustMock.Core
 				return Expression.Lambda(body, parameters.ToArray());
 		}
 
-		private class ClosureWithParameterReplacer : Telerik.JustMock.Core.Expressions.ExpressionVisitor
+		private class ClosureWithSafeParameterReplacer : Telerik.JustMock.Core.Expressions.ExpressionVisitor
 		{
 			public readonly List<ParameterExpression> Parameters = new List<ParameterExpression>();
+			public readonly Dictionary<string, string> ReplacementValues = new Dictionary<string, string>();
+
+			private readonly Dictionary<object, string> stringReplacements = new Dictionary<object, string>(ReferenceEqualityComparer<object>.Instance);
+
+			private bool hasMockReplacement;
 
 			protected override Expression VisitConstant(ConstantExpression c)
 			{
 				if (c.Type.IsCompilerGenerated())
-					return Expression.Parameter(c.Type, "__variable__");
+					return Expression.Parameter(c.Type, "__compiler_generated__");
 
-				if (c.Type.IsProxy())
+				if (!hasMockReplacement && c.Type.IsProxy() || (c.Value != null && c.Value.GetType().IsProxy()))
 				{
+					hasMockReplacement = true;
 					var param = Expression.Parameter(c.Type, "x");
-					Parameters.Add(param);
+					this.Parameters.Add(param);
+					return param;
+				}
+
+				if (c.Value != null)
+				{
+					string name;
+					var value = c.Value;
+					if (!this.stringReplacements.TryGetValue(value, out name))
+					{
+						name = String.Format("__string_replacement_{0}__", this.stringReplacements.Count);
+						this.stringReplacements.Add(value, name);
+
+						var valueStr = "<Exception>";
+						try
+						{
+							valueStr = ProfilerInterceptor.GuardExternal(() => value.ToString());
+						}
+						catch { }
+						if (String.IsNullOrEmpty(valueStr))
+						{
+							valueStr = "#" + this.stringReplacements.Count;
+						}
+						this.ReplacementValues.Add(name, valueStr);
+					}
+					var param = Expression.Parameter(c.Type, name);
+					this.Parameters.Add(param);
 					return param;
 				}
 
 				return base.VisitConstant(c);
+			}
+
+			public string CleanExpressionString(string result)
+			{
+				result = result.Replace("__compiler_generated__.", "");
+				foreach (var strReplacement in this.ReplacementValues.Keys)
+				{
+					result = result.Replace(strReplacement, '(' + this.ReplacementValues[strReplacement] + ')');
+				}
+				return result;
 			}
 		}
 	}

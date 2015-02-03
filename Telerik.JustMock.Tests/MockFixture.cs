@@ -2278,8 +2278,6 @@ namespace Telerik.JustMock.Tests
 			Assert.True(StaticCtor.called);
 		}
 
-
-
 #if LITE_EDITION && !SILVERLIGHT
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldMockNoninheritableInterfaceMembers()
