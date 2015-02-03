@@ -26,7 +26,7 @@ namespace Telerik.JustMock.Core.Context
 {
 	internal abstract class MockingContextResolverBase : IMockingContextResolver
 	{
-		private readonly string assertFailedExceptionTypeName;
+		protected readonly string assertFailedExceptionTypeName;
 		protected readonly Dictionary<string, Assembly> frameworkAssemblies;
 
 		public abstract MocksRepository ResolveRepository(UnresolvedContextBehavior unresolvedContextBehavior);
@@ -49,8 +49,7 @@ namespace Telerik.JustMock.Core.Context
 
 		public Action<string, Exception> GetFailMethod()
 		{
-			var assertionFailedExceptionType = this.FindType(assertFailedExceptionTypeName);
-			var factoryExpr = CreateExceptionFactory(assertionFailedExceptionType);
+			var factoryExpr = CreateExceptionFactory();
 			var factory = factoryExpr.Compile();
 
 			return (message, innerException) =>
@@ -60,7 +59,13 @@ namespace Telerik.JustMock.Core.Context
 			};
 		}
 
-		protected virtual Expression<Func<string, Exception, Exception>> CreateExceptionFactory(Type assertionException)
+		protected virtual Expression<Func<string, Exception, Exception>> CreateExceptionFactory()
+		{
+			var assertionException = this.FindType(this.assertFailedExceptionTypeName);
+			return this.CreateExceptionFactory(assertionException);
+		}
+
+		protected Expression<Func<string, Exception, Exception>> CreateExceptionFactory(Type assertionException)
 		{
 			var exceptionCtor = assertionException.GetConstructor(new[] { typeof(string), typeof(Exception) });
 			var messageParam = Expression.Parameter(typeof(string), "message");

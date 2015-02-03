@@ -601,12 +601,20 @@ namespace Telerik.JustMock.Core
 		}
 
 		private static ModuleBuilder moduleBuilder;
+		public static ModuleBuilder ModuleBuilder
+		{
+			get
+			{
+				if (moduleBuilder == null)
+					moduleBuilder = new ModuleScope().ObtainDynamicModuleWithStrongName();
+
+				return moduleBuilder;
+			}
+		}
+
 		public static MethodInfo CreateDynamicMethodWithVisibilityChecks(Type returnType, Type[] parameterTypes, Action<ILGenerator> ilGen)
 		{
-			if (moduleBuilder == null)
-				moduleBuilder = new ModuleScope().ObtainDynamicModuleWithStrongName();
-
-			var type = moduleBuilder.DefineType("DynamicType_" + Guid.NewGuid().ToString("N"), TypeAttributes.Public);
+			var type = ModuleBuilder.DefineType("DynamicType_" + Guid.NewGuid().ToString("N"), TypeAttributes.Public);
 			var methodBuilder = type.DefineMethod("Proc", MethodAttributes.Public | MethodAttributes.Static,
 				returnType, parameterTypes);
 

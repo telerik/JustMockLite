@@ -17,6 +17,9 @@
 
 using System;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Reflection.Emit;
 
 namespace Telerik.JustMock.Core.Context
 {
@@ -28,7 +31,7 @@ namespace Telerik.JustMock.Core.Context
 			: base("Xunit.Sdk.AssertException", XunitAssemblyName)
 		{
 			SetupStandardHierarchicalTestStructure(
-				new[]{"Xunit.FactAttribute"},
+				new[] { "Xunit.FactAttribute" },
 				null, null, null,
 				FixtureConstuctorSemantics.InstanceConstructorCalledOncePerTest);
 		}
@@ -36,6 +39,36 @@ namespace Telerik.JustMock.Core.Context
 		public static bool IsAvailable
 		{
 			get { return IsAssemblyLoaded(XunitAssemblyName); }
+		}
+
+		private Type exceptionType;
+
+		protected override Expression<Func<string, Exception, Exception>> CreateExceptionFactory()
+		{
+			if (exceptionType == null)
+			{
+				CreateExceptionType();
+			}
+			return this.CreateExceptionFactory(this.exceptionType);
+		}
+
+		private void CreateExceptionType()
+		{
+			var baseType = this.FindType(this.assertFailedExceptionTypeName);
+			var typeBuilder = MockingUtil.ModuleBuilder.DefineType(
+				"Telerik.JustMock.Xunit.AssertFailedException", TypeAttributes.Public, baseType);
+
+			var signature = new[] { typeof(string), typeof(Exception) };
+			var ctor = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.HasThis, signature);
+			var il = ctor.GetILGenerator();
+			il.Emit(OpCodes.Ldarg_0);
+			il.Emit(OpCodes.Ldarg_1);
+			il.Emit(OpCodes.Ldarg_2);
+			il.Emit(OpCodes.Call, baseType.GetConstructor(
+				BindingFlags.NonPublic | BindingFlags.Instance, Type.DefaultBinder, signature, null));
+			il.Emit(OpCodes.Ret);
+
+			this.exceptionType = typeBuilder.CreateType();
 		}
 	}
 }
