@@ -999,10 +999,21 @@ namespace Telerik.JustMock.Tests
 		[TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
 		public void ShouldGetDebugViewTraceInMockException()
 		{
-			var mock = Mock.Create<IFoo>();
-			var ex = Assert.Throws<AssertFailedException>(() => Mock.Assert(() => mock.Value, Occurs.Once()));
+			var traceEnabled = DebugView.IsTraceEnabled;
+			try
+			{
+				DebugView.IsTraceEnabled = true;
 
-			Assert.Equal(typeof(DebugViewDetailsException), ex.InnerException.GetType());
+				var mock = Mock.Create<IFoo>();
+				var ex = Assert.Throws<AssertionException>(() => Mock.Assert(() => mock.Value, Occurs.Once()));
+
+				Assert.NotNull(ex.InnerException);
+				Assert.Equal(typeof(DebugViewDetailsException), ex.InnerException.GetType());
+			}
+			finally
+			{
+				DebugView.IsTraceEnabled = traceEnabled;
+			}
 		}
 	}
 

@@ -97,7 +97,10 @@ namespace Telerik.JustMock
 				ProfilerInterceptor.GuardInternal(() =>
 					{
 						if (value)
-							traceSink = new Trace();
+						{
+							if (traceSink == null)
+								traceSink = new Trace();
+						}
 						else
 							traceSink = null;
 					});
