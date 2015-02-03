@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Telerik.JustMock.Core;
+using Telerik.JustMock.Diagnostics;
 
 #if !NUNIT
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -993,6 +994,15 @@ namespace Telerik.JustMock.Tests
 			var mock = Mock.Create<IFoo>();
 			mock.Value = 10;
 			Assert.Equal(1, Mock.GetTimesSetCalled(() => mock.Value = 0, Args.Ignore()));
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+		public void ShouldGetDebugViewTraceInMockException()
+		{
+			var mock = Mock.Create<IFoo>();
+			var ex = Assert.Throws<AssertFailedException>(() => Mock.Assert(() => mock.Value, Occurs.Once()));
+
+			Assert.Equal(typeof(DebugViewDetailsException), ex.InnerException.GetType());
 		}
 	}
 

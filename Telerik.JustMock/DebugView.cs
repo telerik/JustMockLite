@@ -18,6 +18,9 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+#if !SILVERLIGHT
+using System.Runtime.Serialization;
+#endif
 using System.Text;
 using Telerik.JustMock.Core;
 using Telerik.JustMock.Core.Context;
@@ -153,6 +156,11 @@ namespace Telerik.JustMock
 			TraceEvent(IndentLevel.StackTrace, () => "Stack trace:\n" + MockingContext.GetStackTrace(IndentLevel.StackTraceInner.AsIndent()));
 		}
 
+		internal static Exception GetStateAsException()
+		{
+			return IsTraceEnabled ? new DebugViewDetailsException() : null;
+		}
+
 		private static ITraceSink traceSink;
 
 		private static bool IsLeaf(this IndentLevel level)
@@ -171,6 +179,18 @@ namespace Telerik.JustMock
 
 namespace Telerik.JustMock.Diagnostics
 {
+	[Serializable]
+	public sealed class DebugViewDetailsException : Exception
+	{
+		internal DebugViewDetailsException()
+			: base(String.Format("State:\n{0}\n\nFull trace:\n{1}", DebugView.CurrentState, DebugView.FullTrace))
+		{ }
+
+#if !SILVERLIGHT
+		protected DebugViewDetailsException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+#endif
+	}
+
 	internal enum IndentLevel
 	{
 		Dispatch = 0,

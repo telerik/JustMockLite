@@ -65,13 +65,13 @@ namespace Telerik.JustMock.Core.Context
 
 			LocalMockingContextResolver.RetireRepository();
 		}
-		
+
 		public static void Fail(string message, params object[] args)
 		{
 			var formattedMessage = String.Format(message, args);
 
 			if (failureAggregator == null)
-				failAction(formattedMessage);
+				Fail(formattedMessage);
 			else
 				failureAggregator.AddFailure(formattedMessage);
 		}
@@ -105,7 +105,8 @@ namespace Telerik.JustMock.Core.Context
 		}
 
 		private static readonly List<IMockingContextResolver> registeredContextResolvers = new List<IMockingContextResolver>();
-		private static readonly Action<string> failAction;
+
+		private static Action<string, Exception> failThrower;
 
 		[ThreadStatic]
 		private static FailureAggregator failureAggregator;
@@ -128,13 +129,18 @@ namespace Telerik.JustMock.Core.Context
 
 			foreach (var resolver in registeredContextResolvers)
 			{
-				failAction = resolver.GetFailMethod();
-				if (failAction != null)
+				failThrower = resolver.GetFailMethod();
+				if (failThrower != null)
 					break;
 			}
 
-			if (failAction == null)
-				failAction = msg => { throw new MockAssertionFailedException(msg); };
+			if (failThrower == null)
+				failThrower = (msg, innerException) => { throw new MockAssertionFailedException(msg, innerException); };
+		}
+
+		private static void Fail(string msg)
+		{
+			failThrower(msg, DebugView.GetStateAsException());
 		}
 
 		private class FailureAggregator : IDisposable
@@ -169,7 +175,7 @@ namespace Telerik.JustMock.Core.Context
 					return;
 
 				if (failures.Count == 1)
-					failAction(failures[0]);
+					Fail(failures[0]);
 
 				var sb = new StringBuilder();
 				sb.AppendLine("Multiple assertion failures:");
@@ -178,7 +184,7 @@ namespace Telerik.JustMock.Core.Context
 					sb.AppendFormat("{0}. ", i + 1);
 					sb.AppendLine(failures[i]);
 				}
-				failAction(sb.ToString());
+				Fail(sb.ToString());
 			}
 		}
 	}

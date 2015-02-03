@@ -16,19 +16,26 @@
 */
 
 using System;
-using System.Linq;
+#if !SILVERLIGHT
+using System.Runtime.Serialization;
+#endif
 
 namespace Telerik.JustMock.Core
 {
 	/// <summary>
 	/// The exception that is thrown when Mock.Assert fails.
 	/// </summary>
+	[Serializable]
 	public sealed class MockAssertionFailedException : MockException
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MockAssertionFailedException"/> class.
 		/// </summary>
 		/// <param name="message">Exception message.</param>
-		internal MockAssertionFailedException(string message) : base(message) { }
+		internal MockAssertionFailedException(string message, Exception innerException) : base(message, innerException) { }
+
+#if !SILVERLIGHT
+		protected MockAssertionFailedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+#endif
 	}
 }
