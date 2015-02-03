@@ -285,6 +285,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(5, actualValue);
 		}
 
+#if !SILVERLIGHT
 		[TestMethod, TestCategory("Lite"), TestCategory("Events")]
 		public void ShouldRetainArrangementsInEventHandlerFromPrivateAccessor()
 		{
@@ -299,7 +300,6 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(5, actualValue);
 		}
 
-#if !SILVERLIGHT
 		[TestMethod, TestCategory("Lite"), TestCategory("Events")]
 		public void ShouldRetainArrangementsInEventHandlerFromPrivateAccessorForEventWithRaiseMethod()
 		{
