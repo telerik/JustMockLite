@@ -413,5 +413,60 @@ namespace Telerik.JustMock.Tests
 
 			Assert.Equal(0, disposables.Count);
 		}
+
+		public abstract class DependencyBase
+		{
+			public IDisposable Dep { get; set; }
+
+			protected DependencyBase(IDisposable dep)
+			{
+				this.Dep = dep;
+			}
+
+			public abstract int Value { get; }
+			public abstract string Name { get; set; }
+
+			public int baseValue;
+			public virtual int BaseValue
+			{
+				get { return baseValue; }
+				set { baseValue = value; }
+			}
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+		public void ShouldInjectAbstractType()
+		{
+			var c = new MockingContainer<DependencyBase>();
+			var obj = c.Instance;
+			Assert.NotNull(obj.Dep);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+		public void ShouldArrangeMethodsOnInjectedAbstractType()
+		{
+			var c = new MockingContainer<DependencyBase>();
+			var obj = c.Instance;
+			Mock.Arrange(() => obj.Value).Returns(5);
+			Assert.Equal(5, obj.Value);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+		public void ShouldCheckPropertyMixinOnNonabstractPropertyOnInjectedAbstractType()
+		{
+			var c = new MockingContainer<DependencyBase>();
+			var obj = c.Instance;
+			obj.BaseValue = 10;
+			Assert.Equal(10, obj.baseValue);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+		public void ShouldInjectAbstractTypeWithSpecifiedCtor()
+		{
+			var c = new MockingContainer<DependencyBase>(
+				new AutoMockSettings { ConstructorArgTypes = new[] { typeof(IDisposable) } });
+			var obj = c.Instance;
+			Assert.NotNull(obj.Dep);
+		}
 	}
 }
