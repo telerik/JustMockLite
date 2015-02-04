@@ -18,10 +18,13 @@
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using Telerik.JustMock.AutoMock.Ninject;
 using Telerik.JustMock.AutoMock.Ninject.Planning.Bindings.Resolvers;
 using Telerik.JustMock.AutoMock.Ninject.Syntax;
 using Telerik.JustMock.Core;
+using Telerik.JustMock.Core.Castle.DynamicProxy;
+using Telerik.JustMock.Core.Context;
 using Telerik.JustMock.Expectations;
 using Telerik.JustMock.Helpers;
 
@@ -65,11 +68,38 @@ namespace Telerik.JustMock.AutoMock
 
 			if (Settings.ConstructorArgTypes == null)
 			{
-				this.Bind<T>().ToSelf();
+				this.Bind<T>().To(this.ImplementationType);
 			}
 			else
 			{
 				this.Bind<T>().ToConstructor(CreateConstructorExpression());
+			}
+		}
+
+		private Type implementationType;
+		private Type ImplementationType
+		{
+			get
+			{
+				if (this.implementationType == null)
+				{
+					var targetType = typeof(T);
+					if (targetType.IsAbstract)
+					{
+						var repo = MockingContext.CurrentRepository;
+						var typeInfo = repo.ImplementAbstractType(targetType);
+						this.implementationType = typeInfo.ProxyType;
+						foreach (var mixin in typeInfo.Mixins)
+						{
+							this.Bind(mixin.Key).ToConstant(mixin.Value);
+						}
+					}
+					else
+					{
+						this.implementationType = targetType;
+					}
+				}
+				return this.implementationType;
 			}
 		}
 
@@ -84,14 +114,27 @@ namespace Telerik.JustMock.AutoMock
 		private Expression<Func<IConstructorArgumentSyntax, T>> CreateConstructorExpression()
 		{
 			var argTypes = Settings.ConstructorArgTypes;
-			var constructor = typeof(T).GetConstructor(argTypes);
+			var constructor = typeof(T).GetConstructor(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, Type.DefaultBinder, argTypes, null);
 			if (constructor == null)
 				throw new MockException("Constructor with the following parameter types was not found: " + ", ".Join(argTypes));
+			if (!constructor.IsPublic && !constructor.IsFamily && !constructor.IsFamilyOrAssembly)
+				throw new MockException("Constructor is not accessible by derived types.");
+
+			var implType = this.ImplementationType;
+			if (implType.IsProxy())
+			{
+				constructor = implType.GetConstructors()
+					.Single(ctor => ctor.GetParameters()
+						.Select(p => p.ParameterType)
+						.SkipWhile(pt => pt != typeof(IInterceptor[]))
+						.Skip(1)
+						.SequenceEqual(argTypes));
+			}
 
 			var inject = typeof(IConstructorArgumentSyntax).GetMethod("Inject");
 			var x = Expression.Parameter(typeof(IConstructorArgumentSyntax), "x");
 			var expr = Expression.New(constructor,
-				Settings.ConstructorArgTypes.Select(type => Expression.Call(x, inject.MakeGenericMethod(type))).ToArray());
+				constructor.GetParameters().Select(p => Expression.Call(x, inject.MakeGenericMethod(p.ParameterType))).ToArray());
 
 			return (Expression<Func<IConstructorArgumentSyntax, T>>)Expression.Lambda(typeof(Func<IConstructorArgumentSyntax, T>), expr, x);
 		}

@@ -22,6 +22,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using Telerik.JustMock.Core;
 using Telerik.JustMock.Core.Behaviors;
+using Telerik.JustMock.Core.Castle.DynamicProxy;
 using Telerik.JustMock.Setup;
 
 namespace Telerik.JustMock
@@ -35,18 +36,18 @@ namespace Telerik.JustMock
 		/// Specifies that by default mock calls will behave like a stub, unless explicitly setup.
 		/// </summary>
 		Loose,
-		
+
 		/// <summary>
 		/// Specifies that by default mock calls will return mock objects, unless explicitly setup.
 		/// </summary>
 		RecursiveLoose,
-		
+
 		/// <summary>
 		/// Specifies that any calls made on the mock 
 		/// will throw an exception if not explictly set.
 		/// </summary>
 		Strict,
-		
+
 		/// <summary>
 		/// Specifies that by default all calls made on mock will invoke its 
 		/// corresponding original member unless some expecations are set.
@@ -72,33 +73,33 @@ namespace Telerik.JustMock
 			if (mixins == null)
 				mixins = new List<object>();
 
-			DissectBehavior(behavior.Value, mixins, supplementaryBehaviors, fallbackBehaviors, constructorArgs, ref mockConstructorCall);
+			var settings = DissectBehavior(behavior.Value, mixins, supplementaryBehaviors, fallbackBehaviors, constructorArgs, mockConstructorCall);
+			settings.AdditionalMockedInterfaces = additionalMockedInterfaces;
+			settings.AdditionalProxyTypeAttributes = additionalProxyTypeAttributes;
+			settings.InterceptorFilter = interceptorFilter;
+			return repository.Create(type, settings);
+		}
 
-			return repository.Create(type,
-				new MockCreationSettings
-				{
-					Args = constructorArgs,
-					Mixins = mixins,
-					SupplementaryBehaviors = supplementaryBehaviors,
-					FallbackBehaviors = fallbackBehaviors,
-					AdditionalMockedInterfaces = additionalMockedInterfaces,
-					MockConstructorCall = mockConstructorCall.Value,
-					AdditionalProxyTypeAttributes = additionalProxyTypeAttributes,
-					InterceptorFilter = interceptorFilter,
-				});
+		public static ProxyTypeInfo ImplementAbstractType(this MocksRepository repository, Type type)
+		{
+			var supplementaryBehaviors = new List<IBehavior>();
+			var fallbackBehaviors = new List<IBehavior>();
+			var mixins = new List<object>();
+
+			var settings = DissectBehavior(Behavior.CallOriginal, mixins, supplementaryBehaviors, fallbackBehaviors, constructorArgs: null, mockConstructorCall: false);
+			return repository.CreateClassProxyType(type, settings);
 		}
 
 		public static IMockMixin CreateExternalMockMixin(this MocksRepository repository, Type type, object mockObject, Behavior? behavior)
 		{
 			if (behavior == null)
 				behavior = DefaultBehavior;
-			
+
 			var supplementaryBehaviors = new List<IBehavior>();
 			var fallbackBehaviors = new List<IBehavior>();
 			var mixins = new List<object>();
 
-			bool? mockCtorCall = null;
-			DissectBehavior(behavior.Value, mixins, supplementaryBehaviors, fallbackBehaviors, null, ref mockCtorCall);
+			DissectBehavior(behavior.Value, mixins, supplementaryBehaviors, fallbackBehaviors, constructorArgs: null, mockConstructorCall: null);
 			return repository.CreateExternalMockMixin(type, mockObject, mixins, supplementaryBehaviors, fallbackBehaviors);
 		}
 
@@ -111,15 +112,14 @@ namespace Telerik.JustMock
 			var fallbackBehaviors = new List<IBehavior>();
 			var mixins = new List<object>();
 
-			bool? mockCtorCall = null;
-			DissectBehavior(behavior.Value, mixins, supplementaryBehaviors, fallbackBehaviors, null, ref mockCtorCall);
+			DissectBehavior(behavior.Value, mixins, supplementaryBehaviors, fallbackBehaviors, constructorArgs: null, mockConstructorCall: null);
 			repository.InterceptStatics(type, mixins, supplementaryBehaviors, fallbackBehaviors, mockStaticConstructor);
 		}
 
-		private static void DissectBehavior(Behavior behavior, List<object> mixins, List<IBehavior> supplementaryBehaviors, List<IBehavior> fallbackBehaviors, object[] constructorArgs, ref bool? mockConstructorCall)
+		private static MockCreationSettings DissectBehavior(Behavior behavior, List<object> mixins, List<IBehavior> supplementaryBehaviors, List<IBehavior> fallbackBehaviors, object[] constructorArgs, bool? mockConstructorCall)
 		{
 			mixins.Add(new MockingBehaviorConfiguration { Behavior = behavior });
-			
+
 			var eventStubs = new EventStubsBehavior();
 			mixins.Add(eventStubs.CreateMixin());
 
@@ -130,7 +130,8 @@ namespace Telerik.JustMock
 					fallbackBehaviors.Add(eventStubs);
 					fallbackBehaviors.Add(new PropertyStubsBehavior());
 					fallbackBehaviors.Add(new CallOriginalObjectMethodsBehavior());
-					fallbackBehaviors.Add(new RecursiveMockingBehavior(behavior == Behavior.RecursiveLoose ? RecursiveMockingBehaviorType.ReturnMock : RecursiveMockingBehaviorType.ReturnDefault));
+					fallbackBehaviors.Add(new RecursiveMockingBehavior(behavior == Behavior.RecursiveLoose
+						? RecursiveMockingBehaviorType.ReturnMock : RecursiveMockingBehaviorType.ReturnDefault));
 					fallbackBehaviors.Add(new StaticConstructorMockBehavior());
 					fallbackBehaviors.Add(new ExecuteConstructorBehavior());
 					break;
@@ -139,8 +140,8 @@ namespace Telerik.JustMock
 					fallbackBehaviors.Add(new RecursiveMockingBehavior(RecursiveMockingBehaviorType.OnlyDuringAnalysis));
 					fallbackBehaviors.Add(new StaticConstructorMockBehavior());
 					fallbackBehaviors.Add(new ExecuteConstructorBehavior());
-					fallbackBehaviors.Add(new StrictBehavior(false));
-					supplementaryBehaviors.Add(new StrictBehavior(true));
+					fallbackBehaviors.Add(new StrictBehavior(throwOnlyOnValueReturningMethods: false));
+					supplementaryBehaviors.Add(new StrictBehavior(throwOnlyOnValueReturningMethods: true));
 					break;
 				case Behavior.CallOriginal:
 					fallbackBehaviors.Add(new CallOriginalBehavior());
@@ -169,6 +170,15 @@ namespace Telerik.JustMock
 				mockConstructorCall = false;
 #endif
 			}
+
+			return new MockCreationSettings
+			{
+				Args = constructorArgs,
+				Mixins = mixins,
+				SupplementaryBehaviors = supplementaryBehaviors,
+				FallbackBehaviors = fallbackBehaviors,
+				MockConstructorCall = mockConstructorCall.Value,
+			};
 		}
 	}
 }

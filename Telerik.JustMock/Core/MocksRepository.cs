@@ -50,6 +50,12 @@ namespace Telerik.JustMock.Core
 		public Expression<Predicate<MethodInfo>> InterceptorFilter;
 	}
 
+	internal class ProxyTypeInfo
+	{
+		public Type ProxyType;
+		public Dictionary<Type, object> Mixins = new Dictionary<Type, object>();
+	}
+
 	public sealed class MocksRepository
 	{
 		private static readonly List<KeyValuePair<object, IMockMixin>> externalMixinDatabase = new List<KeyValuePair<object, IMockMixin>>();
@@ -414,6 +420,26 @@ namespace Telerik.JustMock.Core
 				this.matchersInContext.Add(matcher);
 		}
 
+		private ProxyGenerationOptions CreateProxyGenerationOptions(Type type, MockCreationSettings settings, out MockMixin mockMixinImpl)
+		{
+			mockMixinImpl = CreateMockMixin(type, settings.SupplementaryBehaviors, settings.FallbackBehaviors, settings.MockConstructorCall);
+
+			var options = new ProxyGenerationOptions();
+			options.AddMixinInstance(mockMixinImpl);
+			foreach (var mixin in settings.Mixins)
+				options.AddMixinInstance(mixin);
+
+			if (settings.AdditionalProxyTypeAttributes != null)
+			{
+				foreach (var attr in settings.AdditionalProxyTypeAttributes)
+				{
+					options.AdditionalAttributes.Add(attr);
+				}
+			}
+
+			return options;
+		}
+
 		internal object Create(Type type, MockCreationSettings settings)
 		{
 			object delegateResult;
@@ -440,23 +466,10 @@ namespace Telerik.JustMock.Core
 						.ToArray();
 				}
 
-				var mockMixinImpl = CreateMockMixin(type, settings.SupplementaryBehaviors, settings.FallbackBehaviors, settings.MockConstructorCall);
+				MockMixin mockMixinImpl;
+				var options = this.CreateProxyGenerationOptions(type, settings, out mockMixinImpl);
 
-				var options = new ProxyGenerationOptions();
-				options.AddMixinInstance(mockMixinImpl);
-				foreach (var mixin in settings.Mixins)
-					options.AddMixinInstance(mixin);
-
-				bool hasAdditionalProxyTypeAttributes = false;
-				if (settings.AdditionalProxyTypeAttributes != null)
-				{
-					foreach (var attr in settings.AdditionalProxyTypeAttributes)
-					{
-						options.AdditionalAttributes.Add(attr);
-						hasAdditionalProxyTypeAttributes = true;
-					}
-				}
-
+				bool hasAdditionalProxyTypeAttributes = settings.AdditionalProxyTypeAttributes != null && settings.AdditionalProxyTypeAttributes.Any();
 				var ctors = type.GetConstructors();
 				bool isCoclass = ctors.Any(ctor => ctor.IsExtern());
 
@@ -1757,6 +1770,22 @@ namespace Telerik.JustMock.Core
 				sb.AppendLine("    --none--");
 
 			return sb.ToString();
+		}
+
+		internal ProxyTypeInfo CreateClassProxyType(Type classToProxy, MockCreationSettings settings)
+		{
+			MockMixin mockMixinImpl;
+			var pgo = CreateProxyGenerationOptions(classToProxy, settings, out mockMixinImpl);
+			var typeInfo = new ProxyTypeInfo
+			{
+				ProxyType = generator.ProxyBuilder.CreateClassProxyType(classToProxy, Type.EmptyTypes, pgo)
+			};
+			typeInfo.Mixins.Add(typeof(IInterceptor), new DynamicProxyInterceptor(this));
+			foreach (var mixin in pgo.MixinData.MixinInterfaces)
+			{
+				typeInfo.Mixins.Add(mixin, pgo.MixinData.GetMixinInstance(mixin));
+			}
+			return typeInfo;
 		}
 
 		private class ProxyGenerationHook : IProxyGenerationHook, IConstructorGenerationHook

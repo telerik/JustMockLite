@@ -885,6 +885,14 @@ namespace Telerik.JustMock.Tests
 			Assert.Throws<NotImplementedException>(() => { var expected = node.NodeType; });
 		}
 
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior"), TestCategory("CallOriginal")]
+		public void CallOriginalClause_AbstractMethod_ThrowsNotImplemented()
+		{
+			var mock = Mock.Create<IFoo>();
+			Mock.Arrange(() => mock.JustCall()).CallOriginal();
+			Assert.Throws<NotImplementedException>(() => mock.JustCall());
+		}
+
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldSetupMockWithParamsWhenNoParamIsPassed()
 		{
