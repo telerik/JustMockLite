@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using Microsoft.Win32;
 
@@ -26,13 +27,15 @@ namespace Telerik.JustMock.Core
 {
 	internal static class ClrProfilerSetupHelper
 	{
+		private static readonly Guid JustMockGuid = new Guid("{B7ABE522-A68F-44F2-925B-81E7488E9EC0}");
+
 		private static readonly Dictionary<Guid, string> KnownProfilerGuids = new Dictionary<Guid, string>
 		{
 			{ new Guid("{06051352-82A1-41DB-BA4F-12D9D3DF4767}"), "JustTrace" },
 			{ new Guid("{55347B27-3DDF-47FD-ACDC-490C8B04E111}"), "JustTrace" },
 			{ new Guid("{9180FC24-0BC1-4A0E-ABEC-5F860697BD66}"), "JustTrace" },
 			{ new Guid("{4681113A-86F0-44CE-855B-FED84C0924E5}"), "JustTrace" },
-			{ new Guid("{B7ABE522-A68F-44F2-925B-81E7488E9EC0}"), "JustMock" },
+			{ JustMockGuid, "JustMock" },
 			{ new Guid("{1542C21D-80C3-45E6-A56C-A9C1E4BEB7B8}"), "OpenCover" },
 			{ new Guid("{A7A1EDD8-D9A9-4D51-85EA-514A8C4A9100}"), "OpenCover" },
 			{ new Guid("{717FF691-2ADF-4AC0-985F-1DD3C42FDF90}"), "PartCover" },
@@ -60,6 +63,8 @@ namespace Telerik.JustMock.Core
 			{ new Guid("{44A86CAD-F7EE-429C-83EB-F3CDE3B87B70}"), "Visual Studio 2012 Profiler" },
 			{ new Guid("{D9DB81DB-81FE-4611-815D-144AD522E1B1}"), "Visual Studio 2012 Profiler" },
 			{ new Guid("{B19F184A-CC62-4137-9A6F-AF0F91730165}"), "Visual Studio 2012 Code Coverage/IntelliTrace" },
+			{ new Guid("{2CCFACEE-5E60-4734-8A98-181D93097CD9}"), "Visual Studio 2013 Profiler" },
+			{ new Guid("{B61B010D-1035-48A9-9833-32C2A2CDC294}"), "Visual Studio 2013 Profiler" },
 			{ new Guid("{8C29BC4E-1F57-461a-9B51-1200C32E6F1F}"), "CLRProfiler" },
 			{ new Guid("{FF68FEB9-E58A-4B75-A2B8-90CE7D915A26}"), "New Relic Agent" },
 			{ new Guid("{45777DEF-BDA6-431B-A953-E888780FA511}"), "SpeedTrace" },
@@ -75,6 +80,7 @@ namespace Telerik.JustMock.Core
 
 		private const string CorGeneralProfilerKey = "COR_PROFILER";
 		private const string CorGeneralEnableProfilingKey = "COR_ENABLE_PROFILING";
+		private const string CorGeneralProfilerPathKey = "COR_PROFILER_PATH";
 
 		private const string ProcessEnvironmentLocationDescription = "process environment";
 		private const string CurrentUserLocationDescription = "current user registry setting";
@@ -101,10 +107,12 @@ namespace Telerik.JustMock.Core
 			{
 				var profiler = Registry.GetValue(keyName, CorGeneralProfilerKey, null);
 				var enableProfiling = Registry.GetValue(keyName, CorGeneralEnableProfilingKey, null);
+				var profilerPath = Registry.GetValue(keyName, CorGeneralProfilerPathKey, null);
 
-				if (profiler != null || enableProfiling != null)
+				if (profiler != null || enableProfiling != null || profilerPath != null)
 				{
-					AddLocation(profiler != null ? profiler.ToString() : null, locationDescription, locationsBuilder);
+					var profilerId = profilerPath != null ? profilerPath.ToString() : profiler != null ? profiler.ToString() : null;
+					AddLocation(profilerId, locationDescription, locationsBuilder);
 				}
 			}
 			catch
@@ -119,9 +127,10 @@ namespace Telerik.JustMock.Core
 			{
 				var profiler = Environment.GetEnvironmentVariable(CorGeneralProfilerKey);
 				var enableProfiling = Environment.GetEnvironmentVariable(CorGeneralEnableProfilingKey);
-				if (!String.IsNullOrEmpty(profiler) || !String.IsNullOrEmpty(enableProfiling))
+				var profilerPath = Environment.GetEnvironmentVariable(CorGeneralProfilerPathKey);
+				if (!String.IsNullOrEmpty(profiler) || !String.IsNullOrEmpty(enableProfiling) || !String.IsNullOrEmpty(profilerPath))
 				{
-					AddLocation(profiler, ProcessEnvironmentLocationDescription, locationsBuilder);
+					AddLocation(profilerPath ?? profiler, ProcessEnvironmentLocationDescription, locationsBuilder);
 				}
 			}
 			catch
@@ -132,7 +141,7 @@ namespace Telerik.JustMock.Core
 
 		private static void AddLocation(string profiler, string locationDescription, StringBuilder locationsBuilder)
 		{
-			string profilerName = profiler ?? string.Empty;
+			string profilerName = null;
 			try
 			{
 				KnownProfilerGuids.TryGetValue(new Guid(profiler), out profilerName);
@@ -140,7 +149,24 @@ namespace Telerik.JustMock.Core
 			catch
 			{ }
 
-			locationsBuilder.AppendLine(string.Format("* {0} (from {1})", profilerName, locationDescription));
+			if (!IsJustMockProfiler(profiler))
+			{
+				locationsBuilder.AppendLine(string.Format("* {0} (from {1})", profilerName ?? profiler ?? "unknown", locationDescription));
+			}
+		}
+
+		private static bool IsJustMockProfiler(string profiler)
+		{
+			if (profiler == null)
+				return false;
+
+			try
+			{
+				return new Guid(profiler) == JustMockGuid;
+			}
+			catch { }
+
+			return "Telerik.CodeWeaver.Profiler.dll".Equals(Path.GetFileName(profiler), StringComparison.OrdinalIgnoreCase);
 		}
 
 		private static void AddError(string locationDescription, StringBuilder locationsBuilder)
