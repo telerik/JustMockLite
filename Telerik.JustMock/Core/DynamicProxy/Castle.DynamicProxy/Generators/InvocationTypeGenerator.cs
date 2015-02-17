@@ -81,7 +81,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 				ImplementChangeProxyTargetInterface(@class, invocation, targetField);
 			}
 
-			ImplemementInvokeMethodOnTarget(invocation, methodInfo.GetParameters(), targetField, callback);
+			ImplemementInvokeMethodOnTarget(invocation, methodInfo, targetField, callback);
 
 			return invocation;
 		}
@@ -102,11 +102,11 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			return methodOnTargetInvocationExpression;
 		}
 
-		protected virtual void ImplementInvokeMethodOnTarget(AbstractTypeEmitter invocation, ParameterInfo[] parameters,
+		protected virtual void ImplementInvokeMethodOnTarget(AbstractTypeEmitter invocation, MethodInfo method,
 		                                                     MethodEmitter invokeMethodOnTarget,
 		                                                     Reference targetField)
 		{
-			var callbackMethod = GetCallbackMethod(invocation);
+			var callbackMethod = GetCallbackMethod(invocation, method);
 			if (callbackMethod == null)
 			{
 				EmitCallThrowOnNoTarget(invokeMethodOnTarget);
@@ -118,6 +118,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 				EmitCallEnsureValidTarget(invokeMethodOnTarget);
 			}
 
+			var parameters = method.GetParameters();
 			var args = new Expression[parameters.Length];
 
 			// Idea: instead of grab parameters one by one
@@ -248,7 +249,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			invokeMethodOnTarget.CodeBuilder.AddStatement(new ReturnStatement());
 		}
 
-		private MethodInfo GetCallbackMethod(AbstractTypeEmitter invocation)
+		private MethodInfo GetCallbackMethod(AbstractTypeEmitter invocation, MethodInfo method)
 		{
 			if (contributor != null)
 			{
@@ -265,7 +266,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 				return callbackMethod;
 			}
 
-			return callbackMethod.MakeGenericMethod(invocation.GetGenericArgumentsFor(callbackMethod));
+			return callbackMethod.MakeGenericMethod(invocation.GetGenericArgumentsFor(method));
 		}
 
 		private AbstractTypeEmitter GetEmitter(ClassEmitter @class, Type[] interfaces, INamingScope namingScope,
@@ -277,11 +278,11 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			return new ClassEmitter(@class.ModuleScope, uniqueName, GetBaseType(), interfaces);
 		}
 
-		private void ImplemementInvokeMethodOnTarget(AbstractTypeEmitter invocation, ParameterInfo[] parameters,
+		private void ImplemementInvokeMethodOnTarget(AbstractTypeEmitter invocation, MethodInfo method,
 		                                             FieldReference targetField, MethodInfo callbackMethod)
 		{
 			var invokeMethodOnTarget = invocation.CreateMethod("InvokeMethodOnTarget", typeof(void));
-			ImplementInvokeMethodOnTarget(invocation, parameters, invokeMethodOnTarget, targetField);
+			ImplementInvokeMethodOnTarget(invocation, method, invokeMethodOnTarget, targetField);
 		}
 
 		private void ImplementChangeInvocationTarget(AbstractTypeEmitter invocation, FieldReference targetField)

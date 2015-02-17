@@ -2286,6 +2286,27 @@ namespace Telerik.JustMock.Tests
 			Assert.True(StaticCtor.called);
 		}
 
+		public interface IGeneric
+		{
+			string Get<TItem1, TItem2>(TItem1 a, TItem2 b);
+		}
+
+		public class Generic : IGeneric
+		{
+			public virtual string Get<T, U>(T t, U u)
+			{
+				return "";
+			}
+		}
+
+		[TestMethod]
+		public void ShouldCreateMockWithRenamedGenericParameters()
+		{
+			var mock = Mock.Create<Generic>();
+			Mock.Arrange(() => mock.Get<string, int>("5", 5)).Returns("string");
+			Assert.Equal("string", mock.Get<string, int>("5", 5));
+		}
+
 #if LITE_EDITION && !SILVERLIGHT
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldMockNoninheritableInterfaceMembers()
