@@ -31,9 +31,15 @@ using Telerik.JustMock.Helpers;
 namespace Telerik.JustMock.AutoMock
 {
 	/// <summary>
-	/// Entry-point class for auto mocking.
+	/// Auto-mocking container that can automatically inject mocks for all
+	/// dependencies of the tested class. The container is based on NInject and
+	/// supports the core NInject syntax as well as syntax extensions for arranging
+	/// mocks and injecting mocks into properties and constructor arguments.
 	/// </summary>
-	/// <typeparam name="T">The type of the mocked class.</typeparam>
+	/// <typeparam name="T">The type of the class whose dependencies should be mocked.
+	/// If this is an abstract class, then a Behavior.CallOriginal mock is created for the instance.
+	/// Abstract members of the instance can be manipulated using the methods in the Mock class.
+	/// </typeparam>
 	public sealed class MockingContainer<T> : StandardKernel where T : class
 	{
 		private T resolvedInstance;

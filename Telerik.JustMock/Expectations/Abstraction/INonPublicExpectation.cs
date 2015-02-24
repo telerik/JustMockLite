@@ -23,6 +23,16 @@ namespace Telerik.JustMock.Expectations.Abstraction
 	/// <summary>
 	/// Defines methods to mock non-public members.
 	/// </summary>
+	/// <remarks>
+	/// Non-public methods are identified by their name and, optionally, by their arguments
+	/// when there's a need to disambiguate between overloads, or when you need to specify
+	/// matchers for the arguments using. Arguments are passed using either constant objects
+	/// when a specific value needs to be matched, or using one of the members of the
+	/// <see cref="ArgExpr"/> class. If a member is not overloaded and you want the arrangement
+	/// to work for all arguments, then you can specify just the name of the member and omit
+	/// all arguments. This is equivalent to passing the correct ArgExpr.IsAny&lt;T&gt;() arguments
+	/// or adding the .IgnoreArguments() clause.
+	/// </remarks>
 	public interface INonPublicExpectation
 	{
 		/// <summary>
@@ -191,7 +201,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <param name="occurs">Specifies the number of times a call should occur.</param>
 		/// <param name="args">Method arguments</param>
 		void Assert<T>(string memberName, Occurs occurs, params object[] args);
-	   
+
 		/// <summary>
 		/// Asserts the specified member that it is called as expected.
 		/// </summary>
@@ -201,7 +211,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <param name="occurs">Specifies the number of times a call should occur.</param>
 		/// <param name="args">Method arguments</param>
 		void Assert<T, TReturn>(string memberName, Occurs occurs, params object[] args);
-		
+
 		/// <summary>
 		/// Asserts the specified member that it is called as expected.
 		/// </summary>
