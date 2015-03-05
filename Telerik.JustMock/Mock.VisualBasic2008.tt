@@ -27,9 +27,9 @@ using Telerik.JustMock.Core.Context;
 
 namespace Telerik.JustMock
 {
-	/// <summary>
-	/// Mock entry point for settting up expection, creating mock objects and verfiying results.
-	/// </summary>
+#if VISUALBASIC
+	[Obsolete("Telerik.JustMock.VisualBasic.dll is a compatibility library for Visual Basic 2008 and will be removed in a future release. It is recommended that you migrate to a later version of the development environment and reference Telerik.JustMock.dll instead.")]
+#endif
 	public partial class Mock
 	{
 		#if VISUALBASIC
