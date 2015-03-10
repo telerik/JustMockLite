@@ -25,7 +25,7 @@ namespace Telerik.JustMock.Core.Context
 
 		public static Action<string, Exception> GetFailMethod()
 		{
-			var assertFailedExceptionType = Type.GetType(AssertFailedExceptionTypeName);
+			var assertFailedExceptionType = Type.GetType(AssertFailedExceptionTypeName) ?? typeof(MockException);
 			var messageParam = Expression.Parameter(typeof(string));
 			var innerExceptionParam = Expression.Parameter(typeof(Exception));
 			var ctor = assertFailedExceptionType.GetConstructor(new[] { typeof(string), typeof(Exception) });
