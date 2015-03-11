@@ -17,19 +17,21 @@
 
 using System;
 
-
-
-#if !NUNIT
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-#else
+#if NUNIT
 using NUnit.Framework;
 using TestCategory = NUnit.Framework.CategoryAttribute;
 using TestClass = NUnit.Framework.TestFixtureAttribute;
 using TestMethod = NUnit.Framework.TestAttribute;
 using TestInitialize = NUnit.Framework.SetUpAttribute;
 using TestCleanup = NUnit.Framework.TearDownAttribute;
+using AssertionException = NUnit.Framework.AssertionException;
+#elif PORTABLE
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
+using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
+#else
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException;
 #endif
-
 
 namespace Telerik.JustMock.Tests
 {

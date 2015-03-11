@@ -16,7 +16,9 @@
 */
 
 using System.Reflection;
+using System.Resources;
 
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCulture("")]
+[assembly: NeutralResourcesLanguage("en")]

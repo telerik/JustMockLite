@@ -8,19 +8,11 @@ namespace Telerik.JustMock.Core.StaticProxy
 {
 	public static class ProxySourceRegistry
 	{
-		internal static readonly Dictionary<Type, Type> ProxyTypes = new Dictionary<Type, Type>();
+		internal static readonly Dictionary<RuntimeTypeHandle, RuntimeTypeHandle> ProxyTypes = new Dictionary<RuntimeTypeHandle, RuntimeTypeHandle>();
 
-		public static void Register(RuntimeTypeHandle moduleTypeHandle)
+		public static void Register(RuntimeTypeHandle proxyTypeHandle, RuntimeTypeHandle proxiedTypeHandle)
 		{
-			var assembly = Type.GetTypeFromHandle(moduleTypeHandle).Assembly;
-			foreach (var type in assembly.GetLoadableTypes())
-			{
-				var proxyAttr = type.GetCustomAttributes(typeof(ProxyAttribute), false).FirstOrDefault() as ProxyAttribute;
-				if (proxyAttr == null)
-					continue;
-
-				ProxyTypes[proxyAttr.ProxiedType] = type;
-			}
+			ProxyTypes.Add(proxiedTypeHandle, proxyTypeHandle);
 		}
 	}
 }

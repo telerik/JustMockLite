@@ -274,7 +274,7 @@ namespace Telerik.JustMock.Core
 
 		public static object GetUninitializedObject(Type type)
 		{
-#if SILVERLIGHT
+#if COREFX
 			return ProfilerInterceptor.GetUninitializedObjectImpl(type);
 #else
 			if (typeof(ContextBoundObject).IsAssignableFrom(type))
@@ -287,7 +287,7 @@ namespace Telerik.JustMock.Core
 
 		public static object TryGetUninitializedObject(Type type)
 		{
-#if SILVERLIGHT
+#if COREFX
 			return ProfilerInterceptor.GetUninitializedObjectImpl(type);
 #else
 			if (typeof(ContextBoundObject).IsAssignableFrom(type)
@@ -470,7 +470,7 @@ namespace Telerik.JustMock.Core
 
 		public static string GetAssemblyName(this Assembly assembly)
 		{
-#if SILVERLIGHT
+#if COREFX
 			return new AssemblyName(assembly.FullName).Name;
 #else
 			return assembly.GetName().Name;
@@ -479,11 +479,11 @@ namespace Telerik.JustMock.Core
 
 		public static AssemblyName GetStrongAssemblyName(string name, byte[] keyPair)
 		{
-#if !SILVERLIGHT
+#if !COREFX
 			var assemblyName = new AssemblyName(name);
 			if (keyPair != null)
 				assemblyName.KeyPair = new StrongNameKeyPair(keyPair);
-#elif !PORTABLE
+#elif SILVERLIGHT
 			var assemblyName = keyPair == null || !ProfilerInterceptor.IsProfilerAttached
 				? new AssemblyName(name)
 				: (AssemblyName) ProfilerInterceptor.CreateStrongNameAssemblyNameImpl(name, keyPair);
@@ -776,7 +776,7 @@ namespace Telerik.JustMock.Core
 			return method.IsVirtual && !method.IsFinal;
 		}
 
-#if !SILVERLIGHT
+#if !COREFX
 		[DllImport("user32.dll")]
 		private static extern bool IsImmersiveProcess(IntPtr hProcess);
 		private static bool? isMetro;

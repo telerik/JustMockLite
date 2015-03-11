@@ -20,7 +20,7 @@ using System.Linq;
 using System.Reflection;
 using Telerik.JustMock.Core;
 
-#if !SILVERLIGHT
+#if !COREFX
 using System.Security;
 using System.Security.Permissions;
 #endif
@@ -304,7 +304,7 @@ namespace Telerik.JustMock
 		{
 			get
 			{
-#if SILVERLIGHT
+#if COREFX
 				return false;
 #else
 				try

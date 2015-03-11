@@ -33,7 +33,7 @@ namespace Telerik.JustMock.Core
 				return constant.Value;
 
 			bool canCallGetField = true;
-#if SILVERLIGHT
+#if COREFX
 			canCallGetField = ProfilerInterceptor.IsProfilerAttached;
 #endif
 			if (canCallGetField)

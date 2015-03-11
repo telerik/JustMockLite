@@ -18,9 +18,6 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-#if !SILVERLIGHT
-using System.Runtime.Serialization;
-#endif
 using System.Text;
 using Telerik.JustMock.Core;
 using Telerik.JustMock.Core.Context;
@@ -189,8 +186,8 @@ namespace Telerik.JustMock.Diagnostics
 			: base(String.Format("State:\n{0}\n\nFull trace:\n{1}", DebugView.CurrentState, DebugView.FullTrace))
 		{ }
 
-#if !SILVERLIGHT
-		protected DebugViewDetailsException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+#if !COREFX
+		protected DebugViewDetailsException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 #endif
 	}
 

@@ -21,7 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;LITE_EDITION;PORTABLE;SILVERLIGHT</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;COREFX;LITE_EDITION;PORTABLE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -29,14 +29,14 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;LITE_EDITION;PORTABLE;SILVERLIGHT</DefineConstants>
+    <DefineConstants>TRACE;COREFX;LITE_EDITION;PORTABLE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\ARM\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;LITE_EDITION;PORTABLE;SILVERLIGHT</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;COREFX;LITE_EDITION;PORTABLE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>ARM</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -44,7 +44,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM'">
     <OutputPath>bin\ARM\Release\</OutputPath>
-    <DefineConstants>TRACE;LITE_EDITION;PORTABLE;SILVERLIGHT</DefineConstants>
+    <DefineConstants>TRACE;COREFX;LITE_EDITION;PORTABLE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>ARM</PlatformTarget>
@@ -467,6 +467,7 @@
   <ItemGroup>
     <Compile Include="Core\MockingUtil.CodeGen.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

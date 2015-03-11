@@ -16,15 +16,15 @@ namespace Telerik.JustMock.Core.StaticProxy
 
 		public object Create(Type type, MocksRepository repository, IMockMixin mockMixinImpl, MockCreationSettings settings, bool createTransparentProxy)
 		{
-			Type proxyType;
-			if (!ProxySourceRegistry.ProxyTypes.TryGetValue(type, out proxyType))
+			RuntimeTypeHandle proxyType;
+			if (!ProxySourceRegistry.ProxyTypes.TryGetValue(type.TypeHandle, out proxyType))
 			{
 				throw new MockException(String.Format("No proxy type found for type '{0}'. Add [assembly: MockedType(typeof({0}))] to your test assembly.", type));
 			}
 
 			var interceptor = new DynamicProxyInterceptor(repository);
 
-			return Activator.CreateInstance(proxyType, interceptor, mockMixinImpl);
+			return Activator.CreateInstance(Type.GetTypeFromHandle(proxyType), interceptor, mockMixinImpl);
 		}
 
 		public Type CreateDelegateBackend(Type delegateType)

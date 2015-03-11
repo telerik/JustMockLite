@@ -15,23 +15,24 @@
    limitations under the License.
 */
 
-#if !NUNIT
-#if !PORTABLE
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-#else
-using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
-#endif
-#else
+#if NUNIT
 using NUnit.Framework;
 using TestCategory = NUnit.Framework.CategoryAttribute;
 using TestClass = NUnit.Framework.TestFixtureAttribute;
 using TestMethod = NUnit.Framework.TestAttribute;
 using TestInitialize = NUnit.Framework.SetUpAttribute;
 using TestCleanup = NUnit.Framework.TearDownAttribute;
+using AssertionException = NUnit.Framework.AssertionException;
+#elif PORTABLE
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
+using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
+#else
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException;
 #endif
 
 #if LITE_EDITION
-#if !SILVERLIGHT
+#if !COREFX
 using Telerik.JustMock.DemoLibSigned;
 #endif
 #endif
@@ -1372,7 +1373,7 @@ namespace Telerik.JustMock.Tests
 		}
 #endif
 
-#if LITE_EDITION && !SILVERLIGHT
+#if LITE_EDITION && !COREFX
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void MockInternalMembersWithoutExplicitlyGivenVisibilitySentinel()
 		{

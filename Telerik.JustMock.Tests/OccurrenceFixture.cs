@@ -17,19 +17,21 @@
 
 using System.Collections.Generic;
 
-#if !NUNIT
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException;
-#else
+#if NUNIT
 using NUnit.Framework;
 using TestCategory = NUnit.Framework.CategoryAttribute;
 using TestClass = NUnit.Framework.TestFixtureAttribute;
 using TestMethod = NUnit.Framework.TestAttribute;
 using TestInitialize = NUnit.Framework.SetUpAttribute;
 using TestCleanup = NUnit.Framework.TearDownAttribute;
-using AssertFailedException = NUnit.Framework.AssertionException;
+using AssertionException = NUnit.Framework.AssertionException;
+#elif PORTABLE
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
+using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
+#else
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException;
 #endif
-
 
 namespace Telerik.JustMock.Tests
 {
@@ -211,7 +213,7 @@ namespace Telerik.JustMock.Tests
 			IFoo TheFoo { get; }
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Occurrence"), TestCategory("Bug"), Description("Bug #65677")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Occurrence"), TestCategory("Bug")]
 		public void ShouldNotChangeOccurrenceCountDuringRecursiveArrange()
 		{
 			var mock = Mock.Create<IFooProvider>();

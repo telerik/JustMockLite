@@ -227,7 +227,7 @@ namespace Telerik.JustMock.Core
 
 		static MocksRepository()
 		{
-#if !SILVERLIGHT
+#if !COREFX
 			var badApples = new[]
 			{
 				typeof(System.Security.Permissions.SecurityAttribute),

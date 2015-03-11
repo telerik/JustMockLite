@@ -21,16 +21,11 @@ using System.Linq;
 using System.IO;
 using System.Net;
 
-#if !SILVERLIGHT
-
+#if !COREFX
 using Telerik.JustMock.DemoLib;
-
 #endif
 
-#if !NUNIT
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException;
-#else
+#if NUNIT
 using NUnit.Framework;
 using TestCategory = NUnit.Framework.CategoryAttribute;
 using TestClass = NUnit.Framework.TestFixtureAttribute;
@@ -38,6 +33,12 @@ using TestMethod = NUnit.Framework.TestAttribute;
 using TestInitialize = NUnit.Framework.SetUpAttribute;
 using TestCleanup = NUnit.Framework.TearDownAttribute;
 using AssertionException = NUnit.Framework.AssertionException;
+#elif PORTABLE
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
+using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
+#else
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException;
 #endif
 
 namespace Telerik.JustMock.Tests
@@ -202,7 +203,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Throws<ArgumentException>(() => foo.Echo<int, int>(10));
 		}
 
-		[TestMethod, TestCategory("Lite"), Description("Reported Issue")]
+		[TestMethod, TestCategory("Lite")]
 		public void ShouldAssertInvocationFromInsideAMockedEvent()
 		{
 			var @interface = Mock.Create<IInterface>();
@@ -216,7 +217,7 @@ namespace Telerik.JustMock.Tests
 			Assert.True(target.Result);
 		}
 
-		[TestMethod, TestCategory("Lite"), Description("Reported Issue")]
+		[TestMethod, TestCategory("Lite")]
 		public void ShouldAssertRaiseEventAfterAMethodCallFromDifferentMock()
 		{
 			var @interface = Mock.Create<IInterface>();
@@ -233,13 +234,13 @@ namespace Telerik.JustMock.Tests
 			Assert.True(target.NumberOfTimesCalled == 2);
 		}
 
-		[TestMethod, TestCategory("Lite"), Description("Issue")]
+		[TestMethod, TestCategory("Lite")]
 		public void ShouldBeToSubscribeEventForStrictMock()
 		{
 			new EventContainer(Mock.Create<IInterface>(Behavior.Strict));
 		}
 
-		[TestMethod, TestCategory("Lite"), Description("Issue")]
+		[TestMethod, TestCategory("Lite")]
 		public void ShouldNotThrowExceptionForDecimalTypeThatHasMultipleImplicitMethods()
 		{
 			var foo = Mock.Create<TestBase>();
@@ -328,9 +329,9 @@ namespace Telerik.JustMock.Tests
 			}
 		}
 
-#if !SILVERLIGHT
+#if !COREFX
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Misc"), Description("Bug")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Misc")]
 		public void ShouldNotImplementInternalVirtualMemberUsingProxyWhenNotVisible()
 		{
 			var context = Mock.Create<Telerik.JustMock.DemoLibSigned.DummyContext>();
@@ -452,7 +453,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Null(exmpleMock.GetMeAllFoos());
 		}
 
-#if !SILVERLIGHT
+#if !COREFX
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Misc")]
 		public void ShouldMockInternalMemberFromBaseClass()
@@ -475,7 +476,7 @@ namespace Telerik.JustMock.Tests
 #endif
 
 
-		[TestMethod, TestCategory("Lite"), Description("Issue asserting params of object[]")]
+		[TestMethod, TestCategory("Lite")]
 		public void ShouldAssertSetupWithObjectArrayAsParams()
 		{
 			var foo = Mock.Create<Foo<Product>>();
@@ -489,7 +490,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Assert(foo);
 		}
 
-		[TestMethod, TestCategory("Lite"), Description("Issue =>Instance property should not instantiate when set explictly")]
+		[TestMethod, TestCategory("Lite")]
 		public void ShouldNotInstantiatePropertyWhenSetExplicitly()
 		{
 			var foo = Mock.Create<NestedFoo>();
@@ -501,7 +502,7 @@ namespace Telerik.JustMock.Tests
 		}
 
 
-#if !SILVERLIGHT
+#if !COREFX
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Misc")]
 		public void ShouldBeAbleToMockInternalProtectedVirtualMember()
@@ -641,7 +642,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Throws<AssertionException>(() => Mock.AssertSet(() => foo.EffectiveFrom = Arg.IsAny<DateTime>(), Occurs.Never()));
 		}
 
-		[TestMethod, TestCategory("Lite"), Description("Issue asserting byte[]")]
+		[TestMethod, TestCategory("Lite")]
 		public void ShouldAssertWithByteArrayArguments()
 		{
 			ITestInterface ti = Mock.Create<ITestInterface>();
@@ -672,7 +673,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Assert(fakereader);
 		}
 
-		[TestMethod, TestCategory("Lite"), Description("Reported Issue")]
+		[TestMethod, TestCategory("Lite")]
 		public void ShouldAssertNewGuIdArgumentForSpecificValue()
 		{
 			var localPersister = Mock.Create<IProcessDataPersister>();
@@ -687,7 +688,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Assert(localPersister);
 		}
 
-		[TestMethod, TestCategory("Lite"), Description("Reported issue")]
+		[TestMethod, TestCategory("Lite")]
 		public void ShouldConfirmMockingClassWithMethodHidingItsVirtualBase()
 		{
 			var child = Mock.Create<ChildClass>();

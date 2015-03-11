@@ -42,7 +42,7 @@ namespace Telerik.JustMock.Core.Behaviors
 				|| callPattern.Method.IsStatic
 				|| !(callPattern.InstanceMatcher is AnyMatcher)
 				|| typeof(string) == callPattern.Method.DeclaringType
-#if !SILVERLIGHT
+#if !COREFX
 				|| typeof(ContextBoundObject).IsAssignableFrom(callPattern.Method.DeclaringType)
 #endif
 				)

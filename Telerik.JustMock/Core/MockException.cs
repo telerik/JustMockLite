@@ -16,9 +16,6 @@
 */
 
 using System;
-#if !SILVERLIGHT
-using System.Runtime.Serialization;
-#endif
 
 namespace Telerik.JustMock.Core
 {
@@ -44,8 +41,8 @@ namespace Telerik.JustMock.Core
 		/// <param name="innerException">Inner exception.</param>
 		public MockException(string message, Exception innerException) : base(message, innerException) { }
 
-#if !SILVERLIGHT
-		protected MockException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+#if !COREFX
+		protected MockException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 #endif
 
 		internal static void ThrowUnsafeTypeException(Type type)
