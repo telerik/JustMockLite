@@ -16,8 +16,13 @@ namespace Telerik.JustMock.Core.StaticProxy
 
 		public object Create(Type type, MocksRepository repository, IMockMixin mockMixinImpl, MockCreationSettings settings, bool createTransparentProxy)
 		{
-			RuntimeTypeHandle proxyType;
-			if (!ProxySourceRegistry.ProxyTypes.TryGetValue(type.TypeHandle, out proxyType))
+			var baseType = type.IsGenericType ? type.GetGenericTypeDefinition() : type;
+			RuntimeTypeHandle proxyTypeHandle;
+			var key = new ProxySourceRegistry.ProxyKey(
+				baseType.TypeHandle,
+				settings.AdditionalMockedInterfaces != null && settings.AdditionalMockedInterfaces.Length > 0
+				? settings.AdditionalMockedInterfaces.Select(t => t.TypeHandle).ToArray() : null);
+			if (!ProxySourceRegistry.ProxyTypes.TryGetValue(key, out proxyTypeHandle))
 			{
 				throw new MockException(String.Format("No proxy type found for type '{0}'. Add [assembly: MockedType(typeof({0}))] to your test assembly.",
 					type.ToString().Replace('+', '.')));
@@ -25,7 +30,11 @@ namespace Telerik.JustMock.Core.StaticProxy
 
 			var interceptor = new DynamicProxyInterceptor(repository);
 
-			return Activator.CreateInstance(Type.GetTypeFromHandle(proxyType),
+			var proxyType = Type.GetTypeFromHandle(proxyTypeHandle);
+			if (proxyType.IsGenericTypeDefinition)
+				proxyType = proxyType.MakeGenericType(type.GetGenericArguments());
+
+			return Activator.CreateInstance(proxyType,
 				new object[] { interceptor, mockMixinImpl }.Concat(settings.Mixins).ToArray());
 		}
 

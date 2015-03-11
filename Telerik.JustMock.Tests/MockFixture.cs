@@ -769,6 +769,20 @@ namespace Telerik.JustMock.Tests
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+		public void ShouldAssertMixinsWithClosure()
+		{
+			int a = 5;
+			var realItem = Mock.Create<RealItem>(x =>
+			{
+				x.Implements<IDisposable>();
+				x.CallConstructor(() => new RealItem(a));
+			});
+			var iDispose = realItem as IDisposable;
+
+			iDispose.Dispose();
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldImplementDependentInterfacesWhenTopIsSpecified()
 		{
 			var realItem = Mock.Create<RealItem>(x =>

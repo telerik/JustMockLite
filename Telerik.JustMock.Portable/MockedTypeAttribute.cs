@@ -8,6 +8,8 @@ namespace Telerik.JustMock
 	[AttributeUsage(AttributeTargets.Assembly)]
 	public sealed class MockedTypeAttribute : Attribute
 	{
+		public Type[] Implements { get; set; }
+
 		public MockedTypeAttribute(Type mockedType)
 		{
 		}
