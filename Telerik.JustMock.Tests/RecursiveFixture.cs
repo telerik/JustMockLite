@@ -59,6 +59,7 @@ namespace Telerik.JustMock.Tests
 			var b1 = foo.Bar;
 			var b2 = foo.Bar;
 
+			Assert.NotNull(b1);
 			Assert.Same(b1, b2);
 		}
 
