@@ -1020,7 +1020,7 @@ namespace Telerik.JustMock.Tests
 		}
 	}
 
-#if !NUNIT
+#if !NUNIT && !PORTABLE
 	[TestClass]
 	public class DebugViewTests
 	{

@@ -77,23 +77,21 @@ namespace Telerik.JustMock.Core.Context
 
 		public static string GetStackTrace(string indent)
 		{
-#if !PORTABLE
-#if !SILVERLIGHT
-			var skipCount = new System.Diagnostics.StackTrace().GetFrames().TakeWhile(frame => frame.GetMethod().DeclaringType.Assembly == typeof(DebugView).Assembly).Count();
-			var trace = new System.Diagnostics.StackTrace(skipCount, true).ToString();
-#else
+#if SILVERLIGHT
 			var trace = new System.Diagnostics.StackTrace().ToString();
-#endif
-#else
+#elif PORTABLE
 			string trace = null;
 			try
 			{
-				throw new Exception();
+				throw new StackTraceGeneratorException();
 			}
-			catch (Exception ex)
+			catch (StackTraceGeneratorException ex)
 			{
 				trace = ex.StackTrace;
 			}
+#else
+			var skipCount = new System.Diagnostics.StackTrace().GetFrames().TakeWhile(frame => frame.GetMethod().DeclaringType.Assembly == typeof(DebugView).Assembly).Count();
+			var trace = new System.Diagnostics.StackTrace(skipCount, true).ToString();
 #endif
 
 			return "\n".Join(trace
@@ -200,5 +198,10 @@ namespace Telerik.JustMock.Core.Context
 				Fail(sb.ToString());
 			}
 		}
+
+#if PORTABLE
+		private class StackTraceGeneratorException : Exception
+		{ }
+#endif
 	}
 }

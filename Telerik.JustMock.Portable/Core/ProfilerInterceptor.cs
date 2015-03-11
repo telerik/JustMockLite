@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -15,7 +16,13 @@ namespace Telerik.JustMock.Core
 
 		public static bool IsInterceptionEnabled { get; set; }
 
-		public static int ReentrancyCounter { get; set; }
+		[ThreadStatic]
+		private static int reentrancyCounter;
+		public static int ReentrancyCounter
+		{
+			get { return reentrancyCounter; }
+			set { reentrancyCounter = value; }
+		}
 
 		public static void Initialize()
 		{
@@ -70,24 +77,62 @@ namespace Telerik.JustMock.Core
 		{
 		}
 
-		public static void GuardInternal(Action action)
+		[DebuggerHidden]
+		public static void GuardInternal(Action guardedAction)
 		{
-			action();
+			try
+			{
+				ReentrancyCounter++;
+				guardedAction();
+			}
+			finally
+			{
+				ReentrancyCounter--;
+			}
 		}
 
-		public static T GuardInternal<T>(Func<T> func)
+		[DebuggerHidden]
+		public static T GuardInternal<T>(Func<T> guardedAction)
 		{
-			return func();
+			try
+			{
+				ReentrancyCounter++;
+				return guardedAction();
+			}
+			finally
+			{
+				ReentrancyCounter--;
+			}
 		}
 
-		public static void GuardExternal(Action action)
+		[DebuggerHidden]
+		public static void GuardExternal(Action guardedAction)
 		{
-			action();
+			var oldCounter = ProfilerInterceptor.ReentrancyCounter;
+			try
+			{
+				ProfilerInterceptor.ReentrancyCounter = 0;
+				guardedAction();
+			}
+			finally
+			{
+				ProfilerInterceptor.ReentrancyCounter = oldCounter;
+			}
 		}
 
-		public static T GuardExternal<T>(Func<T> func)
+		[DebuggerHidden]
+		public static T GuardExternal<T>(Func<T> guardedAction)
 		{
-			return func();
+			var oldCounter = ProfilerInterceptor.ReentrancyCounter;
+			try
+			{
+				ProfilerInterceptor.ReentrancyCounter = 0;
+				return guardedAction();
+			}
+			finally
+			{
+				ProfilerInterceptor.ReentrancyCounter = oldCounter;
+			}
 		}
 	}
 }
