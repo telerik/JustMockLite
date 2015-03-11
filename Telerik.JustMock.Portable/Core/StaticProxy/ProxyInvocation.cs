@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using Telerik.JustMock.Core.Castle.DynamicProxy;
 
 namespace Telerik.JustMock.Core.StaticProxy

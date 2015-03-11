@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 
 namespace Telerik.JustMock.Core.StaticProxy
 {
@@ -52,9 +50,17 @@ namespace Telerik.JustMock.Core.StaticProxy
 
 		internal static readonly Dictionary<ProxyKey, RuntimeTypeHandle> ProxyTypes = new Dictionary<ProxyKey, RuntimeTypeHandle>();
 
+		internal static readonly Dictionary<RuntimeTypeHandle, RuntimeTypeHandle> DelegateBackendTypes = new Dictionary<RuntimeTypeHandle, RuntimeTypeHandle>();
+
 		public static void Register(RuntimeTypeHandle proxyTypeHandle, RuntimeTypeHandle proxiedTypeHandle, RuntimeTypeHandle[] additionalImplementedTypes)
 		{
-			ProxyTypes.Add(new ProxyKey(proxiedTypeHandle, additionalImplementedTypes), proxyTypeHandle);
+			// duplicates may come from different test assemblies
+			ProxyTypes[new ProxyKey(proxiedTypeHandle, additionalImplementedTypes)] = proxyTypeHandle;
+		}
+
+		public static void RegisterDelegateBackend(RuntimeTypeHandle delegateType, RuntimeTypeHandle backendType)
+		{
+			DelegateBackendTypes[delegateType] = backendType;
 		}
 	}
 }

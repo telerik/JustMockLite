@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using Telerik.JustMock.Core.Castle.DynamicProxy;
 
 namespace Telerik.JustMock.Core.StaticProxy
 {
@@ -24,8 +21,7 @@ namespace Telerik.JustMock.Core.StaticProxy
 				? settings.AdditionalMockedInterfaces.Select(t => t.TypeHandle).ToArray() : null);
 			if (!ProxySourceRegistry.ProxyTypes.TryGetValue(key, out proxyTypeHandle))
 			{
-				throw new MockException(String.Format("No proxy type found for type '{0}'. Add [assembly: MockedType(typeof({0}))] to your test assembly.",
-					type.ToString().Replace('+', '.')));
+				ThrowNoProxyException(baseType, settings.AdditionalMockedInterfaces);
 			}
 
 			var interceptor = new DynamicProxyInterceptor(repository);
@@ -40,7 +36,18 @@ namespace Telerik.JustMock.Core.StaticProxy
 
 		public Type CreateDelegateBackend(Type delegateType)
 		{
-			throw new NotImplementedException();
+			var baseType = delegateType.IsGenericType ? delegateType.GetGenericTypeDefinition() : delegateType;
+			RuntimeTypeHandle backendTypeHandle;
+			if (!ProxySourceRegistry.DelegateBackendTypes.TryGetValue(baseType.TypeHandle, out backendTypeHandle))
+			{
+				ThrowNoProxyException(baseType);
+			}
+
+			var backendType = Type.GetTypeFromHandle(backendTypeHandle);
+			if (backendType.IsGenericTypeDefinition)
+				backendType = backendType.MakeGenericType(delegateType.GetGenericArguments());
+
+			return backendType;
 		}
 
 		public IMockMixin CreateExternalMockMixin(IMockMixin mockMixin, IEnumerable<object> mixins)
@@ -51,6 +58,13 @@ namespace Telerik.JustMock.Core.StaticProxy
 		public ProxyTypeInfo CreateClassProxyType(Type classToProxy, MocksRepository repository, MockCreationSettings settings)
 		{
 			throw new NotImplementedException();
+		}
+
+		private static void ThrowNoProxyException(Type type, params Type[] additionalInterfaces)
+		{
+			//TODO: add additional interfaces to exception message
+			throw new MockException(String.Format("No proxy type found for type '{0}'. Add [assembly: MockedType(typeof({0}))] to your test assembly.",
+				type.ToString().Replace('+', '.')));
 		}
 	}
 }
