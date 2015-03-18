@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace Telerik.JustMock.Core
@@ -34,15 +35,61 @@ namespace Telerik.JustMock.Core
 			return true;
 		}
 
-		public class InterfaceMapping
+		public struct InterfaceMapping
 		{
-			public MethodInfo[] InterfaceMethods;
-			public MethodInfo[] TargetMethods;
+			public readonly MethodInfo[] InterfaceMethods;
+			public readonly MethodInfo[] TargetMethods;
+
+			public InterfaceMapping(MethodInfo[] interfaceMethods, MethodInfo[] targetMethods)
+			{
+				this.InterfaceMethods = interfaceMethods;
+				this.TargetMethods = targetMethods;
+			}
 		}
 
 		public static InterfaceMapping GetInterfaceMap(this Type type, Type interfaceType)
 		{
-			throw new NotSupportedException();
+			var mapping = getRuntimeInterfaceMap(getTypeInfo(type), interfaceType);
+			return new InterfaceMapping(getInterfaceMethods(mapping), getTargetMethods(mapping));
+		}
+
+		private static readonly Func<Type, object> getTypeInfo;
+		private static readonly Func<object, Type, object> getRuntimeInterfaceMap;
+		private static readonly Func<object, MethodInfo[]> getInterfaceMethods;
+		private static readonly Func<object, MethodInfo[]> getTargetMethods;
+
+		static MockingUtil()
+		{
+			var typeInfoType = Type.GetType("System.Reflection.TypeInfo");
+			var introspectionType = Type.GetType("System.Reflection.IntrospectionExtensions");
+
+			var typeParam = Expression.Parameter(typeof(Type));
+			var getTypeInfoMethod = introspectionType.GetMethod("GetTypeInfo");
+			getTypeInfo = Expression.Lambda<Func<Type, object>>(
+				Expression.Call(null, getTypeInfoMethod, typeParam),
+				typeParam).Compile();
+
+			var interfaceMappingType = Type.GetType("System.Reflection.InterfaceMapping");
+			var interfaceMethodsField = interfaceMappingType.GetField("InterfaceMethods");
+			var targetMethodsField = interfaceMappingType.GetField("TargetMethods");
+			var extensionsType = Type.GetType("System.Reflection.RuntimeReflectionExtensions");
+			var getRuntimeInterfaceMapMethod = extensionsType.GetMethod("GetRuntimeInterfaceMap");
+
+			var objectParam = Expression.Parameter(typeof(object));
+			var interfaceTypeParam = Expression.Parameter(typeof(Type));
+
+			getRuntimeInterfaceMap = Expression.Lambda<Func<object, Type, object>>(
+				Expression.Convert(
+					Expression.Call(null, getRuntimeInterfaceMapMethod, Expression.Convert(objectParam, typeInfoType), interfaceTypeParam),
+					typeof(object)),
+				objectParam, interfaceTypeParam).Compile();
+
+			getInterfaceMethods = Expression.Lambda<Func<object, MethodInfo[]>>(
+				Expression.Field(Expression.Convert(objectParam, interfaceMappingType), interfaceMethodsField),
+				objectParam).Compile();
+			getTargetMethods = Expression.Lambda<Func<object, MethodInfo[]>>(
+				Expression.Field(Expression.Convert(objectParam, interfaceMappingType), targetMethodsField),
+				objectParam).Compile();
 		}
 	}
 }

@@ -461,7 +461,7 @@ namespace Telerik.JustMock.Tests
 		[TestMethod, TestCategory("Lite"), TestCategory("Events"), TestCategory("NonPublic")]
 		public void ShouldRaiseCSharpEventOnNonmock()
 		{
-#if SILVERLIGHT
+#if COREFX
 			if (Mock.IsProfilerEnabled)
 #endif
 			{
@@ -476,7 +476,7 @@ namespace Telerik.JustMock.Tests
 		[TestMethod, TestCategory("Lite"), TestCategory("Events"), TestCategory("NonPublic")]
 		public void ShouldRaiseEventOnMockByName()
 		{
-#if SILVERLIGHT
+#if COREFX
 			if (Mock.IsProfilerEnabled)
 #endif
 			{
@@ -491,7 +491,7 @@ namespace Telerik.JustMock.Tests
 		[TestMethod, TestCategory("Lite"), TestCategory("Events"), TestCategory("NonPublic")]
 		public void ShouldRaiseStaticEventOnNonmockByName()
 		{
-#if SILVERLIGHT
+#if COREFX
 			if (Mock.IsProfilerEnabled)
 #endif
 			{
