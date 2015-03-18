@@ -47,7 +47,7 @@ namespace Telerik.JustMock.Tests
 			});
 		}
 
-#if !(SILVERLIGHT && LITE_EDITION)
+#if !(COREFX && LITE_EDITION)
 		[TestMethod, TestCategory("Lite"), TestCategory("Constructor")]
 #if SILVERLIGHT
 		[Ignore, Description("SL instance constructor mocking not implemented")]

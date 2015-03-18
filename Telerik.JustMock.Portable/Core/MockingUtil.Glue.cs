@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace Telerik.JustMock.Core
 {
@@ -12,7 +10,28 @@ namespace Telerik.JustMock.Core
 		public static MethodBase BindToMethod(BindingFlags bindingAttr, MethodBase[] match, ref Object[] args,
 			ParameterModifier[] modifiers, CultureInfo culture, string[] names, out Object state)
 		{
-			throw new NotImplementedException();
+			//TODO: implement entirely
+			state = null;
+			var theArgs = args;
+			var validMatches = match.Where(m => CanBind(m, theArgs)).ToArray();
+			switch (validMatches.Length)
+			{
+				case 1:
+					return validMatches[0];
+				case 0:
+					throw new MissingMethodException();
+				default:
+					throw new AmbiguousMatchException();
+			}
+		}
+
+		private static bool CanBind(MethodBase method, Object[] args)
+		{
+			var parameters = method.GetParameters();
+			if (args.Length != parameters.Length)
+				return false;
+
+			return true;
 		}
 
 		public class InterfaceMapping

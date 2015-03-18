@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Telerik.JustMock
 {
-	[AttributeUsage(AttributeTargets.Assembly)]
+	[AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
 	public sealed class MockedTypeAttribute : Attribute
 	{
 		public Type[] Implements { get; set; }

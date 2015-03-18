@@ -356,7 +356,6 @@ namespace Telerik.JustMock.Tests
 			Assert.NotNull(nonDefaultClass);
 		}
 
-
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldAssertGuidNonDefaultCtorWithDefaultIfNotSpecified()
 		{
@@ -547,8 +546,7 @@ namespace Telerik.JustMock.Tests
 		}
 
 
-#if !SILVERLIGHT
-
+#if !COREFX
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldCreateMockClassWithInternalConstructor()
 		{
@@ -2217,7 +2215,8 @@ namespace Telerik.JustMock.Tests
 			Mock.Arrange(() => identity.Name).Returns("mock");
 			Assert.Equal("mock", identity.Name);
 		}
-
+		
+#if !PORTABLE
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldMockTypesFromReflectionNamespace()
 		{
@@ -2239,6 +2238,7 @@ namespace Telerik.JustMock.Tests
 				Assert.Equal("name", mock.Name);
 			}
 		}
+#endif
 
 #if !SILVERLIGHT
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]

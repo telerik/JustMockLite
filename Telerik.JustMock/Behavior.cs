@@ -153,7 +153,7 @@ namespace Telerik.JustMock
 
 			if (!mockConstructorCall.HasValue)
 			{
-#if !SILVERLIGHT
+#if !COREFX
 				switch (behavior)
 				{
 					case Behavior.RecursiveLoose:

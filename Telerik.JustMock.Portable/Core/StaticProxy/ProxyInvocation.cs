@@ -6,15 +6,20 @@ namespace Telerik.JustMock.Core.StaticProxy
 {
 	public sealed class ProxyInvocation : IInvocation
 	{
-		private readonly MethodInfo method;
+		private readonly Delegate callback;
+		private readonly Func<Delegate, object[], object> callbackCaller;
+		private readonly RuntimeMethodHandle methodHandle;
+		private readonly RuntimeTypeHandle typeHandle;
 		private readonly object proxy;
 		private readonly object[] arguments;
-		private readonly Delegate callback;
 
-		public ProxyInvocation(Delegate callback, RuntimeMethodHandle methodHandle, RuntimeTypeHandle typeHandle, object proxy, object[] arguments)
+		public ProxyInvocation(Delegate callback, Func<Delegate, object[], object> callbackCaller,
+			RuntimeMethodHandle methodHandle, RuntimeTypeHandle typeHandle, object proxy, object[] arguments)
 		{
 			this.callback = callback;
-			this.method = (MethodInfo)MethodBase.GetMethodFromHandle(methodHandle, typeHandle);
+			this.callbackCaller = callbackCaller;
+			this.methodHandle = methodHandle;
+			this.typeHandle = typeHandle;
 			this.proxy = proxy;
 			this.arguments = arguments;
 		}
@@ -33,7 +38,7 @@ namespace Telerik.JustMock.Core.StaticProxy
 
 		public MethodInfo GetConcreteMethod()
 		{
-			return this.method;
+			return (MethodInfo)MethodBase.GetMethodFromHandle(this.methodHandle, this.typeHandle);
 		}
 
 		public void Proceed()
@@ -41,9 +46,7 @@ namespace Telerik.JustMock.Core.StaticProxy
 			if (callback == null)
 				throw new NotImplementedException("Proxied method provides no base implementation.");
 
-			//TODO: generate invocation code statically as an optimization
-			var invoke = callback.GetType().GetMethod("Invoke");
-			this.ReturnValue = invoke.Invoke(callback, this.Arguments);
+			this.ReturnValue = this.callbackCaller(callback, this.Arguments);
 		}
 
 		public Type[] GenericArguments

@@ -48,6 +48,20 @@ namespace Telerik.JustMock.Tests
 				// Test pass
 				return ex;
 			}
+#if PORTABLE
+			catch (System.Reflection.TargetInvocationException ex)
+			{
+				var inner = ex.InnerException;
+				if (inner is T)
+				{
+					return inner;
+				}
+				else
+				{
+					FrameworkAssert.Fail(String.Format("Wrong exception type thrown. Expected {0}, got {1}.", typeof(T), inner.GetType()));
+				}
+			}
+#endif
 			catch (Exception ex)
 			{
 				FrameworkAssert.Fail(String.Format("Wrong exception type thrown. Expected {0}, got {1}.", typeof(T), ex.GetType()));
