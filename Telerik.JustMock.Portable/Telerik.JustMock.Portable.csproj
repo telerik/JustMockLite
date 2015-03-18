@@ -168,14 +168,41 @@
     <Compile Include="..\Telerik.JustMock\Core\ClrProfilerSetupHelper.cs">
       <Link>Core\ClrProfilerSetupHelper.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Context\HierarchicalTestFrameworkContextResolver.cs">
+      <Link>Core\Context\HierarchicalTestFrameworkContextResolver.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Core\Context\IMockingContextResolver.cs">
       <Link>Core\Context\IMockingContextResolver.cs</Link>
     </Compile>
     <Compile Include="..\Telerik.JustMock\Core\Context\MockingContext.cs">
       <Link>Core\Context\MockingContext.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Context\StackTraceExtensions.cs">
+      <Link>Core\Context\StackTraceExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Core\DynamicProxyInterceptor.cs">
       <Link>Core\DynamicProxyInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\DynamicProxy\Castle.Core\Internal\ILockHolder.cs">
+      <Link>Core\DynamicProxy\Castle.Core\Internal\ILockHolder.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\DynamicProxy\Castle.Core\Internal\IUpgradeableLockHolder.cs">
+      <Link>Core\DynamicProxy\Castle.Core\Internal\IUpgradeableLockHolder.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\DynamicProxy\Castle.Core\Internal\Lock.cs">
+      <Link>Core\DynamicProxy\Castle.Core\Internal\Lock.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\DynamicProxy\Castle.Core\Internal\MonitorLock.cs">
+      <Link>Core\DynamicProxy\Castle.Core\Internal\MonitorLock.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\DynamicProxy\Castle.Core\Internal\MonitorLockHolder.cs">
+      <Link>Core\DynamicProxy\Castle.Core\Internal\MonitorLockHolder.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\DynamicProxy\Castle.Core\Internal\MonitorUpgradeableLockHolder.cs">
+      <Link>Core\DynamicProxy\Castle.Core\Internal\MonitorUpgradeableLockHolder.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\DynamicProxy\Castle.Core\Internal\NoOpLock.cs">
+      <Link>Core\DynamicProxy\Castle.Core\Internal\NoOpLock.cs</Link>
     </Compile>
     <Compile Include="..\Telerik.JustMock\Core\DynamicProxy\Castle.Core\Internal\WeakKey.cs">
       <Link>Core\DynamicProxy\Castle.Core\Internal\WeakKey.cs</Link>
@@ -448,6 +475,8 @@
       <Link>StaticConstructor.cs</Link>
     </Compile>
     <Compile Include="Core\Context\LocalMockingContextResolver.cs" />
+    <Compile Include="Core\Context\MockingContextResolverBase.cs" />
+    <Compile Include="Core\Context\VisualStudioPortableContextResolver.cs" />
     <Compile Include="Core\Glue\CustomAttributeBuilder.cs" />
     <Compile Include="Core\Glue\DispIdAttribute.cs" />
     <Compile Include="Core\Glue\MissingMethodException.cs" />
@@ -456,6 +485,7 @@
     <Compile Include="Core\Glue\TypedReference.cs" />
     <Compile Include="Core\MockingUtil.Glue.cs" />
     <Compile Include="Core\ProfilerInterceptor.cs" />
+    <Compile Include="Core\StackTrace.cs" />
     <Compile Include="Core\StaticProxy\ProxyAttribute.cs" />
     <Compile Include="Core\StaticProxy\ProxyInvocation.cs" />
     <Compile Include="Core\StaticProxy\ProxySourceRegistry.cs" />

@@ -125,7 +125,9 @@ namespace Telerik.JustMock.Core.Context
 
 		static MockingContext()
 		{
-#if !PORTABLE
+#if PORTABLE
+			registeredContextResolvers.Add(new VisualStudioPortableContextResolver());
+#else
 			if (MSTestMockingContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new MSTestMockingContextResolver());
 			if (NUnitMockingContextResolver.IsAvailable)

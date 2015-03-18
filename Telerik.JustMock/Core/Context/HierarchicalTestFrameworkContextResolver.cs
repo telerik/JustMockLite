@@ -63,7 +63,7 @@ namespace Telerik.JustMock.Core.Context
 					var parentKey = ops.GetKey(testMethod);
 					if (ops.IsUsedOnAllThreads)
 						parentRepo = ops.FindRepositoryFromAnyThread(parentKey);
-					else 
+					else
 						parentRepo = ops.FindRepository(parentKey) ?? ops.FindRepositoryToInherit(testMethod);
 				}
 			}
@@ -79,7 +79,7 @@ namespace Telerik.JustMock.Core.Context
 			{
 				throw e.InnerException;
 			}
-			
+
 			return entryRepo;
 		}
 
@@ -170,7 +170,7 @@ namespace Telerik.JustMock.Core.Context
 				return repo;
 			}
 		}
-		
+
 		private Func<MethodBase, bool> CreateAttributeMatcher(string[] attributeTypeNames)
 		{
 			if (attributeTypeNames == null)
@@ -197,7 +197,7 @@ namespace Telerik.JustMock.Core.Context
 
 			this.repoOperations.Add(ops);
 		}
-  
+
 		private RepositoryOperationsBase CreateRepositoryOperations(Func<MethodBase, object> getKey, Func<MethodBase, bool> matchesMethod, bool isLeaf, bool isUsedOnAllThreads, Func<MethodBase, object, bool> isInheritingContext)
 		{
 			RepositoryOperationsBase repoOperations = null;
@@ -306,7 +306,7 @@ namespace Telerik.JustMock.Core.Context
 
 		private bool IsDeclaredInTestFixture(MethodBase method, string[] testMethodAttributes)
 		{
-			var assembly = method.Module.Assembly;
+			var assembly = method.DeclaringType.Assembly;
 			HashSet<Type> knownTestClassesInAssembly;
 			lock (knownTestClasses)
 			{
@@ -333,14 +333,14 @@ namespace Telerik.JustMock.Core.Context
 			public abstract MocksRepository FindRepositoryFromAnyThread(object key);
 			public abstract void RetireRepository(object key, MocksRepository repo);
 			public abstract MocksRepository FindRepositoryToInherit(MethodBase testMethod);
-			
+
 			public Func<MethodBase, object> GetKey;
 			public Func<MethodBase, bool> MatchesMethod;
 			public Func<MethodBase/*new entry*/, object/*existing key*/, bool> IsInheritingContext;
 			public bool IsLeaf;
 			public bool IsUsedOnAllThreads;
 		}
-		
+
 		private class RepositoryOperationsStrongRef : RepositoryOperationsBase
 		{
 			private readonly ThreadLocalProperty<Dictionary<object, MocksRepository>> currentRepositories = new ThreadLocalProperty<Dictionary<object, MocksRepository>>();
@@ -353,7 +353,7 @@ namespace Telerik.JustMock.Core.Context
 			public override MocksRepository FindRepository(object key)
 			{
 				var repos = GetCurrentDictionary();
-				
+
 				MocksRepository repo;
 				repos.TryGetValue(key, out repo);
 				return repo;
@@ -383,8 +383,8 @@ namespace Telerik.JustMock.Core.Context
 
 				var inheritableRepos = dict.Where(pair => this.IsInheritingContext(testMethod, pair.Key));
 				var pairToInherit = inheritableRepos
-					.FirstOrDefault(pair => inheritableRepos.All(pair2 => 
-								pair.Equals(pair2) || 
+					.FirstOrDefault(pair => inheritableRepos.All(pair2 =>
+								pair.Equals(pair2) ||
 								this.IsInheritingContext(pair.Value.Method, pair2.Key)));
 
 				return pairToInherit.Value;
@@ -412,7 +412,7 @@ namespace Telerik.JustMock.Core.Context
 
 				return FindRepository(repos, key);
 			}
-  
+
 			public override MocksRepository FindRepositoryFromAnyThread(object key)
 			{
 				var repos = currentRepositories.GetAllThreadsValues().FirstOrDefault(r => r.ContainsKey(key));
@@ -435,7 +435,7 @@ namespace Telerik.JustMock.Core.Context
 
 				return ret;
 			}
-  
+
 			private void Cleanup(Dictionary<object, WeakReference> repos)
 			{
 				var keysToRemove = repos.Where(pair => !pair.Value.IsAlive).Select(pair => pair.Key).ToList();
@@ -476,7 +476,7 @@ namespace Telerik.JustMock.Core.Context
 				return currentRepositories.GetOrSetDefault(() => new Dictionary<object, WeakReference>());
 			}
 		}
-		
+
 		[Flags]
 		private enum ConstructorKind
 		{
