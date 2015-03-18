@@ -5,8 +5,6 @@ namespace Telerik.JustMock.Core.Context
 {
 	internal static class LocalMockingContextResolver
 	{
-		public const string AssertFailedExceptionTypeName = "Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException, Microsoft.VisualStudio.TestPlatform.UnitTestFramework";
-
 		private static MocksRepository repository;
 
 		public static MocksRepository ResolveRepository(UnresolvedContextBehavior unresolvedContextBehavior)

@@ -1436,6 +1436,8 @@ namespace Telerik.JustMock.Core
 				return;
 
 			var instance = valueMatcher.Value;
+			if (instance == null)
+				return;
 			if (MockingProxy.CanIntercept(instance, method))
 				return;
 

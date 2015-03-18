@@ -8,6 +8,9 @@ namespace Telerik.JustMock.Core.StaticProxy
 {
 	internal class StaticProxyMockFactory : IMockFactory
 	{
+		private static readonly MethodInfo getUninitializedObject =
+			Type.GetType("System.Runtime.Serialization.FormatterServices").GetMethod("GetUninitializedObject");
+
 		public bool IsAccessible(Type type)
 		{
 			return type.IsPublic;
@@ -30,14 +33,18 @@ namespace Telerik.JustMock.Core.StaticProxy
 			if (proxyType.IsGenericTypeDefinition)
 				proxyType = proxyType.MakeGenericType(type.GetGenericArguments());
 
-			if (!settings.MockConstructorCall && settings.Args == null)
+			var mockConstructorCall = settings.MockConstructorCall
+				&& proxyType.BaseType != typeof(object)
+				&& getUninitializedObject != null;
+
+			if (!mockConstructorCall && settings.Args == null)
 			{
 				settings.Args =
 					proxyType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
 					.First(ctor => ctor.IsPublic || ctor.IsFamily || ctor.IsFamilyOrAssembly)
 					.GetParameters()
 					.TakeWhile(p => p.ParameterType != typeof(IInterceptor))
-					.Select(p => p.ParameterType.GetDefaultValue())
+					.Select(p => (p.Attributes & ParameterAttributes.HasDefault) != 0 ? p.DefaultValue : p.ParameterType.GetDefaultValue())
 					.ToArray();
 			}
 
@@ -46,14 +53,12 @@ namespace Telerik.JustMock.Core.StaticProxy
 				.Concat(new object[] { interceptor, mockMixinImpl })
 				.Concat(settings.Mixins).ToArray();
 
-			if (!settings.MockConstructorCall || proxyType.BaseType == typeof(object))
+			if (!mockConstructorCall)
 			{
 				return Activator.CreateInstance(proxyType, ctorArgs);
 			}
 			else
 			{
-				var formatterServices = Type.GetType("System.Runtime.Serialization.FormatterServices");
-				var getUninitializedObject = formatterServices.GetMethod("GetUninitializedObject", BindingFlags.NonPublic | BindingFlags.Static);
 				try
 				{
 					var result = getUninitializedObject.Invoke(null, new object[] { proxyType });
