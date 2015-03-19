@@ -684,7 +684,7 @@ namespace Telerik.JustMock.Core
 					var handler = (Delegate)SecuredReflectionMethods.GetField(field, instance);
 					if (ProfilerInterceptor.IsProfilerAttached)
 					{
-						var invoker = MockingUtil.MakeProcCaller(handler);
+						var invoker = MockingUtil.MakeFuncCaller(handler);
 						ProfilerInterceptor.GuardExternal(() => invoker(args, handler));
 					}
 					else

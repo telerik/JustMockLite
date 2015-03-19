@@ -87,7 +87,7 @@ namespace Telerik.JustMock.Core.Behaviors
 						), ex);
 				}
 
-				var invoker = MockingUtil.MakeProcCaller(existing);
+				var invoker = MockingUtil.MakeFuncCaller(existing);
 				ProfilerInterceptor.GuardExternal(() => invoker(delegateArguments, existing));
 			}
 		}
