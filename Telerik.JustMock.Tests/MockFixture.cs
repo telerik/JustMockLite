@@ -1262,6 +1262,7 @@ namespace Telerik.JustMock.Tests
 			Assert.NotNull(Mock.Create<TestTreeItem>(Behavior.CallOriginal));
 		}
 
+#if !PORTABLE
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldCallBaseWhenCallOriginalSpecifiedForMock()
 		{
@@ -1270,6 +1271,7 @@ namespace Telerik.JustMock.Tests
 
 			Assert.Equal(1, result);
 		}
+#endif
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldArrangeBothInterfaceMethodAndImplementation()
@@ -2214,7 +2216,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Arrange(() => identity.Name).Returns("mock");
 			Assert.Equal("mock", identity.Name);
 		}
-		
+
 #if !PORTABLE
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldMockTypesFromReflectionNamespace()
@@ -2327,7 +2329,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal("string", mock.Get<string, int>("5", 5));
 		}
 
-#if LITE_EDITION && !SILVERLIGHT
+#if LITE_EDITION && !COREFX
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldMockNoninheritableInterfaceMembers()
 		{

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reflection;
 using Telerik.JustMock.Core.Castle.DynamicProxy;
 
@@ -13,6 +14,7 @@ namespace Telerik.JustMock.Core.StaticProxy
 		private readonly object proxy;
 		private readonly object[] arguments;
 
+		[DebuggerHidden]
 		public ProxyInvocation(Delegate callback, Func<Delegate, object[], object> callbackCaller,
 			RuntimeMethodHandle methodHandle, RuntimeTypeHandle typeHandle, object proxy, object[] arguments)
 		{

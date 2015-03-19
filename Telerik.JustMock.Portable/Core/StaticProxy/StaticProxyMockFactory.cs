@@ -55,7 +55,7 @@ namespace Telerik.JustMock.Core.StaticProxy
 
 			if (!mockConstructorCall)
 			{
-				return Activator.CreateInstance(proxyType, ctorArgs);
+				return ProfilerInterceptor.GuardExternal(() => Activator.CreateInstance(proxyType, ctorArgs));
 			}
 			else
 			{
