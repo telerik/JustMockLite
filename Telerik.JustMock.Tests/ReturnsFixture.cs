@@ -135,7 +135,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var iFoo = Mock.Create<IFoo>();
 			Mock.Arrange(() => iFoo.Echo(Arg.AnyInt)).Returns(s => s);
-			Assert.Throws<MockException>(() => iFoo.Echo(10));
+			Assert.Throws<Exception>(() => iFoo.Echo(10));
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Returns")]

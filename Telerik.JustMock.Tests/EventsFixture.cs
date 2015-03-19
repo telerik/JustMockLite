@@ -347,8 +347,8 @@ namespace Telerik.JustMock.Tests
 		{
 			var doc = Mock.Create<IDocument>();
 			doc.IsDirtyChanged += (o, e) => { };
-			Assert.Throws<MockException>(() => Mock.Raise(() => doc.IsDirtyChanged += null));
-			Assert.Throws<MockException>(() => Mock.Raise(() => doc.IsDirtyChanged += null, 1, 2));
+			Assert.Throws<Exception>(() => Mock.Raise(() => doc.IsDirtyChanged += null));
+			Assert.Throws<Exception>(() => Mock.Raise(() => doc.IsDirtyChanged += null, 1, 2));
 		}
 
 #if NUNIT
