@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.InteropServices;
 using System.Text;
 using Telerik.JustMock.Core.Castle.DynamicProxy;
 
@@ -12,17 +13,6 @@ namespace Telerik.JustMock.Core
 	internal static partial class MockingUtil
 	{
 		public static readonly Type[] EmptyTypes = Type.EmptyTypes;
-
-		/// <summary>
-		/// Create a delegate to a function that takes a object[] as a parameter and a delegate,
-		/// unpacks the array and calls the delegate by substituting the array members for its parameters.
-		/// It mimics what MethodInfo.Invoke does, but in JustMock it's a bad idea to call reflection
-		/// methods within a GuardExternal block! GuardExternal blocks should do *minimum* amount of work.
-		/// </summary>
-		public static Action<object[], Delegate> MakeProcCaller(Delegate delg)
-		{
-			return (Action<object[], Delegate>)MakeDelegateInvoker(delg, true);
-		}
 
 		/// <summary>
 		/// Create a delegate to a function that takes a object[] as a parameter and a delegate,
@@ -40,7 +30,7 @@ namespace Telerik.JustMock.Core
 			var invokeMethod = delg.GetType().GetMethod("Invoke");
 			var retType = discardReturnValue ? typeof(void) : invokeMethod.ReturnType;
 
-			var proc = CreateDynamicMethod(retType == typeof(void) ? typeof(Action<object[], Delegate>) : typeof(Func<object[], Delegate, object>),
+			var proc = CreateDynamicMethod(typeof(Func<object[], Delegate, object>),
 				il =>
 				{
 					var locals = il.UnpackArgArray(OpCodes.Ldarg_0, invokeMethod);
@@ -51,10 +41,10 @@ namespace Telerik.JustMock.Core
 
 					il.Emit(OpCodes.Callvirt, invokeMethod);
 
-					if (retType == typeof(void) && invokeMethod.ReturnType != typeof(void))
-						il.Emit(OpCodes.Pop);
-					else if (retType != typeof(void) && retType.IsValueType)
+					if (retType != typeof(void) && retType.IsValueType)
 						il.Emit(OpCodes.Box, retType);
+					if (retType == typeof(void))
+						il.Emit(OpCodes.Ldnull);
 
 					il.PackArgArray(OpCodes.Ldarg_0, invokeMethod, locals);
 
@@ -159,6 +149,12 @@ namespace Telerik.JustMock.Core
 			ParameterModifier[] modifiers, CultureInfo culture, string[] names, out Object state)
 		{
 			return Type.DefaultBinder.BindToMethod(bindingAttr, match, ref args, modifiers, culture, names, out state);
+		}
+
+		private static int? GetDispId(MemberInfo member)
+		{
+			var attr = (DispIdAttribute)Attribute.GetCustomAttribute(member, typeof(DispIdAttribute));
+			return attr != null ? (int?)attr.Value : null;
 		}
 	}
 }

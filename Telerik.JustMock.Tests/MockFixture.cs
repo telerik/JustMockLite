@@ -1262,7 +1262,6 @@ namespace Telerik.JustMock.Tests
 			Assert.NotNull(Mock.Create<TestTreeItem>(Behavior.CallOriginal));
 		}
 
-#if !PORTABLE
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldCallBaseWhenCallOriginalSpecifiedForMock()
 		{
@@ -1271,7 +1270,6 @@ namespace Telerik.JustMock.Tests
 
 			Assert.Equal(1, result);
 		}
-#endif
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldArrangeBothInterfaceMethodAndImplementation()

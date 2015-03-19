@@ -53,10 +53,19 @@ namespace Telerik.JustMock.Core
 			return new InterfaceMapping(getInterfaceMethods(mapping), getTargetMethods(mapping));
 		}
 
+		private static int? GetDispId(MemberInfo member)
+		{
+			var attr = Attribute.GetCustomAttribute(member, dispIdAttribute);
+			return attr != null ? (int?)getDispId(attr) : null;
+		}
+
 		private static readonly Func<Type, object> getTypeInfo;
 		private static readonly Func<object, Type, object> getRuntimeInterfaceMap;
 		private static readonly Func<object, MethodInfo[]> getInterfaceMethods;
 		private static readonly Func<object, MethodInfo[]> getTargetMethods;
+
+		private static readonly Type dispIdAttribute;
+		private static readonly Func<Attribute, int> getDispId;
 
 		static MockingUtil()
 		{
@@ -90,6 +99,14 @@ namespace Telerik.JustMock.Core
 			getTargetMethods = Expression.Lambda<Func<object, MethodInfo[]>>(
 				Expression.Field(Expression.Convert(objectParam, interfaceMappingType), targetMethodsField),
 				objectParam).Compile();
+
+			dispIdAttribute = Type.GetType("System.Runtime.InteropServices.DispIdAttribute");
+			var attributeParam = Expression.Parameter(typeof(Attribute));
+			getDispId = Expression.Lambda<Func<Attribute, int>>(
+				Expression.Property(
+					Expression.Convert(attributeParam, dispIdAttribute),
+					dispIdAttribute.GetProperty("Value")),
+				attributeParam).Compile();
 		}
 	}
 }

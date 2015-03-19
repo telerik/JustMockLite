@@ -478,7 +478,6 @@
     <Compile Include="Core\Context\MockingContextResolverBase.cs" />
     <Compile Include="Core\Context\VisualStudioPortableContextResolver.cs" />
     <Compile Include="Core\Glue\CustomAttributeBuilder.cs" />
-    <Compile Include="Core\Glue\DispIdAttribute.cs" />
     <Compile Include="Core\Glue\MissingMethodException.cs" />
     <Compile Include="Core\Glue\ParameterModifier.cs" />
     <Compile Include="Core\Glue\SerializableAttribute.cs" />

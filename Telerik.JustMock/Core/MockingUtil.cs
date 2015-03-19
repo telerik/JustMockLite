@@ -552,12 +552,6 @@ namespace Telerik.JustMock.Core
 			#endregion
 		}
 
-		private static int? GetDispId(MemberInfo member)
-		{
-			var attr = (DispIdAttribute)Attribute.GetCustomAttribute(member, typeof(DispIdAttribute));
-			return attr != null ? (int?)attr.Value : null;
-		}
-
 		private static ComMethodKey? GetMethodDispId(MethodInfo method)
 		{
 			var id = GetDispId(method);
