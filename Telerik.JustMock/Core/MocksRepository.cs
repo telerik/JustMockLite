@@ -588,7 +588,8 @@ namespace Telerik.JustMock.Core
 
 		internal ProxyTypeInfo CreateClassProxyType(Type classToProxy, MockCreationSettings settings)
 		{
-			return mockFactory.CreateClassProxyType(classToProxy, this, settings);
+			var mockMixinImpl = CreateMockMixin(classToProxy, settings.SupplementaryBehaviors, settings.FallbackBehaviors, settings.MockConstructorCall);
+			return mockFactory.CreateClassProxyType(classToProxy, this, settings, mockMixinImpl);
 		}
 
 		private void CheckIfCanMock(Type type, bool checkSafety)

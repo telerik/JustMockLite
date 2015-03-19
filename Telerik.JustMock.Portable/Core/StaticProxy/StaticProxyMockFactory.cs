@@ -90,12 +90,12 @@ namespace Telerik.JustMock.Core.StaticProxy
 
 		public IMockMixin CreateExternalMockMixin(IMockMixin mockMixin, IEnumerable<object> mixins)
 		{
-			throw new NotImplementedException();
+			throw new NotSupportedException();
 		}
 
-		public ProxyTypeInfo CreateClassProxyType(Type classToProxy, MocksRepository repository, MockCreationSettings settings)
+		public ProxyTypeInfo CreateClassProxyType(Type classToProxy, MocksRepository repository, MockCreationSettings settings, MockMixin mockMixinImpl)
 		{
-			throw new NotImplementedException();
+			throw new NotImplementedException("//TODO");
 		}
 
 		private static void ThrowNoProxyException(Type type, params Type[] additionalInterfaces)

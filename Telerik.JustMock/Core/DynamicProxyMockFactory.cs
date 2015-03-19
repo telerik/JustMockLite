@@ -156,9 +156,9 @@ namespace Telerik.JustMock.Core
 			return compoundMockMixin;
 		}
 
-		public ProxyTypeInfo CreateClassProxyType(Type classToProxy, MocksRepository repository, MockCreationSettings settings)
+		public ProxyTypeInfo CreateClassProxyType(Type classToProxy, MocksRepository repository, MockCreationSettings settings, MockMixin mockMixinImpl)
 		{
-			var pgo = CreateProxyGenerationOptions(classToProxy, settings);
+			var pgo = CreateProxyGenerationOptions(classToProxy, settings, mockMixinImpl);
 			var typeInfo = new ProxyTypeInfo
 			{
 				ProxyType = generator.ProxyBuilder.CreateClassProxyType(classToProxy, Type.EmptyTypes, pgo)
