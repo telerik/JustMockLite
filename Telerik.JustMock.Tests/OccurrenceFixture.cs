@@ -171,7 +171,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IFoo>();
 			Mock.Arrange(() => foo.Echo(Arg.AnyInt)).OccursOnce();
-			Assert.Throws<AssertFailedException>(() => Mock.Assert(foo));
+			Assert.Throws<AssertionException>(() => Mock.Assert(foo));
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
@@ -181,8 +181,8 @@ namespace Telerik.JustMock.Tests
 			Mock.Arrange(() => foo.Echo(Arg.AnyInt)).OccursNever();
 			Mock.Assert(foo);
 
-			Assert.Throws<AssertFailedException>(() => foo.Echo(15));
-			Assert.Throws<AssertFailedException>(() => Mock.Assert(foo));
+			Assert.Throws<AssertionException>(() => foo.Echo(15));
+			Assert.Throws<AssertionException>(() => Mock.Assert(foo));
 		}
 
 		public interface IFoo
@@ -240,7 +240,7 @@ namespace Telerik.JustMock.Tests
 
 			Mock.Arrange(() => containerResolver.Resolve<MockDirectoryInfo>(new Dictionary<string, object> { { "path", @"pptestRoot\DrivesData\TestFamily" } })).Returns(new MockDirectoryInfo("ss")).OccursOnce();
 
-			var ex = Assert.Throws<AssertFailedException>(() => Mock.Assert(containerResolver));
+			var ex = Assert.Throws<AssertionException>(() => Mock.Assert(containerResolver));
 			Assert.True(ex.Message.Contains("Occurrence expectation failed."));
 		}
 	}

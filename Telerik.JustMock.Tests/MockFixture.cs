@@ -1211,7 +1211,6 @@ namespace Telerik.JustMock.Tests
 			helper.Worker.Echo("hello");
 		}
 
-
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldAssertMockWithEnumArgumentWithUnderlyingTypeOtherThanInt()
 		{
