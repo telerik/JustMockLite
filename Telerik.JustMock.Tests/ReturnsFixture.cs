@@ -23,7 +23,7 @@ using TestMethod = NUnit.Framework.TestAttribute;
 using TestInitialize = NUnit.Framework.SetUpAttribute;
 using TestCleanup = NUnit.Framework.TearDownAttribute;
 using AssertionException = NUnit.Framework.AssertionException;
-#elif PORTABLE
+#elif VSTEST_PORTABLE
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
 #else
@@ -254,7 +254,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(1, mock.Value);
 			Assert.Equal(2, mock.Value);
 			Assert.Equal(3, mock.Value);
-			Assert.Throws<AssertFailedException>(() => { var x = mock.Value; });
+			Assert.Throws<AssertionException>(() => { var x = mock.Value; });
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Returns")]

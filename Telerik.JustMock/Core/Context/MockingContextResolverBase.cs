@@ -27,24 +27,14 @@ namespace Telerik.JustMock.Core.Context
 	internal abstract class MockingContextResolverBase : IMockingContextResolver
 	{
 		protected readonly string assertFailedExceptionTypeName;
-		protected readonly Dictionary<string, Assembly> frameworkAssemblies;
 
 		public abstract MocksRepository ResolveRepository(UnresolvedContextBehavior unresolvedContextBehavior);
 
 		public abstract bool RetireRepository();
 
-		public MockingContextResolverBase(string assertFailedExceptionTypeName, params string[] frameworkAssemblyNames)
+		public MockingContextResolverBase(string assertFailedExceptionTypeName)
 		{
 			this.assertFailedExceptionTypeName = assertFailedExceptionTypeName;
-
-			frameworkAssemblies = AppDomain.CurrentDomain.GetAssemblies()
-				.Join(frameworkAssemblyNames, asm => asm.GetAssemblyName(), name => name, (asm, name) => asm, StringComparer.OrdinalIgnoreCase)
-				.ToLookup(asm => asm.GetAssemblyName(), asm => asm, StringComparer.OrdinalIgnoreCase)
-				.Select(group => group.MaxElement(asm => new AssemblyName(asm.FullName).Version))
-				.ToDictionary(asm => asm.GetAssemblyName(), asm => asm, StringComparer.OrdinalIgnoreCase);
-
-			if (frameworkAssemblies.Count != frameworkAssemblyNames.Length)
-				throw new MockException(String.Format("{0} did not resolve the framework assemblies.", this.GetType()));
 		}
 
 		public Action<string, Exception> GetFailMethod()
@@ -61,7 +51,7 @@ namespace Telerik.JustMock.Core.Context
 
 		protected virtual Expression<Func<string, Exception, Exception>> CreateExceptionFactory()
 		{
-			var assertionException = this.FindType(this.assertFailedExceptionTypeName);
+			var assertionException = FindType(this.assertFailedExceptionTypeName);
 			return this.CreateExceptionFactory(assertionException);
 		}
 
@@ -74,37 +64,13 @@ namespace Telerik.JustMock.Core.Context
 			return (Expression<Func<string, Exception, Exception>>)Expression.Lambda(typeof(Func<string, Exception, Exception>), newException, messageParam, innerExceptionParam);
 		}
 
-		protected Type FindType(string assemblyAndTypeName)
+		protected static Type FindType(string assemblyAndTypeName)
 		{
-			if (assemblyAndTypeName == null)
-				return null;
-
-			var parts = assemblyAndTypeName.Split('!');
-			Type foundType;
-			if (parts.Length == 2)
-			{
-				var asm = this.frameworkAssemblies[parts[0]];
-				foundType = asm.GetType(parts[1]);
-			}
-			else
-			{
-				foundType = this.frameworkAssemblies.Values
-					.Select(asm => asm.GetType(assemblyAndTypeName))
-					.First(type => type != null);
-			}
+			var foundType = Type.GetType(assemblyAndTypeName);
 			if (foundType == null)
 				throw new InvalidOperationException(String.Format("Test framework type '{0}' not found", assemblyAndTypeName));
 
 			return foundType;
-		}
-
-		protected static bool IsAssemblyLoaded(string assemblyName)
-		{
-#if SILVERLIGHT
-			return AppDomain.CurrentDomain.GetAssemblies().Any(assembly => assembly.GetAssemblyName().Equals(assemblyName, StringComparison.OrdinalIgnoreCase));
-#else
-			return AppDomain.CurrentDomain.GetAssemblies().Any(assembly => assembly.GetName().Name.Equals(assemblyName, StringComparison.OrdinalIgnoreCase));
-#endif
 		}
 	}
 }

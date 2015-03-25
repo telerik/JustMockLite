@@ -1,4 +1,4 @@
-/*
+﻿/*
  JustMock Lite
  Copyright © 2010-2014 Telerik AD
 
@@ -19,24 +19,24 @@ using System;
 
 namespace Telerik.JustMock.Core.Context
 {
-	internal class MbUnitContextResolver : HierarchicalTestFrameworkContextResolver
+	internal class XamarinAndroidNUnitContextResolver : HierarchicalTestFrameworkContextResolver
 	{
-		private const string MbUnitAssertionFailedName = "Gallio.Framework.Assertions.AssertionException, gallio";
+		private const string NunitAssertionExceptionName = "NUnit.Framework.AssertionException, Xamarin.Android.NUnitLite";
 
-		public MbUnitContextResolver()
-			: base(MbUnitAssertionFailedName)
+		public XamarinAndroidNUnitContextResolver()
+			: base(NunitAssertionExceptionName)
 		{
-			SetupStandardHierarchicalTestStructure(
-				new[] { "Gallio.Framework.Pattern.TestMethodPatternAttribute, gallio" },
-				new[] { "MbUnit.Framework.SetUpAttribute, mbunit", "MbUnit.Framework.TearDownAttribute, mbunit" },
-				new[] { "MbUnit.Framework.FixtureSetUpAttribute, mbunit", "MbUnit.Framework.FixtureTearDownAttribute, mbunit" },
+			this.SetupStandardHierarchicalTestStructure(
+				new[] { "NUnit.Framework.TestAttribute, Xamarin.Android.NUnitLite" },
+				new[] { "NUnit.Framework.SetUpAttribute, Xamarin.Android.NUnitLite", "NUnit.Framework.TearDownAttribute, Xamarin.Android.NUnitLite" },
+				new[] { "NUnit.Framework.TestFixtureSetUpAttribute, Xamarin.Android.NUnitLite", "NUnit.Framework.TestFixtureTearDownAttribute, Xamarin.Android.NUnitLite" },
 				null,
 				FixtureConstuctorSemantics.InstanceConstructorCalledOncePerFixture);
 		}
 
 		public static bool IsAvailable
 		{
-			get { return Type.GetType(MbUnitAssertionFailedName) != null; }
+			get { return Type.GetType(NunitAssertionExceptionName) != null; }
 		}
 	}
 }

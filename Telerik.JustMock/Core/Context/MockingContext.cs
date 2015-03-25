@@ -126,14 +126,17 @@ namespace Telerik.JustMock.Core.Context
 		static MockingContext()
 		{
 #if PORTABLE
-			registeredContextResolvers.Add(new VisualStudioPortableContextResolver());
+			if (VisualStudioPortableContextResolver.IsAvailable)
+				registeredContextResolvers.Add(new VisualStudioPortableContextResolver());
+			if (XamarinAndroidNUnitContextResolver.IsAvailable)
+				registeredContextResolvers.Add(new XamarinAndroidNUnitContextResolver());
 #else
 			if (MSTestMockingContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new MSTestMockingContextResolver());
-			if (NUnitMockingContextResolver.IsAvailable)
-				registeredContextResolvers.Add(new NUnitMockingContextResolver());
 			if (XUnitMockingContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new XUnitMockingContextResolver());
+			if (NUnitMockingContextResolver.IsAvailable)
+				registeredContextResolvers.Add(new NUnitMockingContextResolver());
 			if (MSpecContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new MSpecContextResolver());
 			if (MbUnitContextResolver.IsAvailable)

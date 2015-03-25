@@ -29,8 +29,8 @@ namespace Telerik.JustMock.Core.Context
 		private readonly List<RepositoryOperationsBase> repoOperations = new List<RepositoryOperationsBase>();
 		private readonly Dictionary<Assembly, HashSet<Type>> knownTestClasses = new Dictionary<Assembly, HashSet<Type>>();
 
-		public HierarchicalTestFrameworkContextResolver(string assertFailedExceptionTypeName, params string[] frameworkAssemblyNames)
-			: base(assertFailedExceptionTypeName, frameworkAssemblyNames)
+		public HierarchicalTestFrameworkContextResolver(string assertFailedExceptionTypeName)
+			: base(assertFailedExceptionTypeName)
 		{
 		}
 
@@ -176,7 +176,7 @@ namespace Telerik.JustMock.Core.Context
 			if (attributeTypeNames == null)
 				return m => false;
 
-			var attributeTypes = attributeTypeNames.Select(name => this.FindType(name)).ToArray();
+			var attributeTypes = attributeTypeNames.Select(name => Type.GetType(name)).ToArray();
 			if (attributeTypes.Any(t => t == null))
 				throw new InvalidOperationException(String.Format("Some attribute type among {0} not found.", String.Join(",", attributeTypeNames)));
 

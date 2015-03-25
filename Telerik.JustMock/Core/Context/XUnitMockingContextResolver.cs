@@ -25,20 +25,20 @@ namespace Telerik.JustMock.Core.Context
 {
 	internal class XUnitMockingContextResolver : HierarchicalTestFrameworkContextResolver
 	{
-		private const string XunitAssemblyName = "xunit";
+		private const string XunitAssertionExceptionName = "Xunit.Sdk.AssertException, xunit";
 
 		public XUnitMockingContextResolver()
-			: base("Xunit.Sdk.AssertException", XunitAssemblyName)
+			: base(XunitAssertionExceptionName)
 		{
 			SetupStandardHierarchicalTestStructure(
-				new[] { "Xunit.FactAttribute" },
+				new[] { "Xunit.FactAttribute, xunit" },
 				null, null, null,
 				FixtureConstuctorSemantics.InstanceConstructorCalledOncePerTest);
 		}
 
 		public static bool IsAvailable
 		{
-			get { return IsAssemblyLoaded(XunitAssemblyName); }
+			get { return Type.GetType(XunitAssertionExceptionName) != null; }
 		}
 
 		private Type exceptionType;
@@ -54,7 +54,7 @@ namespace Telerik.JustMock.Core.Context
 
 		private void CreateExceptionType()
 		{
-			var baseType = this.FindType(this.assertFailedExceptionTypeName);
+			var baseType = Type.GetType(XunitAssertionExceptionName);
 			var typeBuilder = MockingUtil.ModuleBuilder.DefineType(
 				"Telerik.JustMock.Xunit.AssertFailedException", TypeAttributes.Public, baseType);
 
