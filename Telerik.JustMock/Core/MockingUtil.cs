@@ -414,7 +414,7 @@ namespace Telerik.JustMock.Core
 					.FirstOrDefault(m => m != null)
 					?? baseMethod;
 
-				if (method.IsGenericMethod)
+				if (method.IsGenericMethod && implementerMethod.IsGenericMethodDefinition)
 					implementerMethod = implementerMethod.MakeGenericMethod(method.GetGenericArguments());
 
 				return implementerMethod;

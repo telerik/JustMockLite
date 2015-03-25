@@ -411,7 +411,7 @@ namespace Telerik.JustMock.Tests
 			var foo = Mock.Create<WeirdSignature>();
 			var exception = Assert.Throws<MissingMemberException>(() => Mock.NonPublic.Arrange(foo, "Do"));
 			var message = exception.Message;
-			Assert.Equal("Method 'Do' with the given signature was not found on type Telerik.JustMock.Tests.NonPublicFixture+WeirdSignature\r\n" +
+			Assert.Equal(("Method 'Do' with the given signature was not found on type Telerik.JustMock.Tests.NonPublicFixture+WeirdSignature\r\n" +
 "Review the available methods in the message below and optionally paste the appropriate arrangement snippet.\r\n" +
 "----------\r\n" +
 "Method 1: Int32 Do(Int32, System.String, System.Object ByRef, System.Collections.Generic.IEnumerable`1[System.Int32])\r\n" +
@@ -432,12 +432,12 @@ namespace Telerik.JustMock.Tests
 "----------\r\n" +
 "Method 5: Int32 Do(Char)\r\n" +
 "C#: Mock.NonPublic.Arrange<int>(\"Do\", ArgExpr.IsAny<char>());\r\n" +
-"VB: Mock.NonPublic.Arrange(Of Integer)(\"Do\", ArgExpr.IsAny(Of Char)())\r\n", message);
+"VB: Mock.NonPublic.Arrange(Of Integer)(\"Do\", ArgExpr.IsAny(Of Char)())\r\n").Replace("\r\n", Environment.NewLine), message);
 
 			var exception2 = Assert.Throws<MissingMemberException>(() => Mock.NonPublic.Arrange(foo, "Dont"));
 			var message2 = exception2.Message;
-			Assert.Equal("Method 'Dont' with the given signature was not found on type Telerik.JustMock.Tests.NonPublicFixture+WeirdSignature\r\n" +
-				"No methods or properties found with the given name.\r\n", message2);
+			Assert.Equal(("Method 'Dont' with the given signature was not found on type Telerik.JustMock.Tests.NonPublicFixture+WeirdSignature\r\n" +
+				"No methods or properties found with the given name.\r\n").Replace("\r\n", Environment.NewLine), message2);
 		}
 
 		public abstract class NonPublicOverloads

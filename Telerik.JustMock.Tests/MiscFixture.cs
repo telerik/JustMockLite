@@ -390,7 +390,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var container = Mock.Create<FakeContainer<Product>>();
 
-			Mock.Arrange(() => container.Do<Product>()).MustBeCalled();
+ 			Mock.Arrange(() => container.Do<Product>()).MustBeCalled();
 
 			container.Do<Product>();
 		}

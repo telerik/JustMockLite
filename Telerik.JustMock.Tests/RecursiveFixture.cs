@@ -31,11 +31,13 @@ using AssertionException = NUnit.Framework.AssertionException;
 #elif VSTEST_PORTABLE
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
-using Telerik.JustMock;
-[assembly: MockedType(typeof(Telerik.JustMock.Tests.RecursiveFixture.ValidateMember))]
 #else
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException;
+#endif
+
+#if PORTABLE
+[assembly: Telerik.JustMock.MockedType(typeof(Telerik.JustMock.Tests.RecursiveFixture.ValidateMember))]
 #endif
 
 namespace Telerik.JustMock.Tests
