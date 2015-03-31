@@ -478,6 +478,7 @@
     <Compile Include="Core\Context\MockingContextResolverBase.cs" />
     <Compile Include="Core\Context\VisualStudioPortableContextResolver.cs" />
     <Compile Include="Core\Context\XamarinAndroidNUnitContextResolver.cs" />
+    <Compile Include="Core\Context\XamarinIosNUnitContextResolver.cs" />
     <Compile Include="Core\Glue\CustomAttributeBuilder.cs" />
     <Compile Include="Core\Glue\MissingMethodException.cs" />
     <Compile Include="Core\Glue\ParameterModifier.cs" />

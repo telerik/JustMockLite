@@ -2088,14 +2088,20 @@ namespace Telerik.JustMock.Tests
 			}
 		}
 
-		[ComImport, Guid("4256871F-E8D7-40C2-9E1E-61CFA78C3EC1")]
+#if !__IOS__
+		[ComImport]
+#endif
+		[Guid("4256871F-E8D7-40C2-9E1E-61CFA78C3EC1")]
 		public interface IVersioned
 		{
 			[DispId(1)]
 			string Identity { [DispId(1)] get; [DispId(1)] set; }
 		}
 
-		[ComImport, Guid("8DAF6396-300A-46E2-AA4C-CCB6103FB955")]
+#if !__IOS__
+		[ComImport]
+#endif
+		[Guid("8DAF6396-300A-46E2-AA4C-CCB6103FB955")]
 		public interface IVersioned2 : IVersioned
 		{
 			[DispId(1)]
