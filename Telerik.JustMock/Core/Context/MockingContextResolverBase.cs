@@ -64,10 +64,14 @@ namespace Telerik.JustMock.Core.Context
 			return (Expression<Func<string, Exception, Exception>>)Expression.Lambda(typeof(Func<string, Exception, Exception>), newException, messageParam, innerExceptionParam);
 		}
 
-		protected static Type FindType(string assemblyAndTypeName)
+		protected static Type FindType(string assemblyAndTypeName, bool throwOnNotFound = true)
 		{
-			var foundType = Type.GetType(assemblyAndTypeName);
-			if (foundType == null)
+			var parts = assemblyAndTypeName.Split(',').Select(s => s.Trim()).ToArray();
+			var assembly = AppDomain.CurrentDomain.GetAssemblies()
+				.FirstOrDefault(a => String.Equals(a.GetName().Name, parts[1], StringComparison.OrdinalIgnoreCase));
+
+			var foundType = assembly != null ? assembly.GetType(parts[0]) : null;
+			if (foundType == null && throwOnNotFound)
 				throw new InvalidOperationException(String.Format("Test framework type '{0}' not found", assemblyAndTypeName));
 
 			return foundType;

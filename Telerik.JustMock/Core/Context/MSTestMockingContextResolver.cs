@@ -44,7 +44,7 @@ namespace Telerik.JustMock.Core.Context
 
 		public static bool IsAvailable
 		{
-			get { return Type.GetType(MstestAssertionFailedName) != null; }
+			get { return FindType(MstestAssertionFailedName, false) != null; }
 		}
 
 #if !SILVERLIGHT

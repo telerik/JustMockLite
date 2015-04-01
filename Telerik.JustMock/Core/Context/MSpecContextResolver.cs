@@ -74,7 +74,7 @@ namespace Telerik.JustMock.Core.Context
 
 		public static bool IsAvailable
 		{
-			get { return Type.GetType(MSpecAssertionFailedName) != null; }
+			get { return FindType(MSpecAssertionFailedName, false) != null; }
 		}
 
 		private MethodBase FindExistingTestMethod(IEnumerable<MethodBase> frames)

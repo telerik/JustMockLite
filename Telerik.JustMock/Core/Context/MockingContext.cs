@@ -80,15 +80,7 @@ namespace Telerik.JustMock.Core.Context
 #if SILVERLIGHT
 			var trace = new System.Diagnostics.StackTrace().ToString();
 #elif PORTABLE
-			string trace = null;
-			try
-			{
-				throw new StackTraceGeneratorException();
-			}
-			catch (StackTraceGeneratorException ex)
-			{
-				trace = ex.StackTrace;
-			}
+			var trace = new StackTrace().ToString();
 #else
 			var skipCount = new System.Diagnostics.StackTrace().GetFrames().TakeWhile(frame => frame.GetMethod().DeclaringType.Assembly == typeof(DebugView).Assembly).Count();
 			var trace = new System.Diagnostics.StackTrace(skipCount, true).ToString();

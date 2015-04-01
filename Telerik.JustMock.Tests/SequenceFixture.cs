@@ -170,6 +170,21 @@ namespace Telerik.JustMock.Tests
 			Assert.Equals(7, foo.Add(2, 2));
 		}
 
+		[TestMethod, TestCategory("Lite"), TestCategory("Sequence"), TestCategory("InOrder")]
+		public void ShouldAssertInOrderOnSameMethod()
+		{
+			var mock = Mock.Create<IFoo>();
+			Mock.Arrange(() => mock.GetIntValue()).InSequence().InOrder();
+			Mock.Arrange(() => mock.GetIntValue()).InSequence().InOrder();
+
+			Assert.Throws<AssertionException>(() => Mock.Assert(mock));
+
+			mock.GetIntValue();
+			mock.GetIntValue();
+
+			Mock.Assert(mock);
+		}
+
 		public interface IFoo2
 		{
 			int Add(int addend1, int addend2);

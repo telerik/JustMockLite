@@ -39,6 +39,11 @@ namespace Telerik.JustMock.Core
 			}
 		}
 
+		public override string ToString()
+		{
+			return stackTrace.ToString();
+		}
+
 		private static readonly Func<object> createStackTrace;
 		private static readonly Func<object, int> getFrameCount;
 		private static readonly Func<object, int, object> getFrame;
@@ -51,6 +56,7 @@ namespace Telerik.JustMock.Core
 			var getFrameCountMethod = stackTraceType.GetProperty("FrameCount").GetGetMethod();
 			var getFrameMethod = stackTraceType.GetMethod("GetFrame");
 			var getMethodMethod = stackFrameType.GetMethod("GetMethod");
+			var toStringMethod = stackTraceType.GetMethod("ToString");
 
 			createStackTrace = Expression.Lambda<Func<object>>(Expression.New(stackTraceType)).Compile();
 
@@ -71,6 +77,7 @@ namespace Telerik.JustMock.Core
 				Expression.Call(
 					Expression.Convert(objectParam, stackFrameType), getMethodMethod),
 					objectParam).Compile();
+
 		}
 	}
 }

@@ -38,7 +38,7 @@ namespace Telerik.JustMock.Core.Context
 
 		public static bool IsAvailable
 		{
-			get { return Type.GetType(XunitAssertionExceptionName) != null; }
+			get { return FindType(XunitAssertionExceptionName, false) != null; }
 		}
 
 		private Type exceptionType;
@@ -54,7 +54,7 @@ namespace Telerik.JustMock.Core.Context
 
 		private void CreateExceptionType()
 		{
-			var baseType = Type.GetType(XunitAssertionExceptionName);
+			var baseType = FindType(XunitAssertionExceptionName);
 			var typeBuilder = MockingUtil.ModuleBuilder.DefineType(
 				"Telerik.JustMock.Xunit.AssertFailedException", TypeAttributes.Public, baseType);
 

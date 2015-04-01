@@ -36,7 +36,7 @@ namespace Telerik.JustMock.Core.Context
 
 		public static bool IsAvailable
 		{
-			get { return Type.GetType(NunitAssertionExceptionName) != null; }
+			get { return FindType(NunitAssertionExceptionName, false) != null; }
 		}
 	}
 }

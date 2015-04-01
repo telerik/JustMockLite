@@ -176,7 +176,7 @@ namespace Telerik.JustMock.Core.Context
 			if (attributeTypeNames == null)
 				return m => false;
 
-			var attributeTypes = attributeTypeNames.Select(name => Type.GetType(name)).ToArray();
+			var attributeTypes = attributeTypeNames.Select(name => FindType(name, false)).ToArray();
 			if (attributeTypes.Any(t => t == null))
 				throw new InvalidOperationException(String.Format("Some attribute type among {0} not found.", String.Join(",", attributeTypeNames)));
 

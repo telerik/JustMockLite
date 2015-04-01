@@ -36,7 +36,7 @@ namespace Telerik.JustMock.Core.Context
 
 		public static bool IsAvailable
 		{
-			get { return Type.GetType(MbUnitAssertionFailedName) != null; }
+			get { return FindType(MbUnitAssertionFailedName, false) != null; }
 		}
 	}
 }

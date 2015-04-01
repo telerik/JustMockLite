@@ -22,5 +22,10 @@ namespace Telerik.JustMock.Core.Context
 		{
 			return LocalMockingContextResolver.GetFailMethod(Type.GetType(this.assertFailedExceptionTypeName));
 		}
+
+		protected static Type FindType(string assemblyAndTypeName, bool throwOnNotFound)
+		{
+			return Type.GetType(assemblyAndTypeName, throwOnNotFound);
+		}
 	}
 }
