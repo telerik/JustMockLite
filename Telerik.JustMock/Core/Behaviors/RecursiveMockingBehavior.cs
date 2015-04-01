@@ -53,6 +53,9 @@ namespace Telerik.JustMock.Core.Behaviors
 			if (returnType == typeof(void) || returnType.IsValueType)
 				return;
 
+			if (invocation.Method.Name == "ToString" && invocation.Method.GetParameters().Length == 0 && invocation.UserProvidedImplementation)
+				return;
+
 			object mock = null;
 			List<KeyValuePair<object, object>> mocksList;
 			if (mocks.TryGetValue(invocation.Method, out mocksList))
