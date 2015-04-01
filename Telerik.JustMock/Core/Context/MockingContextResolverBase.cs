@@ -68,7 +68,7 @@ namespace Telerik.JustMock.Core.Context
 		{
 			var parts = assemblyAndTypeName.Split(',').Select(s => s.Trim()).ToArray();
 			var assembly = AppDomain.CurrentDomain.GetAssemblies()
-				.FirstOrDefault(a => String.Equals(a.GetName().Name, parts[1], StringComparison.OrdinalIgnoreCase));
+				.FirstOrDefault(a => String.Equals(a.GetAssemblyName(), parts[1], StringComparison.OrdinalIgnoreCase));
 
 			var foundType = assembly != null ? assembly.GetType(parts[0]) : null;
 			if (foundType == null && throwOnNotFound)
