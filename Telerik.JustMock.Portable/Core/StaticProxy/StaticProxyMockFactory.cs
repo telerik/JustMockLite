@@ -100,9 +100,15 @@ namespace Telerik.JustMock.Core.StaticProxy
 
 		private static void ThrowNoProxyException(Type type, params Type[] additionalInterfaces)
 		{
+			var typeName = type.ToString().Replace('+', '.');
+
 			//TODO: add additional interfaces to exception message
-			throw new MockException(String.Format("No proxy type found for type '{0}'. Add [assembly: MockedType(typeof({0}))] to your test assembly.",
-				type.ToString().Replace('+', '.')));
+			var message = String.Format("No proxy type found for type '{0}'. Add [assembly: MockedType(typeof({0}))] to your test assembly to explicitly emit a proxy.", typeName);
+
+			if (ProxySourceRegistry.IsTrialWeaver)
+				message += " The trial version of JustMock for Devices lets you create mocks only for at most 5 types per test assembly.";
+
+			throw new MockException(message);
 		}
 
 		private static RuntimeTypeHandle[] GetAdditionalInterfaceHandles(Type type, Type[] additionalInterfaces)

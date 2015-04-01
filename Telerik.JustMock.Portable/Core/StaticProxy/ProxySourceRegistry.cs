@@ -48,6 +48,8 @@ namespace Telerik.JustMock.Core.StaticProxy
 			}
 		}
 
+		public static bool IsTrialWeaver;
+
 		internal static readonly Dictionary<ProxyKey, RuntimeTypeHandle> ProxyTypes = new Dictionary<ProxyKey, RuntimeTypeHandle>();
 
 		internal static readonly Dictionary<RuntimeTypeHandle, RuntimeTypeHandle> DelegateBackendTypes = new Dictionary<RuntimeTypeHandle, RuntimeTypeHandle>();
