@@ -10,26 +10,26 @@ namespace Telerik.JustMock.Core.StaticProxy
 		public static object Create(Type type)
 		{
 			object result;
-			var ioe = TryCreate(type, out result);
-			if (ioe != null)
-				throw new NotSupportedException("Cannot mock constructor calls on this platform.", ioe);
+			var ex = TryCreate(type, out result);
+			if (ex != null)
+				throw new NotSupportedException("Cannot mock constructor calls on this platform.", ex);
 			return result;
 		}
 
-		private static InvalidOperationException TryCreate(Type type, out object result)
+		private static Exception TryCreate(Type type, out object result)
 		{
 			result = null;
 			if (getUninitializedObject == null)
-				return null;
+				return new TypeAccessException("GetUninitializedObject");
 
 			try
 			{
 				result = getUninitializedObject.Invoke(null, new object[] { type });
 				return null;
 			}
-			catch (InvalidOperationException ioe)
+			catch (Exception ex)
 			{
-				return ioe;
+				return ex;
 			}
 		}
 
