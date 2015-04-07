@@ -8,8 +8,7 @@ namespace Telerik.JustMock.Core.StaticProxy
 {
 	internal class StaticProxyMockFactory : IMockFactory
 	{
-		private static readonly MethodInfo getUninitializedObject =
-			Type.GetType("System.Runtime.Serialization.FormatterServices").GetMethod("GetUninitializedObject");
+
 
 		public bool IsAccessible(Type type)
 		{
@@ -35,14 +34,14 @@ namespace Telerik.JustMock.Core.StaticProxy
 
 			var mockConstructorCall = settings.MockConstructorCall
 				&& proxyType.BaseType != typeof(object)
-				&& getUninitializedObject != null;
+				&& UninitializedObjectFactory.IsSupported;
 
+			ConstructorInfo proxyCtor = null;
 			if (!mockConstructorCall && settings.Args == null)
 			{
-				settings.Args =
-					proxyType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-					.First(ctor => ctor.IsPublic || ctor.IsFamily || ctor.IsFamilyOrAssembly)
-					.GetParameters()
+				proxyCtor = proxyType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+					.First(ctor => ctor.IsPublic || ctor.IsFamily || ctor.IsFamilyOrAssembly);
+				settings.Args = proxyCtor.GetParameters()
 					.TakeWhile(p => p.ParameterType != typeof(IInterceptor))
 					.Select(p => (p.Attributes & ParameterAttributes.HasDefault) != 0 ? p.DefaultValue : p.ParameterType.GetDefaultValue())
 					.ToArray();
@@ -55,20 +54,20 @@ namespace Telerik.JustMock.Core.StaticProxy
 
 			if (!mockConstructorCall)
 			{
-				return ProfilerInterceptor.GuardExternal(() => Activator.CreateInstance(proxyType, ctorArgs));
+				if (proxyCtor != null)
+				{
+					return ProfilerInterceptor.GuardExternal(() => proxyCtor.Invoke(ctorArgs));
+				}
+				else
+				{
+					return ProfilerInterceptor.GuardExternal(() => Activator.CreateInstance(proxyType, ctorArgs));
+				}
 			}
 			else
 			{
-				try
-				{
-					var result = getUninitializedObject.Invoke(null, new object[] { proxyType });
-					proxyType.GetMethod(".init").Invoke(result, ctorArgs);
-					return result;
-				}
-				catch (InvalidOperationException ioe)
-				{
-					throw new NotSupportedException("Cannot mock constructor calls on this platform.", ioe);
-				}
+				var result = UninitializedObjectFactory.Create(proxyType);
+				proxyType.GetMethod(".init").Invoke(result, ctorArgs);
+				return result;
 			}
 		}
 

@@ -153,7 +153,6 @@ namespace Telerik.JustMock
 
 			if (!mockConstructorCall.HasValue)
 			{
-#if !COREFX
 				switch (behavior)
 				{
 					case Behavior.RecursiveLoose:
@@ -165,9 +164,6 @@ namespace Telerik.JustMock
 						mockConstructorCall = false;
 						break;
 				}
-#else
-				mockConstructorCall = false;
-#endif
 			}
 
 			return new MockCreationSettings

@@ -493,6 +493,7 @@
     <Compile Include="Core\StaticProxy\ProxyInvocation.cs" />
     <Compile Include="Core\StaticProxy\ProxySourceRegistry.cs" />
     <Compile Include="Core\StaticProxy\StaticProxyMockFactory.cs" />
+    <Compile Include="Core\StaticProxy\UninitializedObjectFactory.cs" />
     <Compile Include="Core\TransparentProxy\MockingProxy.cs" />
     <Compile Include="MockedTypeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
