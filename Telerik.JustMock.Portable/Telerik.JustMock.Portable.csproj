@@ -20,20 +20,20 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\..\Binaries\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;COREFX;LITE_EDITION;PORTABLE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Telerik.JustMock.Portable.XML</DocumentationFile>
+    <DocumentationFile>..\..\..\Binaries\Debug\Telerik.JustMock.Portable.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\..\Binaries\Release\</OutputPath>
     <DefineConstants>TRACE;COREFX;LITE_EDITION;PORTABLE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Telerik.JustMock.Portable.XML</DocumentationFile>
+    <DocumentationFile>..\..\..\Binaries\Release\Telerik.JustMock.Portable.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
