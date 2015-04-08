@@ -28,6 +28,14 @@ namespace Telerik.JustMock.Core
 	{
 		public static object EvaluateExpression(this Expression expr)
 		{
+			while (expr.NodeType == ExpressionType.Convert)
+			{
+				var unary = expr as UnaryExpression;
+				if (unary.Type.IsAssignableFrom(unary.Operand.Type))
+					expr = unary.Operand;
+				else break;
+			}
+
 			var constant = expr as ConstantExpression;
 			if (constant != null)
 				return constant.Value;
@@ -49,6 +57,23 @@ namespace Telerik.JustMock.Core
 					}
 				}
 			}
+
+#if !DOTNET35
+			var listInit = expr as ListInitExpression;
+			if (listInit != null)
+			{
+				var collection = Expression.Variable(listInit.NewExpression.Type);
+
+				var block = new List<Expression>
+				{
+					Expression.Assign(collection, listInit.NewExpression)
+				};
+				block.AddRange(listInit.Initializers.Select(init => Expression.Call(collection, init.AddMethod, init.Arguments.ToArray())));
+				block.Add(collection);
+
+				expr = Expression.Block(new[] { collection }, block.ToArray());
+			}
+#endif
 
 			var lambda = Expression.Lambda(Expression.Convert(expr, typeof(object)));
 			var delg = (Func<object>)lambda.Compile();
