@@ -29,264 +29,529 @@ namespace Telerik.JustMock
 	public static class Param
 	{
 		/// <summary>
-		/// First field.
+		/// First parameter.
 		/// </summary>
 		public static readonly EverythingExcept _1;
 		/// <summary>
-		/// Second field.
+		/// Second parameter.
 		/// </summary>
 		public static readonly EverythingExcept _2;
 		/// <summary>
-		/// Third field.
+		/// Third parameter.
 		/// </summary>
 		public static readonly EverythingExcept _3;
 		/// <summary>
-		/// Fourth field.
+		/// Fourth parameter.
 		/// </summary>
 		public static readonly EverythingExcept _4;
 		/// <summary>
-		/// Fifth field.
+		/// Fifth parameter.
 		/// </summary>
 		public static readonly EverythingExcept _5;
 		/// <summary>
-		/// Sixth field.
+		/// Sixth parameter.
 		/// </summary>
 		public static readonly EverythingExcept _6;
 		/// <summary>
-		/// Seventh field.
+		/// Seventh parameter.
 		/// </summary>
 		public static readonly EverythingExcept _7;
 		/// <summary>
-		/// Eighth field.
+		/// Eighth parameter.
 		/// </summary>
 		public static readonly EverythingExcept _8;
 		/// <summary>
-		/// Ninth field.
+		/// Ninth parameter.
 		/// </summary>
 		public static readonly EverythingExcept _9;
 		/// <summary>
-		/// Tenth field.
+		/// Tenth parameter.
 		/// </summary>
 		public static readonly EverythingExcept _10;
 		/// <summary>
-		/// Eleventh field.
+		/// Eleventh parameter.
 		/// </summary>
 		public static readonly EverythingExcept _11;
 		/// <summary>
-		/// Twelfth field.
+		/// Twelfth parameter.
 		/// </summary>
 		public static readonly EverythingExcept _12;
 		/// <summary>
-		/// Thirteenth field.
+		/// Thirteenth parameter.
 		/// </summary>
 		public static readonly EverythingExcept _13;
 		/// <summary>
-		/// Fourteenth field.
+		/// Fourteenth parameter.
 		/// </summary>
 		public static readonly EverythingExcept _14;
 		/// <summary>
-		/// Fifteenth field.
+		/// Fifteenth parameter.
 		/// </summary>
 		public static readonly EverythingExcept _15;
 		/// <summary>
-		/// Sixteenth field.
+		/// Sixteenth parameter.
 		/// </summary>
 		public static readonly EverythingExcept _16;
 
+		/// <summary>
+		/// This class appears only in compiler errors.
+		/// </summary>
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		public struct EverythingExcept : IDictionary, IList, IAsyncResult, IFormatProvider, IComparer, IConvertible, IEqualityComparer, IDisposable
 #if !SILVERLIGHT && !PORTABLE
-			,
-ICloneable
+, ICloneable
 #endif
 		{
+			#region Implicit conversions
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator bool(EverythingExcept _) { return default(bool); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator byte(EverythingExcept _) { return 0; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator sbyte(EverythingExcept _) { return 0; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator char(EverythingExcept _) { return ' '; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator short(EverythingExcept _) { return 0; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator ushort(EverythingExcept _) { return 0; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator int(EverythingExcept _) { return 0; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator uint(EverythingExcept _) { return 0; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator IntPtr(EverythingExcept _) { return default(IntPtr); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator UIntPtr(EverythingExcept _) { return default(UIntPtr); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator long(EverythingExcept _) { return 0; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator ulong(EverythingExcept _) { return 0; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator float(EverythingExcept _) { return 0; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator double(EverythingExcept _) { return 0; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator decimal(EverythingExcept _) { return 0; }
 
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator string(EverythingExcept _) { return default(String); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator DateTime(EverythingExcept _) { return default(DateTime); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator TimeSpan(EverythingExcept _) { return default(TimeSpan); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator Guid(EverythingExcept _) { return default(System.Guid); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator DateTimeOffset(EverythingExcept _) { return default(System.DateTimeOffset); }
 
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator bool[](EverythingExcept _) { return null; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator byte[](EverythingExcept _) { return null; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator sbyte[](EverythingExcept _) { return null; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator char[](EverythingExcept _) { return null; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator short[](EverythingExcept _) { return null; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator ushort[](EverythingExcept _) { return null; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator int[](EverythingExcept _) { return null; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator uint[](EverythingExcept _) { return null; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator IntPtr[](EverythingExcept _) { return null; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator UIntPtr[](EverythingExcept _) { return null; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator long[](EverythingExcept _) { return null; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator ulong[](EverythingExcept _) { return null; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator float[](EverythingExcept _) { return null; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator double[](EverythingExcept _) { return null; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator decimal[](EverythingExcept _) { return null; }
 
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator object[](EverythingExcept _) { return default(Object[]); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator string[](EverythingExcept _) { return default(String[]); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator Type[](EverythingExcept _) { return default(Type[]); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator Attribute[](EverythingExcept _) { return default(Attribute[]); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator DateTime[](EverythingExcept _) { return null; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator TimeSpan[](EverythingExcept _) { return null; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator Guid[](EverythingExcept _) { return null; }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator DateTimeOffset[](EverythingExcept _) { return null; }
 
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator Type(EverythingExcept _) { return default(Type); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator Enum(EverythingExcept _) { return default(Enum); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.Runtime.Serialization.StreamingContext(EverythingExcept _) { return default(System.Runtime.Serialization.StreamingContext); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator AsyncCallback(EverythingExcept _) { return default(AsyncCallback); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.Linq.Expressions.Expression(EverythingExcept _) { return default(System.Linq.Expressions.Expression); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.Globalization.CultureInfo(EverythingExcept _) { return default(System.Globalization.CultureInfo); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.Reflection.BindingFlags(EverythingExcept _) { return default(System.Reflection.BindingFlags); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator Delegate(EverythingExcept _) { return default(Delegate); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.Reflection.MethodInfo(EverythingExcept _) { return default(System.Reflection.MethodInfo); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.Xml.XmlReader(EverythingExcept _) { return default(System.Xml.XmlReader); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.IO.Stream(EverythingExcept _) { return default(System.IO.Stream); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator EventHandler(EverythingExcept _) { return default(EventHandler); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.Xml.XmlWriter(EverythingExcept _) { return default(System.Xml.XmlWriter); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator Uri(EverythingExcept _) { return default(Uri); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator Exception(EverythingExcept _) { return default(Exception); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.Xml.XmlNameTable(EverythingExcept _) { return default(System.Xml.XmlNameTable); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator Array(EverythingExcept _) { return default(Array); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.IO.TextWriter(EverythingExcept _) { return default(System.IO.TextWriter); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator EventArgs(EverythingExcept _) { return default(EventArgs); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.Xml.XmlQualifiedName(EverythingExcept _) { return default(System.Xml.XmlQualifiedName); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.Text.StringBuilder(EverythingExcept _) { return default(System.Text.StringBuilder); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.Collections.BitArray(EverythingExcept _) { return default(System.Collections.BitArray); }
+			#endregion
 
 #if !PORTABLE
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.Reflection.Binder(EverythingExcept _) { return default(System.Reflection.Binder); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.Reflection.ParameterModifier[](EverythingExcept _) { return default(System.Reflection.ParameterModifier[]); }
 #endif
 
 #if !SILVERLIGHT && !PORTABLE
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.Runtime.Serialization.SerializationInfo(EverythingExcept _) { return default(System.Runtime.Serialization.SerializationInfo); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.Xml.XmlElement(EverythingExcept _) { return default(System.Xml.XmlElement); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.Xml.XmlNode(EverythingExcept _) { return default(System.Xml.XmlNode); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.Xml.Schema.XmlSchemaDatatype(EverythingExcept _) { return default(System.Xml.Schema.XmlSchemaDatatype); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.Xml.Schema.XmlSchemaType(EverythingExcept _) { return default(System.Xml.Schema.XmlSchemaType); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.Xml.Schema.XmlSchemaObjectCollection(EverythingExcept _) { return default(System.Xml.Schema.XmlSchemaObjectCollection); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.Xml.Schema.XmlSchemaObject(EverythingExcept _) { return default(System.Xml.Schema.XmlSchemaObject); }
+			/// <summary> </summary>
+			/// <param name="_"></param>
+			/// <returns></returns>
 			public static implicit operator System.Xml.XPath.XPathNavigator(EverythingExcept _) { return default(System.Xml.XPath.XPathNavigator); }
 
 			#region ICloneable
-			public object Clone()
+			object ICloneable.Clone()
 			{
 				throw new NotImplementedException();
 			}
 			#endregion
 #endif
 
-			#region IDictionary
-			public void CopyTo(Array array, int index)
+			#region Interface implementations
+
+			void IDictionary.Add(object key, object value)
 			{
-				// TODO: Implement this method
 				throw new NotImplementedException();
 			}
 
-			public int Count { get; private set; }
-
-			public object SyncRoot { get; private set; }
-
-			public bool IsSynchronized { get; private set; }
-
-			public bool Contains(object key)
+			void IDictionary.Clear()
 			{
-				// TODO: Implement this method
 				throw new NotImplementedException();
 			}
 
-			public void Add(object key, object value)
+			bool IDictionary.Contains(object key)
 			{
-				// TODO: Implement this method
 				throw new NotImplementedException();
 			}
 
-			public void Clear()
+			IDictionaryEnumerator IDictionary.GetEnumerator()
 			{
-				// TODO: Implement this method
 				throw new NotImplementedException();
 			}
 
-			public IDictionaryEnumerator GetEnumerator()
+			bool IDictionary.IsFixedSize
 			{
-				// TODO: Implement this method
+				get { throw new NotImplementedException(); }
+			}
+
+			bool IDictionary.IsReadOnly
+			{
+				get { throw new NotImplementedException(); }
+			}
+
+			ICollection IDictionary.Keys
+			{
+				get { throw new NotImplementedException(); }
+			}
+
+			void IDictionary.Remove(object key)
+			{
 				throw new NotImplementedException();
 			}
 
-			public void Remove(object key)
+			ICollection IDictionary.Values
 			{
-				// TODO: Implement this method
-				throw new NotImplementedException();
+				get { throw new NotImplementedException(); }
 			}
 
-			public object this[object key]
+			object IDictionary.this[object key]
 			{
 				get
 				{
-					// TODO: Implement this indexer getter
 					throw new NotImplementedException();
 				}
 				set
 				{
-					// TODO: Implement this indexer setter
 					throw new NotImplementedException();
 				}
 			}
 
-			public ICollection Keys { get; private set; }
+			void ICollection.CopyTo(Array array, int index)
+			{
+				throw new NotImplementedException();
+			}
 
-			public ICollection Values { get; private set; }
+			int ICollection.Count
+			{
+				get { throw new NotImplementedException(); }
+			}
 
-			public bool IsReadOnly { get; private set; }
+			bool ICollection.IsSynchronized
+			{
+				get { throw new NotImplementedException(); }
+			}
 
-			public bool IsFixedSize { get; private set; }
+			object ICollection.SyncRoot
+			{
+				get { throw new NotImplementedException(); }
+			}
 
 			IEnumerator IEnumerable.GetEnumerator()
 			{
-				// TODO: Implement this method
 				throw new NotImplementedException();
 			}
-			#endregion
 
-			#region IList
-			public int Add(object value)
+			int IList.Add(object value)
 			{
 				throw new NotImplementedException();
 			}
 
-			public int IndexOf(object value)
+			void IList.Clear()
 			{
 				throw new NotImplementedException();
 			}
 
-			public void Insert(int index, object value)
+			bool IList.Contains(object value)
 			{
 				throw new NotImplementedException();
 			}
 
-			public void RemoveAt(int index)
+			int IList.IndexOf(object value)
 			{
 				throw new NotImplementedException();
 			}
 
-			public object this[int index]
+			void IList.Insert(int index, object value)
+			{
+				throw new NotImplementedException();
+			}
+
+			bool IList.IsFixedSize
+			{
+				get { throw new NotImplementedException(); }
+			}
+
+			bool IList.IsReadOnly
+			{
+				get { throw new NotImplementedException(); }
+			}
+
+			void IList.Remove(object value)
+			{
+				throw new NotImplementedException();
+			}
+
+			void IList.RemoveAt(int index)
+			{
+				throw new NotImplementedException();
+			}
+
+			object IList.this[int index]
 			{
 				get
 				{
@@ -297,145 +562,133 @@ ICloneable
 					throw new NotImplementedException();
 				}
 			}
-			#endregion
 
-			#region IFormatProvider
-			public object GetFormat(Type formatType)
-			{
-				throw new NotImplementedException();
-			}
-			#endregion
-
-			#region IAsyncResult
-			public object AsyncState
+			object IAsyncResult.AsyncState
 			{
 				get { throw new NotImplementedException(); }
 			}
 
-			public System.Threading.WaitHandle AsyncWaitHandle
+			System.Threading.WaitHandle IAsyncResult.AsyncWaitHandle
 			{
 				get { throw new NotImplementedException(); }
 			}
 
-			public bool CompletedSynchronously
+			bool IAsyncResult.CompletedSynchronously
 			{
 				get { throw new NotImplementedException(); }
 			}
 
-			public bool IsCompleted
+			bool IAsyncResult.IsCompleted
 			{
 				get { throw new NotImplementedException(); }
 			}
-			#endregion
 
-			#region IComparer
-			public int Compare(object x, object y)
-			{
-				throw new NotImplementedException();
-			}
-			#endregion
-
-			#region IConvertible
-			public TypeCode GetTypeCode()
+			object IFormatProvider.GetFormat(Type formatType)
 			{
 				throw new NotImplementedException();
 			}
 
-			public bool ToBoolean(IFormatProvider provider)
+			int IComparer.Compare(object x, object y)
 			{
 				throw new NotImplementedException();
 			}
 
-			public byte ToByte(IFormatProvider provider)
+			TypeCode IConvertible.GetTypeCode()
 			{
 				throw new NotImplementedException();
 			}
 
-			public char ToChar(IFormatProvider provider)
+			bool IConvertible.ToBoolean(IFormatProvider provider)
 			{
 				throw new NotImplementedException();
 			}
 
-			public DateTime ToDateTime(IFormatProvider provider)
+			byte IConvertible.ToByte(IFormatProvider provider)
 			{
 				throw new NotImplementedException();
 			}
 
-			public decimal ToDecimal(IFormatProvider provider)
+			char IConvertible.ToChar(IFormatProvider provider)
 			{
 				throw new NotImplementedException();
 			}
 
-			public double ToDouble(IFormatProvider provider)
+			DateTime IConvertible.ToDateTime(IFormatProvider provider)
 			{
 				throw new NotImplementedException();
 			}
 
-			public short ToInt16(IFormatProvider provider)
+			decimal IConvertible.ToDecimal(IFormatProvider provider)
 			{
 				throw new NotImplementedException();
 			}
 
-			public int ToInt32(IFormatProvider provider)
+			double IConvertible.ToDouble(IFormatProvider provider)
 			{
 				throw new NotImplementedException();
 			}
 
-			public long ToInt64(IFormatProvider provider)
+			short IConvertible.ToInt16(IFormatProvider provider)
 			{
 				throw new NotImplementedException();
 			}
 
-			public sbyte ToSByte(IFormatProvider provider)
+			int IConvertible.ToInt32(IFormatProvider provider)
 			{
 				throw new NotImplementedException();
 			}
 
-			public float ToSingle(IFormatProvider provider)
+			long IConvertible.ToInt64(IFormatProvider provider)
 			{
 				throw new NotImplementedException();
 			}
 
-			public string ToString(IFormatProvider provider)
+			sbyte IConvertible.ToSByte(IFormatProvider provider)
 			{
 				throw new NotImplementedException();
 			}
 
-			public object ToType(Type conversionType, IFormatProvider provider)
+			float IConvertible.ToSingle(IFormatProvider provider)
 			{
 				throw new NotImplementedException();
 			}
 
-			public ushort ToUInt16(IFormatProvider provider)
+			string IConvertible.ToString(IFormatProvider provider)
 			{
 				throw new NotImplementedException();
 			}
 
-			public uint ToUInt32(IFormatProvider provider)
+			object IConvertible.ToType(Type conversionType, IFormatProvider provider)
 			{
 				throw new NotImplementedException();
 			}
 
-			public ulong ToUInt64(IFormatProvider provider)
-			{
-				throw new NotImplementedException();
-			}
-			#endregion
-
-			#region IEqualityComparer
-			public new bool Equals(object x, object y)
+			ushort IConvertible.ToUInt16(IFormatProvider provider)
 			{
 				throw new NotImplementedException();
 			}
 
-			public int GetHashCode(object obj)
+			uint IConvertible.ToUInt32(IFormatProvider provider)
 			{
 				throw new NotImplementedException();
 			}
-			#endregion
 
-			#region IDisposable
-			public void Dispose()
+			ulong IConvertible.ToUInt64(IFormatProvider provider)
+			{
+				throw new NotImplementedException();
+			}
+
+			bool IEqualityComparer.Equals(object x, object y)
+			{
+				throw new NotImplementedException();
+			}
+
+			int IEqualityComparer.GetHashCode(object obj)
+			{
+				throw new NotImplementedException();
+			}
+
+			void IDisposable.Dispose()
 			{
 				throw new NotImplementedException();
 			}

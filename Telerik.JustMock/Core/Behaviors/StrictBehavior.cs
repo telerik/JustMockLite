@@ -42,7 +42,10 @@ namespace Telerik.JustMock.Core.Behaviors
 
 namespace Telerik.JustMock.Core
 {
-	public class StrictMockException : MockException
+	/// <summary>
+	/// Thrown when a strict mock is accessed inappropriately.
+	/// </summary>
+	public sealed class StrictMockException : MockException
 	{
 		internal StrictMockException(MemberInfo member)
 			: base(String.Format("All calls on {0} should be arranged first.", member))

@@ -113,7 +113,6 @@ namespace Telerik.JustMock
 		/// implicitly by calls to <see cref="Create"/> or <see cref="Arrange"/>. This method is rarely needed in cases
 		/// where you're trying to arrange setters or raise events on a partial mock.
 		/// </summary>
-		/// <typeparam name="TTypeToIntercept">The type to intercept</typeparam>
 		/// <param name="typeToIntercept">The type to intercept</param>
 		public static void Intercept(Type typeToIntercept)
 		{

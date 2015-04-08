@@ -54,6 +54,9 @@ namespace Telerik.JustMock.AutoMock
 		{
 		}
 
+		/// <summary>
+		/// Implementation detail.
+		/// </summary>
 		protected override bool ShouldAddComponent(Type component, Type implementation)
 		{
 			if (implementation == typeof(SelfBindingResolver))
@@ -64,6 +67,9 @@ namespace Telerik.JustMock.AutoMock
 			return base.ShouldAddComponent(component, implementation);
 		}
 
+		/// <summary>
+		/// Implementation detail.
+		/// </summary>
 		protected override void AddComponents()
 		{
 			base.AddComponents();
@@ -183,7 +189,6 @@ namespace Telerik.JustMock.AutoMock
 		/// Mocking interface
 		/// </typeparam>
 		/// <param name="expression">Target expression</param>
-		/// <param name="take">Specifics the instance to resolve</param>
 		/// <returns>
 		/// Reference to <see cref="ActionExpectation"/> to setup the mock.
 		/// </returns>
@@ -243,7 +248,6 @@ namespace Telerik.JustMock.AutoMock
 		/// </summary>
 		/// <param name="bindingName">Name.</param>
 		/// <typeparam name="TService">Service Type.</typeparam>
-		/// <param name="take">Specifies the instance to resolve.</param>
 		public void Assert<TService>(string bindingName)
 		{
 			ProfilerInterceptor.GuardInternal(() => this.Get<TService>(bindingName).Assert());
@@ -277,7 +281,6 @@ namespace Telerik.JustMock.AutoMock
 		/// <typeparam name="TService">Service Type.</typeparam>
 		/// <param name="bindingName">Name.</param>
 		/// <param name="expression">Target expression.</param>
-		/// <param name="take">Specifies the instance to resolve.</param>
 		public void Assert<TService>(string bindingName, Expression<Func<TService, object>> expression)
 		{
 			ProfilerInterceptor.GuardInternal(() => this.Get<TService>(bindingName).Assert(expression));
@@ -289,7 +292,6 @@ namespace Telerik.JustMock.AutoMock
 		/// <typeparam name="TService">Service Type.</typeparam>
 		/// <param name="bindingName">Name.</param>
 		/// <param name="expression">Target expression.</param>
-		/// <param name="take">Specifies the instance to resolve.</param>
 		public void Assert<TService>(string bindingName, Expression<Action<TService>> expression)
 		{
 			ProfilerInterceptor.GuardInternal(() => this.Get<TService>(bindingName).Assert(expression));
@@ -302,7 +304,6 @@ namespace Telerik.JustMock.AutoMock
 		/// <param name="bindingName">Name.</param>
 		/// <param name="expression">Target expression.</param>
 		/// <param name="occurs">Specifies the number of times a mock call should occur.</param>
-		/// <param name="take">Specifies the instance to resolve.</param>
 		public void Assert<TService>(string bindingName, Expression<Func<TService, object>> expression, Occurs occurs)
 		{
 			ProfilerInterceptor.GuardInternal(() => this.Get<TService>(bindingName).Assert(expression, occurs));
@@ -315,7 +316,6 @@ namespace Telerik.JustMock.AutoMock
 		/// <param name="bindingName">Name.</param>
 		/// <param name="expression">Target expression.</param>
 		/// <param name="occurs">Specifies the number of times a mock call should occur.</param>
-		/// <param name="take">Specifies the instance to resolve.</param>
 		public void Assert<TService>(string bindingName, Expression<Action<TService>> expression, Occurs occurs)
 		{
 			ProfilerInterceptor.GuardInternal(() => this.Get<TService>(bindingName).Assert(expression, occurs));

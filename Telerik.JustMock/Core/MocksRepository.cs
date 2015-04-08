@@ -54,6 +54,9 @@ namespace Telerik.JustMock.Core
 		public Dictionary<Type, object> Mixins = new Dictionary<Type, object>();
 	}
 
+	/// <summary>
+	/// An implementation detail. Not intended for external usage.
+	/// </summary>
 	public sealed class MocksRepository
 	{
 		private static readonly List<KeyValuePair<object, IMockMixin>> externalMixinDatabase = new List<KeyValuePair<object, IMockMixin>>();
@@ -1677,8 +1680,11 @@ namespace Telerik.JustMock.Core
 			return sb.ToString();
 		}
 
-		// use this class for creating baseless proxies instead of typeof(object)
-		// so that you don't accidentally enable the interception of Object which kills performance
+		/// <summary>
+		/// An implementation detail. Not intended for external usage.
+		/// Use this class for creating baseless proxies instead of typeof(object)
+		/// so that you don't accidentally enable the interception of Object which kills performance
+		/// </summary>
 		public abstract class ExternalMockMixin
 		{ }
 	}

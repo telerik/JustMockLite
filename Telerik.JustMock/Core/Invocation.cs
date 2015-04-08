@@ -21,6 +21,9 @@ using System.Text;
 
 namespace Telerik.JustMock.Core
 {
+	/// <summary>
+	/// An implementation detail interface. Not intended for external usage.
+	/// </summary>
 	public sealed class Invocation
 	{
 		private MethodBase method;

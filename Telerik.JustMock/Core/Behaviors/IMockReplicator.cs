@@ -20,9 +20,15 @@ using System.Linq;
 
 namespace Telerik.JustMock.Core.Behaviors
 {
+	/// <summary>
+	/// An implementation detail interface. Not intended for external usage.
+	/// </summary>
 	[Mixin]
 	public interface IMockReplicator
 	{
+		/// <summary>
+		/// An implementation detail. Not intended for external usage.
+		/// </summary>
 		object CreateSimilarMock(MocksRepository repository, Type mockType, object[] constructorArgs, bool mockConstructorCall, Type[] additionalMockedInterfaces);
 	}
 }

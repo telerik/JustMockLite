@@ -22,9 +22,15 @@ using System.Reflection;
 
 namespace Telerik.JustMock.Core.Behaviors
 {
+	/// <summary>
+	/// An implementation detail interface. Not intended for external usage.
+	/// </summary>
 	[Mixin]
 	public interface IEventsMixin
 	{
+		/// <summary>
+		/// An implementation detail. Not intended for external usage.
+		/// </summary>
 		void RaiseEvent(EventInfo evt, object[] delegateArguments);
 	}
 

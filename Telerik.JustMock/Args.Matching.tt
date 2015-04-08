@@ -49,6 +49,12 @@ namespace Telerik.JustMock
 			return ProfilerInterceptor.GuardInternal(() => new Args().AndMatching(predicate));
 		}
 
+		/// <summary>
+		/// Specifies a condition on the invocation arguments. See <see cref="M:Telerik.JustMock.Args.Filter"/> for usage details.
+		/// </summary>
+<# for (var j = 1; j <= i; ++j) { #>
+		/// <typeparam name="T<#= j #>">Type of the <#= GetNumberNames()[j-1] #> parameter of the anonymous method that this delegate encapsulates</typeparam>
+<# } #>
 		public Args AndMatching<<#= String.Join(", ", Enumerable.Range(1, i).Select(t => "T" + t)) #>>(Func<<#= String.Join("", Enumerable.Range(1, i).Select(t => "T" + t + ", ")) #>bool> predicate)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>

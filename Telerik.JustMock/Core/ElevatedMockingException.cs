@@ -20,6 +20,9 @@ using System.Reflection;
 
 namespace Telerik.JustMock.Core
 {
+	/// <summary>
+	/// Thrown when the JustMock profiler is required but not present.
+	/// </summary>
 	[Serializable]
 	public sealed class ElevatedMockingException : MockException
 	{

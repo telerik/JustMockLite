@@ -183,7 +183,7 @@ namespace Telerik.JustMock
 		/// <summary>
 		/// Creates a mocked instance from a given type.
 		/// </summary>
-		/// <param name="targetType">Target to mock</param>
+		/// <param name="type">Target to mock</param>
 		/// <param name="constructor">
 		/// Specifies whether to call the base constructor
 		/// </param>
@@ -200,7 +200,7 @@ namespace Telerik.JustMock
 		/// <summary>
 		/// Creates a mocked instance from a given type.
 		/// </summary>
-		/// <param name="target">Target type to mock</param>
+		/// <param name="type">Target type to mock</param>
 		/// <param name="settings">Mock settings</param>
 		/// <returns>Mock instance</returns>
 		public static object Create(Type type, Action<IFluentConfig> settings)
@@ -216,7 +216,7 @@ namespace Telerik.JustMock
 		/// <summary>
 		/// Creates a mock instance from a given type.
 		/// </summary>
-		/// <param name="target">Mocking type</param>
+		/// <param name="type">Mocking type</param>
 		/// <param name="behavior">Specifies behavior of the mock. Default is <see cref="Behavior.RecursiveLoose"/></param>
 		/// <param name="args">Constructor arguments</param>
 		/// <returns>Mock instance</returns>
@@ -231,7 +231,7 @@ namespace Telerik.JustMock
 		/// <summary>
 		/// Creates a mock instance from a given type.
 		/// </summary>
-		/// <param name="target">Mocking type</param>
+		/// <param name="type">Mocking type</param>
 		/// <param name="behavior">Specifies behavior of the mock. Default is <see cref="Behavior.RecursiveLoose"/></param>
 		/// <returns>Mock instance</returns>
 		public static object Create(Type type, Behavior behavior)

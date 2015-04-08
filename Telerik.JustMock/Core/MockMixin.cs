@@ -22,6 +22,9 @@ using Telerik.JustMock.Core.Behaviors;
 
 namespace Telerik.JustMock.Core
 {
+	/// <summary>
+	/// An implementation detail interface. Not intended for external usage.
+	/// </summary>
 	[Mixin]
 	public interface IMockMixin
 	{
@@ -54,9 +57,19 @@ namespace Telerik.JustMock.Core
 		/// </summary>
 		IList<IBehavior> FallbackBehaviors { get; }
 
+		/// <summary>
+		/// The type of the mock associated with this mixin.
+		/// </summary>
 		Type DeclaringType { get; }
 
+		/// <summary>
+		/// True if the static constructor of the associated type should be mocked.
+		/// </summary>
 		bool IsStaticConstructorMocked { get; set; }
+
+		/// <summary>
+		/// True if the constructor of the associated instance should be mocked
+		/// </summary>
 		bool IsInstanceConstructorMocked { get; set; }
 
 		/// <summary>

@@ -29,10 +29,11 @@ namespace Telerik.JustMock.Core
 		/// Initializes a new instance of the <see cref="MockAssertionFailedException"/> class.
 		/// </summary>
 		/// <param name="message">Exception message.</param>
+		/// <param name="innerException">Inner exception.</param>
 		public MockAssertionFailedException(string message, Exception innerException) : base(message, innerException) { }
 
 #if !COREFX
-		protected MockAssertionFailedException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+		private MockAssertionFailedException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 #endif
 	}
 }

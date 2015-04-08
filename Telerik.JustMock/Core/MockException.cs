@@ -42,6 +42,11 @@ namespace Telerik.JustMock.Core
 		public MockException(string message, Exception innerException) : base(message, innerException) { }
 
 #if !COREFX
+		/// <summary>
+		/// Serialization constructor.
+		/// </summary>
+		/// <param name="info"></param>
+		/// <param name="context"></param>
 		protected MockException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 #endif
 

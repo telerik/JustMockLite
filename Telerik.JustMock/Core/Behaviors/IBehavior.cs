@@ -16,7 +16,6 @@
 */
 
 using System;
-using System.Linq;
 
 namespace Telerik.JustMock.Core.Behaviors
 {
@@ -25,6 +24,8 @@ namespace Telerik.JustMock.Core.Behaviors
 	/// </summary>
 	public interface IBehavior
 	{
+		/// <summary> </summary>
+		/// <param name="invocation"></param>
 		void Process(Invocation invocation);
 	}
 

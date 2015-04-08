@@ -196,7 +196,6 @@ namespace Telerik.JustMock
 		/// </summary>
 		/// <param name="action">Action defining the set operation</param>
 		/// <param name="args">Specifies to ignore the instance and/or arguments during assertion.</param>
-		/// <param name="occurs">Specifies the number of times a mock call should occur.</param>
 		public static void AssertSet(Action action, Args args)
 		{
 			ProfilerInterceptor.GuardInternal(() =>

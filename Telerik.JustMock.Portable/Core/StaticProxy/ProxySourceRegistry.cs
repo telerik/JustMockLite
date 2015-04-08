@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace Telerik.JustMock.Core.StaticProxy
 {
+	/// <summary>
+	/// An implementation detail. Not intended for external usage.
+	/// </summary>
 	public static class ProxySourceRegistry
 	{
 		internal struct ProxyKey : IEquatable<ProxyKey>
@@ -48,18 +51,32 @@ namespace Telerik.JustMock.Core.StaticProxy
 			}
 		}
 
+		/// <summary>
+		/// Set by generated code. When 'true' the "mock type not found" exception contains additional information about the trial.
+		/// </summary>
 		public static bool IsTrialWeaver;
 
 		internal static readonly Dictionary<ProxyKey, RuntimeTypeHandle> ProxyTypes = new Dictionary<ProxyKey, RuntimeTypeHandle>();
 
 		internal static readonly Dictionary<RuntimeTypeHandle, RuntimeTypeHandle> DelegateBackendTypes = new Dictionary<RuntimeTypeHandle, RuntimeTypeHandle>();
 
+		/// <summary>
+		/// Implementation detail.
+		/// </summary>
+		/// <param name="proxyTypeHandle"></param>
+		/// <param name="proxiedTypeHandle"></param>
+		/// <param name="additionalImplementedTypes"></param>
 		public static void Register(RuntimeTypeHandle proxyTypeHandle, RuntimeTypeHandle proxiedTypeHandle, RuntimeTypeHandle[] additionalImplementedTypes)
 		{
 			// duplicates may come from different test assemblies
 			ProxyTypes[new ProxyKey(proxiedTypeHandle, additionalImplementedTypes)] = proxyTypeHandle;
 		}
 
+		/// <summary>
+		/// Implementation detail.
+		/// </summary>
+		/// <param name="delegateType"></param>
+		/// <param name="backendType"></param>
 		public static void RegisterDelegateBackend(RuntimeTypeHandle delegateType, RuntimeTypeHandle backendType)
 		{
 			DelegateBackendTypes[delegateType] = backendType;
