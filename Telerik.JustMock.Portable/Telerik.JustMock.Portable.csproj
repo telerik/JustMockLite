@@ -479,6 +479,7 @@
     <Compile Include="Core\TransparentProxy\MockingProxy.cs" />
     <Compile Include="MockedTypeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnproxyableTypeAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\MockingUtil.CodeGen.cs" />
