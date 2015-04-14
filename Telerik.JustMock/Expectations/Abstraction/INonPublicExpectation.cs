@@ -112,6 +112,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// </summary>
 		/// <param name="target">Target mock</param>
 		/// <param name="method">Method to assert taken from reflection.</param>
+		/// <param name="occurs">Specifies the number of times a call should occur.</param>
 		/// <param name="args">Method arguments</param>
 		void Assert(object target, MethodInfo method, Occurs occurs, params object[] args);
 
@@ -129,7 +130,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// </summary>
 		/// <param name="target">Target mock</param>
 		/// <param name="method">Method taken from reflection</param>
-		/// <param name="args">Method arguments<</param>
+		/// <param name="args">Method arguments</param>
 		/// <returns>Number of calls.</returns>
 		int GetTimesCalled(object target, MethodInfo method, params object[] args);
 
@@ -138,7 +139,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// </summary>
 		/// <param name="target">Target mock</param>
 		/// <param name="memberName">Name of the member</param>
-		/// <param name="args">Method arguments<</param>
+		/// <param name="args">Method arguments</param>
 		/// <returns>Number of calls.</returns>
 		int GetTimesCalled(object target, string memberName, params object[] args);
 
@@ -188,7 +189,6 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <summary>
 		/// Arranges a method for mocking.
 		/// </summary>
-		/// <typeparam name="TReturn">Return type</typeparam>
 		/// <param name="method">Target method</param>
 		/// <param name="args">Method arguments</param>
 		ActionExpectation Arrange(MethodInfo method, params object[] args);
@@ -331,7 +331,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// and has the default implementation for add/remove, then that event can also be raised using this 
 		/// method, even with the profiler off.
 		/// </summary>
-		/// <param name="eventName">The type on which the event is declared.</param>
+		/// <param name="type">The type on which the event is declared.</param>
 		/// <param name="eventName">The name of event to raise.</param>
 		/// <param name="args">Arguments to pass to the event handlers.</param>
 		void Raise(Type type, string eventName, params object[] args);

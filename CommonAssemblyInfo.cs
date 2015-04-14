@@ -25,7 +25,7 @@ using System.Reflection;
 
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCompany("Telerik AD")]
-[assembly: AssemblyCopyright("Copyright © 2010-2014 Telerik AD")]
+[assembly: AssemblyCopyright("Copyright © 2010-2015 Telerik AD")]
 
 [assembly: AssemblyVersion("2013.3.1021.0")]
 [assembly: AssemblyFileVersion("2013.3.1021.0")]

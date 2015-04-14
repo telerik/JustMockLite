@@ -18,9 +18,6 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-#if !SILVERLIGHT
-using System.Runtime.Serialization;
-#endif
 using System.Text;
 using Telerik.JustMock.Core;
 using Telerik.JustMock.Core.Context;
@@ -54,7 +51,7 @@ namespace Telerik.JustMock
 	/// The step-by-step replay is intended for use with an interactive debugger
 	/// (e.g. the Visual Studio managed debugger). To begin using it, add the
 	/// DebugView class to a Watch in the debugger. Break the test execution
-	/// before your test begins. Set the <see cref=""/>IsTraceEnabled property to true from
+	/// before your test begins. Set the <see cref="IsTraceEnabled"/> property to true from
 	/// the Watch window. Now, as you step over each line in your test, the
 	/// <see cref="FullTrace"/> and <see cref="LastTrace"/> properties will be updated to show the events
 	/// happening inside the mocking API. <see cref="FullTrace"/> will show the entire event
@@ -182,6 +179,9 @@ namespace Telerik.JustMock
 
 namespace Telerik.JustMock.Diagnostics
 {
+	/// <summary>
+	/// This exception provides additional information when assertion failures are produced.
+	/// </summary>
 	[Serializable]
 	public sealed class DebugViewDetailsException : Exception
 	{
@@ -189,8 +189,8 @@ namespace Telerik.JustMock.Diagnostics
 			: base(String.Format("State:\n{0}\n\nFull trace:\n{1}", DebugView.CurrentState, DebugView.FullTrace))
 		{ }
 
-#if !SILVERLIGHT
-		protected DebugViewDetailsException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+#if !COREFX
+		private DebugViewDetailsException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 #endif
 	}
 

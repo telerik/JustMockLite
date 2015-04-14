@@ -67,6 +67,7 @@ namespace Telerik.JustMock.Abstraction
 		/// <returns>The fluent configuration.</returns>
 		IFluentConfig CallConstructor(object[] args);
 
+#if !PORTABLE
 		/// <summary>
 		/// Add an attribute to the created proxy type.
 		/// </summary>
@@ -92,5 +93,6 @@ namespace Telerik.JustMock.Abstraction
 		/// <param name="filter"></param>
 		/// <returns>The fluent configuration.</returns>
 		IFluentConfig SetInterceptorFilter(Expression<Predicate<MethodInfo>> filter);
+#endif
 	}
 }

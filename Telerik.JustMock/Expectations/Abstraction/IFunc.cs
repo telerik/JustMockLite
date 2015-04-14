@@ -53,8 +53,6 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// Returns a enumerable collection for the target query.
 		/// </summary>
 		/// <typeparam name="TArg">Argument type</typeparam>
-		/// <typeparam name="TReturn">Return type for the collection</typeparam>
-		/// <param name="funcExpectation">Defines the setup instance under which the collection will be set.</param>
 		/// <param name="collection">Enumerable collection</param>
 		/// <returns>Instance of <see cref="IAssertable"/></returns>
 		IAssertable ReturnsCollection<TArg>(IEnumerable<TArg> collection);

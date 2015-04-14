@@ -179,7 +179,7 @@ namespace Telerik.JustMock.Core.MatcherTree
 			var argsArray = args.ToArray();
 
 			object state;
-			Type.DefaultBinder.BindToMethod(BindingFlags.Default, new[] { filter.Method }, ref argsArray, null, null, null, out state);
+			MockingUtil.BindToMethod(MockingUtil.Default, new[] { filter.Method }, ref argsArray, null, null, null, out state);
 
 			var filterFunc = MockingUtil.MakeFuncCaller(filter);
 			var isMatch = (bool) ProfilerInterceptor.GuardExternal(() => filterFunc(argsArray, filter));

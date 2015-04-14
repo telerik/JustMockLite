@@ -53,6 +53,9 @@ namespace Telerik.JustMock.Core.Behaviors
 			if (returnType == typeof(void) || returnType.IsValueType)
 				return;
 
+			if (invocation.Method.Name == "ToString" && invocation.Method.GetParameters().Length == 0 && invocation.UserProvidedImplementation)
+				return;
+
 			object mock = null;
 			List<KeyValuePair<object, object>> mocksList;
 			if (mocks.TryGetValue(invocation.Method, out mocksList))
@@ -92,6 +95,7 @@ namespace Telerik.JustMock.Core.Behaviors
 
 					if (mock == null && mustReturnAMock)
 					{
+#if !LITE_EDITION
 						var stackTrace = new StackTrace();
 						var methodCallingArrange = stackTrace.EnumerateFrames()
 							.SkipWhile(m => !Attribute.IsDefined(m, typeof(ArrangeMethodAttribute)))
@@ -100,6 +104,7 @@ namespace Telerik.JustMock.Core.Behaviors
 
 						if (methodCallingArrange != null && invocation.Method.DeclaringType.IsAssignableFrom(methodCallingArrange.DeclaringType))
 							return;
+#endif
 
 						if (typeof(String) == returnType)
 						{

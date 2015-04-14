@@ -15,10 +15,13 @@
 namespace Telerik.JustMock.Core.Castle.DynamicProxy
 {
 	/// <summary>
-	///   New interface that is going to be used by DynamicProxy 2
+	/// An implementation detail interface. Not intended for external usage.
 	/// </summary>
 	public interface IInterceptor
 	{
+		/// <summary>
+		/// An implementation detail. Not intended for external usage.
+		/// </summary>
 		void Intercept(IInvocation invocation);
 	}
 }

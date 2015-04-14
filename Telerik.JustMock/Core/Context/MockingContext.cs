@@ -17,7 +17,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -78,14 +77,16 @@ namespace Telerik.JustMock.Core.Context
 
 		public static string GetStackTrace(string indent)
 		{
-#if !SILVERLIGHT
-			var skipCount = new StackTrace().GetFrames().TakeWhile(frame => frame.GetMethod().DeclaringType.Assembly == typeof(DebugView).Assembly).Count();
-			var trace = new StackTrace(skipCount, true);
+#if SILVERLIGHT
+			var trace = new System.Diagnostics.StackTrace().ToString();
+#elif PORTABLE
+			var trace = new StackTrace().ToString();
 #else
-			var trace = new StackTrace();
+			var skipCount = new System.Diagnostics.StackTrace().GetFrames().TakeWhile(frame => frame.GetMethod().DeclaringType.Assembly == typeof(DebugView).Assembly).Count();
+			var trace = new System.Diagnostics.StackTrace(skipCount, true).ToString();
 #endif
 
-			return "\n".Join(trace.ToString()
+			return "\n".Join(trace
 					.Split('\n')
 					.Select(p => indent + p.Trim()));
 		}
@@ -116,16 +117,25 @@ namespace Telerik.JustMock.Core.Context
 
 		static MockingContext()
 		{
+#if PORTABLE
+			if (VisualStudioPortableContextResolver.IsAvailable)
+				registeredContextResolvers.Add(new VisualStudioPortableContextResolver());
+			if (XamarinAndroidNUnitContextResolver.IsAvailable)
+				registeredContextResolvers.Add(new XamarinAndroidNUnitContextResolver());
+			if (XamarinIosNUnitContextResolver.IsAvailable)
+				registeredContextResolvers.Add(new XamarinIosNUnitContextResolver());
+#else
 			if (MSTestMockingContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new MSTestMockingContextResolver());
-			if (NUnitMockingContextResolver.IsAvailable)
-				registeredContextResolvers.Add(new NUnitMockingContextResolver());
 			if (XUnitMockingContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new XUnitMockingContextResolver());
+			if (NUnitMockingContextResolver.IsAvailable)
+				registeredContextResolvers.Add(new NUnitMockingContextResolver());
 			if (MSpecContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new MSpecContextResolver());
 			if (MbUnitContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new MbUnitContextResolver());
+#endif
 
 			foreach (var resolver in registeredContextResolvers)
 			{
@@ -135,7 +145,7 @@ namespace Telerik.JustMock.Core.Context
 			}
 
 			if (failThrower == null)
-				failThrower = (msg, innerException) => { throw new MockAssertionFailedException(msg, innerException); };
+				failThrower = LocalMockingContextResolver.GetFailMethod();
 		}
 
 		private static void Fail(string msg)
@@ -187,5 +197,10 @@ namespace Telerik.JustMock.Core.Context
 				Fail(sb.ToString());
 			}
 		}
+
+#if PORTABLE
+		private class StackTraceGeneratorException : Exception
+		{ }
+#endif
 	}
 }

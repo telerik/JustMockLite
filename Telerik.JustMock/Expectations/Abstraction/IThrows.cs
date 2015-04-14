@@ -19,6 +19,10 @@ using System;
 
 namespace Telerik.JustMock.Expectations.Abstraction
 {
+	/// <summary>
+	/// Throws() methods.
+	/// </summary>
+	/// <typeparam name="TContainer"></typeparam>
 	public interface IThrows<TContainer>
 	{
 		/// <summary>

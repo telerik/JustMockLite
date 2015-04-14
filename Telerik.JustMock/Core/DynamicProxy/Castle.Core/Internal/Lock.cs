@@ -30,7 +30,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Internal
 		/// <returns></returns>
 		public static Lock Create()
 		{
-#if SILVERLIGHT
+#if COREFX
 			return new MonitorLock();
 #else
 			return new SlimReadWriteLock();

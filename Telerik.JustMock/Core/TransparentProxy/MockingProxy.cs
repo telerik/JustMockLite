@@ -72,9 +72,10 @@ namespace Telerik.JustMock.Core.TransparentProxy
 			return typeof(MarshalByRefObject).IsAssignableFrom(type);
 		}
 
-		public static object CreateProxy(object wrappedInstance, IInterceptor interceptor, IMockMixin mockMixin)
+		public static object CreateProxy(object wrappedInstance, MocksRepository repository, IMockMixin mockMixin)
 		{
-			var realProxy = new MockingProxy((MarshalByRefObject) wrappedInstance, interceptor, mockMixin);
+			var interceptor = new DynamicProxyInterceptor(repository);
+			var realProxy = new MockingProxy((MarshalByRefObject)wrappedInstance, interceptor, mockMixin);
 			return realProxy.GetTransparentProxy();
 		}
 

@@ -64,10 +64,15 @@ namespace Telerik.JustMock.Core.Context
 			if (stackTrace.EnumerateFrames().Contains(contextMethod))
 			{
 				contextRepository.Retire();
-				
+
 				contextMethod = null;
 				contextRepository = null;
 			}
+		}
+
+		public static Action<string, Exception> GetFailMethod()
+		{
+			return (msg, innerException) => { throw new MockAssertionFailedException(msg, innerException); };
 		}
 	}
 }

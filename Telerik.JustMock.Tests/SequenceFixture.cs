@@ -15,22 +15,24 @@
    limitations under the License.
 */
 
-using System;
-
-
-#if !NUNIT
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-#else
+#if NUNIT
 using NUnit.Framework;
 using TestCategory = NUnit.Framework.CategoryAttribute;
 using TestClass = NUnit.Framework.TestFixtureAttribute;
 using TestMethod = NUnit.Framework.TestAttribute;
 using TestInitialize = NUnit.Framework.SetUpAttribute;
 using TestCleanup = NUnit.Framework.TearDownAttribute;
+using AssertionException = NUnit.Framework.AssertionException;
+#elif VSTEST_PORTABLE
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
+using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
+#else
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException;
 #endif
 
+using System;
 using Telerik.JustMock.Helpers;
-
 
 namespace Telerik.JustMock.Tests
 {
@@ -166,6 +168,21 @@ namespace Telerik.JustMock.Tests
 			Assert.Equals(7, foo.Add(2, 2));
 			//Anything after the last configured InSequence/Returns follows rule of the last arrange
 			Assert.Equals(7, foo.Add(2, 2));
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Sequence"), TestCategory("InOrder")]
+		public void ShouldAssertInOrderOnSameMethod()
+		{
+			var mock = Mock.Create<IFoo>();
+			Mock.Arrange(() => mock.GetIntValue()).InSequence().InOrder();
+			Mock.Arrange(() => mock.GetIntValue()).InSequence().InOrder();
+
+			Assert.Throws<AssertionException>(() => Mock.Assert(mock));
+
+			mock.GetIntValue();
+			mock.GetIntValue();
+
+			Mock.Assert(mock);
 		}
 
 		public interface IFoo2

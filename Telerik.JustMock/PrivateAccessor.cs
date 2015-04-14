@@ -20,7 +20,7 @@ using System.Linq;
 using System.Reflection;
 using Telerik.JustMock.Core;
 
-#if !SILVERLIGHT
+#if !COREFX
 using System.Security;
 using System.Security.Permissions;
 #endif
@@ -79,7 +79,7 @@ namespace Telerik.JustMock
 						.Where(m => m.Name == name && CanCall(m))
 						.ToArray();
 					object state;
-					var method = Type.DefaultBinder.BindToMethod(MockingUtil.AllMembers,
+					var method = MockingUtil.BindToMethod(MockingUtil.AllMembers,
 						candidates, ref args, null, null, null, out state);
 
 					return CallInvoke(method, args);
@@ -243,7 +243,7 @@ namespace Telerik.JustMock
 
 			indexArgs = indexArgs ?? MockingUtil.NoObjects;
 			object state;
-			var foundGetter = Type.DefaultBinder.BindToMethod(MockingUtil.AllMembers, propMethods, ref indexArgs, null, null, null, out state);
+			var foundGetter = MockingUtil.BindToMethod(MockingUtil.AllMembers, propMethods, ref indexArgs, null, null, null, out state);
 			return candidates.First(prop => (getter ? prop.GetGetMethod(true) : prop.GetSetMethod(true)) == foundGetter);
 		}
 
@@ -304,7 +304,7 @@ namespace Telerik.JustMock
 		{
 			get
 			{
-#if SILVERLIGHT
+#if COREFX
 				return false;
 #else
 				try

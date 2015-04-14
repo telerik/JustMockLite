@@ -17,19 +17,21 @@
 
 using System.Collections.Generic;
 
-#if !NUNIT
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException;
-#else
+#if NUNIT
 using NUnit.Framework;
 using TestCategory = NUnit.Framework.CategoryAttribute;
 using TestClass = NUnit.Framework.TestFixtureAttribute;
 using TestMethod = NUnit.Framework.TestAttribute;
 using TestInitialize = NUnit.Framework.SetUpAttribute;
 using TestCleanup = NUnit.Framework.TearDownAttribute;
-using AssertFailedException = NUnit.Framework.AssertionException;
+using AssertionException = NUnit.Framework.AssertionException;
+#elif VSTEST_PORTABLE
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
+using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
+#else
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException;
 #endif
-
 
 namespace Telerik.JustMock.Tests
 {
@@ -169,7 +171,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IFoo>();
 			Mock.Arrange(() => foo.Echo(Arg.AnyInt)).OccursOnce();
-			Assert.Throws<AssertFailedException>(() => Mock.Assert(foo));
+			Assert.Throws<AssertionException>(() => Mock.Assert(foo));
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
@@ -179,8 +181,8 @@ namespace Telerik.JustMock.Tests
 			Mock.Arrange(() => foo.Echo(Arg.AnyInt)).OccursNever();
 			Mock.Assert(foo);
 
-			Assert.Throws<AssertFailedException>(() => foo.Echo(15));
-			Assert.Throws<AssertFailedException>(() => Mock.Assert(foo));
+			Assert.Throws<AssertionException>(() => foo.Echo(15));
+			Assert.Throws<AssertionException>(() => Mock.Assert(foo));
 		}
 
 		public interface IFoo
@@ -211,7 +213,7 @@ namespace Telerik.JustMock.Tests
 			IFoo TheFoo { get; }
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Occurrence"), TestCategory("Bug"), Description("Bug #65677")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Occurrence"), TestCategory("Bug")]
 		public void ShouldNotChangeOccurrenceCountDuringRecursiveArrange()
 		{
 			var mock = Mock.Create<IFooProvider>();
@@ -238,7 +240,7 @@ namespace Telerik.JustMock.Tests
 
 			Mock.Arrange(() => containerResolver.Resolve<MockDirectoryInfo>(new Dictionary<string, object> { { "path", @"pptestRoot\DrivesData\TestFamily" } })).Returns(new MockDirectoryInfo("ss")).OccursOnce();
 
-			var ex = Assert.Throws<AssertFailedException>(() => Mock.Assert(containerResolver));
+			var ex = Assert.Throws<AssertionException>(() => Mock.Assert(containerResolver));
 			Assert.True(ex.Message.Contains("Occurrence expectation failed."));
 		}
 	}

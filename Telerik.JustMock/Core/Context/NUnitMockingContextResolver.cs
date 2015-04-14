@@ -16,28 +16,27 @@
 */
 
 using System;
-using System.Linq;
 
 namespace Telerik.JustMock.Core.Context
 {
 	internal class NUnitMockingContextResolver : HierarchicalTestFrameworkContextResolver
 	{
-		private const string NunitAssemblyName = "nunit.framework";
+		private const string NunitAssertionExceptionName = "NUnit.Framework.AssertionException, nunit.framework";
 
 		public NUnitMockingContextResolver()
-			: base("NUnit.Framework.AssertionException", NunitAssemblyName)
+			: base(NunitAssertionExceptionName)
 		{
 			this.SetupStandardHierarchicalTestStructure(
-				new[] { "NUnit.Framework.TestAttribute", "NUnit.Framework.TestCaseAttribute", "NUnit.Framework.TestCaseSourceAttribute" },
-				new[]{"NUnit.Framework.SetUpAttribute","NUnit.Framework.TearDownAttribute"},
-				new[]{"NUnit.Framework.TestFixtureSetUpAttribute","NUnit.Framework.TestFixtureTearDownAttribute"},
+				new[] { "NUnit.Framework.TestAttribute, nunit.framework", "NUnit.Framework.TestCaseAttribute, nunit.framework", "NUnit.Framework.TestCaseSourceAttribute, nunit.framework" },
+				new[] { "NUnit.Framework.SetUpAttribute, nunit.framework", "NUnit.Framework.TearDownAttribute, nunit.framework" },
+				new[] { "NUnit.Framework.TestFixtureSetUpAttribute, nunit.framework", "NUnit.Framework.TestFixtureTearDownAttribute, nunit.framework" },
 				null,
 				FixtureConstuctorSemantics.InstanceConstructorCalledOncePerFixture);
 		}
 
 		public static bool IsAvailable
 		{
-			get { return IsAssemblyLoaded(NunitAssemblyName); }
+			get { return FindType(NunitAssertionExceptionName, false) != null; }
 		}
 	}
 }

@@ -26,16 +26,14 @@ namespace Telerik.JustMock.Core.Behaviors
 
 		private readonly Delegate implementationOverride;
 		private readonly bool ignoreDelegateReturnValue;
-		private readonly Delegate overrideInvoker;
+		private readonly Func<object[], Delegate, object> overrideInvoker;
 
 		public ImplementationOverrideBehavior(Delegate implementationOverride, bool ignoreDelegateReturnValue)
 		{
 			this.ignoreDelegateReturnValue = ignoreDelegateReturnValue;
 			this.implementationOverride = implementationOverride;
 
-			this.overrideInvoker = implementationOverride.Method.ReturnType != typeof(void)
-				? (Delegate) MockingUtil.MakeFuncCaller(implementationOverride)
-				: MockingUtil.MakeProcCaller(implementationOverride);
+			this.overrideInvoker = MockingUtil.MakeFuncCaller(implementationOverride);
 		}
 
 		public object CallOverride(Invocation invocation)
@@ -58,17 +56,7 @@ namespace Telerik.JustMock.Core.Behaviors
 
 			try
 			{
-				object returnValue = null;
-				if (implementationOverride.Method.ReturnType != typeof(void))
-				{
-					var invoker = (Func<object[], Delegate, object>)this.overrideInvoker;
-					returnValue = ProfilerInterceptor.GuardExternal(() => invoker(args, this.implementationOverride));
-				}
-				else
-				{
-					var invoker = (Action<object[], Delegate>)this.overrideInvoker;
-					ProfilerInterceptor.GuardExternal(() => invoker(args, this.implementationOverride));
-				}
+				var returnValue = ProfilerInterceptor.GuardExternal(() => overrideInvoker(args, this.implementationOverride));
 				return returnValue;
 			}
 			catch (InvalidCastException ex)

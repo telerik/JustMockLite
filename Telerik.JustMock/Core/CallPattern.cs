@@ -53,7 +53,7 @@ namespace Telerik.JustMock.Core
 		{
 			if (checkCompatibility)
 			{
-				if (method == typeof(object).GetConstructor(Type.EmptyTypes))
+				if (method == typeof(object).GetConstructor(MockingUtil.EmptyTypes))
 					DebugView.TraceEvent(Diagnostics.IndentLevel.Warning, () => "System.Object constructor will be intercepted only in 'new' expressions, i.e. 'new object()'.");
 
 				CheckMethodCompatibility(method);
@@ -92,12 +92,14 @@ namespace Telerik.JustMock.Core
 				return;
 			}
 
+#if !PORTABLE
 			var methodImpl = value.GetMethodImplementationFlags();
 			if ((((methodImpl & MethodImplAttributes.InternalCall) != 0
 				   || (methodImpl & MethodImplAttributes.CodeTypeMask) != MethodImplAttributes.IL)
 				  && value.Module.Assembly == typeof(object).Assembly)
 				  && !value.IsInheritable())
 				throw new MockException("Cannot mock a method that is implemented internally by the CLR.");
+#endif
 
 			if (!value.IsInheritable() && !ProfilerInterceptor.TypeSupportsInstrumentation(value.DeclaringType))
 				throw new MockException(String.Format("Cannot mock non-inheritable member '{0}' on type '{1}' due to CLR limitations.", value, value.DeclaringType));

@@ -22,7 +22,6 @@ using System.Reflection;
 using System.Reflection.Emit;
 using Telerik.JustMock.Core;
 using Telerik.JustMock.Core.Behaviors;
-using Telerik.JustMock.Core.Castle.DynamicProxy;
 using Telerik.JustMock.Setup;
 
 namespace Telerik.JustMock
@@ -154,7 +153,6 @@ namespace Telerik.JustMock
 
 			if (!mockConstructorCall.HasValue)
 			{
-#if !SILVERLIGHT
 				switch (behavior)
 				{
 					case Behavior.RecursiveLoose:
@@ -166,9 +164,6 @@ namespace Telerik.JustMock
 						mockConstructorCall = false;
 						break;
 				}
-#else
-				mockConstructorCall = false;
-#endif
 			}
 
 			return new MockCreationSettings

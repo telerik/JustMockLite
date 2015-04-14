@@ -16,9 +16,6 @@
 */
 
 using System;
-#if !SILVERLIGHT
-using System.Runtime.Serialization;
-#endif
 
 namespace Telerik.JustMock.Core
 {
@@ -32,10 +29,11 @@ namespace Telerik.JustMock.Core
 		/// Initializes a new instance of the <see cref="MockAssertionFailedException"/> class.
 		/// </summary>
 		/// <param name="message">Exception message.</param>
-		internal MockAssertionFailedException(string message, Exception innerException) : base(message, innerException) { }
+		/// <param name="innerException">Inner exception.</param>
+		public MockAssertionFailedException(string message, Exception innerException) : base(message, innerException) { }
 
-#if !SILVERLIGHT
-		protected MockAssertionFailedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+#if !COREFX
+		private MockAssertionFailedException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 #endif
 	}
 }

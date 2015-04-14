@@ -32,6 +32,7 @@ namespace Telerik.JustMock.Core.Behaviors
 				))
 			{
 				invocation.CallOriginal = true;
+				invocation.UserProvidedImplementation = true;
 			}
 		}
 	}

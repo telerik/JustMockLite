@@ -23,7 +23,7 @@ namespace Telerik.JustMock.AutoMock
 {
 	/// <summary>
 	/// Contains settings that modify the auto-mocking container behavior. Create an instance of this class, set all relevant properties
-	/// and pass it to <see cref="Telerik.JustMock.AutoMock.MockingContainer.MockingContainer"/>
+	/// and pass it to <see cref="Telerik.JustMock.AutoMock.MockingContainer..ctor"/>
 	/// </summary>
 	public class AutoMockSettings : NinjectSettings
 	{

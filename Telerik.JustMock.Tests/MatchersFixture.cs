@@ -19,16 +19,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-#if !NUNIT
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-#else
+#if NUNIT
 using NUnit.Framework;
 using TestCategory = NUnit.Framework.CategoryAttribute;
 using TestClass = NUnit.Framework.TestFixtureAttribute;
 using TestMethod = NUnit.Framework.TestAttribute;
 using TestInitialize = NUnit.Framework.SetUpAttribute;
 using TestCleanup = NUnit.Framework.TearDownAttribute;
-using AssertFailedException = NUnit.Framework.AssertionException;
+using AssertionException = NUnit.Framework.AssertionException;
+#elif VSTEST_PORTABLE
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
+using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
+#else
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException;
 #endif
 
 namespace Telerik.JustMock.Tests
@@ -269,7 +273,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldNotMatchBoxedStructWithNull()
 		{
 			var mock = Mock.Create<IEchoer>();
-			Mock.Arrange(() => mock.Echo(Arg.IsAny<DateTime>())).Throws<AssertFailedException>("Expected");
+			Mock.Arrange(() => mock.Echo(Arg.IsAny<DateTime>())).Throws<AssertionException>("Expected");
 			mock.Echo(null);
 		}
 
@@ -292,7 +296,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Arrange(() => mock.Echo(Arg.IsInRange(100, 200, RangeKind.Inclusive))).DoNothing().OccursOnce();
 
 			Mock.Assert(() => mock.Echo(Arg.IsInRange(10, 50, RangeKind.Inclusive)));
-			Assert.Throws<AssertFailedException>(() => Mock.Assert(() => mock.Echo(Arg.IsInRange(10, 200, RangeKind.Inclusive))));
+			Assert.Throws<AssertionException>(() => Mock.Assert(() => mock.Echo(Arg.IsInRange(10, 200, RangeKind.Inclusive))));
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
@@ -493,7 +497,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Arrange(() => mock.GetResponse()).When(() => mock.Method == "GET").OccursOnce();
 			Mock.Arrange(() => mock.GetResponse()).When(() => mock.Method == "POST").OccursOnce();
 
-			Assert.Throws<AssertFailedException>(() => Mock.Assert(mock));
+			Assert.Throws<AssertionException>(() => Mock.Assert(mock));
 
 			mock.Method = "GET";
 			mock.GetResponse();

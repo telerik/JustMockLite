@@ -25,12 +25,12 @@ namespace Telerik.JustMock.Core.Context
 {
 	internal class MSpecContextResolver : MockingContextResolverBase
 	{
-		private const string MSpecAssemblyName = "Machine.Specifications";
+		private const string MSpecAssertionFailedName = "Machine.Specifications.SpecificationException, Machine.Specifications";
 
 		private readonly Dictionary<Type, MocksRepository> repositories = new Dictionary<Type, MocksRepository>();
 
 		public MSpecContextResolver()
-			: base("Machine.Specifications.SpecificationException", MSpecAssemblyName)
+			: base(MSpecAssertionFailedName)
 		{
 		}
 
@@ -55,15 +55,15 @@ namespace Telerik.JustMock.Core.Context
 
 			return repo;
 		}
-  
+
 		public override bool RetireRepository()
 		{
 			var stackTrace = new StackTrace();
 			var testMethod = FindExistingTestMethod(stackTrace.EnumerateFrames());
-			
+
 			if (testMethod == null)
 				return false;
-			
+
 			var key = testMethod.DeclaringType;
 			var repo = repositories[key];
 			repositories.Remove(key);
@@ -71,10 +71,10 @@ namespace Telerik.JustMock.Core.Context
 
 			return true;
 		}
-		
+
 		public static bool IsAvailable
 		{
-			get { return IsAssemblyLoaded(MSpecAssemblyName); }
+			get { return FindType(MSpecAssertionFailedName, false) != null; }
 		}
 
 		private MethodBase FindExistingTestMethod(IEnumerable<MethodBase> frames)

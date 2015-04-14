@@ -262,6 +262,7 @@
     <Compile Include="Core\Behaviors\StaticConstructorMockBehavior.cs" />
     <Compile Include="Core\ByRefComparer.cs" />
     <Compile Include="Core\ClrProfilerSetupHelper.cs" />
+    <Compile Include="Core\MockingUtil.CodeGen.cs" />
     <Compile Include="Core\Context\HierarchicalTestFrameworkContextResolver.cs" />
     <Compile Include="Core\Context\IMockingContextResolver.cs" />
     <Compile Include="Core\Context\LocalMockingContextResolver.cs" />
@@ -271,11 +272,14 @@
     <Compile Include="Core\Context\NUnitMockingContextResolver.cs" />
     <Compile Include="Core\Context\MSpecContextResolver.cs" />
     <Compile Include="Core\Context\StackTraceExtensions.cs" />
+    <Compile Include="Core\DynamicProxyMockFactory.cs" />
     <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Serialization\CacheMappingsAttribute.cs" />
+    <Compile Include="Core\IMockFactory.cs" />
     <Compile Include="Core\Lazy.cs" />
     <Compile Include="Core\MatcherTree\MatcherNodeAndParent.cs" />
     <Compile Include="Core\MatcherTree\OutArgAttribute.cs" />
     <Compile Include="Core\MatcherTree\RefArgAttribute.cs" />
+    <Compile Include="Core\ProxyFailureException.cs" />
     <Compile Include="Core\SourceLanguage.cs" />
     <Compile Include="Core\ThreadLocalProperty.cs" />
     <Compile Include="Core\Context\XUnitMockingContextResolver.cs" />

@@ -26,8 +26,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using Telerik.JustMock.Core.Behaviors;
-using Telerik.JustMock.Core.Castle.DynamicProxy;
-using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
 using Telerik.JustMock.Core.Context;
 using Telerik.JustMock.Core.Expressions;
 using Telerik.JustMock.Core.MatcherTree;
@@ -56,6 +54,9 @@ namespace Telerik.JustMock.Core
 		public Dictionary<Type, object> Mixins = new Dictionary<Type, object>();
 	}
 
+	/// <summary>
+	/// An implementation detail. Not intended for external usage.
+	/// </summary>
 	public sealed class MocksRepository
 	{
 		private static readonly List<KeyValuePair<object, IMockMixin>> externalMixinDatabase = new List<KeyValuePair<object, IMockMixin>>();
@@ -71,17 +72,19 @@ namespace Telerik.JustMock.Core
 				typeof(MulticastDelegate),
 				typeof(Array),
 				typeof(String),
-				typeof(AppDomain),
 				typeof(IntPtr),
 				typeof(UIntPtr),
-				typeof(TypedReference),
 				typeof(void),
+#if !PORTABLE
+				typeof(AppDomain),
+				typeof(TypedReference),
+				typeof(RuntimeArgumentHandle),
+				Type.GetType("System.ContextBoundObject"),
+				Type.GetType("System.ArgIterator"),
+#endif
 #if !SILVERLIGHT
 				Type.GetType("System.__ComObject"),
 #endif
-				Type.GetType("System.ContextBoundObject"),
-				Type.GetType("System.ArgIterator"),
-				typeof(RuntimeArgumentHandle),
 #if SILVERLIGHT
 				typeof(WeakReference),
 #endif
@@ -177,7 +180,6 @@ namespace Telerik.JustMock.Core
 			return GetMockMixin(invocation.Instance, invocation.Method.DeclaringType);
 		}
 
-		private static readonly ProxyGenerator generator;
 		private readonly Dictionary<MethodBase, MethodInfoMatcherTreeNode> arrangementTreeRoots = new Dictionary<MethodBase, MethodInfoMatcherTreeNode>();
 		private readonly Dictionary<MethodBase, MethodInfoMatcherTreeNode> invocationTreeRoots = new Dictionary<MethodBase, MethodInfoMatcherTreeNode>();
 		private readonly Dictionary<KeyValuePair<object, object>, object> valueStore = new Dictionary<KeyValuePair<object, object>, object>();
@@ -208,8 +210,11 @@ namespace Telerik.JustMock.Core
 			get
 			{
 				return this.isRetired
-						|| !this.creatingThread.IsAlive
-						|| (this.parentRepository != null && this.parentRepository.IsRetired);
+					|| (this.parentRepository != null && this.parentRepository.IsRetired)
+#if !PORTABLE
+ || !this.creatingThread.IsAlive
+#endif
+;
 			}
 			set
 			{
@@ -221,9 +226,11 @@ namespace Telerik.JustMock.Core
 
 		internal MethodBase Method { get { return this.method; } }
 
+		static readonly IMockFactory mockFactory;
+
 		static MocksRepository()
 		{
-#if !SILVERLIGHT
+#if !COREFX
 			var badApples = new[]
 			{
 				typeof(System.Security.Permissions.SecurityAttribute),
@@ -235,7 +242,11 @@ namespace Telerik.JustMock.Core
 				AttributesToAvoidReplicating.Add(unmockableAttr);
 #endif
 
-			generator = new ProxyGenerator();
+#if !PORTABLE
+			mockFactory = new DynamicProxyMockFactory();
+#else
+			mockFactory = new StaticProxy.StaticProxyMockFactory();
+#endif
 
 			ProfilerInterceptor.Initialize();
 		}
@@ -420,26 +431,6 @@ namespace Telerik.JustMock.Core
 				this.matchersInContext.Add(matcher);
 		}
 
-		private ProxyGenerationOptions CreateProxyGenerationOptions(Type type, MockCreationSettings settings, out MockMixin mockMixinImpl)
-		{
-			mockMixinImpl = CreateMockMixin(type, settings.SupplementaryBehaviors, settings.FallbackBehaviors, settings.MockConstructorCall);
-
-			var options = new ProxyGenerationOptions();
-			options.AddMixinInstance(mockMixinImpl);
-			foreach (var mixin in settings.Mixins)
-				options.AddMixinInstance(mixin);
-
-			if (settings.AdditionalProxyTypeAttributes != null)
-			{
-				foreach (var attr in settings.AdditionalProxyTypeAttributes)
-				{
-					options.AdditionalAttributes.Add(attr);
-				}
-			}
-
-			return options;
-		}
-
 		internal object Create(Type type, MockCreationSettings settings)
 		{
 			object delegateResult;
@@ -461,19 +452,18 @@ namespace Telerik.JustMock.Core
 						(settings.AdditionalMockedInterfaces ?? Enumerable.Empty<Type>())
 						.Concat(
 							type.GetInterfaces()
-							.Where(intf => generator.ProxyBuilder.ModuleScope.Internals.IsAccessible(intf)))
+							.Where(intf => mockFactory.IsAccessible(intf)))
 						.Distinct()
 						.ToArray();
 				}
 
-				MockMixin mockMixinImpl;
-				var options = this.CreateProxyGenerationOptions(type, settings, out mockMixinImpl);
+				var mockMixinImpl = CreateMockMixin(type, settings.SupplementaryBehaviors, settings.FallbackBehaviors, settings.MockConstructorCall);
 
-				bool hasAdditionalProxyTypeAttributes = settings.AdditionalProxyTypeAttributes != null && settings.AdditionalProxyTypeAttributes.Any();
 				var ctors = type.GetConstructors();
 				bool isCoclass = ctors.Any(ctor => ctor.IsExtern());
 
 				bool hasAdditionalInterfaces = settings.AdditionalMockedInterfaces != null && settings.AdditionalMockedInterfaces.Length > 0;
+				bool hasAdditionalProxyTypeAttributes = settings.AdditionalProxyTypeAttributes != null && settings.AdditionalProxyTypeAttributes.Any();
 
 				bool shouldCreateProxy = settings.MustCreateProxy
 					|| hasAdditionalInterfaces
@@ -490,78 +480,13 @@ namespace Telerik.JustMock.Core
 				object instance = null;
 				if (canCreateProxy && shouldCreateProxy)
 				{
-					var interceptor = createTransparentProxy
-						? (IInterceptor)new StandardInterceptor()
-						: new DynamicProxyInterceptor(this);
-#if SILVERLIGHT
-					options.Hook = new ProxyGenerationHook(false, settings.InterceptorFilter);
-#else
-					options.Hook = new ProxyGenerationHook(settings.MockConstructorCall, settings.InterceptorFilter);
-#endif
-
-					if (type.IsInterface)
+					try
 					{
-						if (settings.Args != null && settings.Args.Length > 0)
-							throw new ArgumentException("Do not supply contructor arguments when mocking an interface or delegate.");
-						try
-						{
-							instance = generator.CreateInterfaceProxyWithoutTarget(type, settings.AdditionalMockedInterfaces, options, interceptor);
-						}
-						catch (TypeLoadException ex)
-						{
-							proxyFailure = ex;
-						}
-						catch (GeneratorException ex)
-						{
-							proxyFailure = ex;
-						}
+						instance = mockFactory.Create(type, this, mockMixinImpl, settings, createTransparentProxy);
 					}
-					else
+					catch (ProxyFailureException ex)
 					{
-						try
-						{
-#if SILVERLIGHT
-							if (settings.Args == null || settings.Args.Length == 0)
-							{
-								ConstructorInfo[] constructors = type.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-
-								if (!constructors.Any(constr => constr.GetParameters().Length == 0))
-								{
-									var constructorToCall = constructors.FirstOrDefault();
-									if (constructorToCall != null)
-									{
-										var @params = constructorToCall.GetParameters();
-										settings.Args = new object[@params.Length];
-
-										for (int i = 0; i < @params.Length; ++i)
-										{
-											var p = @params[i];
-											settings.Args[i] = Convert.IsDBNull(p.DefaultValue)
-												? p.ParameterType.GetDefaultValue()
-												: p.DefaultValue;
-										}
-									}
-								}
-							}
-#endif
-
-
-							instance = generator.CreateClassProxy(type, settings.AdditionalMockedInterfaces, options, settings.Args, interceptor);
-						}
-						catch (TypeLoadException ex)
-						{
-							proxyFailure = ex;
-						}
-						catch (GeneratorException ex)
-						{
-							proxyFailure = ex;
-						}
-						catch (InvalidProxyConstructorArgumentsException ex)
-						{
-							proxyFailure = ex;
-							if (!settings.MockConstructorCall)
-								throw new MockException(ex.Message);
-						}
+						proxyFailure = ex.InnerException;
 					}
 				}
 				var mockMixin = instance as IMockMixin;
@@ -619,7 +544,7 @@ namespace Telerik.JustMock.Core
 					{
 						mockMixin = mockMixinImpl;
 					}
-					instance = MockingProxy.CreateProxy(instance, new DynamicProxyInterceptor(this), mockMixin);
+					instance = MockingProxy.CreateProxy(instance, this, mockMixin);
 				}
 
 				mockMixin.IsInstanceConstructorMocked = settings.MockConstructorCall;
@@ -644,13 +569,7 @@ namespace Telerik.JustMock.Core
 				throw new MockException(String.Format("Failed to create instance of type '{0}'", mockObjectType));
 
 			var mockMixin = CreateMockMixin(mockObjectType, supplementaryBehaviors, fallbackBehaviors, false);
-
-			var options = new ProxyGenerationOptions();
-			options.AddMixinInstance(mockMixin);
-			foreach (var mixin in mixins)
-				options.AddMixinInstance(mixin);
-
-			var compoundMockMixin = (IMockMixin)generator.CreateClassProxy(typeof(ExternalMockMixin), options);
+			var compoundMockMixin = mockFactory.CreateExternalMockMixin(mockMixin, mixins);
 			lock (externalMixinDatabase)
 			{
 				if (mockObjectType.IsValueType())
@@ -668,6 +587,12 @@ namespace Telerik.JustMock.Core
 			}
 
 			return compoundMockMixin;
+		}
+
+		internal ProxyTypeInfo CreateClassProxyType(Type classToProxy, MockCreationSettings settings)
+		{
+			var mockMixinImpl = CreateMockMixin(classToProxy, settings.SupplementaryBehaviors, settings.FallbackBehaviors, settings.MockConstructorCall);
+			return mockFactory.CreateClassProxyType(classToProxy, this, settings, mockMixinImpl);
 		}
 
 		private void CheckIfCanMock(Type type, bool checkSafety)
@@ -1030,7 +955,7 @@ namespace Telerik.JustMock.Core
 					{
 						var reimplementedInterfaceMethod = (MethodInfo)method.GetInheritanceChain().Last();
 						if (reimplementedInterfaceMethod.DeclaringType.IsInterface
-							&& generator.ProxyBuilder.ModuleScope.Internals.IsAccessible(reimplementedInterfaceMethod.DeclaringType))
+							&& mockFactory.IsAccessible(reimplementedInterfaceMethod.DeclaringType))
 						{
 							concreteMethod = reimplementedInterfaceMethod;
 						}
@@ -1515,6 +1440,8 @@ namespace Telerik.JustMock.Core
 				return;
 
 			var instance = valueMatcher.Value;
+			if (instance == null)
+				return;
 			if (MockingProxy.CanIntercept(instance, method))
 				return;
 
@@ -1665,26 +1592,7 @@ namespace Telerik.JustMock.Core
 			if (!typeof(Delegate).IsAssignableFrom(type) || type == typeof(Delegate) || type == typeof(MulticastDelegate))
 				return false;
 
-			var moduleScope = generator.ProxyBuilder.ModuleScope;
-			var moduleBuilder = moduleScope.ObtainDynamicModuleWithStrongName();
-
-			var targetIntfName =
-				"Castle.Proxies.Delegates." +
-				type.ToString()
-				.Replace('.', '_')
-				.Replace(',', '`')
-				.Replace("+", "__")
-				.Replace("[", "``")
-				.Replace("]", "``");
-
-			var typeName = moduleScope.NamingScope.GetUniqueName(targetIntfName);
-			var typeBuilder = moduleBuilder.DefineType(typeName, TypeAttributes.Public | TypeAttributes.Abstract | TypeAttributes.Interface);
-
-			var delegateInvoke = type.GetMethod("Invoke");
-			typeBuilder.DefineMethod("Invoke", MethodAttributes.Public | MethodAttributes.Abstract | MethodAttributes.Virtual,
-				delegateInvoke.ReturnType, delegateInvoke.GetParameters().Select(p => p.ParameterType).ToArray());
-
-			var backendType = typeBuilder.CreateType();
+			var backendType = mockFactory.CreateDelegateBackend(type);
 			var backend = Create(backendType, settings);
 
 			delegateResult = Delegate.CreateDelegate(type, backend, backendType.GetMethod("Invoke"));
@@ -1772,102 +1680,11 @@ namespace Telerik.JustMock.Core
 			return sb.ToString();
 		}
 
-		internal ProxyTypeInfo CreateClassProxyType(Type classToProxy, MockCreationSettings settings)
-		{
-			MockMixin mockMixinImpl;
-			var pgo = CreateProxyGenerationOptions(classToProxy, settings, out mockMixinImpl);
-			var typeInfo = new ProxyTypeInfo
-			{
-				ProxyType = generator.ProxyBuilder.CreateClassProxyType(classToProxy, Type.EmptyTypes, pgo)
-			};
-			typeInfo.Mixins.Add(typeof(IInterceptor), new DynamicProxyInterceptor(this));
-			foreach (var mixin in pgo.MixinData.MixinInterfaces)
-			{
-				typeInfo.Mixins.Add(mixin, pgo.MixinData.GetMixinInstance(mixin));
-			}
-			return typeInfo;
-		}
-
-		private class ProxyGenerationHook : IProxyGenerationHook, IConstructorGenerationHook
-		{
-			private readonly bool myMockConstructors;
-			private readonly Expression<Predicate<MethodInfo>> myInterceptorFilter;
-			private readonly Predicate<MethodInfo> myInterceptorFilterImpl;
-
-			public ProxyGenerationHook(bool mockConstructors, Expression<Predicate<MethodInfo>> interceptorFilter)
-			{
-				myMockConstructors = mockConstructors;
-				if (interceptorFilter != null)
-				{
-					myInterceptorFilter = interceptorFilter;
-					myInterceptorFilterImpl = myInterceptorFilter.Compile();
-				}
-			}
-
-			public void MethodsInspected()
-			{
-			}
-
-			public void NonProxyableMemberNotification(Type type, MemberInfo memberInfo)
-			{
-			}
-
-			public bool ShouldInterceptMethod(Type type, MethodInfo methodInfo)
-			{
-				if (Attribute.IsDefined(methodInfo.DeclaringType, typeof(MixinAttribute)))
-					return false;
-
-				bool profilerCannotIntercept = methodInfo.IsAbstract || methodInfo.IsExtern() || !ProfilerInterceptor.TypeSupportsInstrumentation(methodInfo.DeclaringType);
-
-				if (ProfilerInterceptor.IsProfilerAttached && !profilerCannotIntercept)
-					return false;
-
-				return myInterceptorFilterImpl != null ? myInterceptorFilterImpl(methodInfo) : true;
-			}
-
-			public ProxyConstructorImplementation GetConstructorImplementation(ConstructorInfo constructorInfo, ConstructorImplementationAnalysis analysis)
-			{
-				return myMockConstructors ? ProxyConstructorImplementation.DoNotCallBase
-					: analysis.IsBaseVisible ? ProxyConstructorImplementation.CallBase
-					: ProxyConstructorImplementation.SkipConstructor;
-			}
-
-			public ProxyConstructorImplementation DefaultConstructorImplementation
-			{
-				get
-				{
-#if SILVERLIGHT
-					return ProxyConstructorImplementation.SkipConstructor;
-#else
-					return myMockConstructors ? ProxyConstructorImplementation.DoNotCallBase : ProxyConstructorImplementation.SkipConstructor;
-#endif
-				}
-			}
-
-			#region Equality members
-
-			public override bool Equals(object obj)
-			{
-				if (ReferenceEquals(null, obj)) return false;
-				if (ReferenceEquals(this, obj)) return true;
-				if (obj.GetType() != this.GetType()) return false;
-
-				var other = (ProxyGenerationHook)obj;
-				return this.myMockConstructors == other.myMockConstructors
-					&& ((this.myInterceptorFilter == null && other.myInterceptorFilter == null)
-						|| ExpressionComparer.AreEqual(this.myInterceptorFilter, other.myInterceptorFilter));
-			}
-
-			public override int GetHashCode()
-			{
-				return this.myMockConstructors.GetHashCode();
-			}
-
-			#endregion
-		}
-
-		// use this class for creating baseless proxies instead of typeof(object)
-		// so that you don't accidentally enable the interception of Object which kills performance
+		/// <summary>
+		/// An implementation detail. Not intended for external usage.
+		/// Use this class for creating baseless proxies instead of typeof(object)
+		/// so that you don't accidentally enable the interception of Object which kills performance
+		/// </summary>
 		public abstract class ExternalMockMixin
 		{ }
 	}

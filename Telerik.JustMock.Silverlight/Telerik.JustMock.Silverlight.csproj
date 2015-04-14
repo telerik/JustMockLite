@@ -57,7 +57,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\..\Binaries\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;SILVERLIGHT;NO_ASSEMBLY_SCANNING;NO_EXCEPTION_SERIALIZATION;NO_SKIP_VISIBILITY</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;COREFX;SILVERLIGHT;NO_ASSEMBLY_SCANNING;NO_EXCEPTION_SERIALIZATION;NO_SKIP_VISIBILITY</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
@@ -70,7 +70,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\..\Binaries\Release\</OutputPath>
-    <DefineConstants>TRACE;SILVERLIGHT;NO_ASSEMBLY_SCANNING;NO_EXCEPTION_SERIALIZATION;NO_SKIP_VISIBILITY</DefineConstants>
+    <DefineConstants>TRACE;COREFX;SILVERLIGHT;NO_ASSEMBLY_SCANNING;NO_EXCEPTION_SERIALIZATION;NO_SKIP_VISIBILITY</DefineConstants>
     <NoStdLib>true</NoStdLib>
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
@@ -80,7 +80,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseFree|AnyCPU'">
     <OutputPath>..\..\..\Binaries\ReleaseFree\</OutputPath>
-    <DefineConstants>TRACE;SILVERLIGHT;LITE_EDITION;NO_ASSEMBLY_SCANNING;NO_EXCEPTION_SERIALIZATION;NO_SKIP_VISIBILITY</DefineConstants>
+    <DefineConstants>TRACE;COREFX;SILVERLIGHT;LITE_EDITION;NO_ASSEMBLY_SCANNING;NO_EXCEPTION_SERIALIZATION;NO_SKIP_VISIBILITY</DefineConstants>
     <Optimize>true</Optimize>
     <NoStdLib>true</NoStdLib>
     <DebugType>pdbonly</DebugType>
@@ -99,7 +99,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugFree|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\..\..\Binaries\DebugFree\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;SILVERLIGHT;LITE_EDITION;NO_ASSEMBLY_SCANNING;NO_EXCEPTION_SERIALIZATION;NO_SKIP_VISIBILITY</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;COREFX;SILVERLIGHT;LITE_EDITION;NO_ASSEMBLY_SCANNING;NO_EXCEPTION_SERIALIZATION;NO_SKIP_VISIBILITY</DefineConstants>
     <DocumentationFile>
     </DocumentationFile>
     <NoStdLib>true</NoStdLib>
@@ -748,6 +748,9 @@
     </Compile>
     <Compile Include="..\Telerik.JustMock\Core\DynamicProxyInterceptor.cs">
       <Link>Core\DynamicProxyInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\DynamicProxyMockFactory.cs">
+      <Link>Core\DynamicProxyMockFactory.cs</Link>
     </Compile>
     <Compile Include="..\Telerik.JustMock\Core\DynamicProxy\Castle.Core\Extensions\SilverlightExtensions.cs">
       <Link>Core\DynamicProxy\Castle.Core\Extensions\SilverlightExtensions.cs</Link>
@@ -1400,6 +1403,9 @@
     <Compile Include="..\Telerik.JustMock\Core\IMethodMock.cs">
       <Link>Core\IMethodMock.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\IMockFactory.cs">
+      <Link>Core\IMockFactory.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Core\Invocation.cs">
       <Link>Core\Invocation.cs</Link>
     </Compile>
@@ -1472,6 +1478,9 @@
     <Compile Include="..\Telerik.JustMock\Core\MockException.cs">
       <Link>Core\MockException.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MockingUtil.CodeGen.cs">
+      <Link>Core\MockingUtil.CodeGen.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Core\MockingUtil.cs">
       <Link>Core\MockingUtil.cs</Link>
     </Compile>
@@ -1483,6 +1492,9 @@
     </Compile>
     <Compile Include="..\Telerik.JustMock\Core\ProfilerInterceptor.cs">
       <Link>Core\ProfilerInterceptor.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\ProxyFailureException.cs">
+      <Link>Core\ProxyFailureException.cs</Link>
     </Compile>
     <Compile Include="..\Telerik.JustMock\Core\Recording\DelegatingRecorder.cs">
       <Link>Core\Recording\DelegatingRecorder.cs</Link>
@@ -1692,7 +1704,7 @@
       <FlavorProperties GUID="{A1591282-1198-4647-A2B1-27E5FF5F6F3B}">
         <SilverlightProjectProperties />
       </FlavorProperties>
-      <UserProperties ProjectLinkReference="0749ebc2-4e83-4960-bf28-1ff5c2deb2b9" ProjectLinkerExcludeFilter="\\?desktop(\\.*)?$;\\?silverlight(\\.*)?$;\.desktop;\.silverlight;\.xaml;^service references(\\.*)?$;\.clientconfig;^web references(\\.*)?$" />
+      <UserProperties ProjectLinkerExcludeFilter="\\?desktop(\\.*)?$;\\?silverlight(\\.*)?$;\.desktop;\.silverlight;\.xaml;^service references(\\.*)?$;\.clientconfig;^web references(\\.*)?$" ProjectLinkReference="0749ebc2-4e83-4960-bf28-1ff5c2deb2b9" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

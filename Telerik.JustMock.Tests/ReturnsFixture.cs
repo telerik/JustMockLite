@@ -15,16 +15,20 @@
    limitations under the License.
 */
 
-#if !NUNIT
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-#else
+#if NUNIT
 using NUnit.Framework;
 using TestCategory = NUnit.Framework.CategoryAttribute;
 using TestClass = NUnit.Framework.TestFixtureAttribute;
 using TestMethod = NUnit.Framework.TestAttribute;
 using TestInitialize = NUnit.Framework.SetUpAttribute;
 using TestCleanup = NUnit.Framework.TearDownAttribute;
-using AssertFailedException = NUnit.Framework.AssertionException;
+using AssertionException = NUnit.Framework.AssertionException;
+#elif VSTEST_PORTABLE
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
+using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
+#else
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException;
 #endif
 
 using System;
@@ -131,7 +135,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var iFoo = Mock.Create<IFoo>();
 			Mock.Arrange(() => iFoo.Echo(Arg.AnyInt)).Returns(s => s);
-			Assert.Throws<MockException>(() => iFoo.Echo(10));
+			Assert.Throws<Exception>(() => iFoo.Echo(10));
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Returns")]
@@ -250,7 +254,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(1, mock.Value);
 			Assert.Equal(2, mock.Value);
 			Assert.Equal(3, mock.Value);
-			Assert.Throws<AssertFailedException>(() => { var x = mock.Value; });
+			Assert.Throws<AssertionException>(() => { var x = mock.Value; });
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Returns")]
@@ -358,5 +362,12 @@ namespace Telerik.JustMock.Tests
 				throw new Exception();
 			}
 		}
+
+#if PORTABLE
+		public interface ICloneable
+		{
+			object Clone();
+		}
+#endif
 	}
 }

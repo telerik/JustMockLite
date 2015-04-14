@@ -14,7 +14,7 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Internal
 {
-#if SILVERLIGHT
+#if COREFX
 	internal class MonitorLock : Lock
 	{
 		private readonly object locker = new object();

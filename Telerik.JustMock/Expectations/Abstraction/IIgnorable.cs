@@ -20,6 +20,10 @@ using System.Linq;
 
 namespace Telerik.JustMock.Expectations.Abstraction
 {
+	/// <summary>
+	/// Arrangement filtering interface.
+	/// </summary>
+	/// <typeparam name="TContainer"></typeparam>
 	public interface IIgnorable<TContainer> : IWhen<TContainer>
 	{
 		/// <summary>

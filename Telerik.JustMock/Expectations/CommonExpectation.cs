@@ -83,6 +83,11 @@ namespace Telerik.JustMock.Expectations
 
 		#region Implementation from ICommon<TContainer>
 
+		/// <summary>
+		/// Implementation detail.
+		/// </summary>
+		/// <param name="delg"></param>
+		/// <param name="ignoreDelegateReturnValue"></param>
 		protected void ProcessDoInstead(Delegate delg, bool ignoreDelegateReturnValue)
 		{
 			if (delg == null)
@@ -133,7 +138,7 @@ namespace Telerik.JustMock.Expectations
 			var evt = Repository.ParseAddHandlerAction(eventExpression, out instance);
 			this.behaviors.Add(new RaiseEventBehavior(instance, evt, eventArgumentsFactoryFactory(instance)));
 		}
-  
+
 		///<summary>
 		/// Raises the expected with sepecic arguments
 		///</summary>
@@ -141,16 +146,20 @@ namespace Telerik.JustMock.Expectations
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 				{
+#if !PORTABLE
 					IWaitDuration wait = args.OfType<IWaitDuration>().FirstOrDefault();
 					if (wait != null)
 					{
 						args = args.Where(obj => obj != wait).ToArray();
 					}
+#endif
 
 					this.ProcessRaises(eventExpression, instance => new Func<object[]>(() =>
 						{
+#if !PORTABLE
 							if (wait != null)
 								Thread.Sleep(wait.Miliseconds);
+#endif
 							return args;
 						}));
 					return (TContainer)(object)this;
@@ -312,7 +321,7 @@ namespace Telerik.JustMock.Expectations
 		#region Implementation of IAssertable
 
 		/// <summary>
-		/// Specifies that the mock call should be invoked to pass <see cref="Mock.Assert{T}(T)"/>
+		/// Specifies that the arranged member must be called. Asserting the mock will throw if the expectation is not fulfilled.
 		/// </summary>
 		public void MustBeCalled()
 		{
@@ -364,7 +373,7 @@ namespace Telerik.JustMock.Expectations
 		public void OccursNever()
 		{
 			ProfilerInterceptor.GuardInternal(() => occurences.SetBounds(0, 0));
-		} 
+		}
 
 		#endregion
 
@@ -409,6 +418,19 @@ namespace Telerik.JustMock.Expectations
 				});
 		}
 
+		/// <summary>
+		/// Specifies that the arrangement will be respected regardless of the thread
+		/// on which the call to the arranged member happens.
+		/// </summary>
+		/// <remarks>
+		/// This is only needed for arrangements of static members. Arrangements on
+		/// instance members are always respected, regardless of the current thread.
+		/// 
+		/// Cross-thread arrangements are active as long as the current context
+		/// (test method) is on the call stack. Be careful when arranging
+		/// static members cross-thread because the effects of the arrangement may
+		/// affect and even crash the testing framework.
+		/// </remarks>
 		public IAssertable OnAllThreads()
 		{
 			return ProfilerInterceptor.GuardInternal(() =>

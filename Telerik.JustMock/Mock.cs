@@ -31,8 +31,8 @@ namespace Telerik.JustMock
 	{
 		static Mock()
 		{
-#if SILVERLIGHT
-			if (-1 == typeof(object).Assembly.FullName.IndexOf("PublicKeyToken=7cec85d7bea7798e", StringComparison.InvariantCultureIgnoreCase))
+#if SILVERLIGHT && !PORTABLE
+			if (-1 == typeof(object).Assembly.FullName.IndexOf("PublicKeyToken=7cec85d7bea7798e", StringComparison.OrdinalIgnoreCase))
 			{
 				throw new InvalidOperationException("Telerik.JustMock.Silverlight should only be used inside the Silverlight runtime. For all other runtimes reference Telerik.JustMock instead.");
 			}
@@ -66,7 +66,7 @@ namespace Telerik.JustMock
 		}
 
 		#region Raise Event methods
-		
+
 		/// <summary>
 		/// Raises the specified event. If the event is not mocked and is declared on a C# or VB class
 		/// and has the default implementation for add/remove, then that event can also be raised using this 
@@ -113,7 +113,6 @@ namespace Telerik.JustMock
 		/// implicitly by calls to <see cref="Create"/> or <see cref="Arrange"/>. This method is rarely needed in cases
 		/// where you're trying to arrange setters or raise events on a partial mock.
 		/// </summary>
-		/// <typeparam name="TTypeToIntercept">The type to intercept</typeparam>
 		/// <param name="typeToIntercept">The type to intercept</param>
 		public static void Intercept(Type typeToIntercept)
 		{

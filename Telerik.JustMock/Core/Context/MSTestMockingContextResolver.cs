@@ -29,20 +29,22 @@ namespace Telerik.JustMock.Core.Context
 		private const string MstestAssemblyName = "Microsoft.VisualStudio.QualityTools.UnitTestFramework";
 #endif
 
+		private const string MstestAssertionFailedName = "Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException, " + MstestAssemblyName;
+
 		public MSTestMockingContextResolver()
-			: base("Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException", MstestAssemblyName)
+			: base(MstestAssertionFailedName)
 		{
 			this.SetupStandardHierarchicalTestStructure(
-				new[]{"Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute"},
-				new[]{"Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute","Microsoft.VisualStudio.TestTools.UnitTesting.TestCleanupAttribute"},
-				new[]{"Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute","Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute"},
-				new[]{"Microsoft.VisualStudio.TestTools.UnitTesting.AssemblyInitializeAttribute","Microsoft.VisualStudio.TestTools.UnitTesting.AssemblyCleanupAttribute"},
+				new[] { "Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute, " + MstestAssemblyName },
+				new[] { "Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute, " + MstestAssemblyName, "Microsoft.VisualStudio.TestTools.UnitTesting.TestCleanupAttribute, " + MstestAssemblyName },
+				new[] { "Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute, " + MstestAssemblyName, "Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute, " + MstestAssemblyName },
+				new[] { "Microsoft.VisualStudio.TestTools.UnitTesting.AssemblyInitializeAttribute, " + MstestAssemblyName, "Microsoft.VisualStudio.TestTools.UnitTesting.AssemblyCleanupAttribute, " + MstestAssemblyName },
 				FixtureConstuctorSemantics.InstanceConstructorCalledOncePerFixture);
 		}
 
 		public static bool IsAvailable
 		{
-			get { return IsAssemblyLoaded(MstestAssemblyName); }
+			get { return FindType(MstestAssertionFailedName, false) != null; }
 		}
 
 #if !SILVERLIGHT

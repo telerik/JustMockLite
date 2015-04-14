@@ -57,7 +57,7 @@ namespace Telerik.JustMock.Core
 				Expression<Func<bool>> returnDelg = () => true;
 				if (expr.NodeType == ExpressionType.Not)
 				{
-					expr = ((UnaryExpression) expr).Operand;
+					expr = ((UnaryExpression)expr).Operand;
 					returnDelg = () => false;
 				}
 				arranger.ArrangeReturn<bool>((Expression<Func<bool>>)Expression.Lambda(expr), returnDelg);
@@ -112,13 +112,12 @@ namespace Telerik.JustMock.Core
 								parameters = actionParameters;
 							}
 						}
+						if (action.Type != arrangement.Type)
+							action = Expression.Convert(action, arrangement.Type);
 
-						var callPattern = Expression.Lambda(arrangement);
-						Expression<Action<IReturnArranger>> arrangeReturnTempl = a => a.ArrangeReturn<int>(null, null);
-						var arrangeMethodTempl = ((MethodCallExpression)arrangeReturnTempl.Body).Method.GetGenericMethodDefinition();
-						var arrangeMethod = arrangeMethodTempl.MakeGenericMethod(arrangement.Type);
-						var returnLambda = Expression.Lambda(Expression.Convert(action, arrangement.Type), parameters);
-						arrangeMethod.Invoke(arranger, new object[] { callPattern, returnLambda });
+						var callPattern = (Expression<Func<object>>)Expression.Lambda(Expression.Convert(arrangement, typeof(object)));
+						var returnLambda = Expression.Lambda(Expression.Convert(action, typeof(object)), parameters);
+						arranger.ArrangeReturn(callPattern, returnLambda);
 					}
 					break;
 

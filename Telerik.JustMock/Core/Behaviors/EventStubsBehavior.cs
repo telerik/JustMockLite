@@ -22,9 +22,15 @@ using System.Reflection;
 
 namespace Telerik.JustMock.Core.Behaviors
 {
+	/// <summary>
+	/// An implementation detail interface. Not intended for external usage.
+	/// </summary>
 	[Mixin]
 	public interface IEventsMixin
 	{
+		/// <summary>
+		/// An implementation detail. Not intended for external usage.
+		/// </summary>
 		void RaiseEvent(EventInfo evt, object[] delegateArguments);
 	}
 
@@ -78,7 +84,7 @@ namespace Telerik.JustMock.Core.Behaviors
 				try
 				{
 					object state;
-					Type.DefaultBinder.BindToMethod(BindingFlags.Default, new[] { existing.Method }, ref delegateArguments, null, null, null, out state);
+					MockingUtil.BindToMethod(MockingUtil.Default, new[] { existing.Method }, ref delegateArguments, null, null, null, out state);
 				}
 				catch (MissingMethodException ex)
 				{
@@ -87,7 +93,7 @@ namespace Telerik.JustMock.Core.Behaviors
 						), ex);
 				}
 
-				var invoker = MockingUtil.MakeProcCaller(existing);
+				var invoker = MockingUtil.MakeFuncCaller(existing);
 				ProfilerInterceptor.GuardExternal(() => invoker(delegateArguments, existing));
 			}
 		}

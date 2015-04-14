@@ -20,7 +20,13 @@ using Microsoft.Win32;
 
 namespace Telerik.JustMock.Core
 {
+	/// <summary>
+	/// Implementation detail.
+	/// </summary>
 	public delegate bool GetValueImplDelegate(bool currentUser, string keyName, string valueName, StringBuilder outValue, int outValueByteCount);
+	/// <summary>
+	/// Implementation detail.
+	/// </summary>
 	public delegate bool SetValueImplDelegate(bool currentUser, string keyName, string valueName, string value);
 
 	internal static class SecuredRegistryMethods

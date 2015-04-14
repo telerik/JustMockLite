@@ -16,28 +16,27 @@
 */
 
 using System;
-using System.Linq;
 
 namespace Telerik.JustMock.Core.Context
 {
 	internal class MbUnitContextResolver : HierarchicalTestFrameworkContextResolver
 	{
-		private const string MbUnitAssemblyName = "mbunit";
+		private const string MbUnitAssertionFailedName = "Gallio.Framework.Assertions.AssertionException, gallio";
 
 		public MbUnitContextResolver()
-			: base("gallio!Gallio.Framework.Assertions.AssertionException", MbUnitAssemblyName, "gallio")
+			: base(MbUnitAssertionFailedName)
 		{
 			SetupStandardHierarchicalTestStructure(
-				new[]{"gallio!Gallio.Framework.Pattern.TestMethodPatternAttribute"},
-				new[]{"mbunit!MbUnit.Framework.SetUpAttribute", "mbunit!MbUnit.Framework.TearDownAttribute"},
-				new[]{"mbunit!MbUnit.Framework.FixtureSetUpAttribute", "mbunit!MbUnit.Framework.FixtureTearDownAttribute"},
+				new[] { "Gallio.Framework.Pattern.TestMethodPatternAttribute, gallio" },
+				new[] { "MbUnit.Framework.SetUpAttribute, mbunit", "MbUnit.Framework.TearDownAttribute, mbunit" },
+				new[] { "MbUnit.Framework.FixtureSetUpAttribute, mbunit", "MbUnit.Framework.FixtureTearDownAttribute, mbunit" },
 				null,
 				FixtureConstuctorSemantics.InstanceConstructorCalledOncePerFixture);
 		}
 
 		public static bool IsAvailable
 		{
-			get { return IsAssemblyLoaded(MbUnitAssemblyName); }
+			get { return FindType(MbUnitAssertionFailedName, false) != null; }
 		}
 	}
 }
