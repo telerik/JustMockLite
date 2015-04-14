@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2014 Telerik AD
+ Copyright © 2010-2015 Telerik AD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ namespace Telerik.JustMock.Core
 	{
 		private const string ProfilerNeededMessage =
 #if LITE_EDITION
-			" JustMock Lite can only mock interface members, virtual/abstract members in non-sealed classes, delegates and all members on classes derived from MarshalByRefObject on instances created with Mock.Create or Mock.CreateLike. For any other scenario you need to use the full version of JustMock.";
+ " JustMock Lite can only mock interface members, virtual/abstract members in non-sealed classes, delegates and all members on classes derived from MarshalByRefObject on instances created with Mock.Create or Mock.CreateLike. For any other scenario you need to use the full version of JustMock.";
 #else
 			" The profiler must be enabled to mock, arrange or execute the specified target.";
 #endif
