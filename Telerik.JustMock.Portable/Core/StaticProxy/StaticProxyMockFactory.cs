@@ -25,8 +25,6 @@ namespace Telerik.JustMock.Core.StaticProxy
 {
 	internal class StaticProxyMockFactory : IMockFactory
 	{
-
-
 		public bool IsAccessible(Type type)
 		{
 			return type.IsPublic;
@@ -122,7 +120,13 @@ namespace Telerik.JustMock.Core.StaticProxy
 			var message = String.Format("No proxy type found for type '{0}'. Add [assembly: MockedType(typeof({0}))] to your test assembly to explicitly emit a proxy.", typeName);
 
 			if (ProxySourceRegistry.IsTrialWeaver)
-				message += " The trial version of JustMock for Devices lets you create mocks only for at most 5 types per test assembly.";
+				message += "\n\nThe trial version of JustMock for Devices lets you create mocks only for at most 5 types per test assembly.";
+
+			if (ProxySourceRegistry.ProxyTypes.Count == 0 && ProxySourceRegistry.DelegateBackendTypes.Count == 0)
+			{
+				message = "No proxies available. Telerik.JustMock.Portable cannot be used on its own, but only as part of the \"JustMock for Devices\" package which contains the proxy generator.\n\n"
+					+ message;
+			}
 
 			throw new MockException(message);
 		}
