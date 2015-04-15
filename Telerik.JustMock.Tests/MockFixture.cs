@@ -2148,7 +2148,7 @@ namespace Telerik.JustMock.Tests
 			bool IsAllowed(ShortFlags flags);
 		}
 
-#if !DOTNET35 && !SILVERLIGHT
+#if !DOTNET35 && !SILVERLIGHT && !WINDOWS_PHONE
 		[TestMethod, TestCategory("Lite"), TestCategory("Regression")]
 		public void ShouldInterceptDynamicProxyMethodsFromMultipleThreads()
 		{
@@ -2189,7 +2189,7 @@ namespace Telerik.JustMock.Tests
 		}
 #endif
 
-		public class ClassWithCtor
+        public class ClassWithCtor
 		{
 			public ClassWithCtor(string s)
 			{
@@ -2244,7 +2244,7 @@ namespace Telerik.JustMock.Tests
 		}
 #endif
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !WINDOWS_PHONE
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldMockWeakReference()
 		{

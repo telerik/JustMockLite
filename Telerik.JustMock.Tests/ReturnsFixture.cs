@@ -205,7 +205,7 @@ namespace Telerik.JustMock.Tests
 		}
 #endif
 
-#if SILVERLIGHT
+#if SILVERLIGHT || PORTABLE
 		
 		public interface ICloneable
 		{
@@ -362,12 +362,5 @@ namespace Telerik.JustMock.Tests
 				throw new Exception();
 			}
 		}
-
-#if PORTABLE
-		public interface ICloneable
-		{
-			object Clone();
-		}
-#endif
 	}
 }

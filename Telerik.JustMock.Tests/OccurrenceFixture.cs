@@ -202,7 +202,7 @@ namespace Telerik.JustMock.Tests
 
 		public class GenericBaseClass<T>
 		{
-			public void GenericBaseMethod<T, V>() { }
+			public void GenericBaseMethod<U, V>() { }
 		}
 
 		public class GenericDerivedClass<T> : GenericBaseClass<T>
