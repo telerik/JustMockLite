@@ -68,7 +68,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		}
 
 		public Type CreateClassProxyTypeWithTarget(Type classToProxy, Type[] additionalInterfacesToProxy,
-		                                           ProxyGenerationOptions options)
+												   ProxyGenerationOptions options)
 		{
 			AssertValidType(classToProxy);
 			AssertValidTypes(additionalInterfacesToProxy);
@@ -78,8 +78,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		}
 
 		public Type CreateInterfaceProxyTypeWithTarget(Type interfaceToProxy, Type[] additionalInterfacesToProxy,
-		                                               Type targetType,
-		                                               ProxyGenerationOptions options)
+													   Type targetType,
+													   ProxyGenerationOptions options)
 		{
 			AssertValidType(interfaceToProxy);
 			AssertValidTypes(additionalInterfacesToProxy);
@@ -89,7 +89,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		}
 
 		public Type CreateInterfaceProxyTypeWithTargetInterface(Type interfaceToProxy, Type[] additionalInterfacesToProxy,
-		                                                        ProxyGenerationOptions options)
+																ProxyGenerationOptions options)
 		{
 			AssertValidType(interfaceToProxy);
 			AssertValidTypes(additionalInterfacesToProxy);
@@ -99,7 +99,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		}
 
 		public Type CreateInterfaceProxyTypeWithoutTarget(Type interfaceToProxy, Type[] additionalInterfacesToProxy,
-		                                                  ProxyGenerationOptions options)
+														  ProxyGenerationOptions options)
 		{
 			AssertValidType(interfaceToProxy);
 			AssertValidTypes(additionalInterfacesToProxy);
@@ -113,14 +113,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 			if (target.IsGenericTypeDefinition)
 			{
 				throw new GeneratorException("Type " + target.FullName + " is a generic type definition. " +
-				                             "Can not create proxy for open generic types.");
+											 "Can not create proxy for open generic types.");
 			}
 			if (IsPublic(target) == false && IsAccessible(target) == false)
 			{
 				throw new GeneratorException("Type " + target.FullName + " is not visible to DynamicProxy. " +
-				                             "Can not create proxy for types that are not accessible. " +
-				                             "Make the type public, or internal and mark your assembly with " +
-				                             "[assembly: InternalsVisibleTo(InternalsVisible.ToDynamicProxyGenAssembly2)] attribute.");
+											 "Can not create proxy for types that are not accessible. " +
+											 "Make the type public, or internal and mark your assembly with " +
+											 "[assembly: InternalsVisibleTo(InternalsVisible.ToDynamicProxyGenAssembly2)] attribute.");
 			}
 		}
 
@@ -137,7 +137,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 
 		private bool IsAccessible(Type target)
 		{
-            return IsInternal(target) && this.scope.Internals.IsInternalToDynamicProxy(target.Assembly);
+			return (IsInternal(target) && this.scope.Internals.IsInternalToDynamicProxy(target.Assembly))
+				|| ((target.IsNestedPublic || target.IsNestedFamily || target.IsNestedFamORAssem)
+					&& (IsPublic(target.DeclaringType) || IsAccessible(target.DeclaringType)));
 		}
 
 		private bool IsPublic(Type target)

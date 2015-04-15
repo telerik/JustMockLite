@@ -2189,7 +2189,7 @@ namespace Telerik.JustMock.Tests
 		}
 #endif
 
-        public class ClassWithCtor
+		public class ClassWithCtor
 		{
 			public ClassWithCtor(string s)
 			{
@@ -2331,6 +2331,58 @@ namespace Telerik.JustMock.Tests
 			Mock.Arrange(() => mock.Get<string, int>("5", 5)).Returns("string");
 			Assert.Equal("string", mock.Get<string, int>("5", 5));
 		}
+
+#if !PORTABLE
+		[TestMethod]
+		public void ShouldCreateMockOfProtectedAbstractType()
+		{
+			var nestedType = typeof(NestingType).GetNestedType("NestedWrapperType", BindingFlags.NonPublic)
+				.GetNestedType("NestedType", BindingFlags.NonPublic);
+			var mock = Mock.Create(nestedType);
+			Mock.NonPublic.Arrange<int>(mock, "Do").Returns(123);
+			Assert.Equal(123, NestingType.Test(mock));
+		}
+
+		public class NestingType
+		{
+			protected class NestedWrapperType
+			{
+				protected abstract class NestedType
+				{
+					protected abstract int Do();
+
+					public int CallDo()
+					{
+						return Do();
+					}
+				}
+
+				public static int Test(object nestedType)
+				{
+					return ((NestedType)nestedType).CallDo();
+				}
+			}
+
+			public static int Test(object nestedType)
+			{
+				return NestedWrapperType.Test(nestedType);
+			}
+		}
+
+		public class OverrideNestingType : NestingType
+		{
+			protected class OverrideNestedWrapperType : NestedWrapperType
+			{
+				protected class OverrideNestedType : NestedType
+				{
+					protected override int Do()
+					{
+						throw new NotImplementedException();
+					}
+				}
+			}
+		}
+#endif
 
 #if LITE_EDITION && !COREFX
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]

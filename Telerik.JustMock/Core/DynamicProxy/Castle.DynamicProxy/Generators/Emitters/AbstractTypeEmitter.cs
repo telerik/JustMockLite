@@ -320,11 +320,19 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 			genericTypeParams = genericTypeParameterBuilders;
 		}
 
+		private static Type CreateTypeRecursive(TypeBuilder type)
+		{
+			var declaringTypeBuilder = type.DeclaringType as TypeBuilder;
+			if (type.DeclaringType is TypeBuilder)
+				CreateTypeRecursive(declaringTypeBuilder);
+			return type.CreateType();
+		}
+
 		protected Type CreateType(TypeBuilder type)
 		{
             try
             {
-                return type.CreateType();
+				return CreateTypeRecursive(type);
             }
             catch (BadImageFormatException ex)
             {

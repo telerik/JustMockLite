@@ -52,7 +52,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 				}
 			}
 
-			TypeBuilder.SetParent(baseType);
 			moduleScope = modulescope;
 		}
 
@@ -91,10 +90,25 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 
 		private static TypeBuilder CreateTypeBuilder(ModuleScope modulescope, string name, Type baseType,
 		                                             IEnumerable<Type> interfaces,
-		                                             TypeAttributes flags, bool forceUnsigned)
+		                                             TypeAttributes flags, bool forceUnsigned, int wrapperIndex = 1)
 		{
-			var isAssemblySigned = !forceUnsigned && !StrongNameUtil.IsAnyTypeFromUnsignedAssembly(baseType, interfaces);
-			return modulescope.DefineType(isAssemblySigned, name, flags);
+			if (baseType.DeclaringType != null)
+			{
+				var wrapperType = CreateTypeBuilder(modulescope, name,
+					baseType.DeclaringType, new Type[0], flags,
+					forceUnsigned, wrapperIndex + 1);
+
+				return wrapperType.DefineNestedType(name + "``" + wrapperIndex,
+					baseType.Attributes & TypeAttributes.VisibilityMask,
+					baseType);
+			}
+			else
+			{
+				var isAssemblySigned = !forceUnsigned && !StrongNameUtil.IsAnyTypeFromUnsignedAssembly(baseType, interfaces);
+				var result = modulescope.DefineType(isAssemblySigned, name, flags);
+				result.SetParent(baseType);
+				return result;
+			}
 		}
 
 		private static bool ShouldForceUnsigned()
