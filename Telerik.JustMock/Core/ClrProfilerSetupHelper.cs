@@ -68,6 +68,7 @@ namespace Telerik.JustMock.Core
 			{ new Guid("{8C29BC4E-1F57-461a-9B51-1200C32E6F1F}"), "CLRProfiler" },
 			{ new Guid("{FF68FEB9-E58A-4B75-A2B8-90CE7D915A26}"), "New Relic Agent" },
 			{ new Guid("{45777DEF-BDA6-431B-A953-E888780FA511}"), "SpeedTrace" },
+			{ new Guid("{D1087F67-BEE8-4F53-B27A-4E01F64F3DA8}"), "JustMock 2010" },
 		};
 
 		private const string NETFrameworkKey = @"SOFTWARE\Microsoft\.NETFramework";
