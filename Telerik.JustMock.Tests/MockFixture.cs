@@ -2338,9 +2338,22 @@ namespace Telerik.JustMock.Tests
 		{
 			var nestedType = typeof(NestingType).GetNestedType("NestedWrapperType", BindingFlags.NonPublic)
 				.GetNestedType("NestedType", BindingFlags.NonPublic);
+		
 			var mock = Mock.Create(nestedType);
 			Mock.NonPublic.Arrange<int>(mock, "Do").Returns(123);
 			Assert.Equal(123, NestingType.Test(mock));
+		}
+
+		[TestMethod]
+		public void ShouldCallOriginalMethodOnProtectedType()
+		{
+			var nestedType = typeof(NestingType).GetNestedType("NestedWrapperType", BindingFlags.NonPublic)
+				.GetNestedType("NestedType", BindingFlags.NonPublic);
+
+			var mock = Mock.Create(nestedType);
+
+			Mock.NonPublic.Arrange(mock, "Original").CallOriginal();
+			Assert.Equal(15, NestingType.TestOriginal(mock));
 		}
 
 		public class NestingType
@@ -2351,9 +2364,19 @@ namespace Telerik.JustMock.Tests
 				{
 					protected abstract int Do();
 
+					protected virtual int Original()
+					{
+						return 15;
+					}
+
 					public int CallDo()
 					{
 						return Do();
+					}
+
+					public int CallOriginal()
+					{
+						return Original();
 					}
 				}
 
@@ -2361,11 +2384,21 @@ namespace Telerik.JustMock.Tests
 				{
 					return ((NestedType)nestedType).CallDo();
 				}
+
+				public static int TestOriginal(object nestedType)
+				{
+					return ((NestedType)nestedType).CallOriginal();
+				}
 			}
 
 			public static int Test(object nestedType)
 			{
 				return NestedWrapperType.Test(nestedType);
+			}
+
+			public static int TestOriginal(object nestedType)
+			{
+				return NestedWrapperType.TestOriginal(nestedType);
 			}
 		}
 
