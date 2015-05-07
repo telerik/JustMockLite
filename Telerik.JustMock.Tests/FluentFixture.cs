@@ -383,4 +383,29 @@ namespace Telerik.JustMock.Tests
 			Assert.Throws<MockException>(() => Mock.NonPublic.Arrange(mock, "GetGuid", ArgExpr.IsNull<string>()).Returns((Guid?)new Guid()));
 		}
 	}
+
+	[TestClass]
+	public class FluentContextFixture
+	{
+		IDisposable mock;
+
+		[TestInitialize]
+		public void TestInit()
+		{
+			mock = Mock.Create<IDisposable>();
+		}
+
+		[TestMethod]
+		public void ShouldUpdateContextInFluentAssert()
+		{
+			Mock.Arrange(() => mock.Dispose());
+		}
+
+		[TestCleanup]
+		public void TestCleanup()
+		{
+			mock.AssertAll();
+			Mock.AssertAll(mock);
+		}
+	}
 }

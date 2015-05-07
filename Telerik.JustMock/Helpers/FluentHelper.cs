@@ -33,8 +33,7 @@ namespace Telerik.JustMock.Helpers
 	{
 		private static TContainer DoArrange<TContainer>(object obj, Type objType, LambdaExpression expression, Func<TContainer> containerFactory) where TContainer : IMethodMock
 		{
-			var mock = MocksRepository.GetMockMixin(obj, objType);
-			var repo = mock != null ? mock.Repository : MockingContext.CurrentRepository;
+			var repo = MockingContext.CurrentRepository;
 			var instanceParam = expression.Parameters[0];
 			var instanceConstant = Expression.Constant(obj);
 			var parameterlessBody = ExpressionReplacer.Replace(expression.Body, instanceParam, instanceConstant);
@@ -44,8 +43,7 @@ namespace Telerik.JustMock.Helpers
 
 		private static void DoAssert(object obj, Type objType, LambdaExpression expression, Args args, Occurs occurs)
 		{
-			var mock = MocksRepository.GetMockMixin(obj, objType);
-			var repo = mock != null ? mock.Repository : MockingContext.CurrentRepository;
+			var repo = MockingContext.CurrentRepository;
 			Expression parameterlessArrangeStmt = null;
 			if (expression != null)
 			{
@@ -90,12 +88,7 @@ namespace Telerik.JustMock.Helpers
 		/// <returns>Reference to <see cref="ActionExpectation" /> to setup the mock.</returns>
 		public static ActionExpectation ArrangeSet<T>(this T obj, Action<T> action)
 		{
-			return ProfilerInterceptor.GuardInternal(() =>
-			{
-				var mock = MocksRepository.GetMockMixin(obj, typeof(T));
-				var repo = mock != null ? mock.Repository : MockingContext.CurrentRepository;
-				return repo.Arrange(() => action(obj), () => new ActionExpectation());
-			});
+			return ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.Arrange(() => action(obj), () => new ActionExpectation()));
 		}
 
 		/// <summary>
@@ -171,7 +164,7 @@ namespace Telerik.JustMock.Helpers
 				DoAssert(obj, typeof(T), action, null, null);
 			});
 		}
-	
+
 		/// <summary>
 		/// Asserts the specific call
 		/// </summary>
@@ -204,8 +197,7 @@ namespace Telerik.JustMock.Helpers
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 			{
-				var mock = MocksRepository.GetMockMixin(obj, typeof(T));
-				var repo = mock != null ? mock.Repository : MockingContext.CurrentRepository;
+				var repo = MockingContext.CurrentRepository;
 				var evt = repo.ParseAddHandlerAction(obj, eventExpression);
 				RaiseEventBehavior.RaiseEventImpl(obj, evt, new object[] { obj, args });
 			});
@@ -224,8 +216,7 @@ namespace Telerik.JustMock.Helpers
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 			{
-				var mock = MocksRepository.GetMockMixin(obj, typeof(T));
-				var repo = mock != null ? mock.Repository : MockingContext.CurrentRepository;
+				var repo = MockingContext.CurrentRepository;
 				var evt = repo.ParseAddHandlerAction(obj, eventExpression);
 				RaiseEventBehavior.RaiseEventImpl(obj, evt, args);
 			});
@@ -239,10 +230,7 @@ namespace Telerik.JustMock.Helpers
 		/// <param name="target">Target instance.</param>
 		public static void Assert<T>(this T target)
 		{
-			ProfilerInterceptor.GuardInternal(() =>
-			{
-				target.Assert(null, null);
-			});
+			ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.Assert(target));
 		}
 
 		/// <summary>
@@ -252,11 +240,7 @@ namespace Telerik.JustMock.Helpers
 		/// <param name="target">Target instance.</param>
 		public static void AssertAll<T>(this T target)
 		{
-			ProfilerInterceptor.GuardInternal(() =>
-			{
-				var mock = MocksRepository.GetMockMixin(target, typeof(T));
-				mock.Repository.AssertAll(target);
-			});
+			ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.AssertAll(target));
 		}
 	}
 }
