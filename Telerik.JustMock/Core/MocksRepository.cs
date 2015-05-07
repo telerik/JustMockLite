@@ -1476,6 +1476,7 @@ namespace Telerik.JustMock.Core
 
 		private List<MethodMockMatcherTreeNode> GetMethodMocksFromObject(object mock, Type mockType = null)
 		{
+			UnwrapDelegateTarget(ref mock);
 			var methodMocks = new List<MethodMockMatcherTreeNode>();
 			var visitedMocks = new List<object>(); // can't be HashSet because we can't depend on GetHashCode being implemented properly
 			GetMethodMocksFromObjectInternal(mock, mockType, methodMocks, visitedMocks);

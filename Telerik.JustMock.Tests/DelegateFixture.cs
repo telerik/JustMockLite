@@ -119,5 +119,33 @@ namespace Telerik.JustMock.Tests
 			Assert.Throws<MockException>(() => Mock.Create<MulticastDelegate>());
 		}
 #endif
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("Delegate")]
+		public void ShouldAssertDelegateCall()
+		{
+			var action = Mock.Create<Action>();
+			Mock.Arrange(() => action()).MustBeCalled();
+
+			Assert.Throws<AssertionException>(() => Mock.Assert(() => action()));
+			Assert.Throws<AssertionException>(() => Mock.Assert(action));
+
+			action();
+
+			Mock.Assert(action);
+			Mock.Assert(() => action());
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("Delegate")]
+		public void ShouldAssertDelegateCallWithAssertAll()
+		{
+			var action = Mock.Create<Action>();
+			Mock.Arrange(() => action());
+
+			Assert.Throws<AssertionException>(() => Mock.AssertAll(action));
+
+			action();
+
+			Mock.AssertAll(action);
+		}
 	}
 }
