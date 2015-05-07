@@ -651,19 +651,29 @@ namespace Telerik.JustMock.Core
 		internal TMethodMock Arrange<TMethodMock>(Expression expr, Func<TMethodMock> methodMockFactory)
 			where TMethodMock : IMethodMock
 		{
+			var callPattern = new CallPattern();
+			var result = methodMockFactory();
+
 			using (this.sharedContext.StartArrange())
 			{
-				var result = methodMockFactory();
 				result.Repository = this;
 				result.ArrangementExpression = ExpressionUtil.ConvertMockExpressionToString(expr);
-
-				var callPattern = new CallPattern();
 				result.CallPattern = callPattern;
 				ConvertExpressionToCallPattern(expr, callPattern);
 
 				AddArrange(result);
-				return result;
 			}
+
+#if !PORTABLE
+			var createInstanceLambda = ActivatorCreateInstanceTBehavior.TryCreateArrangementExpression(callPattern.Method);
+			if (createInstanceLambda != null)
+			{
+				var createInstanceMethodMock = Arrange(createInstanceLambda, methodMockFactory);
+				ActivatorCreateInstanceTBehavior.Attach(result, createInstanceMethodMock);
+			}
+#endif
+
+			return result;
 		}
 
 		[ArrangeMethod]

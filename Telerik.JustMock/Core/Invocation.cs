@@ -35,6 +35,8 @@ namespace Telerik.JustMock.Core
 
 		internal object[] Args { get; private set; }
 
+		#region Output properties
+
 		internal object ReturnValue
 		{
 			get { return this.returnValue; }
@@ -52,12 +54,14 @@ namespace Telerik.JustMock.Core
 
 		internal bool CallOriginal { get; set; }
 		internal bool UserProvidedImplementation { get; set; }
+		internal Action ExceptionThrower { get; set; }
+
+		#endregion
+
 		internal bool InArrange { get; set; }
 		internal bool Recording { get; set; }
 		internal bool RetainBehaviorDuringRecording { get; set; }
 		internal MocksRepository Repository { get; set; }
-
-		internal Action ExceptionThrower { get; set; }
 
 		internal Invocation(object instance, MethodBase method, object[] args)
 		{

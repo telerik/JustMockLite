@@ -117,7 +117,7 @@ namespace Telerik.JustMock.Core
 				{
 					if (invocation.CallOriginal)
 					{
-						skipMethodInterceptionOnce = method;
+						SkipMethodInterceptionOnce(method);
 						return null;
 					}
 					if (invocation.IsReturnValueSet && invocation.ReturnValue != null)
@@ -595,5 +595,11 @@ namespace Telerik.JustMock.Core
 
 		[ThreadStatic]
 		private static MethodBase skipMethodInterceptionOnce;
+
+		internal static void SkipMethodInterceptionOnce(MethodBase method)
+		{
+			Debug.Assert(skipMethodInterceptionOnce == null || skipMethodInterceptionOnce == method);
+			skipMethodInterceptionOnce = method;
+		}
 	}
 }
