@@ -247,6 +247,7 @@
     <Compile Include="Core\Behaviors\CallOriginalBehavior.cs" />
     <Compile Include="Core\Behaviors\CallOriginalObjectMethodsBehavior.cs" />
     <Compile Include="Core\Behaviors\ConstructorMockBehavior.cs" />
+    <Compile Include="Core\Behaviors\ActivatorCreateInstanceTBehavior.cs" />
     <Compile Include="Core\Behaviors\EventStubsBehavior.cs" />
     <Compile Include="Core\Behaviors\ExecuteConstructorBehavior.cs" />
     <Compile Include="Core\Behaviors\IBehavior.cs" />
