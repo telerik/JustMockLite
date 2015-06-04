@@ -2189,7 +2189,7 @@ namespace Telerik.JustMock.Tests
 		}
 #endif
 
-        public class ClassWithCtor
+		public class ClassWithCtor
 		{
 			public ClassWithCtor(string s)
 			{
@@ -2330,6 +2330,22 @@ namespace Telerik.JustMock.Tests
 			var mock = Mock.Create<Generic>();
 			Mock.Arrange(() => mock.Get<string, int>("5", 5)).Returns("string");
 			Assert.Equal("string", mock.Get<string, int>("5", 5));
+		}
+
+		public class SealedGeneric : IGeneric
+		{
+			public string Get<TItem1, TItem2>(TItem1 a, TItem2 b)
+			{
+				throw new NotImplementedException();
+			}
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+		public void ShouldArrangeFinalGenericMethodThroughInterface()
+		{
+			IGeneric mock = Mock.Create<SealedGeneric>();
+			Mock.Arrange(() => mock.Get(5, "4")).Returns("123");
+			Assert.Equal("123", mock.Get(5, "4"));
 		}
 
 #if LITE_EDITION && !COREFX

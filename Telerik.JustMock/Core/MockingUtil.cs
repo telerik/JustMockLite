@@ -392,33 +392,33 @@ namespace Telerik.JustMock.Core
 
 		public static MethodInfo GetConcreteImplementer(MethodInfo method, Type implementerType)
 		{
+			var targetMethod = method;
+
 			if (method.DeclaringType.IsInterface)
 			{
+				var baseMethod = method.IsGenericMethod ? method.GetGenericMethodDefinition() : method;
 				var intfMap = implementerType.GetInterfaceMap(method.DeclaringType);
-				var intfMethodIdx = intfMap.InterfaceMethods.IndexOf(m => m == method);
-				return intfMap.TargetMethods[intfMethodIdx];
+				var intfMethodIdx = intfMap.InterfaceMethods.IndexOf(m => m == baseMethod);
+				targetMethod = intfMap.TargetMethods[intfMethodIdx];
 			}
-			else
+			else if (method.IsVirtual)
 			{
-				if (!method.IsVirtual)
-					return method;
-
 				var baseMethod = method.GetBaseDefinition();
 
 				var typesToSearch = implementerType.GetInheritanceChain()
 					.TakeWhile(t => t != baseMethod.DeclaringType);
 
-				MethodInfo implementerMethod = typesToSearch.Select(candidateType =>
+				targetMethod = typesToSearch.Select(candidateType =>
 					candidateType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
 						.FirstOrDefault(m => m.GetBaseDefinition() == baseMethod))
 					.FirstOrDefault(m => m != null)
 					?? baseMethod;
-
-				if (method.IsGenericMethod && implementerMethod.IsGenericMethodDefinition)
-					implementerMethod = implementerMethod.MakeGenericMethod(method.GetGenericArguments());
-
-				return implementerMethod;
 			}
+
+			if (method.IsGenericMethod && targetMethod.IsGenericMethodDefinition)
+				targetMethod = targetMethod.MakeGenericMethod(method.GetGenericArguments());
+
+			return targetMethod;
 		}
 
 		public static int IndexOf<T>(this IEnumerable<T> enumerable, Predicate<T> predicate)
