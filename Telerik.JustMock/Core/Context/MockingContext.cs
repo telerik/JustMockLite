@@ -127,8 +127,10 @@ namespace Telerik.JustMock.Core.Context
 #else
 			if (MSTestMockingContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new MSTestMockingContextResolver());
-			if (XUnitMockingContextResolver.IsAvailable)
-				registeredContextResolvers.Add(new XUnitMockingContextResolver());
+			if (XUnit1xMockingContextResolver.IsAvailable)
+				registeredContextResolvers.Add(new XUnit1xMockingContextResolver());
+			if (XUnit2xMockingContextResolver.IsAvailable)
+				registeredContextResolvers.Add(new XUnit2xMockingContextResolver());
 			if (NUnitMockingContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new NUnitMockingContextResolver());
 			if (MSpecContextResolver.IsAvailable)

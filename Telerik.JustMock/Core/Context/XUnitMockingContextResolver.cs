@@ -23,25 +23,14 @@ using System.Reflection.Emit;
 
 namespace Telerik.JustMock.Core.Context
 {
-	internal class XUnitMockingContextResolver : HierarchicalTestFrameworkContextResolver
+	internal abstract class XUnitMockingContextResolver : HierarchicalTestFrameworkContextResolver
 	{
-		private const string XunitAssertionExceptionName = "Xunit.Sdk.AssertException, xunit";
-
-		public XUnitMockingContextResolver()
-			: base(XunitAssertionExceptionName)
-		{
-			SetupStandardHierarchicalTestStructure(
-				new[] { "Xunit.FactAttribute, xunit" },
-				null, null, null,
-				FixtureConstuctorSemantics.InstanceConstructorCalledOncePerTest);
-		}
-
-		public static bool IsAvailable
-		{
-			get { return FindType(XunitAssertionExceptionName, false) != null; }
-		}
-
 		private Type exceptionType;
+
+		protected XUnitMockingContextResolver(string exceptionName)
+			: base(exceptionName)
+		{
+		}
 
 		protected override Expression<Func<string, Exception, Exception>> CreateExceptionFactory()
 		{
@@ -49,12 +38,14 @@ namespace Telerik.JustMock.Core.Context
 			{
 				CreateExceptionType();
 			}
-			return this.CreateExceptionFactory(this.exceptionType);
+			return exceptionType != null ? this.CreateExceptionFactory(this.exceptionType) : null;
 		}
 
 		private void CreateExceptionType()
 		{
-			var baseType = FindType(XunitAssertionExceptionName);
+			var baseType = FindType(this.assertFailedExceptionTypeName, throwOnNotFound: false);
+			if (baseType == null)
+				return;
 			var typeBuilder = MockingUtil.ModuleBuilder.DefineType(
 				"Telerik.JustMock.Xunit.AssertFailedException", TypeAttributes.Public, baseType);
 
@@ -69,6 +60,44 @@ namespace Telerik.JustMock.Core.Context
 			il.Emit(OpCodes.Ret);
 
 			this.exceptionType = typeBuilder.CreateType();
+		}
+	}
+
+	internal class XUnit1xMockingContextResolver : XUnitMockingContextResolver
+	{
+		private const string XunitAssertionExceptionName = "Xunit.Sdk.AssertException, xunit";
+
+		public static bool IsAvailable
+		{
+			get { return FindType(XunitAssertionExceptionName, false) != null; }
+		}
+
+		public XUnit1xMockingContextResolver()
+			: base(XunitAssertionExceptionName)
+		{
+			SetupStandardHierarchicalTestStructure(
+				new[] { "Xunit.FactAttribute, xunit" },
+				null, null, null,
+				FixtureConstuctorSemantics.InstanceConstructorCalledOncePerTest);
+		}
+	}
+
+	internal class XUnit2xMockingContextResolver : XUnitMockingContextResolver
+	{
+		private const string XunitAssertionExceptionName = "Xunit.Sdk.XunitException, xunit.assert";
+
+		public static bool IsAvailable
+		{
+			get { return FindType("Xunit.FactAttribute, xunit.core", false) != null; }
+		}
+
+		public XUnit2xMockingContextResolver()
+			: base(XunitAssertionExceptionName)
+		{
+			SetupStandardHierarchicalTestStructure(
+				new[] { "Xunit.FactAttribute, xunit.core", "Xunit.TheoryAttribute, xunit.core" },
+				null, null, null,
+				FixtureConstuctorSemantics.InstanceConstructorCalledOncePerTest);
 		}
 	}
 }

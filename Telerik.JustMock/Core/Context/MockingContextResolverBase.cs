@@ -40,6 +40,9 @@ namespace Telerik.JustMock.Core.Context
 		public Action<string, Exception> GetFailMethod()
 		{
 			var factoryExpr = CreateExceptionFactory();
+			if (factoryExpr == null)
+				return null;
+
 			var factory = factoryExpr.Compile();
 
 			return (message, innerException) =>
