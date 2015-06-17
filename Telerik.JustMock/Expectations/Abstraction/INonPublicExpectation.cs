@@ -184,14 +184,14 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <typeparam name="TReturn">Return type</typeparam>
 		/// <param name="method">Target method</param>
 		/// <param name="args">Method arguments</param>
-		FuncExpectation<TReturn> Arrange<TReturn>(MethodInfo method, params object[] args);
+		FuncExpectation<TReturn> Arrange<TReturn>(MethodBase method, params object[] args);
 
 		/// <summary>
 		/// Arranges a method for mocking.
 		/// </summary>
 		/// <param name="method">Target method</param>
 		/// <param name="args">Method arguments</param>
-		ActionExpectation Arrange(MethodInfo method, params object[] args);
+		ActionExpectation Arrange(MethodBase method, params object[] args);
 
 		/// <summary>
 		/// Asserts the specified member that it is called as expected.
@@ -236,7 +236,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <param name="method">Target method</param>
 		/// <param name="occurs">Specifies the number of times a call should occur.</param>
 		/// <param name="args">Method arguments</param>
-		void Assert(MethodInfo method, Occurs occurs, params object[] args);
+		void Assert(MethodBase method, Occurs occurs, params object[] args);
 
 		/// <summary>
 		/// Asserts the specified member that it is called as expected.
@@ -277,7 +277,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// </summary>
 		/// <param name="method">Target method</param>
 		/// <param name="args">Method arguments</param>
-		void Assert(MethodInfo method, params object[] args);
+		void Assert(MethodBase method, params object[] args);
 
 		/// <summary>
 		/// Returns the number of times the specified member was called.
@@ -285,7 +285,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <param name="method">Target method</param>
 		/// <param name="args">Method arguments</param>
 		/// <returns>Number of calls.</returns>
-		int GetTimesCalled(MethodInfo method, params object[] args);
+		int GetTimesCalled(MethodBase method, params object[] args);
 
 		/// <summary>
 		/// Returns the number of times the specified member was called.

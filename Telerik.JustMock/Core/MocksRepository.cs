@@ -691,7 +691,7 @@ namespace Telerik.JustMock.Core
 		}
 
 		[ArrangeMethod]
-		internal TMethodMock Arrange<TMethodMock>(object instance, MethodInfo method, object[] arguments, Func<TMethodMock> methodMockFactory)
+		internal TMethodMock Arrange<TMethodMock>(object instance, MethodBase method, object[] arguments, Func<TMethodMock> methodMockFactory)
 			where TMethodMock : IMethodMock
 		{
 			using (this.sharedContext.StartArrange())
@@ -779,7 +779,7 @@ namespace Telerik.JustMock.Core
 			}
 		}
 
-		internal void AssertMethodInfo(object instance, MethodInfo method, object[] arguments, Occurs occurs)
+		internal void AssertMethodInfo(object instance, MethodBase method, object[] arguments, Occurs occurs)
 		{
 			using (MockingContext.BeginFailureAggregation())
 			{
@@ -851,7 +851,7 @@ namespace Telerik.JustMock.Core
 			return callsCount;
 		}
 
-		internal int GetTimesCalledFromMethodInfo(object instance, MethodInfo method, object[] arguments)
+		internal int GetTimesCalledFromMethodInfo(object instance, MethodBase method, object[] arguments)
 		{
 			var callPattern = ConvertMethodInfoToCallPattern(instance, method, arguments);
 			int callsCount;
@@ -1378,7 +1378,7 @@ namespace Telerik.JustMock.Core
 			}
 		}
 
-		private CallPattern ConvertMethodInfoToCallPattern(object instance, MethodInfo method, object[] arguments)
+		private CallPattern ConvertMethodInfoToCallPattern(object instance, MethodBase method, object[] arguments)
 		{
 			var callPattern = new CallPattern
 			{

@@ -58,7 +58,7 @@ namespace Telerik.JustMock.Expectations
 						{
 							var byref = p.ParameterType.IsByRef;
 							var paramType = byref ? p.ParameterType.GetElementType() : p.ParameterType;
-							var isAny = (Expression) typeof(ArgExpr).GetMethod("IsAny").MakeGenericMethod(paramType).Invoke(null, null);
+							var isAny = (Expression)typeof(ArgExpr).GetMethod("IsAny").MakeGenericMethod(paramType).Invoke(null, null);
 							if (byref)
 							{
 								isAny = ArgExpr.Ref(isAny);
@@ -359,7 +359,7 @@ namespace Telerik.JustMock.Expectations
 				});
 		}
 
-		public FuncExpectation<TReturn> Arrange<TReturn>(MethodInfo method, params object[] args)
+		public FuncExpectation<TReturn> Arrange<TReturn>(MethodBase method, params object[] args)
 		{
 			return ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.Arrange(null, method, args, () => new FuncExpectation<TReturn>()));
 		}
@@ -373,7 +373,7 @@ namespace Telerik.JustMock.Expectations
 				});
 		}
 
-		public ActionExpectation Arrange(MethodInfo method, params object[] args)
+		public ActionExpectation Arrange(MethodBase method, params object[] args)
 		{
 			return ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.Arrange(null, method, args, () => new ActionExpectation()));
 		}
@@ -387,7 +387,7 @@ namespace Telerik.JustMock.Expectations
 				});
 		}
 
-		public void Assert(MethodInfo method, Occurs occurs, params object[] args)
+		public void Assert(MethodBase method, Occurs occurs, params object[] args)
 		{
 			ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.AssertMethodInfo(null, method, args, occurs));
 		}
@@ -410,7 +410,7 @@ namespace Telerik.JustMock.Expectations
 				});
 		}
 
-		public void Assert(MethodInfo method, params object[] args)
+		public void Assert(MethodBase method, params object[] args)
 		{
 			ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.AssertMethodInfo(null, method, args, null));
 		}
@@ -460,7 +460,7 @@ namespace Telerik.JustMock.Expectations
 				});
 		}
 
-		public int GetTimesCalled(MethodInfo method, params object[] args)
+		public int GetTimesCalled(MethodBase method, params object[] args)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 				MockingContext.CurrentRepository.GetTimesCalledFromMethodInfo(null, method, args));
