@@ -797,43 +797,6 @@ namespace Telerik.JustMock.Core
 			}
 		}
 
-#if VISUALBASIC
-		internal Expression<Action> ConvertDelegateAndArgumentsToExpression(Delegate delg, object[] args)
-		{
-			var method = delg.Method;
-			var declaringType = method.DeclaringType;
-			if (declaringType.IsProxy())
-				method = (MethodInfo)method.GetInheritanceChain().ElementAt(1);
-
-			if (method.IsCompilerGenerated())
-				throw new ArgumentException("The argument appears to be an anonymous delegate or lambda instead of a reference to the intended method. Use AddressOf instead of Sub() to make a reference to the method intended. If you're using Visual Studio 2010 or later then reference and use Telerik.JustMock.dll instead of Telerik.JustJustMock.VisualBasic.dll");
-
-			var matchers = this.matchersInContext;
-			if (matchers.Count != 0 && matchers.Count != args.Length)
-				throw new ArgumentException("When arranging or asserting using delegates instead of expressions, use either only matchers or only values as formal arguments.");
-
-			var arrangementParameters = new Expression[args.Length];
-			var methodParameters = method.GetParameters();
-			for (int i = 0; i < args.Length; i++)
-			{
-				var arg = args[i];
-				Type type = (arg != null) ? arg.GetType() : methodParameters[i].ParameterType;
-				arrangementParameters[i] = matchers.Count == 0
-					? Expression.Constant(arg, type)
-					: matchers[i].ToExpression(type);
-			}
-
-			MethodCallExpression expression = delg.Target == null
-				? Expression.Call(method, arrangementParameters)
-				: Expression.Call(Expression.Constant(delg.Target), method, arrangementParameters);
-
-			matchers.Clear();
-
-			var action = (Expression<Action>)Expression.Lambda(expression);
-			return action;
-		}
-#endif
-
 		internal int GetTimesCalled(Expression expression, Args args)
 		{
 			var callPattern = new CallPattern();

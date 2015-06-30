@@ -614,11 +614,6 @@
     <Compile Include="Core\MatcherTree\ValueMatcher.cs" />
     <Compile Include="Trial\JustMockExpiredException.cs" />
     <Compile Include="Mock.cs" />
-    <Compile Include="Mock.VisualBasic2008.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Mock.VisualBasic2008.tt</DependentUpon>
-    </Compile>
     <Compile Include="Core\MockException.cs" />
     <Compile Include="Occurs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -668,10 +663,6 @@
       <LastGenOutput>Func.cs</LastGenOutput>
     </None>
     <Compile Include="Mock.Create.cs" />
-    <None Include="Mock.VisualBasic2008.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Mock.VisualBasic2008.cs</LastGenOutput>
-    </None>
     <None Include="../Solution Items/snkey_lite.snk">
       <Link>snkey_lite.snk</Link>
     </None>

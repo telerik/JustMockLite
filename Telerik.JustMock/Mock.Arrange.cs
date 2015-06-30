@@ -94,7 +94,6 @@ namespace Telerik.JustMock
 			});
 		}
 
-#if !VISUALBASIC
 		/// <summary>
 		/// Setups the target call to act in a specific way.
 		/// </summary>
@@ -111,7 +110,6 @@ namespace Telerik.JustMock
 				return MockingContext.CurrentRepository.Arrange(expression, () => new ActionExpectation());
 			});
 		}
-#endif
 
 		/// <summary>
 		/// Setups target property set operation to act in a specific way.  
