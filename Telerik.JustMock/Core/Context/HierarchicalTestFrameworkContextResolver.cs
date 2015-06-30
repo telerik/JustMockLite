@@ -306,6 +306,8 @@ namespace Telerik.JustMock.Core.Context
 
 		private bool IsDeclaredInTestFixture(MethodBase method, string[] testMethodAttributes)
 		{
+			if (method.DeclaringType == null)
+				return false;
 			var assembly = method.DeclaringType.Assembly;
 			HashSet<Type> knownTestClassesInAssembly;
 			lock (knownTestClasses)
