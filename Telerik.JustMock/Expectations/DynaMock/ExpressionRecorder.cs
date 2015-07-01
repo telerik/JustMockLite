@@ -138,7 +138,7 @@ namespace Telerik.JustMock.Expectations.DynaMock
 			}).ToArray();
 
 			object state;
-			var method = (MethodInfo)Type.DefaultBinder.BindToMethod(BindingFlags.Default, candidateMethods, ref methodArgs, null, null, null, out state);
+			var method = (MethodInfo)MockingUtil.BindToMethod(MockingUtil.Default, candidateMethods, ref methodArgs, null, null, null, out state);
 
 			var memberExpr = Expression.Call(!wrapper.IsStatic ? valueExpr : null, method, args.Select(FromArg).ToArray());
 
