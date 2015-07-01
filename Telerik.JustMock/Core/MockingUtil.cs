@@ -457,7 +457,6 @@ namespace Telerik.JustMock.Core
 			return type.IsProxy() ? ((IMockMixin)instance).DeclaringType : type;
 		}
 
-
 		public static bool IsImplementedBy(this MethodInfo interfaceMethod, MethodBase implMethod)
 		{
 			var type = implMethod.DeclaringType;

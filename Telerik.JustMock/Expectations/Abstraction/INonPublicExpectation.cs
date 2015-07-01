@@ -351,5 +351,13 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <param name="type">Type whose static members will be given non-public access to.</param>
 		/// <returns>Non-public accessor.</returns>
 		PrivateAccessor MakeStaticPrivateAccessor(Type type);
+
+		dynamic Wrap(object instance);
+
+		dynamic WrapType(Type type);
+
+		ActionExpectation Arrange(IExpressionContainer dynamicExpression);
+
+		FuncExpectation<TReturn> Arrange<TReturn>(IExpressionContainer dynamicExpression);
 	}
 }

@@ -1529,6 +1529,9 @@
     <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IDoInstead.cs">
       <Link>Expectations\Abstraction\IDoInstead.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IExpressionContainer.cs">
+      <Link>Expectations\Abstraction\IExpressionContainer.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IFunc.cs">
       <Link>Expectations\Abstraction\IFunc.cs</Link>
     </Compile>
@@ -1579,6 +1582,12 @@
     </Compile>
     <Compile Include="..\Telerik.JustMock\Expectations\CommonExpectation.partial.cs">
       <Link>Expectations\CommonExpectation.partial.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\DynaMock\ExpressionContainer.cs">
+      <Link>Expectations\DynaMock\ExpressionContainer.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\DynaMock\ExpressionRecorder.cs">
+      <Link>Expectations\DynaMock\ExpressionRecorder.cs</Link>
     </Compile>
     <Compile Include="..\Telerik.JustMock\Expectations\EventWaitDuration.cs">
       <Link>Expectations\EventWaitDuration.cs</Link>

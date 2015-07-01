@@ -27,7 +27,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\..\Binaries\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DOTNET35;NO_ASSEMBLY_SCANNING;NO_EXCEPTION_SERIALIZATION</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NO_ASSEMBLY_SCANNING;NO_EXCEPTION_SERIALIZATION</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -35,7 +35,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\..\Binaries\Release\</OutputPath>
-    <DefineConstants>TRACE;DOTNET35;NO_ASSEMBLY_SCANNING;NO_EXCEPTION_SERIALIZATION</DefineConstants>
+    <DefineConstants>TRACE;NO_ASSEMBLY_SCANNING;NO_EXCEPTION_SERIALIZATION</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>..\..\..\Binaries\Release\Telerik.JustMock.xml</DocumentationFile>
@@ -48,7 +48,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseFree|AnyCPU'">
     <OutputPath>..\..\..\Binaries\ReleaseFree\</OutputPath>
-    <DefineConstants>TRACE;DOTNET35;LITE_EDITION;NO_ASSEMBLY_SCANNING;NO_EXCEPTION_SERIALIZATION</DefineConstants>
+    <DefineConstants>TRACE;LITE_EDITION;NO_ASSEMBLY_SCANNING;NO_EXCEPTION_SERIALIZATION</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -60,13 +60,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugFree|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\..\..\Binaries\DebugFree\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DOTNET35;LITE_EDITION;NO_ASSEMBLY_SCANNING;NO_EXCEPTION_SERIALIZATION</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;LITE_EDITION;NO_ASSEMBLY_SCANNING;NO_EXCEPTION_SERIALIZATION</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.XML" />
@@ -535,6 +536,9 @@
     <Compile Include="Core\TransparentProxy\MockingProxy.cs" />
     <Compile Include="Core\TransparentProxy\ProxyInvocation.cs" />
     <Compile Include="DebugView.cs" />
+    <Compile Include="Expectations\Abstraction\IExpressionContainer.cs" />
+    <Compile Include="Expectations\DynaMock\ExpressionContainer.cs" />
+    <Compile Include="Expectations\DynaMock\ExpressionRecorder.cs" />
     <Compile Include="Helpers\TaskHelper.cs" />
     <Compile Include="Setup\DisableAutomaticRepositoryResetAttribute.cs">
       <SubType>Code</SubType>

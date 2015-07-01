@@ -76,7 +76,7 @@ namespace Telerik.JustMock
 				{
 					args = args ?? MockingUtil.NoObjects;
 					var candidates = type.GetAllMethods()
-						.Where(m => m.Name == name && CanCall(m))
+						.Where(m => m.Name == name && CanCall(m, this.instance != null))
 						.ToArray();
 					object state;
 					var method = MockingUtil.BindToMethod(MockingUtil.AllMembers,
@@ -144,7 +144,7 @@ namespace Telerik.JustMock
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 				{
-					var prop = ResolveProperty(name, indexArgs);
+					var prop = ResolveProperty(this.type, name, indexArgs, this.instance != null);
 					return ProfilerInterceptor.GuardExternal(() => SecuredReflectionMethods.GetProperty(prop, this.instance, indexArgs));
 				});
 		}
@@ -169,7 +169,7 @@ namespace Telerik.JustMock
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
-					var prop = ResolveProperty(name, indexArgs, value, getter: false);
+					var prop = ResolveProperty(this.type, name, indexArgs, this.instance != null, value, getter: false);
 					ProfilerInterceptor.GuardExternal(() => SecuredReflectionMethods.SetProperty(prop, this.instance, value, indexArgs));
 				});
 		}
@@ -224,7 +224,7 @@ namespace Telerik.JustMock
 				throw new MissingMemberException(String.Format("Couldn't find {0} '{1}' on type '{2}'.", kind, name, this.type));
 		}
 
-		private PropertyInfo ResolveProperty(string name, object[] indexArgs, object setterValue = null, bool getter = true)
+		internal static PropertyInfo ResolveProperty(Type type, string name, object[] indexArgs, bool hasInstance, object setterValue = null, bool getter = true)
 		{
 			var candidates = type.GetAllProperties().Where(prop => prop.Name == name).ToArray();
 			if (candidates.Length == 1)
@@ -238,7 +238,7 @@ namespace Telerik.JustMock
 
 			var propMethods = candidates
 				.Select(prop => getter ? prop.GetGetMethod(true) : prop.GetSetMethod(true))
-				.Where(m => m != null && CanCall(m))
+				.Where(m => m != null && CanCall(m, hasInstance))
 				.ToArray();
 
 			indexArgs = indexArgs ?? MockingUtil.NoObjects;
@@ -252,9 +252,9 @@ namespace Telerik.JustMock
 			return type.GetAllFields().FirstOrDefault(f => f.Name == name);
 		}
 
-		private bool CanCall(MethodBase method)
+		private static bool CanCall(MethodBase method, bool hasInstance)
 		{
-			return method.IsStatic || this.instance != null;
+			return method.IsStatic || hasInstance;
 		}
 
 		private object CallInvoke(MethodBase method, object[] args)

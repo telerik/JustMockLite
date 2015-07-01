@@ -25,6 +25,7 @@ using Telerik.JustMock.Core;
 using Telerik.JustMock.Core.Behaviors;
 using Telerik.JustMock.Core.Context;
 using Telerik.JustMock.Expectations.Abstraction;
+using Telerik.JustMock.Expectations.DynaMock;
 
 namespace Telerik.JustMock.Expectations
 {
@@ -516,6 +517,34 @@ namespace Telerik.JustMock.Expectations
 		public PrivateAccessor MakeStaticPrivateAccessor(Type type)
 		{
 			return PrivateAccessor.ForType(type);
+		}
+
+		public dynamic Wrap(object instance)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+				new ExpressionContainer(Expression.Constant(instance, MockingUtil.GetUnproxiedType(instance)))
+			);
+		}
+
+		public dynamic WrapType(Type type)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+				new ExpressionContainer(Expression.Constant(type.GetDefaultValue(), type)) { IsStatic = true }
+			);
+		}
+
+		public ActionExpectation Arrange(IExpressionContainer dynamicExpression)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+				MockingContext.CurrentRepository.Arrange(Expression.Lambda(dynamicExpression.Expression), () => new ActionExpectation())
+			);
+		}
+
+		public FuncExpectation<TReturn> Arrange<TReturn>(IExpressionContainer dynamicExpression)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+				MockingContext.CurrentRepository.Arrange(Expression.Lambda(dynamicExpression.Expression), () => new FuncExpectation<TReturn>())
+			);
 		}
 	}
 }

@@ -1052,6 +1052,37 @@ namespace Telerik.JustMock.Core
 				target = invocation.Expression;
 				args = invocation.Arguments.ToArray();
 			}
+			else if (expr.NodeType == ExpressionType.Assign)
+			{
+				var binary = (BinaryExpression)expr;
+				if (binary.Left is MemberExpression)
+				{
+					var memberExpr = (MemberExpression)binary.Left;
+					if (!(memberExpr.Member is PropertyInfo))
+						throw new MockException("Fields cannot be mocked, only properties.");
+
+					var property = (PropertyInfo)memberExpr.Member;
+					target = memberExpr.Expression;
+					method = property.GetSetMethod(true);
+					args = new[] { binary.Right };
+				}
+				else if (binary.Left is IndexExpression)
+				{
+					var indexExpr = (IndexExpression)binary.Left;
+					target = indexExpr.Object;
+					method = indexExpr.Indexer.GetSetMethod(true);
+					args = indexExpr.Arguments.Concat(new[] { binary.Right }).ToArray();
+				}
+				else throw new MockException("Left-hand of assignment is not a member or indexer.");
+			}
+			else if (expr is IndexExpression)
+			{
+				var index = (IndexExpression)expr;
+				target = index.Object;
+				var property = index.Indexer;
+				method = property.GetGetMethod(true);
+				args = index.Arguments.ToArray();
+			}
 			else throw new MockException("The expression does not represent a method call, property access, new expression or a delegate invocation.");
 
 			// Create the matcher for the instance part of the call pattern.
