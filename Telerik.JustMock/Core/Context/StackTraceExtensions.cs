@@ -86,7 +86,7 @@ namespace Telerik.JustMock.Core.Context
 					if (stateMachineAttr == null)
 						return false;
 					var stateMachineImpl = StateMachineTypeProperty.GetValue(stateMachineAttr, null);
-					return stateMachineImpl == declType;
+					return ReferenceEquals(stateMachineImpl, declType);
 				});
 		}
 

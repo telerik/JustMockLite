@@ -1604,6 +1604,9 @@
     <Compile Include="..\Telerik.JustMock\Helpers\MultipleReturnValueChainHelper.cs">
       <Link>Helpers\MultipleReturnValueChainHelper.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Helpers\TaskHelper.cs">
+      <Link>Helpers\TaskHelper.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Mock.Arrange.cs">
       <Link>Mock.Arrange.cs</Link>
     </Compile>

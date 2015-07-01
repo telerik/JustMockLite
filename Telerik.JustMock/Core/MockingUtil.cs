@@ -25,6 +25,7 @@ using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Telerik.JustMock.Core.MatcherTree;
 using Telerik.JustMock.Core.Recording;
 
@@ -768,6 +769,13 @@ namespace Telerik.JustMock.Core
 		public static bool IsInheritable(this MethodBase method)
 		{
 			return method.IsVirtual && !method.IsFinal;
+		}
+
+		public static Task<T> TaskFromResult<T>(T value)
+		{
+			var tcs = new TaskCompletionSource<T>();
+			tcs.SetResult(value);
+			return tcs.Task;
 		}
 
 #if !COREFX

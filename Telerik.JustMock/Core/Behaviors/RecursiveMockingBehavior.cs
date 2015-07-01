@@ -20,7 +20,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
 using Telerik.JustMock.Core.Context;
 
 namespace Telerik.JustMock.Core.Behaviors
@@ -69,57 +71,10 @@ namespace Telerik.JustMock.Core.Behaviors
 			{
 				var parentMock = MocksRepository.GetMockMixinFromInvocation(invocation);
 				var repository = parentMock.Repository;
-				var replicator = parentMock as IMockReplicator;
 
-				bool mustReturnAMock = invocation.InArrange || this.type == RecursiveMockingBehaviorType.ReturnMock;
-				if (mustReturnAMock || this.type == RecursiveMockingBehaviorType.ReturnDefault)
+				if (MustReturnMock(invocation) || this.type == RecursiveMockingBehaviorType.ReturnDefault)
 				{
-					if (returnType.IsArray)
-					{
-						mock = Array.CreateInstance(returnType.GetElementType(), Enumerable.Repeat(0, returnType.GetArrayRank()).ToArray());
-					}
-
-					var idictionaryType = returnType.GetImplementationOfGenericInterface(typeof(IDictionary<,>));
-					if (mock == null && idictionaryType != null)
-					{
-						var dictType = typeof(Dictionary<,>).MakeGenericType(idictionaryType.GetGenericArguments());
-						mock = MockCollection.Create(returnType, repository, replicator, (IEnumerable)MockingUtil.CreateInstance(dictType));
-					}
-
-					var ienumerableType = returnType.GetImplementationOfGenericInterface(typeof(IEnumerable<>));
-					if (mock == null && ienumerableType != null)
-					{
-						var listType = typeof(List<>).MakeGenericType(ienumerableType.GetGenericArguments());
-						mock = MockCollection.Create(returnType, repository, replicator, (IEnumerable)MockingUtil.CreateInstance(listType));
-					}
-
-					if (mock == null && mustReturnAMock)
-					{
-#if !LITE_EDITION
-						var stackTrace = new StackTrace();
-						var methodCallingArrange = stackTrace.EnumerateFrames()
-							.SkipWhile(m => !Attribute.IsDefined(m, typeof(ArrangeMethodAttribute)))
-							.SkipWhile(m => m.Module.Assembly == typeof(MocksRepository).Assembly)
-							.FirstOrDefault();
-
-						if (methodCallingArrange != null && invocation.Method.DeclaringType.IsAssignableFrom(methodCallingArrange.DeclaringType))
-							return;
-#endif
-
-						if (typeof(String) == returnType)
-						{
-							mock = String.Empty;
-						}
-						else
-						{
-							try
-							{
-								mock = replicator.CreateSimilarMock(repository, returnType, null, true, null);
-							}
-							catch (MockException)
-							{ }
-						}
-					}
+					mock = CreateMock(returnType, repository, invocation);
 				}
 
 				if (mock == null)
@@ -140,6 +95,85 @@ namespace Telerik.JustMock.Core.Behaviors
 			invocation.ReturnValue = mock;
 			invocation.CallOriginal = false;
 			invocation.UserProvidedImplementation = true;
+		}
+
+		private bool MustReturnMock(Invocation invocation, bool checkPropertyOnTestFixture = false)
+		{
+			if (checkPropertyOnTestFixture)
+			{
+#if !LITE_EDITION
+				var stackTrace = new StackTrace();
+				var methodCallingArrange = stackTrace.EnumerateFrames()
+					.SkipWhile(m => !Attribute.IsDefined(m, typeof(ArrangeMethodAttribute)))
+					.SkipWhile(m => m.Module.Assembly == typeof(MocksRepository).Assembly)
+					.FirstOrDefault();
+
+				if (methodCallingArrange != null && invocation.Method.DeclaringType.IsAssignableFrom(methodCallingArrange.DeclaringType))
+					return false;
+#endif
+			}
+
+			return invocation.InArrange || this.type == RecursiveMockingBehaviorType.ReturnMock;
+		}
+
+		private object CreateMock(Type returnType, MocksRepository repository, Invocation invocation)
+		{
+			var parentMock = MocksRepository.GetMockMixinFromInvocation(invocation);
+			var replicator = parentMock as IMockReplicator;
+
+			object mock = null;
+			if (returnType.IsArray)
+			{
+				mock = Array.CreateInstance(returnType.GetElementType(), Enumerable.Repeat(0, returnType.GetArrayRank()).ToArray());
+			}
+
+			var idictionaryType = returnType.GetImplementationOfGenericInterface(typeof(IDictionary<,>));
+			if (mock == null && idictionaryType != null)
+			{
+				var dictType = typeof(Dictionary<,>).MakeGenericType(idictionaryType.GetGenericArguments());
+				mock = MockCollection.Create(returnType, repository, replicator, (IEnumerable)MockingUtil.CreateInstance(dictType));
+			}
+
+			var ienumerableType = returnType.GetImplementationOfGenericInterface(typeof(IEnumerable<>));
+			if (mock == null && ienumerableType != null)
+			{
+				var listType = typeof(List<>).MakeGenericType(ienumerableType.GetGenericArguments());
+				mock = MockCollection.Create(returnType, repository, replicator, (IEnumerable)MockingUtil.CreateInstance(listType));
+			}
+
+			if (mock == null && typeof(Task).IsAssignableFrom(returnType))
+			{
+				var elementType = returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>)
+					? returnType.GetGenericArguments()[0] : typeof(object);
+				var taskResultValue = MustReturnMock(invocation)
+					? CreateMock(elementType, repository, invocation)
+					: elementType.GetDefaultValue();
+
+				Expression<Func<Task<object>>> taskFromResult = () => MockingUtil.TaskFromResult((object)null);
+				mock = ((MethodCallExpression)taskFromResult.Body).Method
+					.GetGenericMethodDefinition()
+					.MakeGenericMethod(elementType)
+					.Invoke(null, new object[] { taskResultValue });
+			}
+
+			if (mock == null && MustReturnMock(invocation, checkPropertyOnTestFixture: true))
+			{
+				if (typeof(String) == returnType)
+				{
+					mock = String.Empty;
+				}
+				else
+				{
+					try
+					{
+						mock = replicator.CreateSimilarMock(repository, returnType, null, true, null);
+					}
+					catch (MockException)
+					{ }
+				}
+			}
+
+			return mock;
 		}
 	}
 }

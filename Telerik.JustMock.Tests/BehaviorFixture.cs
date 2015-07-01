@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Telerik.JustMock.Core;
 
 #if NUNIT
@@ -226,6 +227,37 @@ namespace Telerik.JustMock.Tests
 			{
 				throw new InvalidOperationException();
 			}
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior"), TestCategory("Task")]
+		public async Task ShouldAutoArrangeResultOfAsyncMethodOnRecursiveLooseMock()
+		{
+			var mock = Mock.Create<IAsyncTest>();
+			var result = await mock.GetAsync();
+			Assert.NotNull(result);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior"), TestCategory("Task")]
+		public async Task ShouldAutoArrangeResultOfAsyncMethodOnLooseMock()
+		{
+			var mock = Mock.Create<IAsyncTest>(Behavior.Loose);
+			var result = await mock.GetAsync();
+			Assert.Null(result);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior"), TestCategory("Task")]
+		public async Task ShouldArrangeTaskResultOfAsyncMethod()
+		{
+			var mock = Mock.Create<IAsyncTest>();
+			Mock.Arrange(() => mock.GetIntAsync()).TaskResult(5);
+			var result = await mock.GetIntAsync();
+			Assert.Equal(5, result);
+		}
+
+		public interface IAsyncTest
+		{
+			Task<IDisposable> GetAsync();
+			Task<int> GetIntAsync();
 		}
 	}
 }

@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Telerik.JustMock</RootNamespace>
     <AssemblyName>Telerik.JustMock</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>
     </SccProjectName>
@@ -535,6 +535,7 @@
     <Compile Include="Core\TransparentProxy\MockingProxy.cs" />
     <Compile Include="Core\TransparentProxy\ProxyInvocation.cs" />
     <Compile Include="DebugView.cs" />
+    <Compile Include="Helpers\TaskHelper.cs" />
     <Compile Include="Setup\DisableAutomaticRepositoryResetAttribute.cs">
       <SubType>Code</SubType>
     </Compile>
