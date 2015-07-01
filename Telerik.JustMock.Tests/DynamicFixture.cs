@@ -178,5 +178,18 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal("", mock.RootWrapper.Left.Name);
 			Assert.Equal("abc", mock.RootWrapper.Left.Left.Right.Name);
 		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+		public void ShouldAssertNonPublicMethodViaDynaMock()
+		{
+			var mock = Mock.Create<TestBed>();
+			var wrapper = Mock.NonPublic.Wrap(mock);
+
+			Assert.Throws<AssertionException>(() => Mock.NonPublic.Assert(wrapper.Value = 123, Occurs.Once()));
+			Assert.Throws<AssertionException>(() => Mock.NonPublic.Assert(wrapper.Value = ArgExpr.IsAny<int>(), Occurs.Once()));
+			mock.ValueWrapper = 123;
+			Mock.NonPublic.Assert(wrapper.Value = 123, Occurs.Once());
+			Mock.NonPublic.Assert(wrapper.Value = ArgExpr.IsAny<int>(), Occurs.Once());
+		}
 	}
 }

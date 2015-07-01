@@ -352,12 +352,60 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <returns>Non-public accessor.</returns>
 		PrivateAccessor MakeStaticPrivateAccessor(Type type);
 
+		/// <summary>
+		/// Returns a dynamic wrapper of the given object that can be used to arrange non-public instance members on the object.
+		/// </summary>
+		/// <param name="instance">The object to wrap.</param>
+		/// <returns>A wrapper that can be passed to Arrange.</returns>
 		dynamic Wrap(object instance);
 
+		/// <summary>
+		/// Returns a dynamic wrapper of the given type that can be used to arrange non-public static members on the type.
+		/// </summary>
+		/// <param name="type">The type to wrap.</param>
+		/// <returns>A wrapper that can be passed to Arrange.</returns>
 		dynamic WrapType(Type type);
 
+		/// <summary>
+		/// Arranges an expectation on a void method given using a dynamic wrapper built with Wrap().
+		/// </summary>
+		/// <param name="dynamicExpression">An expression built using a wrapper returned by Wrap.</param>
+		/// <returns>An expectation object that can further configure the arrangement</returns>
+		/// <example>
+		/// var mock = Mock.NonPublic.Wrap(myobj);
+		/// Mock.NonPublic.Arrange(mock.PrivateMethod(ArgExpr.IsAny&lt;int&gt;()).DoNothing();
+		/// Mock.NonPublic.Arrange(mock.Value = ArgExpr.IsAny&lt;int&gt;()).MustBeCalled();
+		/// 
+		/// var staticMock = Mock.NonPublic.WrapType(typeof(MyType));
+		/// Mock.NonPublic.Arrange(staticMock.PrivateMethod()).DoNothing();
+		/// </example>
 		ActionExpectation Arrange(IExpressionContainer dynamicExpression);
 
+		/// <summary>
+		/// Arranges an expectation on a non-void method given using a dynamic wrapper built with Wrap().
+		/// </summary>
+		/// <param name="dynamicExpression">An expression built using a wrapper returned by Wrap.</param>
+		/// <returns>An expectation object that can further configure the arrangement</returns>
+		/// <example>
+		/// var mock = Mock.NonPublic.Wrap(myobj);
+		/// Mock.NonPublic.Arrange&lt;int&gt;(mock.PrivateValue).Returns(123);
+		/// Mock.NonPublic.Arrange&lt;string&gt;(mock.GetNamePrivate(123)).Returns("me");
+		/// </example>
 		FuncExpectation<TReturn> Arrange<TReturn>(IExpressionContainer dynamicExpression);
+
+		/// <summary>
+		/// Asserts an expectation given using a dynamic wrapper built with Wrap()
+		/// </summary>
+		/// <param name="dynamicExpression">An expression built using a wrapper returned by Wrap.</param>
+		/// <param name="occurs">Occurrence expectation to assert.</param>
+		void Assert(IExpressionContainer dynamicExpression, Occurs occurs);
+
+		/// <summary>
+		/// Asserts an expectation given using a dynamic wrapper built with Wrap()
+		/// </summary>
+		/// <param name="dynamicExpression">An expression built using a wrapper returned by Wrap.</param>
+		/// <param name="args">Additional arguments to clarify the assertion expression.</param>
+		/// <param name="occurs">Occurrence expectation to assert.</param>
+		void Assert(IExpressionContainer dynamicExpression, Args args, Occurs occurs);
 	}
 }

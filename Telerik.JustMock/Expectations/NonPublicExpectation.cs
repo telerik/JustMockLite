@@ -522,28 +522,52 @@ namespace Telerik.JustMock.Expectations
 		public dynamic Wrap(object instance)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
-				new ExpressionContainer(Expression.Constant(instance, MockingUtil.GetUnproxiedType(instance)))
+				{
+#if !LITE_EDITION
+					Mock.Intercept(instance.GetType());
+#endif
+					return new ExpressionContainer(Expression.Constant(instance, MockingUtil.GetUnproxiedType(instance)));
+				}
 			);
 		}
 
 		public dynamic WrapType(Type type)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
-				new ExpressionContainer(Expression.Constant(type.GetDefaultValue(), type)) { IsStatic = true }
+				{
+#if !LITE_EDITION
+					Mock.Intercept(type);
+#endif
+					return new ExpressionContainer(Expression.Constant(type.GetDefaultValue(), type)) { IsStatic = true };
+				}
 			);
 		}
 
 		public ActionExpectation Arrange(IExpressionContainer dynamicExpression)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
-				MockingContext.CurrentRepository.Arrange(Expression.Lambda(dynamicExpression.Expression), () => new ActionExpectation())
+				MockingContext.CurrentRepository.Arrange(dynamicExpression.ToLambda(), () => new ActionExpectation())
 			);
 		}
 
 		public FuncExpectation<TReturn> Arrange<TReturn>(IExpressionContainer dynamicExpression)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
-				MockingContext.CurrentRepository.Arrange(Expression.Lambda(dynamicExpression.Expression), () => new FuncExpectation<TReturn>())
+				MockingContext.CurrentRepository.Arrange(dynamicExpression.ToLambda(), () => new FuncExpectation<TReturn>())
+			);
+		}
+
+		public void Assert(IExpressionContainer dynamicExpression, Occurs occurs)
+		{
+			ProfilerInterceptor.GuardInternal(() =>
+				MockingContext.CurrentRepository.Assert(null, dynamicExpression.ToLambda(), null, occurs)
+			);
+		}
+
+		public void Assert(IExpressionContainer dynamicExpression, Args args, Occurs occurs)
+		{
+			ProfilerInterceptor.GuardInternal(() =>
+				MockingContext.CurrentRepository.Assert(null, dynamicExpression.ToLambda(), args, occurs)
 			);
 		}
 	}
