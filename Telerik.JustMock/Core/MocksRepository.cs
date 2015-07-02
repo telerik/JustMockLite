@@ -1122,6 +1122,13 @@ namespace Telerik.JustMock.Core
 					continue;
 				}
 
+				if (rootTarget is BinaryExpression)
+				{
+					prevToRoot = rootTarget;
+					rootTarget = ((BinaryExpression)rootTarget).Left;
+					continue;
+				}
+
 				break;
 			}
 

@@ -24,7 +24,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		Expression Expression { get; }
 	}
 
-	public static class ExpressionContainerExtensions
+	internal static class ExpressionContainerExtensions
 	{
 		public static Expression ToLambda(this IExpressionContainer expressionContainer)
 		{

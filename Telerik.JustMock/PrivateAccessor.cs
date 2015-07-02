@@ -16,7 +16,10 @@
 */
 
 using System;
+using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using Telerik.JustMock.Core;
 
@@ -31,11 +34,17 @@ namespace Telerik.JustMock
 	/// Gives access to the non-public members of a type or instance. This class provides functionality similar to the
 	/// one that exists in regular reflection classes with the added benefit that it can bypass essential security checks related
 	/// to accessing non-public members through reflection.
+	/// </summary>
+	/// <remarks>
 	/// When the profiler is enabled, PrivateAccessor acquires additional power:
 	/// - It can even be used to access all kinds of non-public members in Silverlight (and when running in partial trust in general).
 	/// - All calls made through PrivateAccessor are always made with full trust (unrestricted) permissions.
-	/// </summary>
-	public sealed class PrivateAccessor
+	/// 
+	/// You can assign a PrivateAccessor to a dynamic variable and access it as if you're referencing the original object:
+	/// dynamic acc = new PrivateAccessor(myobj);
+	/// acc.PrivateProperty = acc.PrivateMethod(123); // PrivateProperty and PrivateMethod are private members on myobj's type.
+	/// </remarks>
+	public sealed class PrivateAccessor : IDynamicMetaObjectProvider
 	{
 		private object instance;
 		private Type type;
@@ -61,7 +70,7 @@ namespace Telerik.JustMock
 		private PrivateAccessor(object instance, Type type)
 		{
 			this.instance = instance;
-			this.type = type.IsProxy() ? type.BaseType : type;
+			this.type = type.IsProxy() && type.BaseType != typeof(object) ? type.BaseType : type;
 		}
 
 		/// <summary>
@@ -218,6 +227,14 @@ namespace Telerik.JustMock
 				});
 		}
 
+		/// <summary>
+		/// The wrapped instance.
+		/// </summary>
+		public object Instance
+		{
+			get { return this.instance; }
+		}
+
 		private void CheckMemberInfo(string kind, string name, MemberInfo mi)
 		{
 			if (mi == null)
@@ -260,6 +277,96 @@ namespace Telerik.JustMock
 		private object CallInvoke(MethodBase method, object[] args)
 		{
 			return ProfilerInterceptor.GuardExternal(() => SecuredReflectionMethods.Invoke(method, this.instance, args));
+		}
+
+		DynamicMetaObject IDynamicMetaObjectProvider.GetMetaObject(Expression parameter)
+		{
+			return new PrivateAccessorMetaObject(parameter, BindingRestrictions.Empty, this);
+		}
+
+		private class PrivateAccessorMetaObject : DynamicMetaObject
+		{
+			public PrivateAccessorMetaObject(Expression expression, BindingRestrictions restrictions)
+				: base(expression, restrictions)
+			{ }
+
+			public PrivateAccessorMetaObject(Expression expression, BindingRestrictions restrictions, object value)
+				: base(expression, restrictions, value)
+			{ }
+
+			private DynamicMetaObject CreateMetaObject(Expression value, bool wrap = true)
+			{
+				if (wrap)
+					value = Expression.New(typeof(PrivateAccessor).GetConstructor(new[] { typeof(object) }), value);
+				return new PrivateAccessorMetaObject(value, BindingRestrictions.GetTypeRestriction(this.Expression, typeof(PrivateAccessor)));
+			}
+
+			public override DynamicMetaObject BindInvokeMember(InvokeMemberBinder binder, DynamicMetaObject[] args)
+			{
+				var invoke = typeof(PrivateAccessor).GetMethod("CallMethod", new[] { typeof(string), typeof(object[]) });
+				var call = Expression.Call(Expression.Convert(this.Expression, typeof(PrivateAccessor)), invoke,
+					Expression.Constant(binder.Name),
+					Expression.NewArrayInit(typeof(object), args.Select(a => Expression.Convert(a.Expression, typeof(object)))));
+
+				return CreateMetaObject(call);
+			}
+
+			private DynamicMetaObject BindGetProperty(string propertyName, IEnumerable<Expression> indexes)
+			{
+				var getProp = typeof(PrivateAccessor).GetMethod("GetProperty");
+
+				var call = Expression.Call(Expression.Convert(this.Expression, typeof(PrivateAccessor)), getProp,
+					Expression.Constant(propertyName),
+					Expression.NewArrayInit(typeof(object), indexes.Select(a => Expression.Convert(a, typeof(object)))));
+				return CreateMetaObject(call);
+			}
+
+			private DynamicMetaObject BindSetProperty(Type returnType, string propertyName, Expression value, IEnumerable<Expression> indexes)
+			{
+				var setProp = typeof(PrivateAccessor).GetMethod("SetProperty");
+
+				var tempValue = Expression.Variable(value.Type);
+				var call = Expression.Call(Expression.Convert(this.Expression, typeof(PrivateAccessor)), setProp,
+					Expression.Constant(propertyName),
+					Expression.Convert(tempValue, typeof(object)),
+					Expression.NewArrayInit(typeof(object), indexes.Select(a => Expression.Convert(a, typeof(object)))));
+				return CreateMetaObject(
+					Expression.Block(new[] { tempValue },
+					new Expression[]
+					{
+						Expression.Assign(tempValue, value),
+						call,
+						Expression.Convert(tempValue, returnType),
+					}), wrap: false);
+			}
+
+			public override DynamicMetaObject BindGetMember(GetMemberBinder binder)
+			{
+				return BindGetProperty(binder.Name, new Expression[0]);
+			}
+
+			public override DynamicMetaObject BindSetMember(SetMemberBinder binder, DynamicMetaObject value)
+			{
+				return BindSetProperty(binder.ReturnType, binder.Name, value.Expression, new Expression[0]);
+			}
+
+			public override DynamicMetaObject BindGetIndex(GetIndexBinder binder, DynamicMetaObject[] indexes)
+			{
+				return BindGetProperty("Item", indexes.Select(i => i.Expression));
+			}
+
+			public override DynamicMetaObject BindSetIndex(SetIndexBinder binder, DynamicMetaObject[] indexes, DynamicMetaObject value)
+			{
+				return BindSetProperty(binder.ReturnType, "Item", value.Expression, indexes.Select(i => i.Expression));
+			}
+
+			public override DynamicMetaObject BindConvert(ConvertBinder binder)
+			{
+				var obj = typeof(PrivateAccessor).GetProperty("Instance");
+				return new DynamicMetaObject(
+					Expression.Convert(Expression.Property(Expression.Convert(this.Expression, typeof(PrivateAccessor)), obj), binder.Type),
+					BindingRestrictions.GetTypeRestriction(this.Expression, typeof(PrivateAccessor)));
+			}
 		}
 	}
 

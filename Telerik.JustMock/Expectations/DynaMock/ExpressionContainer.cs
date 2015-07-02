@@ -21,7 +21,7 @@ using Telerik.JustMock.Expectations.Abstraction;
 
 namespace Telerik.JustMock.Expectations.DynaMock
 {
-	public class ExpressionContainer : IDynamicMetaObjectProvider, IExpressionContainer
+	internal sealed class ExpressionContainer : IDynamicMetaObjectProvider, IExpressionContainer
 	{
 		public Expression Expression { get; set; }
 
@@ -32,7 +32,7 @@ namespace Telerik.JustMock.Expectations.DynaMock
 			this.Expression = expression;
 		}
 
-		public DynamicMetaObject GetMetaObject(Expression parameter)
+		DynamicMetaObject IDynamicMetaObjectProvider.GetMetaObject(Expression parameter)
 		{
 			return new ExpressionRecorder(parameter, BindingRestrictions.Empty, this);
 		}
