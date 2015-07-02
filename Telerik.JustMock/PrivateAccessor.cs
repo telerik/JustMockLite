@@ -46,8 +46,8 @@ namespace Telerik.JustMock
 	/// </remarks>
 	public sealed class PrivateAccessor : IDynamicMetaObjectProvider
 	{
-		private object instance;
-		private Type type;
+		private readonly object instance;
+		private readonly Type type;
 
 		/// <summary>
 		/// Creates a new <see cref="PrivateAccessor"/> wrapping the given instance. Can be used to access both instance and static members.
@@ -297,7 +297,25 @@ namespace Telerik.JustMock
 			private DynamicMetaObject CreateMetaObject(Expression value, bool wrap = true)
 			{
 				if (wrap)
-					value = Expression.New(typeof(PrivateAccessor).GetConstructor(new[] { typeof(object) }), value);
+				{
+					var valueVar = Expression.Variable(value.Type);
+					var statements = new List<Expression>();
+
+					if (!value.Type.IsValueType)
+					{
+						statements.Add(Expression.Assign(valueVar, value));
+						statements.Add(Expression.Condition(
+							Expression.Equal(valueVar, Expression.Constant(null)),
+							Expression.Constant(null, typeof(PrivateAccessor)),
+							Expression.New(typeof(PrivateAccessor).GetConstructor(new[] { typeof(object) }), valueVar)));
+					}
+					else
+					{
+						statements.Add(value);
+					}
+
+					value = Expression.Block(new[] { valueVar }, statements.ToArray());
+				}
 				return new PrivateAccessorMetaObject(value, BindingRestrictions.GetTypeRestriction(this.Expression, typeof(PrivateAccessor)));
 			}
 
