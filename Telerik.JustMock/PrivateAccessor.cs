@@ -214,6 +214,37 @@ namespace Telerik.JustMock
 		}
 
 		/// <summary>
+		/// Gets the value of a field or property.
+		/// </summary>
+		/// <param name="name">Name of a field or property to get.</param>
+		/// <returns>The value of the field or property.</returns>
+		public object GetMember(string name)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+				{
+					var field = ResolveField(name);
+					return field != null ? GetField(name) : GetProperty(name);
+				});
+		}
+
+		/// <summary>
+		/// Sets the value of a field or property.
+		/// </summary>
+		/// <param name="name">The name of a field or property to set</param>
+		/// <param name="value">The new value of the field or property.</param>
+		public void SetMember(string name, object value)
+		{
+			ProfilerInterceptor.GuardInternal(() =>
+				{
+					var field = ResolveField(name);
+					if (field != null)
+						SetField(name, value);
+					else
+						SetProperty(name, value);
+				});
+		}
+
+		/// <summary>
 		/// Raises the specified event passing the given arguments to the handlers.
 		/// </summary>
 		/// <param name="name">The name of the event to raise.</param>
@@ -329,25 +360,22 @@ namespace Telerik.JustMock
 				return CreateMetaObject(call);
 			}
 
-			private DynamicMetaObject BindGetProperty(string propertyName, IEnumerable<Expression> indexes)
+			private DynamicMetaObject BindSetMember(Type returnType, string propertyName, Expression value, IEnumerable<Expression> indexes = null)
 			{
-				var getProp = typeof(PrivateAccessor).GetMethod("GetProperty");
+				bool hasIndexes = indexes != null;
 
-				var call = Expression.Call(Expression.Convert(this.Expression, typeof(PrivateAccessor)), getProp,
-					Expression.Constant(propertyName),
-					Expression.NewArrayInit(typeof(object), indexes.Select(a => Expression.Convert(a, typeof(object)))));
-				return CreateMetaObject(call);
-			}
-
-			private DynamicMetaObject BindSetProperty(Type returnType, string propertyName, Expression value, IEnumerable<Expression> indexes)
-			{
-				var setProp = typeof(PrivateAccessor).GetMethod("SetProperty");
+				var setProp = typeof(PrivateAccessor).GetMethod(hasIndexes ? "SetProperty" : "SetMember");
 
 				var tempValue = Expression.Variable(value.Type);
-				var call = Expression.Call(Expression.Convert(this.Expression, typeof(PrivateAccessor)), setProp,
+				var arguments = new List<Expression>
+				{
 					Expression.Constant(propertyName),
 					Expression.Convert(tempValue, typeof(object)),
-					Expression.NewArrayInit(typeof(object), indexes.Select(a => Expression.Convert(a, typeof(object)))));
+				};
+				if (hasIndexes)
+					arguments.Add(Expression.NewArrayInit(typeof(object), indexes.Select(a => Expression.Convert(a, typeof(object)))));
+
+				var call = Expression.Call(Expression.Convert(this.Expression, typeof(PrivateAccessor)), setProp, arguments.ToArray());
 				return CreateMetaObject(
 					Expression.Block(new[] { tempValue },
 					new Expression[]
@@ -360,22 +388,29 @@ namespace Telerik.JustMock
 
 			public override DynamicMetaObject BindGetMember(GetMemberBinder binder)
 			{
-				return BindGetProperty(binder.Name, new Expression[0]);
+				var getProp = typeof(PrivateAccessor).GetMethod("GetMember");
+				var call = Expression.Call(Expression.Convert(this.Expression, typeof(PrivateAccessor)), getProp, Expression.Constant(binder.Name));
+				return CreateMetaObject(call);
 			}
 
 			public override DynamicMetaObject BindSetMember(SetMemberBinder binder, DynamicMetaObject value)
 			{
-				return BindSetProperty(binder.ReturnType, binder.Name, value.Expression, new Expression[0]);
+				return BindSetMember(binder.ReturnType, binder.Name, value.Expression);
 			}
 
 			public override DynamicMetaObject BindGetIndex(GetIndexBinder binder, DynamicMetaObject[] indexes)
 			{
-				return BindGetProperty("Item", indexes.Select(i => i.Expression));
+				var getProp = typeof(PrivateAccessor).GetMethod("GetProperty");
+
+				var call = Expression.Call(Expression.Convert(this.Expression, typeof(PrivateAccessor)), getProp,
+					Expression.Constant("Item"),
+					Expression.NewArrayInit(typeof(object), indexes.Select(a => Expression.Convert(a.Expression, typeof(object)))));
+				return CreateMetaObject(call);
 			}
 
 			public override DynamicMetaObject BindSetIndex(SetIndexBinder binder, DynamicMetaObject[] indexes, DynamicMetaObject value)
 			{
-				return BindSetProperty(binder.ReturnType, "Item", value.Expression, indexes.Select(i => i.Expression));
+				return BindSetMember(binder.ReturnType, "Item", value.Expression, indexes.Select(i => i.Expression));
 			}
 
 			public override DynamicMetaObject BindConvert(ConvertBinder binder)
