@@ -2167,28 +2167,6 @@ namespace Telerik.JustMock.Tests
 		}
 #endif
 
-#if LITE_EDITION && SILVERLIGHT
-		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
-		public void ShouldThrowWhenArrangingSealedMethod()
-		{
-			var foo = Mock.Create<HasCalls>();
-			Assert.Throws<ElevatedMockingException>(() => Mock.Arrange(() => foo.GetIntFromCall()));
-		}
-
-		public interface IHasCalls
-		{
-			int GetIntFromCall();
-		}
-
-		public class HasCalls : IHasCalls
-		{
-			public int GetIntFromCall()
-			{
-				return 123;
-			}
-		}
-#endif
-
 		public class ClassWithCtor
 		{
 			public ClassWithCtor(string s)

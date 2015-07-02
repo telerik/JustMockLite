@@ -62,6 +62,39 @@ namespace Telerik.JustMock.Tests
 				get { throw new NotImplementedException(); }
 				set { throw new NotImplementedException(); }
 			}
+
+			public class Accessor
+			{
+				private readonly TestBed testBed;
+
+				public Accessor(TestBed testBed)
+				{
+					this.testBed = testBed;
+				}
+
+				public int Value
+				{
+					get { return this.testBed.Value; }
+					set { this.testBed.Value = value; }
+				}
+
+				public int Get(int x, string y)
+				{
+					return this.testBed.Get(x, y);
+				}
+
+				public int this[string x]
+				{
+					get { return this.testBed[x]; }
+					set { this.testBed[x] = value; }
+				}
+
+				public INode Root
+				{
+					get { return this.testBed.Root; }
+					set { this.testBed.Root = value; }
+				}
+			}
 		}
 
 		public interface INode
@@ -77,7 +110,7 @@ namespace Telerik.JustMock.Tests
 			var mock = Mock.Create<TestBed>();
 			dynamic wrapper = Mock.NonPublic.Wrap(mock);
 			Mock.NonPublic.Arrange<int>(wrapper.Value).Returns(123);
-			Assert.Equal(123, new PrivateAccessor(mock).GetProperty("Value"));
+			Assert.Equal(123, new TestBed.Accessor(mock).Value);
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
@@ -85,7 +118,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var mock = Mock.Create<TestBed>();
 			dynamic wrapper = Mock.NonPublic.Wrap(mock);
-			dynamic acc = new PrivateAccessor(mock);
+			var acc = new TestBed.Accessor(mock);
 			Mock.NonPublic.Arrange(wrapper.Value = 123).MustBeCalled();
 
 			acc.Value = 100;
@@ -103,7 +136,7 @@ namespace Telerik.JustMock.Tests
 			Mock.NonPublic.Arrange(wrapper.Value = ArgExpr.IsAny<int>()).MustBeCalled();
 
 			Assert.Throws<AssertionException>(() => Mock.Assert(mock));
-			new PrivateAccessor(mock).SetProperty("Value", 77);
+			new TestBed.Accessor(mock).Value = 77;
 			Mock.Assert(mock);
 		}
 
@@ -114,9 +147,9 @@ namespace Telerik.JustMock.Tests
 			dynamic wrapper = Mock.NonPublic.Wrap(mock);
 			Mock.NonPublic.Arrange<int>(wrapper.Get(10, "ss")).Returns(123);
 
-			dynamic acc = Mock.NonPublic.MakePrivateAccessor(mock);
-			Assert.Equal(0, (int) acc.Get(20, "dd"));
-			Assert.Equal(123, (int) acc.Get(10, "ss"));
+			var acc = new TestBed.Accessor(mock);
+			Assert.Equal(0, acc.Get(20, "dd"));
+			Assert.Equal(123, acc.Get(10, "ss"));
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
@@ -126,9 +159,9 @@ namespace Telerik.JustMock.Tests
 			dynamic wrapper = Mock.NonPublic.Wrap(mock);
 			Mock.NonPublic.Arrange<int>(wrapper.Get(ArgExpr.Matches<int>(x => x > 40), ArgExpr.IsAny<string>())).Returns(123);
 
-			dynamic acc = Mock.NonPublic.MakePrivateAccessor(mock);
-			Assert.Equal(0, (int) acc.Get(20, "ss"));
-			Assert.Equal(123, (int) acc.Get(50, "dd"));
+			var acc = new TestBed.Accessor(mock);
+			Assert.Equal(0, acc.Get(20, "ss"));
+			Assert.Equal(123, acc.Get(50, "dd"));
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
@@ -139,9 +172,9 @@ namespace Telerik.JustMock.Tests
 
 			Mock.NonPublic.Arrange<int>(wrapper["sss"]).Returns(123);
 
-			dynamic acc = Mock.NonPublic.MakePrivateAccessor(mock);
-			Assert.Equal(0, (int) acc["ssd"]);
-			Assert.Equal(123, (int) acc["sss"]);
+			var acc = new TestBed.Accessor(mock);
+			Assert.Equal(0, acc["ssd"]);
+			Assert.Equal(123, acc["sss"]);
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
@@ -149,7 +182,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var mock = Mock.Create<TestBed>();
 			dynamic wrapper = Mock.NonPublic.Wrap(mock);
-			dynamic acc = Mock.NonPublic.MakePrivateAccessor(mock);
+			var acc = new TestBed.Accessor(mock);
 
 			Mock.NonPublic.Arrange<int>(wrapper["sss"] = 1000).MustBeCalled();
 
@@ -167,12 +200,12 @@ namespace Telerik.JustMock.Tests
 		{
 			var mock = Mock.Create<TestBed>();
 			dynamic wrapper = Mock.NonPublic.Wrap(mock);
-			dynamic acc = Mock.NonPublic.MakePrivateAccessor(mock);
+			var acc = new TestBed.Accessor(mock);
 
 			Mock.NonPublic.Arrange<string>(wrapper.Root.Left.Left.Right.Name).Returns("abc");
 
-			Assert.Equal("", (string) acc.Root.Left.Name);
-			Assert.Equal("abc", (string) acc.Root.Left.Left.Right.Name);
+			Assert.Equal("", acc.Root.Left.Name);
+			Assert.Equal("abc", acc.Root.Left.Left.Right.Name);
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
@@ -183,7 +216,7 @@ namespace Telerik.JustMock.Tests
 
 			Assert.Throws<AssertionException>(() => Mock.NonPublic.Assert(wrapper.Value = 123, Occurs.Once()));
 			Assert.Throws<AssertionException>(() => Mock.NonPublic.Assert(wrapper.Value = ArgExpr.IsAny<int>(), Occurs.Once()));
-			new PrivateAccessor(mock).SetProperty("Value", 123);
+			new TestBed.Accessor(mock).Value = 123;
 			Mock.NonPublic.Assert(wrapper.Value = 123, Occurs.Once());
 			Mock.NonPublic.Assert(wrapper.Value = ArgExpr.IsAny<int>(), Occurs.Once());
 		}

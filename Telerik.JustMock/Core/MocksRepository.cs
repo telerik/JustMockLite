@@ -923,7 +923,6 @@ namespace Telerik.JustMock.Core
 				if (!type.IsInterface && method.DeclaringType.IsAssignableFrom(type))
 				{
 					var concreteMethod = MockingUtil.GetConcreteImplementer(method, type);
-#if !SILVERLIGHT
 					if (!concreteMethod.IsInheritable() && !ProfilerInterceptor.IsProfilerAttached)
 					{
 						var reimplementedInterfaceMethod = (MethodInfo)method.GetInheritanceChain().Last();
@@ -933,7 +932,6 @@ namespace Telerik.JustMock.Core
 							concreteMethod = reimplementedInterfaceMethod;
 						}
 					}
-#endif
 					method = concreteMethod;
 				}
 			}
@@ -1126,6 +1124,13 @@ namespace Telerik.JustMock.Core
 				{
 					prevToRoot = rootTarget;
 					rootTarget = ((BinaryExpression)rootTarget).Left;
+					continue;
+				}
+
+				if (rootTarget is IndexExpression)
+				{
+					prevToRoot = rootTarget;
+					rootTarget = ((IndexExpression)rootTarget).Object;
 					continue;
 				}
 
