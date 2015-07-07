@@ -69,7 +69,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IFoo>(Behavior.Strict);
 
-			string expected = "All calls on Telerik.JustMock.Tests.BehaviorFixture+IFoo should be arranged first.";
+			string expected = "All calls on 'Telerik.JustMock.Tests.BehaviorFixture+IFoo' should be arranged first.";
 			string actual = Assert.Throws<MockException>(() => foo.GetGuid()).Message;
 
 			Assert.Equal(expected, actual);
@@ -226,6 +226,38 @@ namespace Telerik.JustMock.Tests
 			{
 				throw new InvalidOperationException();
 			}
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior"), TestCategory("Strict")]
+		public void ShouldAssertStrictMock()
+		{
+			var mock = Mock.Create<IFoo>(Behavior.Strict);
+			Mock.Assert(mock);
+
+			try
+			{
+				mock.GetGuid();
+			}
+			catch (Exception) { }
+
+			var message = Assert.Throws<AssertionException>(() => Mock.Assert(mock)).Message;
+			Assert.Equal("Called unarranged member 'System.Guid GetGuid()' on strict mock of type 'Telerik.JustMock.Tests.BehaviorFixture+IFoo'", message.Trim());
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior"), TestCategory("Strict")]
+		public void ShouldAssertStrictDelegateMock()
+		{
+			var mock = Mock.Create<Action>(Behavior.Strict);
+			Mock.Assert(mock);
+
+			try
+			{
+				mock();
+			}
+			catch (Exception) { }
+
+			var message = Assert.Throws<AssertionException>(() => Mock.Assert(mock)).Message;
+			Assert.Equal("Called unarranged member 'Void Invoke()' on strict mock of type 'Castle.Proxies.Delegates.System_Action'", message.Trim());
 		}
 	}
 }

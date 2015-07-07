@@ -760,6 +760,15 @@ namespace Telerik.JustMock.Core
 						foreach (var behavior in methodMock.Behaviors.OfType<IAssertableBehavior>())
 							behavior.Assert();
 					}
+
+					UnwrapDelegateTarget(ref mock);
+					var mockMixin = GetMockMixin(mock, null);
+					if (mockMixin != null)
+					{
+						foreach (var behavior in mockMixin.FallbackBehaviors.OfType<IAssertableBehavior>()
+							.Concat(mockMixin.SupplementaryBehaviors.OfType<IAssertableBehavior>()))
+							behavior.Assert();
+					}
 				}
 				else
 				{

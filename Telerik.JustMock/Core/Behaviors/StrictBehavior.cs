@@ -17,12 +17,16 @@
 
 using System;
 using System.Reflection;
+using System.Text;
+using Telerik.JustMock.Core.Context;
 
 namespace Telerik.JustMock.Core.Behaviors
 {
-	internal class StrictBehavior : IBehavior
+	internal class StrictBehavior : IAssertableBehavior
 	{
 		private readonly bool throwOnlyOnValueReturningMethods;
+
+		private StringBuilder strictnessViolationMessage;
 
 		public StrictBehavior(bool throwOnlyOnValueReturningMethods)
 		{
@@ -35,7 +39,30 @@ namespace Telerik.JustMock.Core.Behaviors
 				&& !invocation.Recording
 				&& (invocation.Method.GetReturnType() != typeof(void) || !throwOnlyOnValueReturningMethods)
 				&& !(invocation.Method is ConstructorInfo))
+			{
+				if (strictnessViolationMessage == null)
+					strictnessViolationMessage = new StringBuilder();
+				strictnessViolationMessage.AppendFormat("Called unarranged member '{0}' on strict mock of type '{1}'\n",
+					invocation.Method, invocation.Method.DeclaringType);
+
 				throw new StrictMockException(invocation.Method.DeclaringType);
+			}
+		}
+
+		public void Assert()
+		{
+			if (this.strictnessViolationMessage != null)
+				MockingContext.Fail(this.strictnessViolationMessage.ToString());
+		}
+
+		public string DebugView
+		{
+			get
+			{
+				return this.strictnessViolationMessage != null
+					? "Strict mock violations:\n" + this.strictnessViolationMessage
+					: "Strict mock with no violations";
+			}
 		}
 	}
 }
@@ -48,7 +75,7 @@ namespace Telerik.JustMock.Core
 	public sealed class StrictMockException : MockException
 	{
 		internal StrictMockException(MemberInfo member)
-			: base(String.Format("All calls on {0} should be arranged first.", member))
+			: base(String.Format("All calls on '{0}' should be arranged first.", member))
 		{
 		}
 	}
