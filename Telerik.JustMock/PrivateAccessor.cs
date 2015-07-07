@@ -353,11 +353,24 @@ namespace Telerik.JustMock
 			public override DynamicMetaObject BindInvokeMember(InvokeMemberBinder binder, DynamicMetaObject[] args)
 			{
 				var invoke = typeof(PrivateAccessor).GetMethod("CallMethod", new[] { typeof(string), typeof(object[]) });
-				var call = Expression.Call(Expression.Convert(this.Expression, typeof(PrivateAccessor)), invoke,
-					Expression.Constant(binder.Name),
-					Expression.NewArrayInit(typeof(object), args.Select(a => Expression.Convert(a.Expression, typeof(object)))));
 
-				return CreateMetaObject(call);
+				var callResult = Expression.Variable(typeof(object));
+				var argsVar = Expression.Variable(typeof(object[]));
+
+				var executionList = new List<Expression>
+				{
+					Expression.Assign(argsVar, Expression.NewArrayInit(typeof(object), args.Select(a => Expression.Convert(a.Expression, typeof(object))))),
+					Expression.Assign(callResult, Expression.Call(
+						Expression.Convert(this.Expression, typeof(PrivateAccessor)), invoke, Expression.Constant(binder.Name), argsVar)),
+				};
+
+				executionList.AddRange(args
+					.Select((a, i) => new { expr = a.Expression, i })
+					.Where(p => p.expr is ParameterExpression)
+					.Select(p => Expression.Assign(p.expr, Expression.Convert(Expression.ArrayIndex(argsVar, Expression.Constant(p.i)), p.expr.Type))));
+				executionList.Add(callResult);
+
+				return CreateMetaObject(Expression.Block(new[] { argsVar, callResult }, executionList));
 			}
 
 			private DynamicMetaObject BindSetMember(Type returnType, string propertyName, Expression value, IEnumerable<Expression> indexes = null)
