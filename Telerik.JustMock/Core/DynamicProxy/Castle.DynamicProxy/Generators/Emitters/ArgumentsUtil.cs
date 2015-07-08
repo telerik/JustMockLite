@@ -15,6 +15,7 @@
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 {
 	using System;
+	using System.Linq;
 	using System.Reflection;
 	using System.Reflection.Emit;
 
@@ -124,6 +125,18 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 				}
 			}
 			return false;
+		}
+
+		public static MethodInfo PointerFromIntPtr()
+		{
+			return typeof(IntPtr).GetMethods(BindingFlags.Public | BindingFlags.Static)
+					.First(m => m.Name == "op_Explicit" && m.ReturnType.IsPointer);
+		}
+
+		public static MethodInfo IntPtrFromPointer()
+		{
+			return typeof(IntPtr).GetMethods(BindingFlags.Public | BindingFlags.Static)
+					.First(m => m.Name == "op_Explicit" && m.GetParameters()[0].ParameterType.IsPointer);
 		}
 	}
 }

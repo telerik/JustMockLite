@@ -174,6 +174,13 @@ namespace Telerik.JustMock
 					return false;
 			}
 		}
+
+#if DEBUG && !COREFX
+		public static void SaveProxyAssembly()
+		{
+			DynamicProxyMockFactory.SaveAssembly();
+		}
+#endif
 	}
 }
 

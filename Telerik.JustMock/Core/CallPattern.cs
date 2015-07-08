@@ -69,9 +69,9 @@ namespace Telerik.JustMock.Core
 			{
 				while (sigType.IsByRef || sigType.IsArray)
 					sigType = sigType.GetElementType();
-				return sigType.IsPointer || sigType == typeof(TypedReference);
+				return sigType == typeof(TypedReference);
 			}))
-				throw new MockException("Mocking methods with pointers or TypedReference in their signature is not supported.");
+				throw new MockException("Mocking methods with TypedReference in their signature is not supported.");
 
 			if (method.GetReturnType().IsByRef)
 				throw new MockException("Cannot mock method with by-ref return value.");

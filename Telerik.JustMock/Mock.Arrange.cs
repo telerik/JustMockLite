@@ -94,6 +94,29 @@ namespace Telerik.JustMock
 			});
 		}
 
+		/// <summary>
+		/// Setups the target mock call with user expectation.
+		/// </summary>
+		/// <typeparam name="T">Target type</typeparam>
+		/// <param name="obj">
+		/// Target instance.
+		/// </param>
+		/// <param name="func">
+		/// Expression delegate to the target call
+		/// </param>
+		/// <returns>
+		/// Reference to <see cref="ActionExpectation"/> to setup the mock.
+		/// </returns>
+		public static ActionExpectation Arrange<T>(T obj, Action<T> action)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				var repo = MockingContext.CurrentRepository;
+				repo.EnableInterception(typeof(T));
+				return repo.Arrange(() => action(obj), () => new ActionExpectation());
+			});
+		}
+
 #if !VISUALBASIC
 		/// <summary>
 		/// Setups the target call to act in a specific way.

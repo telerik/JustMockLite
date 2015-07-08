@@ -54,7 +54,17 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 				target = target.GetElementType();
 			}
 
-			if (target.IsValueType)
+			if (target.IsPointer && fromType == typeof(object))
+			{
+				gen.Emit(OpCodes.Unbox_Any, typeof(IntPtr));
+				gen.Emit(OpCodes.Call, ArgumentsUtil.PointerFromIntPtr());
+			}
+			else if (target == typeof(object) && fromType.IsPointer)
+			{
+				gen.Emit(OpCodes.Call, ArgumentsUtil.IntPtrFromPointer());
+				gen.Emit(OpCodes.Box, typeof(IntPtr));
+			}
+			else if (target.IsValueType)
 			{
 				if (fromType.IsValueType)
 				{

@@ -30,6 +30,11 @@ namespace Telerik.JustMock.Expectations
 {
 	internal sealed class NonPublicExpectation : INonPublicExpectation
 	{
+		private static bool ReturnTypeMatches(Type returnType, MethodInfo method)
+		{
+			return returnType == null || method.ReturnType == returnType || (method.ReturnType.IsPointer && returnType == typeof(IntPtr));
+		}
+
 		private static MethodInfo GetMethodByName(Type type, Type returnType, string memberName, ref object[] args)
 		{
 			if (type.IsProxy())
@@ -48,7 +53,7 @@ namespace Telerik.JustMock.Expectations
 			if (candidateMethods.Length == 1)
 			{
 				var singleCandidate = candidateMethods[0];
-				var returnTypeMatches = returnType == typeof(void) || returnType == singleCandidate.ReturnType;
+				var returnTypeMatches = ReturnTypeMatches(returnType, singleCandidate);
 				var argsIgnored = args == null || args.Length == 0;
 				if (returnTypeMatches && argsIgnored)
 				{
@@ -58,6 +63,8 @@ namespace Telerik.JustMock.Expectations
 						{
 							var byref = p.ParameterType.IsByRef;
 							var paramType = byref ? p.ParameterType.GetElementType() : p.ParameterType;
+							if (paramType.IsPointer)
+								paramType = typeof(IntPtr);
 							var isAny = (Expression)typeof(ArgExpr).GetMethod("IsAny").MakeGenericMethod(paramType).Invoke(null, null);
 							if (byref)
 							{
@@ -202,8 +209,7 @@ namespace Telerik.JustMock.Expectations
 
 		private static MethodInfo FindMethodBySignature(IEnumerable<MethodInfo> candidates, Type returnType, object[] args)
 		{
-			return candidates.FirstOrDefault(method => method.ArgumentsMatchSignature(args)
-					&& (returnType == null || method.ReturnType == returnType));
+			return candidates.FirstOrDefault(method => method.ArgumentsMatchSignature(args) && ReturnTypeMatches(returnType, method));
 		}
 
 		public ActionExpectation Arrange(object target, string memberName, params object[] args)
