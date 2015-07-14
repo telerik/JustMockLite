@@ -543,31 +543,31 @@ namespace Telerik.JustMock.Expectations
 			);
 		}
 
-		public ActionExpectation Arrange(IExpressionContainer dynamicExpression)
+		public ActionExpectation Arrange(dynamic dynamicExpression)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
-				MockingContext.CurrentRepository.Arrange(dynamicExpression.ToLambda(), () => new ActionExpectation())
+				MockingContext.CurrentRepository.Arrange(((IExpressionContainer)dynamicExpression).ToLambda(), () => new ActionExpectation())
 			);
 		}
 
-		public FuncExpectation<TReturn> Arrange<TReturn>(IExpressionContainer dynamicExpression)
+		public FuncExpectation<TReturn> Arrange<TReturn>(dynamic dynamicExpression)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
-				MockingContext.CurrentRepository.Arrange(dynamicExpression.ToLambda(), () => new FuncExpectation<TReturn>())
+				MockingContext.CurrentRepository.Arrange(((IExpressionContainer)dynamicExpression).ToLambda(), () => new FuncExpectation<TReturn>())
 			);
 		}
 
-		public void Assert(IExpressionContainer dynamicExpression, Occurs occurs)
+		public void Assert(dynamic dynamicExpression, Occurs occurs)
 		{
 			ProfilerInterceptor.GuardInternal(() =>
-				MockingContext.CurrentRepository.Assert(null, dynamicExpression.ToLambda(), null, occurs)
+				MockingContext.CurrentRepository.Assert(null, ((IExpressionContainer)dynamicExpression).ToLambda(), null, occurs)
 			);
 		}
 
-		public void Assert(IExpressionContainer dynamicExpression, Args args, Occurs occurs)
+		public void Assert(dynamic dynamicExpression, Args args, Occurs occurs)
 		{
 			ProfilerInterceptor.GuardInternal(() =>
-				MockingContext.CurrentRepository.Assert(null, dynamicExpression.ToLambda(), args, occurs)
+				MockingContext.CurrentRepository.Assert(null, ((IExpressionContainer)dynamicExpression).ToLambda(), args, occurs)
 			);
 		}
 	}

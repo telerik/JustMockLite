@@ -19,7 +19,7 @@ using System.Linq.Expressions;
 
 namespace Telerik.JustMock.Expectations.Abstraction
 {
-	public interface IExpressionContainer
+	internal interface IExpressionContainer
 	{
 		Expression Expression { get; }
 	}

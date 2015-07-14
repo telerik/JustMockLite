@@ -153,7 +153,7 @@ namespace Telerik.JustMock
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 				{
-					var prop = ResolveProperty(this.type, name, indexArgs, this.instance != null);
+					var prop = ResolveProperty(this.type, name, false, indexArgs, this.instance != null);
 					return ProfilerInterceptor.GuardExternal(() => SecuredReflectionMethods.GetProperty(prop, this.instance, indexArgs));
 				});
 		}
@@ -178,7 +178,7 @@ namespace Telerik.JustMock
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
-					var prop = ResolveProperty(this.type, name, indexArgs, this.instance != null, value, getter: false);
+					var prop = ResolveProperty(this.type, name, false, indexArgs, this.instance != null, value, getter: false);
 					ProfilerInterceptor.GuardExternal(() => SecuredReflectionMethods.SetProperty(prop, this.instance, value, indexArgs));
 				});
 		}
@@ -272,9 +272,9 @@ namespace Telerik.JustMock
 				throw new MissingMemberException(String.Format("Couldn't find {0} '{1}' on type '{2}'.", kind, name, this.type));
 		}
 
-		internal static PropertyInfo ResolveProperty(Type type, string name, object[] indexArgs, bool hasInstance, object setterValue = null, bool getter = true)
+		internal static PropertyInfo ResolveProperty(Type type, string name, bool ignoreCase, object[] indexArgs, bool hasInstance, object setterValue = null, bool getter = true)
 		{
-			var candidates = type.GetAllProperties().Where(prop => prop.Name == name).ToArray();
+			var candidates = type.GetAllProperties().Where(prop => MockingUtil.StringEqual(prop.Name, name, ignoreCase)).ToArray();
 			if (candidates.Length == 1)
 				return candidates[0];
 

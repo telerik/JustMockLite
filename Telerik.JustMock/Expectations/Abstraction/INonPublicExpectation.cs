@@ -379,7 +379,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// var staticMock = Mock.NonPublic.WrapType(typeof(MyType));
 		/// Mock.NonPublic.Arrange(staticMock.PrivateMethod()).DoNothing();
 		/// </example>
-		ActionExpectation Arrange(IExpressionContainer dynamicExpression);
+		ActionExpectation Arrange(dynamic dynamicExpression);
 
 		/// <summary>
 		/// Arranges an expectation on a non-void method given using a dynamic wrapper built with Wrap().
@@ -391,14 +391,14 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// Mock.NonPublic.Arrange&lt;int&gt;(mock.PrivateValue).Returns(123);
 		/// Mock.NonPublic.Arrange&lt;string&gt;(mock.GetNamePrivate(123)).Returns("me");
 		/// </example>
-		FuncExpectation<TReturn> Arrange<TReturn>(IExpressionContainer dynamicExpression);
+		FuncExpectation<TReturn> Arrange<TReturn>(dynamic dynamicExpression);
 
 		/// <summary>
 		/// Asserts an expectation given using a dynamic wrapper built with Wrap()
 		/// </summary>
 		/// <param name="dynamicExpression">An expression built using a wrapper returned by Wrap.</param>
 		/// <param name="occurs">Occurrence expectation to assert.</param>
-		void Assert(IExpressionContainer dynamicExpression, Occurs occurs);
+		void Assert(dynamic dynamicExpression, Occurs occurs);
 
 		/// <summary>
 		/// Asserts an expectation given using a dynamic wrapper built with Wrap()
@@ -406,6 +406,6 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <param name="dynamicExpression">An expression built using a wrapper returned by Wrap.</param>
 		/// <param name="args">Additional arguments to clarify the assertion expression.</param>
 		/// <param name="occurs">Occurrence expectation to assert.</param>
-		void Assert(IExpressionContainer dynamicExpression, Args args, Occurs occurs);
+		void Assert(dynamic dynamicExpression, Args args, Occurs occurs);
 	}
 }

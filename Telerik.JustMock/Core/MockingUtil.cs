@@ -777,6 +777,11 @@ namespace Telerik.JustMock.Core
 			return tcs.Task;
 		}
 
+		public static bool StringEqual(string a, string b, bool ignoreCase)
+		{
+			return String.Equals(a, b, ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+		}
+
 #if !COREFX
 		[DllImport("user32.dll")]
 		private static extern bool IsImmersiveProcess(IntPtr hProcess);

@@ -34,9 +34,9 @@ namespace Telerik.JustMock.Expectations.DynaMock
 			: base(expression, restrictions, value)
 		{ }
 
-		private static DynamicMetaObject CreateRecorder(Expression expression, DynamicMetaObjectBinder binder)
+		private static DynamicMetaObject CreateRecorder(Expression expression, Type returnType)
 		{
-			return new ExpressionRecorder(Expression.Constant(new ExpressionContainer(expression), binder.ReturnType),
+			return new ExpressionRecorder(Expression.Constant(new ExpressionContainer(expression), returnType),
 				BindingRestrictions.GetExpressionRestriction(Expression.Constant(true)));
 		}
 
@@ -72,48 +72,57 @@ namespace Telerik.JustMock.Expectations.DynaMock
 
 		public override DynamicMetaObject BindGetMember(GetMemberBinder binder)
 		{
+			return DoBindGetMember(binder.ReturnType, binder.Name, binder.IgnoreCase);
+		}
+
+		private DynamicMetaObject DoBindGetMember(Type returnType, string memberName, bool ignoreCase)
+		{
 			var wrapper = this.Value as ExpressionContainer;
 			var valueExpr = wrapper.Expression;
-			var property = PrivateAccessor.ResolveProperty(valueExpr.Type, binder.Name, new object[0], !wrapper.IsStatic);
+			var property = PrivateAccessor.ResolveProperty(valueExpr.Type, memberName, ignoreCase, new object[0], !wrapper.IsStatic);
 			if (property == null)
-				ThrowMissingMemberException(valueExpr.Type, binder.Name);
+				ThrowMissingMemberException(valueExpr.Type, memberName);
 
 			var memberExpr = Expression.Property(!wrapper.IsStatic ? valueExpr : null, property);
 
-			return CreateRecorder(memberExpr, binder);
+			return CreateRecorder(memberExpr, returnType);
 		}
 
 		public override DynamicMetaObject BindSetMember(SetMemberBinder binder, DynamicMetaObject value)
 		{
-			var wrapper = this.Value as ExpressionContainer;
+			return DoBindSetMember(this.Value as ExpressionContainer, binder.ReturnType, binder.Name, binder.IgnoreCase, value);
+		}
+
+		private DynamicMetaObject DoBindSetMember(ExpressionContainer wrapper, Type returnType, string memberName, bool ignoreCase, DynamicMetaObject value)
+		{
 			var valueExpr = wrapper.Expression;
-			var property = PrivateAccessor.ResolveProperty(valueExpr.Type, binder.Name, new object[0], !wrapper.IsStatic, value.Value, getter: false);
+			var property = PrivateAccessor.ResolveProperty(valueExpr.Type, memberName, ignoreCase, new object[0], !wrapper.IsStatic, value.Value, getter: false);
 			if (property == null)
-				ThrowMissingMemberException(valueExpr.Type, binder.Name);
+				ThrowMissingMemberException(valueExpr.Type, memberName);
 
 			var memberExpr = Expression.Assign(Expression.Property(!wrapper.IsStatic ? valueExpr : null, property), FromArg(value));
 
-			return CreateRecorder(memberExpr, binder);
+			return CreateRecorder(memberExpr, returnType);
 		}
 
 		public override DynamicMetaObject BindGetIndex(GetIndexBinder binder, DynamicMetaObject[] indexes)
 		{
 			var wrapper = this.Value as ExpressionContainer;
 			var valueExpr = wrapper.Expression;
-			var property = PrivateAccessor.ResolveProperty(valueExpr.Type, "Item",
+			var property = PrivateAccessor.ResolveProperty(valueExpr.Type, "Item", false,
 				indexes.Select(i => i.Value).ToArray(), !wrapper.IsStatic);
 			if (property == null)
 				ThrowMissingMemberException(valueExpr.Type, "Item");
 
 			var memberExpr = Expression.MakeIndex(!wrapper.IsStatic ? valueExpr : null, property, indexes.Select(FromArg));
-			return CreateRecorder(memberExpr, binder);
+			return CreateRecorder(memberExpr, binder.ReturnType);
 		}
 
 		public override DynamicMetaObject BindSetIndex(SetIndexBinder binder, DynamicMetaObject[] indexes, DynamicMetaObject value)
 		{
 			var wrapper = this.Value as ExpressionContainer;
 			var valueExpr = wrapper.Expression;
-			var property = PrivateAccessor.ResolveProperty(valueExpr.Type, "Item",
+			var property = PrivateAccessor.ResolveProperty(valueExpr.Type, "Item", false,
 				indexes.Select(i => i.Value).ToArray(), !wrapper.IsStatic, value.Value, getter: false);
 			if (property == null)
 				ThrowMissingMemberException(valueExpr.Type, "Item");
@@ -121,7 +130,7 @@ namespace Telerik.JustMock.Expectations.DynaMock
 			var memberExpr = Expression.Assign(
 				Expression.MakeIndex(!wrapper.IsStatic ? valueExpr : null, property, indexes.Select(FromArg)),
 				FromArg(value));
-			return CreateRecorder(memberExpr, binder);
+			return CreateRecorder(memberExpr, binder.ReturnType);
 		}
 
 		public override DynamicMetaObject BindInvokeMember(InvokeMemberBinder binder, DynamicMetaObject[] args)
@@ -130,7 +139,7 @@ namespace Telerik.JustMock.Expectations.DynaMock
 			var valueExpr = wrapper.Expression;
 
 			var candidateMethods = valueExpr.Type.GetAllMethods()
-				.Where(m => m.Name == binder.Name && m.IsStatic == wrapper.IsStatic)
+				.Where(m => MockingUtil.StringEqual(m.Name, binder.Name, binder.IgnoreCase) && m.IsStatic == wrapper.IsStatic)
 				.Where(m =>
 				{
 					var methodParams = m.GetParameters();
@@ -148,6 +157,11 @@ namespace Telerik.JustMock.Expectations.DynaMock
 				})
 				.ToArray();
 
+			if (candidateMethods.Length == 0 && args.Length == 0)
+			{
+				return DoBindGetMember(binder.ReturnType, binder.Name, binder.IgnoreCase);
+			}
+
 			var methodArgs = args.Select(a =>
 			{
 				var matcher = UnwrapMatcher(a);
@@ -159,7 +173,23 @@ namespace Telerik.JustMock.Expectations.DynaMock
 
 			var memberExpr = Expression.Call(!wrapper.IsStatic ? valueExpr : null, method, args.Select(FromArg).ToArray());
 
-			return CreateRecorder(memberExpr, binder);
+			return CreateRecorder(memberExpr, binder.ReturnType);
+		}
+
+		public override DynamicMetaObject BindBinaryOperation(BinaryOperationBinder binder, DynamicMetaObject arg)
+		{
+			if (binder.Operation == ExpressionType.Equal)
+			{
+				var wrapper = this.Value as ExpressionContainer;
+				var valueExpr = wrapper.Expression as MemberExpression;
+				if (valueExpr != null)
+				{
+					var prevContainer = new ExpressionContainer(valueExpr.Expression) { IsStatic = ((PropertyInfo)valueExpr.Member).GetGetMethod(true).IsStatic };
+					return DoBindSetMember(prevContainer, binder.ReturnType, valueExpr.Member.Name, false, arg);
+				}
+			}
+
+			return base.BindBinaryOperation(binder, arg);
 		}
 	}
 }
