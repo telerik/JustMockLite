@@ -1397,8 +1397,17 @@ namespace Telerik.JustMock.Core
 					: new ReferenceMatcher(instance),
 			};
 			callPattern.SetMethod(method, checkCompatibility: true);
-			foreach (var arg in arguments)
-				callPattern.ArgumentMatchers.Add(CreateMatcherForArgument(arg));
+			var parameters = method.GetParameters();
+			if (arguments == null || arguments.Length == 0)
+			{
+				callPattern.ArgumentMatchers.AddRange(method.GetParameters().Select(p => (IMatcher)new TypeMatcher(p.ParameterType)));
+			}
+			else
+			{
+				if (arguments.Length != method.GetParameters().Length)
+					throw new MockException("Argument count mismatch.");
+				callPattern.ArgumentMatchers.AddRange(arguments.Select(arg => CreateMatcherForArgument(arg)));
+			}
 
 			callPattern.AdjustForExtensionMethod();
 
