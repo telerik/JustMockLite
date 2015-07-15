@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Telerik.JustMock.Core;
 using Telerik.JustMock.Diagnostics;
@@ -1020,22 +1021,48 @@ namespace Telerik.JustMock.Tests
 		}
 	}
 
-#if !NUNIT && !PORTABLE
+#if !PORTABLE
+#if !NUNIT
 	[TestClass]
 	public class DebugViewTests
 	{
+		private static string resultsDirectory;
+
 		[AssemblyInitialize]
-		public static void AssemblyInit(TestContext _)
+		public static void AssemblyInit(TestContext testContext)
 		{
-			Telerik.JustMock.DebugView.IsTraceEnabled = true;
+			resultsDirectory = testContext.TestRunResultsDirectory;
+			DebugView.IsTraceEnabled = true;
 		}
 
 		[AssemblyCleanup]
 		public static void AssemblyUninit()
 		{
-			var trace = Telerik.JustMock.DebugView.FullTrace;
-			Telerik.JustMock.DebugView.IsTraceEnabled = false;
+			var trace = DebugView.FullTrace;
+			DebugView.IsTraceEnabled = false;
+
+			Directory.CreateDirectory(resultsDirectory);
+			File.WriteAllText(Path.Combine(resultsDirectory, "VSTest.FullTrace.log"), trace);
 		}
 	}
+#else
+	[SetUpFixture]
+	public class DebugViewTests
+	{
+		[SetUp]
+		public void AssemblyInit()
+		{
+			DebugView.IsTraceEnabled = true;
+		}
+
+		public void AssemblyUninit()
+		{
+			var trace = DebugView.FullTrace;
+			DebugView.IsTraceEnabled = false;
+
+			File.WriteAllText("NUnit.FullTrace.log", trace);
+		}
+	}
+#endif
 #endif
 }

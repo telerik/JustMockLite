@@ -17,8 +17,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using Telerik.JustMock.Diagnostics;
 
 namespace Telerik.JustMock.Core.Context
 {
@@ -38,6 +40,11 @@ namespace Telerik.JustMock.Core.Context
 
 		public static MocksRepository ResolveRepository(UnresolvedContextBehavior unresolvedContextBehavior)
 		{
+			if (unresolvedContextBehavior != UnresolvedContextBehavior.DoNotCreateNew)
+			{
+				DebugView.TraceEvent(IndentLevel.StackTrace, () => String.Format("Resolving repository with unresolved context behavior {0}", unresolvedContextBehavior));
+			}
+
 			foreach (var resolver in registeredContextResolvers)
 			{
 				var repo = resolver.ResolveRepository(unresolvedContextBehavior);

@@ -34,6 +34,9 @@ namespace Telerik.JustMock.Core
 	{
 		private static bool DispatchInvocation(Invocation invocation)
 		{
+			DebugView.TraceEvent(IndentLevel.Dispatch, () => String.Format("Intercepted profiler call: {0}", invocation.InputToString()));
+			DebugView.PrintStackTrace();
+
 			var mockMixin = invocation.MockMixin;
 			var repo = mockMixin != null ? mockMixin.Repository : MockingContext.ResolveRepository(UnresolvedContextBehavior.CreateNewContextual);
 
@@ -41,9 +44,6 @@ namespace Telerik.JustMock.Core
 				repo = TryFindGlobalInterceptor(invocation.Method);
 			if (repo == null)
 				return false;
-
-			DebugView.TraceEvent(IndentLevel.Dispatch, () => String.Format("Intercepted profiler call: {0}", invocation.InputToString()));
-			DebugView.PrintStackTrace();
 
 			lock (repo)
 			{
