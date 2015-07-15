@@ -1061,12 +1061,14 @@ namespace Telerik.JustMock.Tests
 			DebugView.IsTraceEnabled = true;
 		}
 
+		[TearDown]
 		public void AssemblyUninit()
 		{
 			var trace = DebugView.FullTrace;
 			DebugView.IsTraceEnabled = false;
 
-			File.WriteAllText("NUnit.FullTrace.log", trace);
+
+			File.WriteAllText(Path.Combine(TestContext.CurrentContext.WorkDirectory, "NUnit.FullTrace.log"), trace);
 		}
 	}
 #endif
