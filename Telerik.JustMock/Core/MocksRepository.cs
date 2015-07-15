@@ -175,11 +175,6 @@ namespace Telerik.JustMock.Core
 			return Object.Equals(queryObj, objInRegistry); // no guard - Object.Equals on a value type can't get intercepted
 		}
 
-		internal static IMockMixin GetMockMixinFromInvocation(Invocation invocation)
-		{
-			return GetMockMixin(invocation.Instance, invocation.Method.DeclaringType);
-		}
-
 		private readonly Dictionary<MethodBase, MethodInfoMatcherTreeNode> arrangementTreeRoots = new Dictionary<MethodBase, MethodInfoMatcherTreeNode>();
 		private readonly Dictionary<MethodBase, MethodInfoMatcherTreeNode> invocationTreeRoots = new Dictionary<MethodBase, MethodInfoMatcherTreeNode>();
 		private readonly Dictionary<KeyValuePair<object, object>, object> valueStore = new Dictionary<KeyValuePair<object, object>, object>();
@@ -251,8 +246,12 @@ namespace Telerik.JustMock.Core
 			ProfilerInterceptor.Initialize();
 		}
 
+		private static int repositoryCounter;
+		private int repositoryId;
+
 		internal MocksRepository(MocksRepository parentRepository, MethodBase method)
 		{
+			this.repositoryId = ++repositoryCounter;
 			this.method = method;
 			this.creatingThread = Thread.CurrentThread;
 			if (parentRepository != null)
@@ -268,6 +267,7 @@ namespace Telerik.JustMock.Core
 			}
 
 			ProfilerInterceptor.IsInterceptionEnabled = true;
+			DebugView.TraceEvent(IndentLevel.Configuration, () => String.Format("Created mocks repository #{0} for {1}", this.repositoryId, this.method));
 		}
 
 		private MethodInfoMatcherTreeNode DeepCopy(MethodInfoMatcherTreeNode root)
@@ -366,6 +366,8 @@ namespace Telerik.JustMock.Core
 
 		internal void DispatchInvocation(Invocation invocation)
 		{
+			DebugView.TraceEvent(IndentLevel.DispatchResult, () => String.Format("Handling dispatch in repo #{0} servicing {1}", this.repositoryId, this.method));
+
 			if (this.disabledTypes.Contains(invocation.Method.DeclaringType))
 			{
 				invocation.CallOriginal = true;
@@ -391,7 +393,7 @@ namespace Telerik.JustMock.Core
 
 			if (!methodMockProcessed)
 			{
-				var mock = GetMockMixinFromInvocation(invocation);
+				var mock = invocation.MockMixin;
 				if (mock != null)
 				{
 					foreach (var behavior in mock.FallbackBehaviors)
@@ -1606,7 +1608,7 @@ namespace Telerik.JustMock.Core
 			foreach (var behavior in methodMock.Behaviors)
 				behavior.Process(invocation);
 
-			var mock = GetMockMixinFromInvocation(invocation);
+			var mock = invocation.MockMixin;
 			if (mock != null)
 			{
 				foreach (var behavior in mock.SupplementaryBehaviors)

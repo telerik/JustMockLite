@@ -67,7 +67,7 @@ namespace Telerik.JustMock.Core.Behaviors
 
 			if (mock == null)
 			{
-				var parentMock = MocksRepository.GetMockMixinFromInvocation(invocation);
+				var parentMock = invocation.MockMixin;
 				var repository = parentMock.Repository;
 				var replicator = parentMock as IMockReplicator;
 

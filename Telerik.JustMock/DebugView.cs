@@ -137,8 +137,9 @@ namespace Telerik.JustMock
 				messageStr = "[Exception thrown]\n" + ex;
 			}
 
-			var formattedMessage = String.Format("{0}{1}{2}",
-				traceLevel.AsIndent(), messageStr.Trim(), traceLevel.IsLeaf() ? "" : ":");
+			var formattedMessage = String.Join(Environment.NewLine, messageStr.Split('\n')
+					.Select(line => String.Format("{0}{1}", traceLevel.AsIndent(), line.TrimEnd())).ToArray())
+				+ (traceLevel.IsLeaf() ? "" : ":");
 			lTraceSink.TraceEvent(formattedMessage);
 
 			Debug.WriteLine(formattedMessage);

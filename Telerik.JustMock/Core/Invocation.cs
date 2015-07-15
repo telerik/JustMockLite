@@ -63,11 +63,17 @@ namespace Telerik.JustMock.Core
 		internal bool RetainBehaviorDuringRecording { get; set; }
 		internal MocksRepository Repository { get; set; }
 
+		internal IMockMixin MockMixin { get; private set; }
+
 		internal Invocation(object instance, MethodBase method, object[] args)
 		{
 			this.Instance = instance;
 			this.Method = method;
 			this.Args = args;
+
+			this.MockMixin = method.IsExtensionMethod() && args.Length >= 1
+				? MocksRepository.GetMockMixin(args[0], null)
+				: MocksRepository.GetMockMixin(instance, method.DeclaringType);
 		}
 
 		internal void ThrowExceptionIfNecessary()

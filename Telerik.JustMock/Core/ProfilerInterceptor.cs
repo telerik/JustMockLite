@@ -34,7 +34,7 @@ namespace Telerik.JustMock.Core
 	{
 		private static bool DispatchInvocation(Invocation invocation)
 		{
-			var mockMixin = MocksRepository.GetMockMixinFromInvocation(invocation);
+			var mockMixin = invocation.MockMixin;
 			var repo = mockMixin != null ? mockMixin.Repository : MockingContext.ResolveRepository(UnresolvedContextBehavior.CreateNewContextual);
 
 			if (repo == null)
@@ -199,7 +199,7 @@ namespace Telerik.JustMock.Core
 			{
 				if (!IsInterceptionSetup)
 				{
-					CheckProfilerCompatibility();
+					//CheckProfilerCompatibility();
 
 					FinalizerThreadIdentifier.Identify();
 

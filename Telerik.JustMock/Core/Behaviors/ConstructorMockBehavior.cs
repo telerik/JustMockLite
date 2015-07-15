@@ -25,7 +25,7 @@ namespace Telerik.JustMock.Core.Behaviors
 	{
 		public void Process(Invocation invocation)
 		{
-			var mockMixin = MocksRepository.GetMockMixinFromInvocation(invocation);
+			var mockMixin = invocation.MockMixin;
 			if (mockMixin == null)
 			{
 				mockMixin = invocation.Repository.CreateExternalMockMixin(null, invocation.Instance, Behavior.CallOriginal);

@@ -39,7 +39,7 @@ namespace Telerik.JustMock.Core
 
 		public static bool IsExtensionMethod(this MethodBase method)
 		{
-			return method.GetCustomAttributes(typeof(ExtensionAttribute), false).Count() > 0;
+			return method.IsStatic && method.GetCustomAttributes(typeof(ExtensionAttribute), false).Any();
 		}
 
 		public static EventInfo GetEventFromAddOrRemove(this MethodBase addOrRemoveMethod)
