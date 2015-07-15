@@ -1026,12 +1026,16 @@ namespace Telerik.JustMock.Tests
 	[TestClass]
 	public class DebugViewTests
 	{
+#if !SILVERLIGHT
 		private static string resultsDirectory;
+#endif
 
 		[AssemblyInitialize]
 		public static void AssemblyInit(TestContext testContext)
 		{
+#if !SILVERLIGHT
 			resultsDirectory = testContext.TestRunResultsDirectory;
+#endif
 			DebugView.IsTraceEnabled = true;
 		}
 
@@ -1041,8 +1045,10 @@ namespace Telerik.JustMock.Tests
 			var trace = DebugView.FullTrace;
 			DebugView.IsTraceEnabled = false;
 
+#if !SILVERLIGHT
 			Directory.CreateDirectory(resultsDirectory);
 			File.WriteAllText(Path.Combine(resultsDirectory, "VSTest.FullTrace.log"), trace);
+#endif
 		}
 	}
 #else
