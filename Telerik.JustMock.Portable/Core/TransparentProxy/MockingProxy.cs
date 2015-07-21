@@ -44,5 +44,10 @@ namespace Telerik.JustMock.Core.TransparentProxy
 		{
 			return false;
 		}
+
+		public static object Unwrap(object maybeProxy)
+		{
+			return maybeProxy;
+		}
 	}
 }

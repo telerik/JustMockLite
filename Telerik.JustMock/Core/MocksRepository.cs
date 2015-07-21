@@ -92,7 +92,7 @@ namespace Telerik.JustMock.Core
 
 		internal static IMockMixin GetMockMixin(object obj, Type objType)
 		{
-			var asMixin = GetMockMixinFromTrueMock(obj);
+			var asMixin = GetMockMixinFromAnyMock(obj);
 			if (asMixin != null)
 				return asMixin;
 
@@ -115,7 +115,7 @@ namespace Telerik.JustMock.Core
 			return asMixin;
 		}
 
-		private static IMockMixin GetMockMixinFromTrueMock(object mock)
+		private static IMockMixin GetMockMixinFromAnyMock(object mock)
 		{
 			var asMixin = MockingProxy.GetMockMixin(mock);
 			if (asMixin != null)
@@ -311,7 +311,7 @@ namespace Telerik.JustMock.Core
 
 				foreach (var mockRef in parentRepository.controlledMocks)
 				{
-					var mixin = GetMockMixinFromTrueMock(mockRef.Target);
+					var mixin = GetMockMixinFromAnyMock(mockRef.Target);
 					if (mixin != null)
 					{
 						mixin.Repository = this;
@@ -351,7 +351,7 @@ namespace Telerik.JustMock.Core
 			{
 				foreach (var mockRef in this.controlledMocks)
 				{
-					var mock = GetMockMixinFromTrueMock(mockRef.Target);
+					var mock = GetMockMixinFromAnyMock(mockRef.Target);
 					if (mock != null && mock.ExternalizedMock != null && mock.Originator == this)
 					{
 						externalMixinDatabase.RemoveAll(kvp => kvp.Value == mock);

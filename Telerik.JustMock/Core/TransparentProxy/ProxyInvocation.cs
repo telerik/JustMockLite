@@ -16,6 +16,7 @@
 */
 
 using System;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Messaging;
@@ -52,7 +53,8 @@ namespace Telerik.JustMock.Core.TransparentProxy
 
 		public MethodInfo GetConcreteMethod()
 		{
-			return (MethodInfo)this.message.MethodBase;
+			var method = (MethodInfo)this.message.MethodBase;
+			return method.DeclaringType.IsProxy() ? (MethodInfo)method.GetInheritanceChain().Skip(1).First() : method;
 		}
 
 		public void Proceed()

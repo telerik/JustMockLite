@@ -86,17 +86,21 @@ namespace Telerik.JustMock.Core.TransparentProxy
 				&& method is MethodInfo;
 		}
 
+		private static MockingProxy GetRealProxy(object instance)
+		{
+			return instance != null ? RemotingServices.GetRealProxy(instance) as MockingProxy : null;
+		}
+
 		public static IMockMixin GetMockMixin(object instance)
 		{
-			if (instance != null)
-			{
-				var proxy = RemotingServices.GetRealProxy(instance) as MockingProxy;
-				if (proxy != null)
-				{
-					return proxy.mockMixin;
-				}
-			}
-			return null;
+			var proxy = GetRealProxy(instance);
+			return proxy != null ? proxy.mockMixin : null;
+		}
+
+		public static object Unwrap(object maybeProxy)
+		{
+			var proxy = GetRealProxy(maybeProxy);
+			return proxy != null ? proxy.WrappedInstance : maybeProxy;
 		}
 	}
 }

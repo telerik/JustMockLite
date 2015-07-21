@@ -18,6 +18,7 @@
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using Telerik.JustMock.Core.TransparentProxy;
 
 namespace Telerik.JustMock.Core.MatcherTree
 {
@@ -66,7 +67,7 @@ namespace Telerik.JustMock.Core.MatcherTree
 
 			if (this.IsValueType)
 				return Equals(this.reference, valueMatcher.Value);
-			return ReferenceEquals(this.reference, valueMatcher.Value);
+			return ReferenceEquals(MockingProxy.Unwrap(this.reference), MockingProxy.Unwrap(valueMatcher.Value));
 		}
 
 		private bool IsValueType

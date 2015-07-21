@@ -57,9 +57,7 @@ namespace Telerik.JustMock.Core
 				}
 			}
 
-			var interceptor = createTransparentProxy
-				? (IInterceptor)new StandardInterceptor()
-				: new DynamicProxyInterceptor(repository);
+			var interceptor = new DynamicProxyInterceptor(repository);
 #if SILVERLIGHT
 			options.Hook = new ProxyGenerationHook(false, settings.InterceptorFilter);
 #else

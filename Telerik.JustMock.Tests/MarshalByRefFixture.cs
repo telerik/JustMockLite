@@ -129,5 +129,32 @@ namespace Telerik.JustMock.Tests
 			mock.DrawLine(null, 0, 0, 0, 0);
 			Assert.True(called);
 		}
+
+		public abstract class LikeStream : MarshalByRefObject
+		{
+			public abstract void Do();
+
+			public void CallDo()
+			{
+				Do();
+			}
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+		public void ShouldAssertMarshalByRefMemberOnAbstractType()
+		{
+			var mock = Mock.Create<LikeStream>();
+			mock.Do();
+			Mock.Assert(() => mock.Do());
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+		public void ShouldAssertMarshalByRefMemberOnAbstractTypeCalledFromWithinType()
+		{
+			var mock = Mock.Create<LikeStream>();
+			Mock.Arrange(() => mock.CallDo()).CallOriginal();
+			mock.CallDo();
+			Mock.Assert(() => mock.Do());
+		}
 	}
 }
