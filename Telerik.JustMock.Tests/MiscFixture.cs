@@ -384,17 +384,15 @@ namespace Telerik.JustMock.Tests
 			Assert.True(called);
 		}
 
-
 		[TestMethod, TestCategory("Lite"), TestCategory("Misc")]
 		public void ShouldMockClassWithInterfaceConstraints()
 		{
 			var container = Mock.Create<FakeContainer<Product>>();
 
- 			Mock.Arrange(() => container.Do<Product>()).MustBeCalled();
+			Mock.Arrange(() => container.Do<Product>()).MustBeCalled();
 
 			container.Do<Product>();
 		}
-
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Misc")]
 		public void ShouldMockMethodCallWithObjectArgumentWithMatcher()

@@ -862,7 +862,7 @@ namespace Telerik.JustMock.Core
 			MethodInfoMatcherTreeNode root;
 			callsCount = 0;
 			var mocks = new HashSet<IMethodMock>();
-			var method = GetMethodFromCallPattern(callPattern);
+			var method = callPattern.Method;
 			if (invocationTreeRoots.TryGetValue(method, out root))
 			{
 				var occurences = root.GetOccurences(callPattern);
@@ -1269,6 +1269,7 @@ namespace Telerik.JustMock.Core
 			}
 
 			callPattern.AdjustForExtensionMethod();
+			callPattern.SetMethod(GetMethodFromCallPattern(callPattern), checkCompatibility: false);
 		}
 
 		private static MethodInfo UnwrapDelegateTarget(ref object obj)
@@ -1413,7 +1414,7 @@ namespace Telerik.JustMock.Core
 
 		private void AddArrange(IMethodMock methodMock)
 		{
-			var method = GetMethodFromCallPattern(methodMock.CallPattern);
+			var method = methodMock.CallPattern.Method;
 
 			if (methodMock.CallPattern.IsDerivedFromObjectEquals && method.ReflectedType.IsValueType())
 				throw new MockException("Cannot mock Equals method because JustMock depends on it. Also, when Equals is called internally by JustMock, all methods called by it will not be intercepted and will have only their original implementations called.");
@@ -1575,9 +1576,10 @@ namespace Telerik.JustMock.Core
 		private IMethodMock DispatchInvocationToArrangements(CallPattern callPattern, Invocation invocation)
 		{
 			MethodInfoMatcherTreeNode arrangeFuncRoot;
-			var allMethods = callPattern.Method.GetInheritanceChain().ToList();
 			var methodMockNodes = new List<MethodMockMatcherTreeNode>();
 
+			var allMethods = new[] { callPattern.Method }
+				.Concat(callPattern.Method.GetInheritanceChain().Where(m => m.DeclaringType.IsInterface));
 			foreach (var method in allMethods)
 			{
 				DebugView.TraceEvent(IndentLevel.MethodMatch, () => String.Format("Inspect arrangements on {0} on {1}", method, method.DeclaringType));
