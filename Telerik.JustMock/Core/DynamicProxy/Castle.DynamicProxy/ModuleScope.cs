@@ -486,73 +486,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 				File.Delete(assemblyFilePath);
 			}
 
-			AddCacheMappings(assemblyBuilder);
 			assemblyBuilder.Save(assemblyFileName);
 			return assemblyFilePath;
-		}
-#endif
-
-#if !SILVERLIGHT
-		private void AddCacheMappings(AssemblyBuilder builder)
-		{
-			Dictionary<CacheKey, string> mappings;
-
-			using (Lock.ForReading())
-			{
-				mappings = new Dictionary<CacheKey, string>();
-				foreach (var cacheEntry in typeCache)
-				{
-					// NOTE: using == returns invalid results.
-					// we need to use Equals here for it to work properly
-					if(builder.Equals(cacheEntry.Value.Assembly))
-					{
-						mappings.Add(cacheEntry.Key, cacheEntry.Value.FullName);
-					}
-				}
-			}
-
-			CacheMappingsAttribute.ApplyTo(builder, mappings);
-		}
-#endif
-
-#if !SILVERLIGHT
-		/// <summary>
-		///   Loads the generated types from the given assembly into this <see cref = "ModuleScope" />'s cache.
-		/// </summary>
-		/// <param name = "assembly">The assembly to load types from. This assembly must have been saved via <see
-		///    cref = "SaveAssembly(bool)" /> or
-		///   <see cref = "SaveAssembly()" />, or it must have the <see cref = "CacheMappingsAttribute" /> manually applied.</param>
-		/// <remarks>
-		///   This method can be used to load previously generated and persisted proxy types from disk into this scope's type cache, eg. in order
-		///   to avoid the performance hit associated with proxy generation.
-		/// </remarks>
-		public void LoadAssemblyIntoCache(Assembly assembly)
-		{
-			if (assembly == null)
-			{
-				throw new ArgumentNullException("assembly");
-			}
-
-			var cacheMappings =
-				(CacheMappingsAttribute[])assembly.GetCustomAttributes(typeof(CacheMappingsAttribute), false);
-
-			if (cacheMappings.Length == 0)
-			{
-				var message = string.Format(
-					"The given assembly '{0}' does not contain any cache information for generated types.",
-					assembly.FullName);
-				throw new ArgumentException(message, "assembly");
-			}
-
-			foreach (var mapping in cacheMappings[0].GetDeserializedMappings())
-			{
-				var loadedType = assembly.GetType(mapping.Value);
-
-				if (loadedType != null)
-				{
-					RegisterInCache(mapping.Key, loadedType);
-				}
-			}
 		}
 #endif
 

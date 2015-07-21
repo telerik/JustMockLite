@@ -93,7 +93,10 @@ namespace Telerik.JustMock.Core
 		public static object GetDefaultValue(this Type t)
 		{
 			Debug.Assert(t != typeof(void));
-			return t.IsValueType && t != typeof(void) ? MockingUtil.CreateInstance(t) : null;
+			return
+				t.IsPointer ? IntPtr.Zero
+				: t.IsValueType && t != typeof(void) ? MockingUtil.CreateInstance(t)
+				: null;
 		}
 
 		public static Type GetImplementationOfGenericInterface(this Type type, Type genericIntf)

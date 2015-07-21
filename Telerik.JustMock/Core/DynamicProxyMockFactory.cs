@@ -34,8 +34,19 @@ namespace Telerik.JustMock.Core
 
 		static DynamicProxyMockFactory()
 		{
+#if DEBUG
+			generator = new ProxyGenerator(new DefaultProxyBuilder(new ModuleScope(savePhysicalAssembly: true)));
+#else
 			generator = new ProxyGenerator();
+#endif
 		}
+
+#if DEBUG
+		internal static void SaveAssembly()
+		{
+			generator.ProxyBuilder.ModuleScope.SaveAssembly();
+		}
+#endif
 
 		public bool IsAccessible(Type type)
 		{
