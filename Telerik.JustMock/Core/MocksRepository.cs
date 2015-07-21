@@ -448,17 +448,6 @@ namespace Telerik.JustMock.Core
 
 				bool canCreateProxy = !type.IsSealed;
 
-				if (!ProfilerInterceptor.IsProfilerAttached && canCreateProxy)
-				{
-					settings.AdditionalMockedInterfaces =
-						(settings.AdditionalMockedInterfaces ?? Enumerable.Empty<Type>())
-						.Concat(
-							type.GetInterfaces()
-							.Where(intf => mockFactory.IsAccessible(intf)))
-						.Distinct()
-						.ToArray();
-				}
-
 				var mockMixinImpl = CreateMockMixin(type, settings.SupplementaryBehaviors, settings.FallbackBehaviors, settings.MockConstructorCall);
 
 				var ctors = type.GetConstructors();

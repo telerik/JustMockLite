@@ -2343,16 +2343,48 @@ namespace Telerik.JustMock.Tests
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldArrangeFinalGenericMethodThroughInterface()
 		{
-			IGeneric mock = Mock.Create<SealedGeneric>();
+			IGeneric mock = Mock.Create<SealedGeneric>(
+#if LITE_EDITION
+			cfg => cfg.Implements<IGeneric>()
+#endif
+);
+
 			Mock.Arrange(() => mock.Get(5, "4")).Returns("123");
 			Assert.Equal("123", mock.Get(5, "4"));
+		}
+
+		public interface IEntity
+		{
+			string Name { get; set; }
+		}
+
+		public class EntityBase : IEntity
+		{
+			public string Name { get; set; }
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+		public void ShouldTreatInterfaceAndImplementationMemberIdentically()
+		{
+			var mock = Mock.Create<EntityBase>();
+			mock.Name = "Git";
+			var staticName = mock.Name;
+			var iName = ((IEntity)mock).Name;
+			Assert.Equal(staticName, iName);
 		}
 
 #if LITE_EDITION && !COREFX
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldMockNoninheritableInterfaceMembers()
 		{
-			var mock = Mock.Create<PrivateInterface>(Behavior.CallOriginal);
+			var mock = Mock.Create<PrivateInterface>(cfg =>
+				{
+					cfg.SetBehavior(Behavior.CallOriginal);
+					cfg.Implements<IJustDoIt>();
+					cfg.Implements<IJustDoThat>();
+					cfg.Implements<Scope.IImplementable>();
+					cfg.Implements<Scope.IImplementable2>();
+				});
 
 			Assert.Throws<InvalidOperationException>(() => ((IJustDoThat)mock).DoThat());
 			Mock.Arrange(() => mock.DoThat()).DoNothing();

@@ -1046,8 +1046,11 @@ namespace Telerik.JustMock.Tests
 			DebugView.IsTraceEnabled = false;
 
 #if !SILVERLIGHT
-			Directory.CreateDirectory(resultsDirectory);
-			File.WriteAllText(Path.Combine(resultsDirectory, "VSTest.FullTrace.log"), trace);
+			if (!String.IsNullOrEmpty(resultsDirectory))
+			{
+				Directory.CreateDirectory(resultsDirectory);
+				File.WriteAllText(Path.Combine(resultsDirectory, "VSTest.FullTrace.log"), trace);
+			}
 #endif
 		}
 	}
