@@ -797,43 +797,6 @@ namespace Telerik.JustMock.Core
 			}
 		}
 
-#if VISUALBASIC
-		internal Expression<Action> ConvertDelegateAndArgumentsToExpression(Delegate delg, object[] args)
-		{
-			var method = delg.Method;
-			var declaringType = method.DeclaringType;
-			if (declaringType.IsProxy())
-				method = (MethodInfo)method.GetInheritanceChain().ElementAt(1);
-
-			if (method.IsCompilerGenerated())
-				throw new ArgumentException("The argument appears to be an anonymous delegate or lambda instead of a reference to the intended method. Use AddressOf instead of Sub() to make a reference to the method intended. If you're using Visual Studio 2010 or later then reference and use Telerik.JustMock.dll instead of Telerik.JustJustMock.VisualBasic.dll");
-
-			var matchers = this.matchersInContext;
-			if (matchers.Count != 0 && matchers.Count != args.Length)
-				throw new ArgumentException("When arranging or asserting using delegates instead of expressions, use either only matchers or only values as formal arguments.");
-
-			var arrangementParameters = new Expression[args.Length];
-			var methodParameters = method.GetParameters();
-			for (int i = 0; i < args.Length; i++)
-			{
-				var arg = args[i];
-				Type type = (arg != null) ? arg.GetType() : methodParameters[i].ParameterType;
-				arrangementParameters[i] = matchers.Count == 0
-					? Expression.Constant(arg, type)
-					: matchers[i].ToExpression(type);
-			}
-
-			MethodCallExpression expression = delg.Target == null
-				? Expression.Call(method, arrangementParameters)
-				: Expression.Call(Expression.Constant(delg.Target), method, arrangementParameters);
-
-			matchers.Clear();
-
-			var action = (Expression<Action>)Expression.Lambda(expression);
-			return action;
-		}
-#endif
-
 		internal int GetTimesCalled(Expression expression, Args args)
 		{
 			var callPattern = new CallPattern();
@@ -960,7 +923,6 @@ namespace Telerik.JustMock.Core
 				if (!type.IsInterface && method.DeclaringType.IsAssignableFrom(type))
 				{
 					var concreteMethod = MockingUtil.GetConcreteImplementer(method, type);
-#if !SILVERLIGHT
 					if (!concreteMethod.IsInheritable() && !ProfilerInterceptor.IsProfilerAttached)
 					{
 						var reimplementedInterfaceMethod = (MethodInfo)method.GetInheritanceChain().Last();
@@ -970,7 +932,6 @@ namespace Telerik.JustMock.Core
 							concreteMethod = reimplementedInterfaceMethod;
 						}
 					}
-#endif
 					method = concreteMethod;
 				}
 			}
@@ -1089,6 +1050,37 @@ namespace Telerik.JustMock.Core
 				target = invocation.Expression;
 				args = invocation.Arguments.ToArray();
 			}
+			else if (expr.NodeType == ExpressionType.Assign)
+			{
+				var binary = (BinaryExpression)expr;
+				if (binary.Left is MemberExpression)
+				{
+					var memberExpr = (MemberExpression)binary.Left;
+					if (!(memberExpr.Member is PropertyInfo))
+						throw new MockException("Fields cannot be mocked, only properties.");
+
+					var property = (PropertyInfo)memberExpr.Member;
+					target = memberExpr.Expression;
+					method = property.GetSetMethod(true);
+					args = new[] { binary.Right };
+				}
+				else if (binary.Left is IndexExpression)
+				{
+					var indexExpr = (IndexExpression)binary.Left;
+					target = indexExpr.Object;
+					method = indexExpr.Indexer.GetSetMethod(true);
+					args = indexExpr.Arguments.Concat(new[] { binary.Right }).ToArray();
+				}
+				else throw new MockException("Left-hand of assignment is not a member or indexer.");
+			}
+			else if (expr is IndexExpression)
+			{
+				var index = (IndexExpression)expr;
+				target = index.Object;
+				var property = index.Indexer;
+				method = property.GetGetMethod(true);
+				args = index.Arguments.ToArray();
+			}
 			else throw new MockException("The expression does not represent a method call, property access, new expression or a delegate invocation.");
 
 			// Create the matcher for the instance part of the call pattern.
@@ -1125,6 +1117,20 @@ namespace Telerik.JustMock.Core
 				{
 					prevToRoot = rootTarget;
 					rootTarget = ((InvocationExpression)rootTarget).Expression;
+					continue;
+				}
+
+				if (rootTarget is BinaryExpression)
+				{
+					prevToRoot = rootTarget;
+					rootTarget = ((BinaryExpression)rootTarget).Left;
+					continue;
+				}
+
+				if (rootTarget is IndexExpression)
+				{
+					prevToRoot = rootTarget;
+					rootTarget = ((IndexExpression)rootTarget).Object;
 					continue;
 				}
 

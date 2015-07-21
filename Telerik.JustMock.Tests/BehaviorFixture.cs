@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2014 Telerik AD
+ Copyright © 2010-2015 Telerik AD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Telerik.JustMock.Core;
 
 #if NUNIT
@@ -258,6 +259,37 @@ namespace Telerik.JustMock.Tests
 
 			var message = Assert.Throws<AssertionException>(() => Mock.Assert(mock)).Message;
 			Assert.Equal("Called unarranged member 'Void Invoke()' on strict mock of type 'Castle.Proxies.Delegates.System_Action'", message.Trim());
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior"), TestCategory("Task")]
+		public async Task ShouldAutoArrangeResultOfAsyncMethodOnRecursiveLooseMock()
+		{
+			var mock = Mock.Create<IAsyncTest>();
+			var result = await mock.GetAsync();
+			Assert.NotNull(result);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior"), TestCategory("Task")]
+		public async Task ShouldAutoArrangeResultOfAsyncMethodOnLooseMock()
+		{
+			var mock = Mock.Create<IAsyncTest>(Behavior.Loose);
+			var result = await mock.GetAsync();
+			Assert.Null(result);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior"), TestCategory("Task")]
+		public async Task ShouldArrangeTaskResultOfAsyncMethod()
+		{
+			var mock = Mock.Create<IAsyncTest>();
+			Mock.Arrange(() => mock.GetIntAsync()).TaskResult(5);
+			var result = await mock.GetIntAsync();
+			Assert.Equal(5, result);
+		}
+
+		public interface IAsyncTest
+		{
+			Task<IDisposable> GetAsync();
+			Task<int> GetIntAsync();
 		}
 	}
 }

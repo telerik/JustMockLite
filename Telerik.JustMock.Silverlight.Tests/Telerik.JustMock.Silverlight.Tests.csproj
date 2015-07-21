@@ -120,6 +120,10 @@
     <NoConfig>true</NoConfig>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CompilerServices.AsyncTargetingPack.Silverlight5">
+      <HintPath>.\Microsoft.CompilerServices.AsyncTargetingPack.Silverlight5.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Silverlight.Testing">
       <HintPath>..\Telerik.JustMock.Silverlight\References\Microsoft.Silverlight.Testing.dll</HintPath>
     </Reference>
@@ -165,6 +169,9 @@
     </Compile>
     <Compile Include="..\Telerik.JustMock.Tests\DelegateFixture.cs">
       <Link>DelegateFixture.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock.Tests\DynamicFixture.cs">
+      <Link>DynamicFixture.cs</Link>
     </Compile>
     <Compile Include="..\Telerik.JustMock.Tests\EventsFixture.cs">
       <Link>EventsFixture.cs</Link>
@@ -271,7 +278,7 @@
       <FlavorProperties GUID="{A1591282-1198-4647-A2B1-27E5FF5F6F3B}">
         <SilverlightProjectProperties />
       </FlavorProperties>
-      <UserProperties ProjectLinkReference="83f0c270-db35-4b80-beda-5aed79c0fb2d" ProjectLinkerExcludeFilter="\\?desktop(\\.*)?$;\\?silverlight(\\.*)?$;\.desktop;\.silverlight;\.xaml;^service references(\\.*)?$;\.clientconfig;^web references(\\.*)?$" />
+      <UserProperties ProjectLinkerExcludeFilter="\\?desktop(\\.*)?$;\\?silverlight(\\.*)?$;\.desktop;\.silverlight;\.xaml;^service references(\\.*)?$;\.clientconfig;^web references(\\.*)?$" ProjectLinkReference="83f0c270-db35-4b80-beda-5aed79c0fb2d" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

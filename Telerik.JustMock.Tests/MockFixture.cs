@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2014 Telerik AD
+ Copyright © 2010-2015 Telerik AD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -2164,28 +2164,6 @@ namespace Telerik.JustMock.Tests
 		public interface IGuidGenerator
 		{
 			Guid Generate();
-		}
-#endif
-
-#if LITE_EDITION && SILVERLIGHT
-		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
-		public void ShouldThrowWhenArrangingSealedMethod()
-		{
-			var foo = Mock.Create<HasCalls>();
-			Assert.Throws<ElevatedMockingException>(() => Mock.Arrange(() => foo.GetIntFromCall()));
-		}
-
-		public interface IHasCalls
-		{
-			int GetIntFromCall();
-		}
-
-		public class HasCalls : IHasCalls
-		{
-			public int GetIntFromCall()
-			{
-				return 123;
-			}
 		}
 #endif
 

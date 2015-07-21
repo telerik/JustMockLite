@@ -25,6 +25,7 @@ using Telerik.JustMock.Core;
 using Telerik.JustMock.Core.Behaviors;
 using Telerik.JustMock.Core.Context;
 using Telerik.JustMock.Expectations.Abstraction;
+using Telerik.JustMock.Expectations.DynaMock;
 
 namespace Telerik.JustMock.Expectations
 {
@@ -522,6 +523,58 @@ namespace Telerik.JustMock.Expectations
 		public PrivateAccessor MakeStaticPrivateAccessor(Type type)
 		{
 			return PrivateAccessor.ForType(type);
+		}
+
+		public dynamic Wrap(object instance)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+				{
+#if !LITE_EDITION
+					Mock.Intercept(instance.GetType());
+#endif
+					return new ExpressionContainer(Expression.Constant(instance, MockingUtil.GetUnproxiedType(instance)));
+				}
+			);
+		}
+
+		public dynamic WrapType(Type type)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+				{
+#if !LITE_EDITION
+					Mock.Intercept(type);
+#endif
+					return new ExpressionContainer(Expression.Constant(type.GetDefaultValue(), type)) { IsStatic = true };
+				}
+			);
+		}
+
+		public ActionExpectation Arrange(dynamic dynamicExpression)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+				MockingContext.CurrentRepository.Arrange(((IExpressionContainer)dynamicExpression).ToLambda(), () => new ActionExpectation())
+			);
+		}
+
+		public FuncExpectation<TReturn> Arrange<TReturn>(dynamic dynamicExpression)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+				MockingContext.CurrentRepository.Arrange(((IExpressionContainer)dynamicExpression).ToLambda(), () => new FuncExpectation<TReturn>())
+			);
+		}
+
+		public void Assert(dynamic dynamicExpression, Occurs occurs)
+		{
+			ProfilerInterceptor.GuardInternal(() =>
+				MockingContext.CurrentRepository.Assert(null, ((IExpressionContainer)dynamicExpression).ToLambda(), null, occurs)
+			);
+		}
+
+		public void Assert(dynamic dynamicExpression, Args args, Occurs occurs)
+		{
+			ProfilerInterceptor.GuardInternal(() =>
+				MockingContext.CurrentRepository.Assert(null, ((IExpressionContainer)dynamicExpression).ToLambda(), args, occurs)
+			);
 		}
 	}
 }

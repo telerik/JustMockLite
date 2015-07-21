@@ -63,6 +63,7 @@ namespace Telerik.JustMock.Core.Expressions
 				case ExpressionType.RightShift:
 				case ExpressionType.LeftShift:
 				case ExpressionType.ExclusiveOr:
+				case ExpressionType.Assign:
 					return this.VisitBinary((BinaryExpression)exp);
 				case ExpressionType.TypeIs:
 					return this.VisitTypeIs((TypeBinaryExpression)exp);
@@ -89,6 +90,8 @@ namespace Telerik.JustMock.Core.Expressions
 					return this.VisitMemberInit((MemberInitExpression)exp);
 				case ExpressionType.ListInit:
 					return this.VisitListInit((ListInitExpression)exp);
+				case ExpressionType.Index:
+					return this.VisitIndex((IndexExpression)exp);
 				default:
 					throw new Exception(string.Format("Unhandled expression type: '{0}'", exp.NodeType));
 			}
@@ -375,6 +378,17 @@ namespace Telerik.JustMock.Core.Expressions
 				return Expression.Invoke(expr, args);
 			}
 			return iv;
+		}
+
+		protected virtual Expression VisitIndex(IndexExpression index)
+		{
+			IEnumerable<Expression> args = this.VisitExpressionList(index.Arguments);
+			Expression expr = this.Visit(index.Object);
+			if (args != index.Arguments || expr != index.Object)
+			{
+				return Expression.MakeIndex(expr, index.Indexer, args);
+			}
+			return index;
 		}
 	}
 }

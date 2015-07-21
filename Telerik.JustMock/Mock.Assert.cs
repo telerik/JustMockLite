@@ -81,7 +81,6 @@ namespace Telerik.JustMock
 			});
 		}
 
-#if !VISUALBASIC
 		/// <summary>
 		/// Asserts a specific call from expression.
 		/// </summary>
@@ -93,7 +92,6 @@ namespace Telerik.JustMock
 				MockingContext.CurrentRepository.Assert(null, expression);
 			});
 		}
-#endif
 
 		/// <summary>
 		/// Asserts the specified call from expression.

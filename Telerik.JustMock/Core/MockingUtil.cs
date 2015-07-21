@@ -25,6 +25,7 @@ using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Telerik.JustMock.Core.MatcherTree;
 using Telerik.JustMock.Core.Recording;
 
@@ -459,7 +460,6 @@ namespace Telerik.JustMock.Core
 			return type.IsProxy() ? ((IMockMixin)instance).DeclaringType : type;
 		}
 
-
 		public static bool IsImplementedBy(this MethodInfo interfaceMethod, MethodBase implMethod)
 		{
 			var type = implMethod.DeclaringType;
@@ -771,6 +771,18 @@ namespace Telerik.JustMock.Core
 		public static bool IsInheritable(this MethodBase method)
 		{
 			return method.IsVirtual && !method.IsFinal;
+		}
+
+		public static Task<T> TaskFromResult<T>(T value)
+		{
+			var tcs = new TaskCompletionSource<T>();
+			tcs.SetResult(value);
+			return tcs.Task;
+		}
+
+		public static bool StringEqual(string a, string b, bool ignoreCase)
+		{
+			return String.Equals(a, b, ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
 		}
 
 #if !COREFX

@@ -52,16 +52,13 @@ namespace Telerik.JustMock
 		}
 
 		/// <summary>
-		/// Returns interface defining non-public expectations.
+		/// Arrange and assert expectations on non-public members.
 		/// </summary>
 		public static INonPublicExpectation NonPublic
 		{
 			get
 			{
-				return ProfilerInterceptor.GuardInternal(() =>
-				{
-					return new NonPublicExpectation();
-				});
+				return ProfilerInterceptor.GuardInternal(() => new NonPublicExpectation());
 			}
 		}
 

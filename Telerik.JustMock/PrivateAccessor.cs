@@ -16,7 +16,10 @@
 */
 
 using System;
+using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using Telerik.JustMock.Core;
 
@@ -31,14 +34,20 @@ namespace Telerik.JustMock
 	/// Gives access to the non-public members of a type or instance. This class provides functionality similar to the
 	/// one that exists in regular reflection classes with the added benefit that it can bypass essential security checks related
 	/// to accessing non-public members through reflection.
+	/// </summary>
+	/// <remarks>
 	/// When the profiler is enabled, PrivateAccessor acquires additional power:
 	/// - It can even be used to access all kinds of non-public members in Silverlight (and when running in partial trust in general).
 	/// - All calls made through PrivateAccessor are always made with full trust (unrestricted) permissions.
-	/// </summary>
-	public sealed class PrivateAccessor
+	/// 
+	/// You can assign a PrivateAccessor to a dynamic variable and access it as if you're referencing the original object:
+	/// dynamic acc = new PrivateAccessor(myobj);
+	/// acc.PrivateProperty = acc.PrivateMethod(123); // PrivateProperty and PrivateMethod are private members on myobj's type.
+	/// </remarks>
+	public sealed class PrivateAccessor : IDynamicMetaObjectProvider
 	{
-		private object instance;
-		private Type type;
+		private readonly object instance;
+		private readonly Type type;
 
 		/// <summary>
 		/// Creates a new <see cref="PrivateAccessor"/> wrapping the given instance. Can be used to access both instance and static members.
@@ -61,7 +70,7 @@ namespace Telerik.JustMock
 		private PrivateAccessor(object instance, Type type)
 		{
 			this.instance = instance;
-			this.type = type.IsProxy() ? type.BaseType : type;
+			this.type = type.IsProxy() && type.BaseType != typeof(object) ? type.BaseType : type;
 		}
 
 		/// <summary>
@@ -76,7 +85,7 @@ namespace Telerik.JustMock
 				{
 					args = args ?? MockingUtil.NoObjects;
 					var candidates = type.GetAllMethods()
-						.Where(m => m.Name == name && CanCall(m))
+						.Where(m => m.Name == name && CanCall(m, this.instance != null))
 						.ToArray();
 					object state;
 					var method = MockingUtil.BindToMethod(MockingUtil.AllMembers,
@@ -144,7 +153,7 @@ namespace Telerik.JustMock
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 				{
-					var prop = ResolveProperty(name, indexArgs);
+					var prop = ResolveProperty(this.type, name, false, indexArgs, this.instance != null);
 					return ProfilerInterceptor.GuardExternal(() => SecuredReflectionMethods.GetProperty(prop, this.instance, indexArgs));
 				});
 		}
@@ -169,7 +178,7 @@ namespace Telerik.JustMock
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
-					var prop = ResolveProperty(name, indexArgs, value, getter: false);
+					var prop = ResolveProperty(this.type, name, false, indexArgs, this.instance != null, value, getter: false);
 					ProfilerInterceptor.GuardExternal(() => SecuredReflectionMethods.SetProperty(prop, this.instance, value, indexArgs));
 				});
 		}
@@ -205,6 +214,37 @@ namespace Telerik.JustMock
 		}
 
 		/// <summary>
+		/// Gets the value of a field or property.
+		/// </summary>
+		/// <param name="name">Name of a field or property to get.</param>
+		/// <returns>The value of the field or property.</returns>
+		public object GetMember(string name)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+				{
+					var field = ResolveField(name);
+					return field != null ? GetField(name) : GetProperty(name);
+				});
+		}
+
+		/// <summary>
+		/// Sets the value of a field or property.
+		/// </summary>
+		/// <param name="name">The name of a field or property to set</param>
+		/// <param name="value">The new value of the field or property.</param>
+		public void SetMember(string name, object value)
+		{
+			ProfilerInterceptor.GuardInternal(() =>
+				{
+					var field = ResolveField(name);
+					if (field != null)
+						SetField(name, value);
+					else
+						SetProperty(name, value);
+				});
+		}
+
+		/// <summary>
 		/// Raises the specified event passing the given arguments to the handlers.
 		/// </summary>
 		/// <param name="name">The name of the event to raise.</param>
@@ -218,15 +258,23 @@ namespace Telerik.JustMock
 				});
 		}
 
+		/// <summary>
+		/// The wrapped instance.
+		/// </summary>
+		public object Instance
+		{
+			get { return this.instance; }
+		}
+
 		private void CheckMemberInfo(string kind, string name, MemberInfo mi)
 		{
 			if (mi == null)
 				throw new MissingMemberException(String.Format("Couldn't find {0} '{1}' on type '{2}'.", kind, name, this.type));
 		}
 
-		private PropertyInfo ResolveProperty(string name, object[] indexArgs, object setterValue = null, bool getter = true)
+		internal static PropertyInfo ResolveProperty(Type type, string name, bool ignoreCase, object[] indexArgs, bool hasInstance, object setterValue = null, bool getter = true)
 		{
-			var candidates = type.GetAllProperties().Where(prop => prop.Name == name).ToArray();
+			var candidates = type.GetAllProperties().Where(prop => MockingUtil.StringEqual(prop.Name, name, ignoreCase)).ToArray();
 			if (candidates.Length == 1)
 				return candidates[0];
 
@@ -238,7 +286,7 @@ namespace Telerik.JustMock
 
 			var propMethods = candidates
 				.Select(prop => getter ? prop.GetGetMethod(true) : prop.GetSetMethod(true))
-				.Where(m => m != null && CanCall(m))
+				.Where(m => m != null && CanCall(m, hasInstance))
 				.ToArray();
 
 			indexArgs = indexArgs ?? MockingUtil.NoObjects;
@@ -252,14 +300,139 @@ namespace Telerik.JustMock
 			return type.GetAllFields().FirstOrDefault(f => f.Name == name);
 		}
 
-		private bool CanCall(MethodBase method)
+		private static bool CanCall(MethodBase method, bool hasInstance)
 		{
-			return method.IsStatic || this.instance != null;
+			return method.IsStatic || hasInstance;
 		}
 
 		private object CallInvoke(MethodBase method, object[] args)
 		{
 			return ProfilerInterceptor.GuardExternal(() => SecuredReflectionMethods.Invoke(method, this.instance, args));
+		}
+
+		DynamicMetaObject IDynamicMetaObjectProvider.GetMetaObject(Expression parameter)
+		{
+			return new PrivateAccessorMetaObject(parameter, BindingRestrictions.Empty, this);
+		}
+
+		private class PrivateAccessorMetaObject : DynamicMetaObject
+		{
+			public PrivateAccessorMetaObject(Expression expression, BindingRestrictions restrictions)
+				: base(expression, restrictions)
+			{ }
+
+			public PrivateAccessorMetaObject(Expression expression, BindingRestrictions restrictions, object value)
+				: base(expression, restrictions, value)
+			{ }
+
+			private DynamicMetaObject CreateMetaObject(Expression value, bool wrap = true)
+			{
+				if (wrap)
+				{
+					var valueVar = Expression.Variable(value.Type);
+					var statements = new List<Expression>();
+
+					if (!value.Type.IsValueType)
+					{
+						statements.Add(Expression.Assign(valueVar, value));
+						statements.Add(Expression.Condition(
+							Expression.Equal(valueVar, Expression.Constant(null)),
+							Expression.Constant(null, typeof(PrivateAccessor)),
+							Expression.New(typeof(PrivateAccessor).GetConstructor(new[] { typeof(object) }), valueVar)));
+					}
+					else
+					{
+						statements.Add(value);
+					}
+
+					value = Expression.Block(new[] { valueVar }, statements.ToArray());
+				}
+				return new PrivateAccessorMetaObject(value, BindingRestrictions.GetTypeRestriction(this.Expression, typeof(PrivateAccessor)));
+			}
+
+			public override DynamicMetaObject BindInvokeMember(InvokeMemberBinder binder, DynamicMetaObject[] args)
+			{
+				var invoke = typeof(PrivateAccessor).GetMethod("CallMethod", new[] { typeof(string), typeof(object[]) });
+
+				var callResult = Expression.Variable(typeof(object));
+				var argsVar = Expression.Variable(typeof(object[]));
+
+				var executionList = new List<Expression>
+				{
+					Expression.Assign(argsVar, Expression.NewArrayInit(typeof(object), args.Select(a => Expression.Convert(a.Expression, typeof(object))))),
+					Expression.Assign(callResult, Expression.Call(
+						Expression.Convert(this.Expression, typeof(PrivateAccessor)), invoke, Expression.Constant(binder.Name), argsVar)),
+				};
+
+				executionList.AddRange(args
+					.Select((a, i) => new { expr = a.Expression, i })
+					.Where(p => p.expr is ParameterExpression)
+					.Select(p => Expression.Assign(p.expr, Expression.Convert(Expression.ArrayIndex(argsVar, Expression.Constant(p.i)), p.expr.Type))));
+				executionList.Add(callResult);
+
+				return CreateMetaObject(Expression.Block(new[] { argsVar, callResult }, executionList));
+			}
+
+			private DynamicMetaObject BindSetMember(Type returnType, string propertyName, Expression value, IEnumerable<Expression> indexes = null)
+			{
+				bool hasIndexes = indexes != null;
+
+				var setProp = typeof(PrivateAccessor).GetMethod(hasIndexes ? "SetProperty" : "SetMember");
+
+				var tempValue = Expression.Variable(value.Type);
+				var arguments = new List<Expression>
+				{
+					Expression.Constant(propertyName),
+					Expression.Convert(tempValue, typeof(object)),
+				};
+				if (hasIndexes)
+					arguments.Add(Expression.NewArrayInit(typeof(object), indexes.Select(a => Expression.Convert(a, typeof(object)))));
+
+				var call = Expression.Call(Expression.Convert(this.Expression, typeof(PrivateAccessor)), setProp, arguments.ToArray());
+				return CreateMetaObject(
+					Expression.Block(new[] { tempValue },
+					new Expression[]
+					{
+						Expression.Assign(tempValue, value),
+						call,
+						Expression.Convert(tempValue, returnType),
+					}), wrap: false);
+			}
+
+			public override DynamicMetaObject BindGetMember(GetMemberBinder binder)
+			{
+				var getProp = typeof(PrivateAccessor).GetMethod("GetMember");
+				var call = Expression.Call(Expression.Convert(this.Expression, typeof(PrivateAccessor)), getProp, Expression.Constant(binder.Name));
+				return CreateMetaObject(call);
+			}
+
+			public override DynamicMetaObject BindSetMember(SetMemberBinder binder, DynamicMetaObject value)
+			{
+				return BindSetMember(binder.ReturnType, binder.Name, value.Expression);
+			}
+
+			public override DynamicMetaObject BindGetIndex(GetIndexBinder binder, DynamicMetaObject[] indexes)
+			{
+				var getProp = typeof(PrivateAccessor).GetMethod("GetProperty");
+
+				var call = Expression.Call(Expression.Convert(this.Expression, typeof(PrivateAccessor)), getProp,
+					Expression.Constant("Item"),
+					Expression.NewArrayInit(typeof(object), indexes.Select(a => Expression.Convert(a.Expression, typeof(object)))));
+				return CreateMetaObject(call);
+			}
+
+			public override DynamicMetaObject BindSetIndex(SetIndexBinder binder, DynamicMetaObject[] indexes, DynamicMetaObject value)
+			{
+				return BindSetMember(binder.ReturnType, "Item", value.Expression, indexes.Select(i => i.Expression));
+			}
+
+			public override DynamicMetaObject BindConvert(ConvertBinder binder)
+			{
+				var obj = typeof(PrivateAccessor).GetProperty("Instance");
+				return new DynamicMetaObject(
+					Expression.Convert(Expression.Property(Expression.Convert(this.Expression, typeof(PrivateAccessor)), obj), binder.Type),
+					BindingRestrictions.GetTypeRestriction(this.Expression, typeof(PrivateAccessor)));
+			}
 		}
 	}
 

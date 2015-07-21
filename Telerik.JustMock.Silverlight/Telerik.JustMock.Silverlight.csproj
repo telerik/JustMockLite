@@ -110,6 +110,7 @@
     <NoConfig>true</NoConfig>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Windows" />
     <Reference Include="mscorlib" />
     <Reference Include="system" />
@@ -1529,6 +1530,9 @@
     <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IDoInstead.cs">
       <Link>Expectations\Abstraction\IDoInstead.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IExpressionContainer.cs">
+      <Link>Expectations\Abstraction\IExpressionContainer.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IFunc.cs">
       <Link>Expectations\Abstraction\IFunc.cs</Link>
     </Compile>
@@ -1580,6 +1584,12 @@
     <Compile Include="..\Telerik.JustMock\Expectations\CommonExpectation.partial.cs">
       <Link>Expectations\CommonExpectation.partial.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\DynaMock\ExpressionContainer.cs">
+      <Link>Expectations\DynaMock\ExpressionContainer.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\DynaMock\ExpressionRecorder.cs">
+      <Link>Expectations\DynaMock\ExpressionRecorder.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Expectations\EventWaitDuration.cs">
       <Link>Expectations\EventWaitDuration.cs</Link>
     </Compile>
@@ -1604,6 +1614,9 @@
     <Compile Include="..\Telerik.JustMock\Helpers\MultipleReturnValueChainHelper.cs">
       <Link>Helpers\MultipleReturnValueChainHelper.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Helpers\TaskHelper.cs">
+      <Link>Helpers\TaskHelper.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Mock.Arrange.cs">
       <Link>Mock.Arrange.cs</Link>
     </Compile>
@@ -1618,9 +1631,6 @@
     </Compile>
     <Compile Include="..\Telerik.JustMock\Mock.SetupStatic.cs">
       <Link>Mock.SetupStatic.cs</Link>
-    </Compile>
-    <Compile Include="..\Telerik.JustMock\Mock.VisualBasic2008.cs">
-      <Link>Mock.VisualBasic2008.cs</Link>
     </Compile>
     <Compile Include="..\Telerik.JustMock\Occurs.cs">
       <Link>Occurs.cs</Link>
