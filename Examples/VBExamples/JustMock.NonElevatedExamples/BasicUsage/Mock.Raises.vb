@@ -35,9 +35,9 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.Mock_Raises
 
             ' Arranging: When foo.RaiseMethod() is called, it should raise foo.CustomEvent with expected args.
             Mock.Arrange(Sub() foo.RaiseMethod()).Raises(Sub() AddHandler foo.CustomEvent, Nothing, expected)
-            AddHandler foo.CustomEvent, Function(s)
+            AddHandler foo.CustomEvent, Sub(s)
                                             actual = s
-                                        End Function
+                                        End Sub
 
             ' ACT
             foo.RaiseMethod()
@@ -56,9 +56,9 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.Mock_Raises
 
             ' Arranging: When foo.Echo() is called with expected arguments, it should raise foo.EchoEvent with arg: true.
             Mock.Arrange(Function() foo.Echo("string")).Raises(Sub() AddHandler foo.EchoEvent, Nothing, True)
-            AddHandler foo.EchoEvent, Function(c)
+            AddHandler foo.EchoEvent, Sub(c)
                                           isRaised = c
-                                      End Function
+                                      End Sub
 
             ' ACT
             Dim actual = foo.Echo("string")
@@ -80,12 +80,12 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.Mock_Raises
             Mock.Arrange(Sub() foo.Execute()).Raises(Sub() AddHandler foo.EchoEvent, Nothing, True)
 
             ' Subscribing for the event
-            AddHandler foo.EchoEvent, Function(c)
+            AddHandler foo.EchoEvent, Sub(c)
                                           isRaisedForFirstSubscr = c
-                                      End Function
-            AddHandler foo.EchoEvent, Function(c)
+                                      End Sub
+            AddHandler foo.EchoEvent, Sub(c)
                                           isRaisedForSecondSubscr = c
-                                      End Function
+                                      End Sub
 
             ' ACT
             foo.Execute()

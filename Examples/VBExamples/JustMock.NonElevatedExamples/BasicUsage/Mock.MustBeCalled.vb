@@ -19,7 +19,7 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
 
 Namespace JustMock.NonElevatedExamples.BasicUsage.Mock_MustBeCalled
     ''' <summary>
-    ''' <FEATURE HELP>
+    ''' &lt;FEATURE HELP&gt;
     ''' The MustBeCalled method is used to assert that a call to a given method or property is made during the execution of a test.
     ''' See http://www.telerik.com/help/justmock/basic-usage-mock-must-be-called.html for full documentation of the feature.
     ''' </summary>

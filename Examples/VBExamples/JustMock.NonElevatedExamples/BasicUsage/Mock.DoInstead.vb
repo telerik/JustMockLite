@@ -33,10 +33,9 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.Mock_DoInstead
             Dim called As Boolean = False
 
             ' Arranging: When foo.Execute() is called with any string as an argument it should change "called" to true and also return that argument.
-            Mock.Arrange(Function() foo.Execute(Arg.IsAny(Of String)())).DoInstead(Function()
-                                                                                                called = True
-
-                                                                                            End Function).Returns(Function(s As String) s)
+            Mock.Arrange(Function() foo.Execute(Arg.IsAny(Of String)())).DoInstead(Sub()
+                                                                                       called = True
+                                                                                   End Sub).Returns(Function(s As String) s)
 
             ' ACT 
             Dim actual = foo.Execute("bar")
@@ -55,10 +54,10 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.Mock_DoInstead
             Dim foo = Mock.Create(Of IFoo)()
 
             ' Arranging: When foo.Submit() is called with any integers as an arguments it should assign their sum to the "expected" variable.
-            Mock.Arrange(Function() foo.Submit(Arg.IsAny(Of Integer)(), Arg.IsAny(Of Integer)(), Arg.IsAny(Of Integer)(), Arg.IsAny(Of Integer)())).DoInstead(Function(arg1 As Integer, arg2 As Integer, arg3 As Integer, arg4 As Integer)
+            Mock.Arrange(Function() foo.Submit(Arg.IsAny(Of Integer)(), Arg.IsAny(Of Integer)(), Arg.IsAny(Of Integer)(), Arg.IsAny(Of Integer)())).DoInstead(Sub(arg1 As Integer, arg2 As Integer, arg3 As Integer, arg4 As Integer)
                                                                                                                                                                            expected = arg1 + arg2 + arg3 + arg4
 
-                                                                                                                                                                       End Function)
+                                                                                                                                                                       End Sub)
 
             ' Act
             foo.Submit(10, 10, 10, 10)
@@ -95,9 +94,9 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.Mock_DoInstead
 
             ' Arranging: When myMock.AddTo is called with 10 and "refArg" it should assign their sum to the second argument (refArg).
             Mock.Arrange(Sub() myMock.AddTo(10, refArg)) _
-                .DoInstead(New RefAction(Of Integer, Integer)(Function(arg1 As Integer, ByRef arg2 As Integer)
-                                                                  arg2 += arg1
-                                                              End Function))
+                .DoInstead(New RefAction(Of Integer, Integer)(Sub(arg1 As Integer, ByRef arg2 As Integer)
+                                                                              arg2 += arg1
+                                                                          End Sub))
 
             ' Act
             myMock.AddTo(10, refArg)

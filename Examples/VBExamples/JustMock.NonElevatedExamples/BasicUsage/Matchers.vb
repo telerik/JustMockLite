@@ -34,9 +34,9 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.Matchers
     '''         Arg.AnyShort
     '''         Arg.AnyString
     '''         Arg.NullOrEmpty
-    '''     - Arg.IsAny<[Type]>();
+    '''     - Arg.IsAny(Of Type)();
     '''     - Arg.IsInRange([FromValue : int], [ToValue : int], [RangeKind])
-    '''     - Arg.Matches<T>(Expression<Predicate<T>> expression) 
+    '''     - Arg.Matches(Of T)(Expression(Of Predicate(Of T)) expression) 
     ''' </summary>
     <TestClass> _
     Public Class Matchers_Tests
