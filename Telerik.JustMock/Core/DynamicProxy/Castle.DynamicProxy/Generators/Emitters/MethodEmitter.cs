@@ -156,6 +156,10 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 				{
 					parameterBuilder.SetCustomAttribute(attribute);
 				}
+				if (parameter.DefaultValue != DBNull.Value && parameter.DefaultValue != null)
+				{
+					parameterBuilder.SetConstant(parameter.DefaultValue);
+				}
 			}
 		}
 
