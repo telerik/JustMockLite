@@ -442,109 +442,106 @@ namespace Telerik.JustMock.Core
 			if (TryCreateDelegate(type, settings, out delegateResult))
 				return delegateResult;
 
-			using (this.sharedContext.StartCreate())
+			bool isSafeMock = settings.FallbackBehaviors.OfType<CallOriginalBehavior>().Any();
+			CheckIfCanMock(type, !isSafeMock);
+
+			EnableInterception(type);
+
+			bool canCreateProxy = !type.IsSealed;
+
+			var mockMixinImpl = CreateMockMixin(type, settings.SupplementaryBehaviors, settings.FallbackBehaviors, settings.MockConstructorCall);
+
+			var ctors = type.GetConstructors();
+			bool isCoclass = ctors.Any(ctor => ctor.IsExtern());
+
+			bool hasAdditionalInterfaces = settings.AdditionalMockedInterfaces != null && settings.AdditionalMockedInterfaces.Length > 0;
+			bool hasAdditionalProxyTypeAttributes = settings.AdditionalProxyTypeAttributes != null && settings.AdditionalProxyTypeAttributes.Any();
+
+			bool shouldCreateProxy = settings.MustCreateProxy
+				|| hasAdditionalInterfaces
+				|| isCoclass
+				|| type.IsAbstract || type.IsInterface
+				|| !settings.MockConstructorCall
+				|| hasAdditionalProxyTypeAttributes
+				|| !ProfilerInterceptor.IsProfilerAttached
+				|| !ProfilerInterceptor.TypeSupportsInstrumentation(type);
+
+			var createTransparentProxy = MockingProxy.CanCreate(type) && !ProfilerInterceptor.IsProfilerAttached;
+
+			Exception proxyFailure = null;
+			object instance = null;
+			if (canCreateProxy && shouldCreateProxy)
 			{
-				bool isSafeMock = settings.FallbackBehaviors.OfType<CallOriginalBehavior>().Any();
-				CheckIfCanMock(type, !isSafeMock);
+				try
+				{
+					instance = mockFactory.Create(type, this, mockMixinImpl, settings, createTransparentProxy);
+				}
+				catch (ProxyFailureException ex)
+				{
+					proxyFailure = ex.InnerException;
+				}
+			}
+			var mockMixin = instance as IMockMixin;
 
-				EnableInterception(type);
+			if (instance == null)
+			{
+				if (type.IsInterface || type.IsAbstract)
+					throw new MockException(String.Format("Abstract type '{0}' is not accessible for inheritance.", type));
 
-				bool canCreateProxy = !type.IsSealed;
+				if (hasAdditionalInterfaces)
+					throw new MockException(String.Format("Type '{0}' is not accessible for inheritance. Cannot create mock object implementing the specified additional interfaces.", type));
 
-				var mockMixinImpl = CreateMockMixin(type, settings.SupplementaryBehaviors, settings.FallbackBehaviors, settings.MockConstructorCall);
+				if (!ProfilerInterceptor.IsProfilerAttached && !createTransparentProxy)
+					ProfilerInterceptor.ThrowElevatedMockingException(type);
 
-				var ctors = type.GetConstructors();
-				bool isCoclass = ctors.Any(ctor => ctor.IsExtern());
+				if (settings.MockConstructorCall && type.IsValueType)
+				{
+					settings.MockConstructorCall = false;
+					settings.Args = null;
+				}
 
-				bool hasAdditionalInterfaces = settings.AdditionalMockedInterfaces != null && settings.AdditionalMockedInterfaces.Length > 0;
-				bool hasAdditionalProxyTypeAttributes = settings.AdditionalProxyTypeAttributes != null && settings.AdditionalProxyTypeAttributes.Any();
-
-				bool shouldCreateProxy = settings.MustCreateProxy
-					|| hasAdditionalInterfaces
-					|| isCoclass
-					|| type.IsAbstract || type.IsInterface
-					|| !settings.MockConstructorCall
-					|| hasAdditionalProxyTypeAttributes
-					|| !ProfilerInterceptor.IsProfilerAttached
-					|| !ProfilerInterceptor.TypeSupportsInstrumentation(type);
-
-				var createTransparentProxy = MockingProxy.CanCreate(type) && !ProfilerInterceptor.IsProfilerAttached;
-
-				Exception proxyFailure = null;
-				object instance = null;
-				if (canCreateProxy && shouldCreateProxy)
+				if (!settings.MockConstructorCall)
 				{
 					try
 					{
-						instance = mockFactory.Create(type, this, mockMixinImpl, settings, createTransparentProxy);
+						instance = type.CreateObject(settings.Args);
 					}
-					catch (ProxyFailureException ex)
+					catch (MissingMethodException)
 					{
-						proxyFailure = ex.InnerException;
+						settings.MockConstructorCall = true;
 					}
 				}
-				var mockMixin = instance as IMockMixin;
 
-				if (instance == null)
+				if (settings.MockConstructorCall)
 				{
-					if (type.IsInterface || type.IsAbstract)
-						throw new MockException(String.Format("Abstract type '{0}' is not accessible for inheritance.", type));
-
-					if (hasAdditionalInterfaces)
-						throw new MockException(String.Format("Type '{0}' is not accessible for inheritance. Cannot create mock object implementing the specified additional interfaces.", type));
-
-					if (!ProfilerInterceptor.IsProfilerAttached && !createTransparentProxy)
-						ProfilerInterceptor.ThrowElevatedMockingException(type);
-
-					if (settings.MockConstructorCall && type.IsValueType)
-					{
-						settings.MockConstructorCall = false;
-						settings.Args = null;
-					}
-
-					if (!settings.MockConstructorCall)
-					{
-						try
-						{
-							instance = type.CreateObject(settings.Args);
-						}
-						catch (MissingMethodException)
-						{
-							settings.MockConstructorCall = true;
-						}
-					}
-
-					if (settings.MockConstructorCall)
-					{
-						instance = MockingUtil.GetUninitializedObject(type);
-					}
-
-					if (!createTransparentProxy)
-					{
-						mockMixin = CreateExternalMockMixin(type, instance, settings.Mixins, settings.SupplementaryBehaviors, settings.FallbackBehaviors);
-					}
+					instance = MockingUtil.GetUninitializedObject(type);
 				}
-				else
+
+				if (!createTransparentProxy)
 				{
-					this.controlledMocks.Add(new WeakReference(instance));
+					mockMixin = CreateExternalMockMixin(type, instance, settings.Mixins, settings.SupplementaryBehaviors, settings.FallbackBehaviors);
 				}
-
-				if (type.IsClass)
-					GC.SuppressFinalize(instance);
-
-				if (createTransparentProxy)
-				{
-					if (mockMixin == null)
-					{
-						mockMixin = mockMixinImpl;
-					}
-					instance = MockingProxy.CreateProxy(instance, this, mockMixin);
-				}
-
-				mockMixin.IsInstanceConstructorMocked = settings.MockConstructorCall;
-
-				return instance;
 			}
+			else
+			{
+				this.controlledMocks.Add(new WeakReference(instance));
+			}
+
+			if (type.IsClass)
+				GC.SuppressFinalize(instance);
+
+			if (createTransparentProxy)
+			{
+				if (mockMixin == null)
+				{
+					mockMixin = mockMixinImpl;
+				}
+				instance = MockingProxy.CreateProxy(instance, this, mockMixin);
+			}
+
+			mockMixin.IsInstanceConstructorMocked = settings.MockConstructorCall;
+
+			return instance;
 		}
 
 		internal IMockMixin CreateExternalMockMixin(Type mockObjectType, object mockObject, IEnumerable<object> mixins,

@@ -28,7 +28,6 @@ namespace Telerik.JustMock.Core
 
 		private readonly ThreadLocalProperty<IRecorder> recorder = new ThreadLocalProperty<IRecorder>();
 		private readonly ThreadLocalProperty<object> inArrange = new ThreadLocalProperty<object>();
-		private readonly ThreadLocalProperty<object> inCreate = new ThreadLocalProperty<object>();
 		private readonly ThreadLocalProperty<object> dispatchToMethodMocks = new ThreadLocalProperty<object>();
 
 		public IRecorder Recorder
@@ -41,12 +40,6 @@ namespace Telerik.JustMock.Core
 		{
 			get { return this.inArrange.Get() != null; }
 			private set { this.inArrange.Set(value ? (object)value : null); }
-		}
-
-		public bool InCreate
-		{
-			get { return this.inCreate.Get() != null; }
-			private set { this.inCreate.Set(value ? (object)value : null); }
 		}
 
 		public bool DispatchToMethodMocks
@@ -67,12 +60,6 @@ namespace Telerik.JustMock.Core
 		{
 			Monitor.Enter(this);
 			return new InArrangeContext(this);
-		}
-
-		public IDisposable StartCreate()
-		{
-			Monitor.Enter(this);
-			return new InCreateContext(this);
 		}
 
 		public int GetNextArrangeId()
@@ -117,24 +104,6 @@ namespace Telerik.JustMock.Core
 			public void Dispose()
 			{
 				context.InArrange = false;
-				Monitor.Exit(context);
-			}
-		}
-
-		private class InCreateContext : IDisposable
-		{
-			private readonly RepositorySharedContext context;
-
-			public InCreateContext(RepositorySharedContext context)
-			{
-				this.context = context;
-				Debug.Assert(!context.InCreate);
-				context.InCreate = true;
-			}
-
-			public void Dispose()
-			{
-				context.InCreate = false;
 				Monitor.Exit(context);
 			}
 		}

@@ -14,8 +14,30 @@ namespace Telerik.JustMock.Tests
 			var model = Mock.Create<IAsyncModel>();
 			Mock.Arrange(() => model.GetData()).Returns(5);
 			var controller = new TestAsyncController();
-			controller.DoStuff(model);
+			await controller.DoStuff(model);
 			//no exception
+		}
+
+		[TestMethod, TestCategory("Async"), TestCategory("Lite")]
+		public void ShouldCreateRecursiveMockInConstructorOnAnotherThread()
+		{
+			var mock = Mock.Create<ThreadCtor>(Constructor.NotMocked, Behavior.RecursiveLoose);
+			Assert.NotNull(mock.TheItem);
+		}
+
+		public abstract class ThreadCtor
+		{
+			protected abstract IDisposable Item { get; }
+
+			public ThreadCtor()
+			{
+				var thread = new Thread(() => TheItem = Item);
+				thread.Start();
+				if (!thread.Join(TimeSpan.FromMilliseconds(1500)))
+					throw new TimeoutException();
+			}
+
+			public IDisposable TheItem;
 		}
 	}
 

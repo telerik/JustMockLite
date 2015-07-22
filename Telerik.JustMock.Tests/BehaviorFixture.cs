@@ -188,6 +188,25 @@ namespace Telerik.JustMock.Tests
 			Assert.Same(array, matrix.GetMultidimensionalArray());
 		}
 
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
+		public void ShouldCreateRecursiveMockInsideConstructor()
+		{
+			var mock = Mock.Create<CtorMock>(Constructor.NotMocked, Behavior.RecursiveLoose);
+			Assert.NotNull(mock.TheFoo);
+		}
+
+		public abstract class CtorMock
+		{
+			protected abstract IFoo Foo { get; }
+
+			public CtorMock()
+			{
+				TheFoo = Foo;
+			}
+
+			public IFoo TheFoo;
+		}
+
 		public interface IMatrix
 		{
 			int[, ,] GetMultidimensionalArray();
