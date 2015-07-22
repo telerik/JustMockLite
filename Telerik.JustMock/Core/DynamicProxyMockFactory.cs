@@ -41,7 +41,7 @@ namespace Telerik.JustMock.Core
 #endif
 		}
 
-#if DEBUG
+#if DEBUG && !SILVERLIGHT
 		internal static void SaveAssembly()
 		{
 			generator.ProxyBuilder.ModuleScope.SaveAssembly();

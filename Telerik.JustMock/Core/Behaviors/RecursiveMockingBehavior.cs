@@ -118,7 +118,7 @@ namespace Telerik.JustMock.Core.Behaviors
 
 		private object CreateMock(Type returnType, MocksRepository repository, Invocation invocation)
 		{
-			var parentMock = MocksRepository.GetMockMixinFromInvocation(invocation);
+			var parentMock = invocation.MockMixin;
 			var replicator = parentMock as IMockReplicator;
 
 			object mock = null;
