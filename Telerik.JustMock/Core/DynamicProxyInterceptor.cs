@@ -25,7 +25,7 @@ namespace Telerik.JustMock.Core
 	{
 		private readonly MocksRepository constructionRepo;
 
-		public DynamicProxyInterceptor(MocksRepository constructionRepo)
+		internal DynamicProxyInterceptor(MocksRepository constructionRepo)
 		{
 			this.constructionRepo = constructionRepo;
 		}

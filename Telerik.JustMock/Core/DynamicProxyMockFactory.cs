@@ -68,7 +68,7 @@ namespace Telerik.JustMock.Core
 				}
 			}
 
-			var interceptor = new DynamicProxyInterceptor(repository);
+			var interceptor = repository.Interceptor;
 #if SILVERLIGHT
 			options.Hook = new ProxyGenerationHook(false, settings.InterceptorFilter);
 #else
@@ -189,7 +189,7 @@ namespace Telerik.JustMock.Core
 			{
 				ProxyType = generator.ProxyBuilder.CreateClassProxyType(classToProxy, Type.EmptyTypes, pgo)
 			};
-			typeInfo.Mixins.Add(typeof(IInterceptor), new DynamicProxyInterceptor(repository));
+			typeInfo.Mixins.Add(typeof(IInterceptor), repository.Interceptor);
 			foreach (var mixin in pgo.MixinData.MixinInterfaces)
 			{
 				typeInfo.Mixins.Add(mixin, pgo.MixinData.GetMixinInstance(mixin));

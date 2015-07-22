@@ -74,8 +74,7 @@ namespace Telerik.JustMock.Core.TransparentProxy
 
 		public static object CreateProxy(object wrappedInstance, MocksRepository repository, IMockMixin mockMixin)
 		{
-			var interceptor = new DynamicProxyInterceptor(repository);
-			var realProxy = new MockingProxy((MarshalByRefObject)wrappedInstance, interceptor, mockMixin);
+			var realProxy = new MockingProxy((MarshalByRefObject)wrappedInstance, repository.Interceptor, mockMixin);
 			return realProxy.GetTransparentProxy();
 		}
 

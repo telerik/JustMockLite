@@ -221,6 +221,8 @@ namespace Telerik.JustMock.Core
 
 		internal MethodBase Method { get { return this.method; } }
 
+		internal DynamicProxyInterceptor Interceptor { get; private set; }
+
 		static readonly IMockFactory mockFactory;
 
 		static MocksRepository()
@@ -254,6 +256,7 @@ namespace Telerik.JustMock.Core
 			this.repositoryId = ++repositoryCounter;
 			this.method = method;
 			this.creatingThread = Thread.CurrentThread;
+			this.Interceptor = new DynamicProxyInterceptor(this);
 			if (parentRepository != null)
 			{
 				this.parentRepository = parentRepository;
