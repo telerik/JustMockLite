@@ -282,7 +282,10 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 
 		public Type GetGenericArgument(String genericArgumentName)
 		{
-			return name2GenericType[genericArgumentName];
+			if (name2GenericType.ContainsKey(genericArgumentName))
+				return name2GenericType[genericArgumentName];
+
+			return null;
 		}
 
 		public Type[] GetGenericArgumentsFor(Type genericType)

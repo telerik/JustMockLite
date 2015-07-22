@@ -204,7 +204,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 			for (var i = 0; i < arguments.Length; i++)
 			{
 				var newType = GetClosedParameterType(emitter, arguments[i]);
-				if (!ReferenceEquals(newType, arguments[i]))
+				if (newType != null && !ReferenceEquals(newType, arguments[i]))
 				{
 					arguments[i] = newType;
 					hasAnyGenericParameters = true;
