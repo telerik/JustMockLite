@@ -285,6 +285,8 @@ namespace Telerik.JustMock.Core
 				throw new MockException("Cannot mock constructors of ContextBoundObject descendants.");
 			if (type == typeof(string))
 				return string.Empty;
+			if (type.IsPointer)
+				return IntPtr.Zero;
 			return FormatterServices.GetUninitializedObject(type);
 #endif
 		}
