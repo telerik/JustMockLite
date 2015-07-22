@@ -117,7 +117,10 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 			if (parameter.IsArray)
 			{
 				var elementType = GetClosedParameterType(type, parameter.GetElementType());
-				return elementType.MakeArrayType();
+				int rank = parameter.GetArrayRank();
+				return rank == 1
+					? elementType.MakeArrayType()
+					: elementType.MakeArrayType(rank);
 			}
 
 			if (parameter.IsByRef)
