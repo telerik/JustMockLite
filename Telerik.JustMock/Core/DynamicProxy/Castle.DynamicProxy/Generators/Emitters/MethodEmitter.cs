@@ -158,11 +158,24 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 				}
 				if (parameter.DefaultValue != DBNull.Value && parameter.DefaultValue != null)
 				{
-					if (parameter.ParameterType == typeof(decimal) || parameter.ParameterType == typeof(decimal?))
+					if (parameter.ParameterType == typeof(Boolean)
+						|| parameter.ParameterType == typeof(SByte)
+						|| parameter.ParameterType == typeof(Int16)
+						|| parameter.ParameterType == typeof(Int32)
+						|| parameter.ParameterType == typeof(Int64)
+						|| parameter.ParameterType == typeof(Byte)
+						|| parameter.ParameterType == typeof(UInt16)
+						|| parameter.ParameterType == typeof(UInt32)
+						|| parameter.ParameterType == typeof(UInt64)
+						|| parameter.ParameterType == typeof(Single)
+						|| parameter.ParameterType == typeof(Double)
+						|| parameter.ParameterType == typeof(DateTime)
+						|| parameter.ParameterType == typeof(Char)
+						|| parameter.ParameterType == typeof(String)
+						|| parameter.ParameterType.IsEnum)
 					{
-						continue;
+						parameterBuilder.SetConstant(parameter.DefaultValue);
 					}
-					parameterBuilder.SetConstant(parameter.DefaultValue);
 				}
 			}
 		}
@@ -181,7 +194,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
  null,
 				null,
 #else
-				returnParameter.GetRequiredCustomModifiers(),
+ returnParameter.GetRequiredCustomModifiers(),
 				returnParameter.GetOptionalCustomModifiers(),
 #endif
  parameters,
@@ -189,7 +202,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
  null,
 				null
 #else
-				baseMethodParameters.Select(x => x.GetRequiredCustomModifiers()).ToArray(),
+ baseMethodParameters.Select(x => x.GetRequiredCustomModifiers()).ToArray(),
 				baseMethodParameters.Select(x => x.GetOptionalCustomModifiers()).ToArray()
 #endif
 );
