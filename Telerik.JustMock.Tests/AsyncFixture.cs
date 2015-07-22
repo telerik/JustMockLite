@@ -21,6 +21,7 @@ namespace Telerik.JustMock.Tests
 		[TestMethod, TestCategory("Async"), TestCategory("Lite")]
 		public void ShouldCreateRecursiveMockInConstructorOnAnotherThread()
 		{
+			Mock.Arrange(() => Arg.IsAny<ThreadCtor>().Assign()).CallOriginal();
 			var mock = Mock.Create<ThreadCtor>(Constructor.NotMocked, Behavior.RecursiveLoose);
 			Assert.NotNull(mock.TheItem);
 		}
@@ -31,10 +32,15 @@ namespace Telerik.JustMock.Tests
 
 			public ThreadCtor()
 			{
-				var thread = new Thread(() => TheItem = Item);
+				var thread = new Thread(this.Assign);
 				thread.Start();
 				if (!thread.Join(TimeSpan.FromMilliseconds(1500)))
 					throw new TimeoutException();
+			}
+
+			public virtual void Assign()
+			{
+				TheItem = Item;
 			}
 
 			public IDisposable TheItem;
