@@ -264,6 +264,7 @@
     <Compile Include="Core\Behaviors\StaticConstructorMockBehavior.cs" />
     <Compile Include="Core\ByRefComparer.cs" />
     <Compile Include="Core\ClrProfilerSetupHelper.cs" />
+    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\ClassProxyWithTargetInstanceContributor.cs" />
     <Compile Include="Core\MockingUtil.CodeGen.cs" />
     <Compile Include="Core\Context\HierarchicalTestFrameworkContextResolver.cs" />
     <Compile Include="Core\Context\IMockingContextResolver.cs" />

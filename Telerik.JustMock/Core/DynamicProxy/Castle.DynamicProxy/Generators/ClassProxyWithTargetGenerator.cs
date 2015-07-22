@@ -32,7 +32,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 		private readonly Type[] additionalInterfacesToProxy;
 
 		public ClassProxyWithTargetGenerator(ModuleScope scope, Type classToProxy, Type[] additionalInterfacesToProxy,
-		                                     ProxyGenerationOptions options)
+											 ProxyGenerationOptions options)
 			: base(scope, classToProxy)
 		{
 			CheckNotGenericTypeDefinition(targetType, "targetType");
@@ -51,13 +51,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 		}
 
 		protected virtual IEnumerable<Type> GetTypeImplementerMapping(out IEnumerable<ITypeContributor> contributors,
-		                                                              INamingScope namingScope)
+																	  INamingScope namingScope)
 		{
 			var methodsToSkip = new List<MethodInfo>();
-			var proxyInstance = new ClassProxyInstanceContributor(targetType, methodsToSkip, additionalInterfacesToProxy);
+			var proxyInstance = new ClassProxyWithTargetInstanceContributor(targetType, methodsToSkip, additionalInterfacesToProxy);
 			// TODO: the trick with methodsToSkip is not very nice...
-			var proxyTarget = new ClassProxyWithTargetTargetContributor(targetType, methodsToSkip, namingScope, this.Scope)
-			{ Logger = Logger };
+			var proxyTarget = new ClassProxyWithTargetTargetContributor(targetType, methodsToSkip, namingScope, this.Scope) { Logger = Logger };
 			IDictionary<Type, ITypeContributor> typeImplementerMapping = new Dictionary<Type, ITypeContributor>();
 
 			// Order of interface precedence:
@@ -75,7 +74,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 					{
 						// OK, so the target implements this interface. We now do one of two things:
 						if (additionalInterfacesToProxy.Contains(mixinInterface) &&
-						    typeImplementerMapping.ContainsKey(mixinInterface) == false)
+							typeImplementerMapping.ContainsKey(mixinInterface) == false)
 						{
 							AddMappingNoCheck(mixinInterface, proxyTarget, typeImplementerMapping);
 							proxyTarget.AddInterfaceToProxy(mixinInterface);
@@ -94,8 +93,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 				}
 			}
 			var additionalInterfacesContributor = new InterfaceProxyWithoutTargetContributor(namingScope, Scope,
-			                                                                                 (c, m) => NullExpression.Instance)
-			{ Logger = Logger };
+																							 (c, m) => NullExpression.Instance) { Logger = Logger };
 			// 3. then additional interfaces
 			foreach (var @interface in additionalInterfacesToProxy)
 			{
