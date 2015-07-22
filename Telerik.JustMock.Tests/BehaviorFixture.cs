@@ -277,7 +277,7 @@ namespace Telerik.JustMock.Tests
 			catch (Exception) { }
 
 			var message = Assert.Throws<AssertionException>(() => Mock.Assert(mock)).Message;
-#if !COREFX
+#if !COREFX || SILVERLIGHT
 			Assert.Equal("Called unarranged member 'Void Invoke()' on strict mock of type 'Castle.Proxies.Delegates.System_Action'", message.Trim());
 #else
 			Assert.Equal("Called unarranged member 'Void Invoke()' on strict mock of type 'Telerik.JustMock.DelegateBackends.System.Action'", message.Trim());
