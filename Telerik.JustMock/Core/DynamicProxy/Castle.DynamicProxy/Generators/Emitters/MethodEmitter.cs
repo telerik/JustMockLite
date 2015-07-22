@@ -45,8 +45,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 		}
 
 		internal MethodEmitter(AbstractTypeEmitter owner, String name,
-		                       MethodAttributes attributes, Type returnType,
-		                       params Type[] argumentTypes)
+							   MethodAttributes attributes, Type returnType,
+							   params Type[] argumentTypes)
 			: this(owner, name, attributes)
 		{
 			SetParameters(argumentTypes);
@@ -54,7 +54,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 		}
 
 		internal MethodEmitter(AbstractTypeEmitter owner, String name,
-		                       MethodAttributes attributes, MethodInfo methodToUseAsATemplate)
+							   MethodAttributes attributes, MethodInfo methodToUseAsATemplate)
 			: this(owner, name, attributes)
 		{
 			var name2GenericType = GenericUtil.GetGenericArgumentsMap(owner);
@@ -158,6 +158,10 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 				}
 				if (parameter.DefaultValue != DBNull.Value && parameter.DefaultValue != null)
 				{
+					if (parameter.ParameterType == typeof(decimal) || parameter.ParameterType == typeof(decimal?))
+					{
+						continue;
+					}
 					parameterBuilder.SetConstant(parameter.DefaultValue);
 				}
 			}
@@ -169,26 +173,26 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 		}
 
 		private void SetSignature(Type returnType, ParameterInfo returnParameter, Type[] parameters,
-		                          ParameterInfo[] baseMethodParameters)
+								  ParameterInfo[] baseMethodParameters)
 		{
 			builder.SetSignature(
 				returnType,
 #if SILVERLIGHT
-				null,
+ null,
 				null,
 #else
 				returnParameter.GetRequiredCustomModifiers(),
 				returnParameter.GetOptionalCustomModifiers(),
 #endif
-				parameters,
+ parameters,
 #if SILVERLIGHT
-				null,
+ null,
 				null
 #else
 				baseMethodParameters.Select(x => x.GetRequiredCustomModifiers()).ToArray(),
 				baseMethodParameters.Select(x => x.GetOptionalCustomModifiers()).ToArray()
 #endif
-				);
+);
 		}
 	}
 }
