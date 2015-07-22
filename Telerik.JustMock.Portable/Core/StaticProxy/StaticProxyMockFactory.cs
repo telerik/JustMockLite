@@ -27,7 +27,7 @@ namespace Telerik.JustMock.Core.StaticProxy
 	{
 		public bool IsAccessible(Type type)
 		{
-			return type.IsPublic;
+			return type.IsPublic || (type.IsNestedPublic && type.DeclaringType != null && IsAccessible(type.DeclaringType));
 		}
 
 		public object Create(Type type, MocksRepository repository, IMockMixin mockMixinImpl, MockCreationSettings settings, bool createTransparentProxy)
@@ -134,7 +134,7 @@ namespace Telerik.JustMock.Core.StaticProxy
 		private static RuntimeTypeHandle[] GetAdditionalInterfaceHandles(Type type, Type[] additionalInterfaces)
 		{
 			var keyInterfaces = new HashSet<Type>(additionalInterfaces ?? Enumerable.Empty<Type>());
-			keyInterfaces.ExceptWith(type.GetInterfaces());
+			//keyInterfaces.ExceptWith(type.GetInterfaces());
 
 			return keyInterfaces.Count > 0
 				? keyInterfaces
