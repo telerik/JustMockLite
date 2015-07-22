@@ -79,14 +79,14 @@ namespace Telerik.JustMock.Tests
 		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
 		public void ShouldReturnDefaultGuidOnLoose()
 		{
-			var foo = Mock.Create<IFoo>();
+			var foo = Mock.Create<IFoo>(Behavior.Loose);
 			Assert.Equal(default(Guid), foo.GetGuid());
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
-		public void ShoudReturnEmptyArrayOnLoose()
+		public void ShouldReturnEmptyArrayOnLoose()
 		{
-			var foo = Mock.Create<IFoo>();
+			var foo = Mock.Create<IFoo>(Behavior.Loose);
 			// array should not be null:framework design guidelines.
 			var array = foo.GetArray();
 			Assert.NotNull(array);
@@ -97,7 +97,7 @@ namespace Telerik.JustMock.Tests
 		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
 		public void ShouldReturnEmptyEnumerableOnLoose()
 		{
-			var foo = Mock.Create<IFoo>();
+			var foo = Mock.Create<IFoo>(Behavior.Loose);
 			var e = foo.GetEnumerable();
 			Assert.NotNull(e);
 			Assert.Equal(e.Cast<string>().Count(), 0);
@@ -105,9 +105,9 @@ namespace Telerik.JustMock.Tests
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
-		public void SHouldReturnEmptyDictionaryOnLoose()
+		public void ShouldReturnEmptyDictionaryOnLoose()
 		{
-			var foo = Mock.Create<IFoo>();
+			var foo = Mock.Create<IFoo>(Behavior.Loose);
 
 			var dict = foo.GetDictionary();
 
@@ -119,7 +119,7 @@ namespace Telerik.JustMock.Tests
 		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
 		public void ShouldReturnEmptyListOnLoose()
 		{
-			var foo = Mock.Create<IFoo>();
+			var foo = Mock.Create<IFoo>(Behavior.Loose);
 			IList<string> list = foo.GetList();
 
 			Assert.NotNull(list);
@@ -130,7 +130,7 @@ namespace Telerik.JustMock.Tests
 		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
 		public void ShouldAbleToInsertListItemOnLoose()
 		{
-			var foo = Mock.Create<IFoo>();
+			var foo = Mock.Create<IFoo>(Behavior.Loose);
 			IList<string> list = foo.GetList();
 
 			list.Add("pong");

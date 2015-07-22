@@ -67,9 +67,6 @@
     <Compile Include="..\Telerik.JustMock\Constructor.cs">
       <Link>Constructor.cs</Link>
     </Compile>
-    <Compile Include="..\Telerik.JustMock\Core\AllowedMockableTypes.cs">
-      <Link>Core\AllowedMockableTypes.cs</Link>
-    </Compile>
     <Compile Include="..\Telerik.JustMock\Core\ArrangeMethodAttribute.cs">
       <Link>Core\ArrangeMethodAttribute.cs</Link>
     </Compile>
@@ -447,6 +444,12 @@
     </Compile>
     <Compile Include="..\Telerik.JustMock\RangeKind.cs">
       <Link>RangeKind.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Setup\AllowedMockableTypes.cs">
+      <Link>Setup\AllowedMockableTypes.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Setup\AutoArrangeRules.cs">
+      <Link>Setup\AutoArrangeRules.cs</Link>
     </Compile>
     <Compile Include="..\Telerik.JustMock\Setup\DisableAutomaticRepositoryResetAttribute.cs">
       <Link>Setup\DisableAutomaticRepositoryResetAttribute.cs</Link>

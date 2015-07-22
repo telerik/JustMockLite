@@ -537,6 +537,7 @@
     <Compile Include="Core\TransparentProxy\MockingProxy.cs" />
     <Compile Include="Core\TransparentProxy\ProxyInvocation.cs" />
     <Compile Include="DebugView.cs" />
+    <Compile Include="Setup\AutoArrangeRules.cs" />
     <Compile Include="Expectations\Abstraction\IExpressionContainer.cs" />
     <Compile Include="Expectations\DynaMock\ExpressionContainer.cs" />
     <Compile Include="Expectations\DynaMock\ExpressionRecorder.cs" />
@@ -569,7 +570,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Expectations\ReturnArranger.cs" />
-    <Compile Include="Core\AllowedMockableTypes.cs" />
+    <Compile Include="Setup\AllowedMockableTypes.cs" />
     <Compile Include="Expectations\Abstraction\IAction.cs" />
     <Compile Include="Expectations\Abstraction\IAssertable.cs" />
     <Compile Include="Expectations\Abstraction\IDoInstead.cs" />

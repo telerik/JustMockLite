@@ -24,6 +24,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using Telerik.JustMock.Core.Context;
+using Telerik.JustMock.Setup;
 
 namespace Telerik.JustMock.Core.Behaviors
 {
@@ -36,8 +37,10 @@ namespace Telerik.JustMock.Core.Behaviors
 
 	internal class RecursiveMockingBehavior : IBehavior
 	{
-		private readonly Dictionary<MethodBase, List<KeyValuePair<object, object>>> mocks
-			= new Dictionary<MethodBase, List<KeyValuePair<object, object>>>();
+		// can't put the key part in a Dictionary,
+		// because we can't be sure that GetHashCode() works
+		private readonly Dictionary<MethodBase, List<KeyValuePair<WeakReference, object>>> mocks
+			= new Dictionary<MethodBase, List<KeyValuePair<WeakReference, object>>>();
 
 		private readonly RecursiveMockingBehaviorType type;
 
@@ -59,12 +62,26 @@ namespace Telerik.JustMock.Core.Behaviors
 				return;
 
 			object mock = null;
-			List<KeyValuePair<object, object>> mocksList;
+			List<KeyValuePair<WeakReference, object>> mocksList;
 			if (mocks.TryGetValue(invocation.Method, out mocksList))
 			{
-				// can't put the key part in a Dictionary,
-				// because we can't be sure that GetHashCode() works
-				mock = mocksList.FirstOrDefault(kvp => Equals(kvp.Key, invocation.Instance)).Value;
+				for (int i = 0; i < mocksList.Count; )
+				{
+					var parentMock = mocksList[i].Key.Target;
+					if (parentMock == null)
+					{
+						mocksList.RemoveAt(i);
+					}
+					else if (Equals(parentMock, invocation.Instance))
+					{
+						mock = mocksList[i].Value;
+						break;
+					}
+					else
+					{
+						i++;
+					}
+				}
 			}
 
 			if (mock == null)
@@ -82,10 +99,10 @@ namespace Telerik.JustMock.Core.Behaviors
 
 				if (mocksList == null)
 				{
-					mocksList = new List<KeyValuePair<object, object>>();
+					mocksList = new List<KeyValuePair<WeakReference, object>>();
 					mocks.Add(invocation.Method, mocksList);
 				}
-				mocksList.Add(new KeyValuePair<object, object>(invocation.Instance, mock));
+				mocksList.Add(new KeyValuePair<WeakReference, object>(new WeakReference(invocation.Instance), mock));
 
 				var mockMixin = MocksRepository.GetMockMixin(mock, null);
 				if (parentMock != null && mockMixin != null)
@@ -116,45 +133,20 @@ namespace Telerik.JustMock.Core.Behaviors
 			return invocation.InArrange || this.type == RecursiveMockingBehaviorType.ReturnMock;
 		}
 
-		private object CreateMock(Type returnType, MocksRepository repository, Invocation invocation)
+		internal object CreateMock(Type returnType, MocksRepository repository, Invocation invocation)
 		{
 			var parentMock = invocation.MockMixin;
 			var replicator = parentMock as IMockReplicator;
 
-			object mock = null;
-			if (returnType.IsArray)
+			var request = new LooseBehaviorReturnRequest
 			{
-				mock = Array.CreateInstance(returnType.GetElementType(), Enumerable.Repeat(0, returnType.GetArrayRank()).ToArray());
-			}
-
-			var idictionaryType = returnType.GetImplementationOfGenericInterface(typeof(IDictionary<,>));
-			if (mock == null && idictionaryType != null)
-			{
-				var dictType = typeof(Dictionary<,>).MakeGenericType(idictionaryType.GetGenericArguments());
-				mock = MockCollection.Create(returnType, repository, replicator, (IEnumerable)MockingUtil.CreateInstance(dictType));
-			}
-
-			var ienumerableType = returnType.GetImplementationOfGenericInterface(typeof(IEnumerable<>));
-			if (mock == null && ienumerableType != null)
-			{
-				var listType = typeof(List<>).MakeGenericType(ienumerableType.GetGenericArguments());
-				mock = MockCollection.Create(returnType, repository, replicator, (IEnumerable)MockingUtil.CreateInstance(listType));
-			}
-
-			if (mock == null && typeof(Task).IsAssignableFrom(returnType))
-			{
-				var elementType = returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>)
-					? returnType.GetGenericArguments()[0] : typeof(object);
-				var taskResultValue = MustReturnMock(invocation)
-					? CreateMock(elementType, repository, invocation)
-					: elementType.GetDefaultValue();
-
-				Expression<Func<Task<object>>> taskFromResult = () => MockingUtil.TaskFromResult((object)null);
-				mock = ((MethodCallExpression)taskFromResult.Body).Method
-					.GetGenericMethodDefinition()
-					.MakeGenericMethod(elementType)
-					.Invoke(null, new object[] { taskResultValue });
-			}
+				Type = returnType,
+				ArrangedMock = parentMock,
+				MustReturnMock = MustReturnMock(invocation),
+				Invocation = invocation,
+				Source = this,
+			};
+			var mock = LooseBehaviorReturnRules.CreateValue(request);
 
 			if (mock == null && MustReturnMock(invocation, checkPropertyOnTestFixture: true))
 			{
