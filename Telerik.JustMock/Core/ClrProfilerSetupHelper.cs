@@ -65,6 +65,7 @@ namespace Telerik.JustMock.Core
 			{ new Guid("{B19F184A-CC62-4137-9A6F-AF0F91730165}"), "Visual Studio 2012 Code Coverage/IntelliTrace" },
 			{ new Guid("{2CCFACEE-5E60-4734-8A98-181D93097CD9}"), "Visual Studio 2013 Profiler" },
 			{ new Guid("{B61B010D-1035-48A9-9833-32C2A2CDC294}"), "Visual Studio 2013 Profiler" },
+			{ new Guid("{9999995D-2CBB-4893-BE09-FCE80ABC7564}"), "Visual Studio 2015 Code Coverage/IntelliTrace" },
 			{ new Guid("{8C29BC4E-1F57-461a-9B51-1200C32E6F1F}"), "CLRProfiler" },
 			{ new Guid("{FF68FEB9-E58A-4B75-A2B8-90CE7D915A26}"), "New Relic Agent" },
 			{ new Guid("{45777DEF-BDA6-431B-A953-E888780FA511}"), "SpeedTrace" },
