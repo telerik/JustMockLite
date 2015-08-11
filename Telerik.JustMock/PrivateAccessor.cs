@@ -67,6 +67,19 @@ namespace Telerik.JustMock
 			return ProfilerInterceptor.GuardInternal(() => new PrivateAccessor(null, type));
 		}
 
+		/// <summary>
+		/// Gets the value of a dynamic private accessor expression. Use this when the value to get
+		/// is of type Object, otherwise cast the expression to the desired type.
+		/// </summary>
+		/// <param name="privateAccessor">A PrivateAccessor expression built from a dynamic variable.</param>
+		/// <returns>The value of the private accessor expression</returns>
+		public static object Unwrap(dynamic privateAccessor)
+		{
+			var obj = (object)privateAccessor;
+			var acc = obj as PrivateAccessor;
+			return acc != null ? acc.Instance : obj;
+		}
+
 		private PrivateAccessor(object instance, Type type)
 		{
 			this.instance = instance;
@@ -86,7 +99,7 @@ namespace Telerik.JustMock
 					args = args ?? MockingUtil.NoObjects;
 					var candidates = type.GetAllMethods()
 						.Where(m => m.Name == name && CanCall(m, this.instance != null))
-						.Select(m => TrySpecializeGenericMethod(m, args) ?? m)
+						.Select(m => MockingUtil.TrySpecializeGenericMethod(m, args.Select(a => a != null ? a.GetType() : null).ToArray()) ?? m)
 						.ToArray();
 					object state;
 					var method = MockingUtil.BindToMethod(MockingUtil.AllMembers,
@@ -94,39 +107,6 @@ namespace Telerik.JustMock
 
 					return CallInvoke(method, args);
 				});
-		}
-
-		private static MethodBase TrySpecializeGenericMethod(MethodBase methodBase, object[] args)
-		{
-			var method = methodBase as MethodInfo;
-			if (method == null || !method.IsGenericMethodDefinition)
-				return null;
-
-			var parameters = method.GetParameters();
-			var typeArgs = method.GetGenericArguments();
-
-			for (int i = 0; i < args.Length; ++i)
-			{
-				var arg = args[i];
-				if (arg == null)
-					continue;
-				var argType = arg.GetType();
-
-				var paramType = parameters[i].ParameterType;
-				ApplyTypeSubstitutions(paramType, argType, typeArgs);
-			}
-
-			if (typeArgs.Any(t => t.ContainsGenericParameters))
-				return null;
-
-			try
-			{
-				return method.MakeGenericMethod(typeArgs);
-			}
-			catch
-			{
-				return null;
-			}
 		}
 
 		/// <summary>
@@ -141,21 +121,8 @@ namespace Telerik.JustMock
 			return ProfilerInterceptor.GuardInternal(() =>
 				{
 					var candidates = type.GetAllMethods()
-						.Where(m => m.Name == name
-							&& CanCall(m, this.instance != null)
-							&& m.IsGenericMethodDefinition
-							&& m.GetGenericArguments().Length == typeArguments.Count)
-						.Select(m =>
-						{
-							try
-							{
-								return m.MakeGenericMethod(typeArguments.ToArray());
-							}
-							catch (ArgumentException)
-							{
-								return null;
-							}
-						})
+						.Where(m => m.Name == name && CanCall(m, this.instance != null))
+						.Select(m => MockingUtil.TryApplyTypeArguments(m, typeArguments.ToArray()))
 						.Where(m => m != null)
 						.ToArray();
 
@@ -383,50 +350,6 @@ namespace Telerik.JustMock
 			return ProfilerInterceptor.GuardExternal(() => SecuredReflectionMethods.Invoke(method, this.instance, args));
 		}
 
-		private static void ApplyTypeSubstitutions(Type paramType, Type argType, Type[] typeArgs)
-		{
-			if (paramType.IsGenericParameter)
-			{
-				var i = typeArgs.IndexOf(t => t == paramType);
-				if (i != -1)
-				{
-					typeArgs[i] = argType;
-				}
-			}
-			else if (!paramType.ContainsGenericParameters)
-			{
-				return;
-			}
-			else if (paramType.IsArray || paramType.IsByRef)
-			{
-				var argElementType = (paramType.IsArray && argType.IsArray) || (paramType.IsByRef && argType.IsByRef) ? argType.GetElementType() : argType;
-				ApplyTypeSubstitutions(paramType.GetElementType(), argElementType, typeArgs);
-			}
-			else if (paramType.IsGenericType && argType.IsGenericType && paramType.GetGenericTypeDefinition() == argType.GetGenericTypeDefinition())
-			{
-				var paramTypeArgs = paramType.GetGenericArguments();
-				var argTypeArgs = argType.GetGenericArguments();
-				if (paramTypeArgs.Length != argTypeArgs.Length)
-					return;
-
-				for (int i = 0; i < argTypeArgs.Length; ++i)
-				{
-					ApplyTypeSubstitutions(paramTypeArgs[i], argTypeArgs[i], typeArgs);
-				}
-			}
-			else
-			{
-				foreach (var intf in argType.GetInterfaces())
-				{
-					ApplyTypeSubstitutions(paramType, intf, typeArgs);
-				}
-				if (argType.BaseType != null)
-				{
-					ApplyTypeSubstitutions(paramType, argType.BaseType, typeArgs);
-				}
-			}
-		}
-
 		DynamicMetaObject IDynamicMetaObjectProvider.GetMetaObject(Expression parameter)
 		{
 			return new PrivateAccessorMetaObject(parameter, BindingRestrictions.Empty, this);
@@ -469,16 +392,28 @@ namespace Telerik.JustMock
 
 			public override DynamicMetaObject BindInvokeMember(InvokeMemberBinder binder, DynamicMetaObject[] args)
 			{
-				var invoke = typeof(PrivateAccessor).GetMethod("CallMethod", new[] { typeof(string), typeof(object[]) });
-
 				var callResult = Expression.Variable(typeof(object));
 				var argsVar = Expression.Variable(typeof(object[]));
+
+				MethodInfo invoke = typeof(PrivateAccessor).GetMethod("CallMethod", new[] { typeof(string), typeof(object[]) });
+				var invokeArgs = new List<Expression>
+				{
+					Expression.Constant(binder.Name),
+					argsVar
+				};
+
+				var typeArgs = MockingUtil.TryGetTypeArgumentsFromBinder(binder);
+				if (typeArgs != null)
+				{
+					invoke = typeof(PrivateAccessor).GetMethod("CallMethodWithTypeArguments");
+					invokeArgs.Insert(1, Expression.Constant(typeArgs));
+				}
 
 				var executionList = new List<Expression>
 				{
 					Expression.Assign(argsVar, Expression.NewArrayInit(typeof(object), args.Select(a => Expression.Convert(a.Expression, typeof(object))))),
 					Expression.Assign(callResult, Expression.Call(
-						Expression.Convert(this.Expression, typeof(PrivateAccessor)), invoke, Expression.Constant(binder.Name), argsVar)),
+						Expression.Convert(this.Expression, typeof(PrivateAccessor)), invoke, invokeArgs.ToArray())),
 				};
 
 				executionList.AddRange(args
