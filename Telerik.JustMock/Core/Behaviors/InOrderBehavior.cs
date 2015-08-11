@@ -25,18 +25,20 @@ namespace Telerik.JustMock.Core.Behaviors
 	{
 		private readonly IMockMixin mock;
 		private readonly int arrangementId;
+		private readonly string message;
 		private bool calledInWrongOrder = false;
 		private bool wasCalled = false;
 
 		public string DebugView
 		{
-			get { return String.Format("{0}: in-order execution expectation.", IsExpectationMet ? "Met" : "Unmet"); }
+			get { return String.Format("{0}: in-order execution expectation. {1}", IsExpectationMet ? "Met" : "Unmet", this.message ?? ""); }
 		}
 
-		public InOrderBehavior(IMockMixin mock)
+		public InOrderBehavior(IMockMixin mock, string message)
 		{
 			this.mock = mock;
 			this.arrangementId = InOrderArrangementCount++;
+			this.message = message;
 		}
 
 		private int InOrderArrangementCount
@@ -76,16 +78,18 @@ namespace Telerik.JustMock.Core.Behaviors
 
 			if (this.calledInWrongOrder)
 			{
-				MockingContext.Fail("Last call executed out of order. Order of calls so far:\n{1}", invocation.InputToString(), InOrderExecutionMessage);
+				MockingContext.Fail("{0}Last call executed out of order. Order of calls so far:\n{1}",
+					this.message != null ? this.message + " " : "", InOrderExecutionMessage);
 			}
 		}
 
 		public void Assert()
 		{
 			if (!IsExpectationMet)
-				MockingContext.Fail("Calls should be executed in the order they are expected. Actual order of calls:\n{0}", InOrderExecutionMessage);
+				MockingContext.Fail("{0}Calls should be executed in the order they are expected. Actual order of calls:\n{1}",
+					this.message != null ? this.message + " " : "", InOrderExecutionMessage);
 		}
-  
+
 		private bool IsExpectationMet
 		{
 			get { return wasCalled && !calledInWrongOrder; }

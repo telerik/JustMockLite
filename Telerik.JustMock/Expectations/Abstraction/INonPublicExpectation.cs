@@ -398,7 +398,8 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// </summary>
 		/// <param name="dynamicExpression">An expression built using a wrapper returned by Wrap.</param>
 		/// <param name="occurs">Occurrence expectation to assert.</param>
-		void Assert(dynamic dynamicExpression, Occurs occurs);
+		/// <param name="message">A message to display if the assertion fails.</param>
+		void Assert(dynamic dynamicExpression, Occurs occurs, string message = null);
 
 		/// <summary>
 		/// Asserts an expectation given using a dynamic wrapper built with Wrap()
@@ -406,6 +407,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <param name="dynamicExpression">An expression built using a wrapper returned by Wrap.</param>
 		/// <param name="args">Additional arguments to clarify the assertion expression.</param>
 		/// <param name="occurs">Occurrence expectation to assert.</param>
-		void Assert(dynamic dynamicExpression, Args args, Occurs occurs);
+		/// <param name="message">A message to display if the assertion fails.</param>
+		void Assert(dynamic dynamicExpression, Args args, Occurs occurs, string message = null);
 	}
 }

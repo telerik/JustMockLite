@@ -29,6 +29,7 @@ namespace Telerik.JustMock.Core.Behaviors
 
 		public int? LowerBound { get; set; }
 		public int? UpperBound { get; set; }
+		private string message;
 		private int calls;
 
 		public string DebugView
@@ -38,11 +39,12 @@ namespace Telerik.JustMock.Core.Behaviors
 				if ((LowerBound == null || LowerBound <= 0) && (UpperBound == null))
 					return null;
 
-				return String.Format("{3}: Occurences must be in [{0}, {1}]; calls so far: {2}.",
+				return String.Format("{3}: Occurences must be in [{0}, {1}]; calls so far: {2}. {4}",
 					LowerBound.HasValue ? (object)LowerBound.Value : "any",
 					UpperBound.HasValue ? (object)UpperBound.Value : "any",
 					calls,
-					IsInRange(LowerBound, UpperBound, calls) ? "Met" : "Unmet");
+					IsInRange(LowerBound, UpperBound, calls) ? "Met" : "Unmet",
+					this.message ?? "");
 			}
 		}
 
@@ -51,10 +53,11 @@ namespace Telerik.JustMock.Core.Behaviors
 			this.methodMock = methodMock;
 		}
 
-		public void SetBounds(int? lowerBound, int? upperBound)
+		public void SetBounds(int? lowerBound, int? upperBound, string message)
 		{
 			this.LowerBound = lowerBound;
 			this.UpperBound = upperBound;
+			this.message = message;
 		}
 
 		public void Process(Invocation invocation)
@@ -62,7 +65,7 @@ namespace Telerik.JustMock.Core.Behaviors
 			++calls;
 
 			Telerik.JustMock.DebugView.TraceEvent(IndentLevel.DispatchResult, () => String.Format("Calls so far: {0}", calls));
-			Assert(null, this.UpperBound, calls, null);
+			Assert(null, this.UpperBound, calls, this.message, null);
 		}
 
 		public void Assert()
@@ -73,17 +76,18 @@ namespace Telerik.JustMock.Core.Behaviors
 		public void Assert(int? lowerBound, int? upperBound)
 		{
 			var expr = this.methodMock.ArrangementExpression;
-			Assert(lowerBound, upperBound, this.calls, expr);
+			Assert(lowerBound, upperBound, this.calls, this.message, expr);
 		}
 
-		public static void Assert(int? lowerBound, int? upperBound, int calls, object expression)
+		public static void Assert(int? lowerBound, int? upperBound, int calls, string userMessage, object expression)
 		{
 			if (IsInRange(lowerBound, upperBound, calls))
 				return;
 
-			var message = String.Format("Occurrence expectation failed. {0}. Calls so far: {1}",
+			var message = String.Format("{2}Occurrence expectation failed. {0}. Calls so far: {1}",
 				MakeRangeString(lowerBound, upperBound),
-				calls);
+				calls,
+				userMessage != null ? userMessage + " " : string.Empty);
 
 			if (expression != null)
 				message += String.Format("\nArrange expression: {0}", expression).EscapeFormatString();

@@ -323,9 +323,9 @@ namespace Telerik.JustMock.Expectations
 		/// <summary>
 		/// Specifies that the arranged member must be called. Asserting the mock will throw if the expectation is not fulfilled.
 		/// </summary>
-		public void MustBeCalled()
+		public void MustBeCalled(string message = null)
 		{
-			ProfilerInterceptor.GuardInternal(() => occurences.SetBounds(1, null));
+			ProfilerInterceptor.GuardInternal(() => occurences.SetBounds(1, null, message));
 		}
 
 		#endregion
@@ -336,43 +336,43 @@ namespace Telerik.JustMock.Expectations
 		/// Specifies how many times the call should occur.
 		/// </summary>
 		/// <param name="numberOfTimes">Specified number of times</param>
-		public void Occurs(int numberOfTimes)
+		public void Occurs(int numberOfTimes, string message = null)
 		{
-			ProfilerInterceptor.GuardInternal(() => occurences.SetBounds(numberOfTimes, numberOfTimes));
+			ProfilerInterceptor.GuardInternal(() => occurences.SetBounds(numberOfTimes, numberOfTimes, message));
 		}
 
 		/// <summary>
 		/// Specifies how many times atleast the call should occur.
 		/// </summary>
 		/// <param name="numberOfTimes">Specified number of times</param>
-		public void OccursAtLeast(int numberOfTimes)
+		public void OccursAtLeast(int numberOfTimes, string message = null)
 		{
-			ProfilerInterceptor.GuardInternal(() => occurences.SetBounds(numberOfTimes, null));
+			ProfilerInterceptor.GuardInternal(() => occurences.SetBounds(numberOfTimes, null, message));
 		}
 
 		/// <summary>
 		/// Specifies how many times maximum the call can occur.
 		/// </summary>
 		/// <param name="numberOfTimes">Specified number of times</param>
-		public void OccursAtMost(int numberOfTimes)
+		public void OccursAtMost(int numberOfTimes, string message = null)
 		{
-			ProfilerInterceptor.GuardInternal(() => occurences.SetBounds(null, numberOfTimes));
+			ProfilerInterceptor.GuardInternal(() => occurences.SetBounds(null, numberOfTimes, message));
 		}
 
 		/// <summary>
 		/// Specifies that the call must occur once.
 		/// </summary>
-		public void OccursOnce()
+		public void OccursOnce(string message = null)
 		{
-			ProfilerInterceptor.GuardInternal(() => occurences.SetBounds(1, 1));
+			ProfilerInterceptor.GuardInternal(() => occurences.SetBounds(1, 1, message));
 		}
 
 		/// <summary>
 		/// Specifies that the call must never occur.
 		/// </summary>
-		public void OccursNever()
+		public void OccursNever(string message = null)
 		{
-			ProfilerInterceptor.GuardInternal(() => occurences.SetBounds(0, 0));
+			ProfilerInterceptor.GuardInternal(() => occurences.SetBounds(0, 0, message));
 		}
 
 		#endregion
@@ -396,11 +396,11 @@ namespace Telerik.JustMock.Expectations
 		/// <summary>
 		/// Specifies a call should occur in a specific order.
 		/// </summary>
-		public IOccurrence InOrder()
+		public IOccurrence InOrder(string message = null)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 				{
-					this.behaviors.Add(new InOrderBehavior(this.Mock));
+					this.behaviors.Add(new InOrderBehavior(this.Mock, message));
 					return this;
 				});
 		}

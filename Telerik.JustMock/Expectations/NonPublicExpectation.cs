@@ -213,6 +213,11 @@ namespace Telerik.JustMock.Expectations
 			return candidates.FirstOrDefault(method => method.ArgumentsMatchSignature(args) && ReturnTypeMatches(returnType, method));
 		}
 
+		private static string GetAssertionMessage(object[] args)
+		{
+			return null;
+		}
+
 		public ActionExpectation Arrange(object target, string memberName, params object[] args)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
@@ -260,14 +265,19 @@ namespace Telerik.JustMock.Expectations
 					if (mixin != null)
 						type = mixin.DeclaringType;
 
+					var message = GetAssertionMessage(args);
 					var method = GetMethodByName(type, typeof(TReturn), memberName, ref args);
-					MockingContext.CurrentRepository.AssertMethodInfo(target, method, args, null);
+					MockingContext.CurrentRepository.AssertMethodInfo(message, target, method, args, null);
 				});
 		}
 
 		public void Assert(object target, MethodInfo method, params object[] args)
 		{
-			ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.AssertMethodInfo(target, method, args, null));
+			ProfilerInterceptor.GuardInternal(() =>
+				{
+					var message = GetAssertionMessage(args);
+					MockingContext.CurrentRepository.AssertMethodInfo(message, target, method, args, null);
+				});
 		}
 
 		public void Assert(object target, string memberName, params object[] args)
@@ -279,8 +289,9 @@ namespace Telerik.JustMock.Expectations
 					if (mixin != null)
 						type = mixin.DeclaringType;
 
+					var message = GetAssertionMessage(args);
 					var method = GetMethodByName(type, typeof(void), memberName, ref args);
-					MockingContext.CurrentRepository.AssertMethodInfo(target, method, args, null);
+					MockingContext.CurrentRepository.AssertMethodInfo(message, target, method, args, null);
 				});
 		}
 
@@ -293,14 +304,19 @@ namespace Telerik.JustMock.Expectations
 					if (mixin != null)
 						type = mixin.DeclaringType;
 
+					var message = GetAssertionMessage(args);
 					var method = GetMethodByName(type, typeof(TReturn), memberName, ref args);
-					MockingContext.CurrentRepository.AssertMethodInfo(target, method, args, occurs);
+					MockingContext.CurrentRepository.AssertMethodInfo(message, target, method, args, occurs);
 				});
 		}
 
 		public void Assert(object target, MethodInfo method, Occurs occurs, params object[] args)
 		{
-			ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.AssertMethodInfo(target, method, args, occurs));
+			ProfilerInterceptor.GuardInternal(() =>
+				{
+					var message = GetAssertionMessage(args);
+					MockingContext.CurrentRepository.AssertMethodInfo(message, target, method, args, occurs);
+				});
 		}
 
 		public void Assert(object target, string memberName, Occurs occurs, params object[] args)
@@ -312,8 +328,9 @@ namespace Telerik.JustMock.Expectations
 					if (mixin != null)
 						type = mixin.DeclaringType;
 
+					var message = GetAssertionMessage(args);
 					var method = GetMethodByName(type, typeof(void), memberName, ref args);
-					MockingContext.CurrentRepository.AssertMethodInfo(target, method, args, occurs);
+					MockingContext.CurrentRepository.AssertMethodInfo(message, target, method, args, occurs);
 				});
 		}
 
@@ -389,22 +406,28 @@ namespace Telerik.JustMock.Expectations
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
+					var message = GetAssertionMessage(args);
 					var method = GetMethodByName(typeof(T), typeof(void), memberName, ref args);
-					MockingContext.CurrentRepository.AssertMethodInfo(null, method, args, occurs);
+					MockingContext.CurrentRepository.AssertMethodInfo(message, null, method, args, occurs);
 				});
 		}
 
 		public void Assert(MethodBase method, Occurs occurs, params object[] args)
 		{
-			ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.AssertMethodInfo(null, method, args, occurs));
+			ProfilerInterceptor.GuardInternal(() =>
+				{
+					var message = GetAssertionMessage(args);
+					MockingContext.CurrentRepository.AssertMethodInfo(message, null, method, args, occurs);
+				});
 		}
 
 		public void Assert<T, TReturn>(string memberName, Occurs occurs, params object[] args)
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
+					var message = GetAssertionMessage(args);
 					var method = GetMethodByName(typeof(T), typeof(TReturn), memberName, ref args);
-					MockingContext.CurrentRepository.AssertMethodInfo(null, method, args, occurs);
+					MockingContext.CurrentRepository.AssertMethodInfo(message, null, method, args, occurs);
 				});
 		}
 
@@ -412,22 +435,28 @@ namespace Telerik.JustMock.Expectations
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
+					var message = GetAssertionMessage(args);
 					var method = GetMethodByName(typeof(T), typeof(void), memberName, ref args);
-					MockingContext.CurrentRepository.AssertMethodInfo(null, method, args, null);
+					MockingContext.CurrentRepository.AssertMethodInfo(message, null, method, args, null);
 				});
 		}
 
 		public void Assert(MethodBase method, params object[] args)
 		{
-			ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.AssertMethodInfo(null, method, args, null));
+			ProfilerInterceptor.GuardInternal(() =>
+				{
+					var message = GetAssertionMessage(args);
+					MockingContext.CurrentRepository.AssertMethodInfo(message, null, method, args, null);
+				});
 		}
 
 		public void Assert<T, TReturn>(string memberName, params object[] args)
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
+					var message = GetAssertionMessage(args);
 					var method = GetMethodByName(typeof(T), typeof(TReturn), memberName, ref args);
-					MockingContext.CurrentRepository.AssertMethodInfo(null, method, args, null);
+					MockingContext.CurrentRepository.AssertMethodInfo(message, null, method, args, null);
 				});
 		}
 
@@ -435,8 +464,9 @@ namespace Telerik.JustMock.Expectations
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
+					var message = GetAssertionMessage(args);
 					var method = GetMethodByName(targetType, typeof(void), memberName, ref args);
-					MockingContext.CurrentRepository.AssertMethodInfo(null, method, args, occurs);
+					MockingContext.CurrentRepository.AssertMethodInfo(message, null, method, args, occurs);
 				});
 		}
 
@@ -444,8 +474,9 @@ namespace Telerik.JustMock.Expectations
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
+					var message = GetAssertionMessage(args);
 					var method = GetMethodByName(targetType, typeof(TReturn), memberName, ref args);
-					MockingContext.CurrentRepository.AssertMethodInfo(null, method, args, occurs);
+					MockingContext.CurrentRepository.AssertMethodInfo(message, null, method, args, occurs);
 				});
 		}
 
@@ -453,8 +484,9 @@ namespace Telerik.JustMock.Expectations
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
+					var message = GetAssertionMessage(args);
 					var method = GetMethodByName(targetType, typeof(void), memberName, ref args);
-					MockingContext.CurrentRepository.AssertMethodInfo(null, method, args, null);
+					MockingContext.CurrentRepository.AssertMethodInfo(message, null, method, args, null);
 				});
 		}
 
@@ -462,8 +494,9 @@ namespace Telerik.JustMock.Expectations
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
+					var message = GetAssertionMessage(args);
 					var method = GetMethodByName(targetType, typeof(TReturn), memberName, ref args);
-					MockingContext.CurrentRepository.AssertMethodInfo(null, method, args, null);
+					MockingContext.CurrentRepository.AssertMethodInfo(message, null, method, args, null);
 				});
 		}
 
@@ -563,17 +596,17 @@ namespace Telerik.JustMock.Expectations
 			);
 		}
 
-		public void Assert(dynamic dynamicExpression, Occurs occurs)
+		public void Assert(dynamic dynamicExpression, Occurs occurs, string message = null)
 		{
 			ProfilerInterceptor.GuardInternal(() =>
-				MockingContext.CurrentRepository.Assert(null, ((IExpressionContainer)dynamicExpression).ToLambda(), null, occurs)
+				MockingContext.CurrentRepository.Assert(message, null, ((IExpressionContainer)dynamicExpression).ToLambda(), null, occurs)
 			);
 		}
 
-		public void Assert(dynamic dynamicExpression, Args args, Occurs occurs)
+		public void Assert(dynamic dynamicExpression, Args args, Occurs occurs, string message = null)
 		{
 			ProfilerInterceptor.GuardInternal(() =>
-				MockingContext.CurrentRepository.Assert(null, ((IExpressionContainer)dynamicExpression).ToLambda(), args, occurs)
+				MockingContext.CurrentRepository.Assert(message, null, ((IExpressionContainer)dynamicExpression).ToLambda(), args, occurs)
 			);
 		}
 	}

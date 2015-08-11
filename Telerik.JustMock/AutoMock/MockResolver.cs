@@ -77,7 +77,7 @@ namespace Telerik.JustMock.AutoMock
 
 		public void ForEachMock(Action<object> action)
 		{
-			using (MockingContext.BeginFailureAggregation())
+			using (MockingContext.BeginFailureAggregation(null))
 			{
 				foreach (var mock in this.mocks)
 					action(mock);

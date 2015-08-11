@@ -30,6 +30,6 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <summary>
 		/// Specifies a call should occur in a specific order.
 		/// </summary>
-		IOccurrence InOrder();
+		IOccurrence InOrder(string message = null);
 	}
 }

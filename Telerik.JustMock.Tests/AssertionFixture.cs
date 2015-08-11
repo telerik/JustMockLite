@@ -805,6 +805,38 @@ namespace Telerik.JustMock.Tests
 			Mock.NonPublic.Assert(target, "DoB", Occurs.Once());
 		}
 
+		[TestMethod]
+		public void ShouldIncludeMessageInPosthocAssertion()
+		{
+			var x = Mock.Create<IDisposable>();
+			var ex = Assert.Throws<AssertionException>(() => Mock.Assert(() => x.Dispose(), "The message!"));
+			Assert.True(ex.Message.Contains("The message!"));
+		}
+
+		[TestMethod]
+		public void ShouldIncludeMessageInBlanketAssertionWithMultipleFailures()
+		{
+			var x = Mock.Create<IDisposable>();
+			Mock.Arrange(() => x.Dispose()).MustBeCalled("Because of reasons!");
+			Mock.Arrange(() => x.Dispose()).InOrder("More reasons!");
+
+			var ex = Assert.Throws<AssertionException>(() => Mock.Assert(x, "The blanket!"));
+			Assert.True(ex.Message.Contains("Because of reasons!"));
+			Assert.True(ex.Message.Contains("More reasons!"));
+			Assert.True(ex.Message.Contains("The blanket!"));
+		}
+
+		[TestMethod]
+		public void ShouldIncludeMessageInBlanketAssertionWithSingleFailure()
+		{
+			var x = Mock.Create<IDisposable>();
+			Mock.Arrange(() => x.Dispose()).MustBeCalled("Because of reasons!");
+
+			var ex = Assert.Throws<AssertionException>(() => Mock.Assert(x, "The blanket!"));
+			Assert.True(ex.Message.Contains("Because of reasons!"));
+			Assert.True(ex.Message.Contains("The blanket!"));
+		}
+
 		public class FooWithSetThatThows
 		{
 			public virtual int Value
@@ -835,7 +867,6 @@ namespace Telerik.JustMock.Tests
 		{
 			void RequestNavigate(RegionNames names, FooExrepssion exp);
 		}
-
 
 		public class FooExrepssion
 		{

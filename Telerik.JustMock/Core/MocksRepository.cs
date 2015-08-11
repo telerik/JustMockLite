@@ -729,18 +729,18 @@ namespace Telerik.JustMock.Core
 			}
 		}
 
-		internal void AssertAll(object mock)
+		internal void AssertAll(string message, object mock)
 		{
-			using (MockingContext.BeginFailureAggregation())
+			using (MockingContext.BeginFailureAggregation(message))
 			{
 				var mocks = GetMethodMocksFromObject(mock);
 				AssertBehaviorsForMocks(mocks.Select(m => m.MethodMock), false);
 			}
 		}
 
-		internal void Assert(object mock, Expression expr = null, Args args = null, Occurs occurs = null)
+		internal void Assert(string message, object mock, Expression expr = null, Args args = null, Occurs occurs = null)
 		{
-			using (MockingContext.BeginFailureAggregation())
+			using (MockingContext.BeginFailureAggregation(message))
 			{
 				if (expr == null)
 				{
@@ -770,27 +770,27 @@ namespace Telerik.JustMock.Core
 			}
 		}
 
-		internal void AssertAction(Action memberAction, Args args = null, Occurs occurs = null)
+		internal void AssertAction(string message, Action memberAction, Args args = null, Occurs occurs = null)
 		{
-			using (MockingContext.BeginFailureAggregation())
+			using (MockingContext.BeginFailureAggregation(message))
 			{
 				var callPattern = ConvertActionToCallPattern(memberAction);
 				AssertForCallPattern(callPattern, args, occurs);
 			}
 		}
 
-		internal void AssertMethodInfo(object instance, MethodBase method, object[] arguments, Occurs occurs)
+		internal void AssertMethodInfo(string message, object instance, MethodBase method, object[] arguments, Occurs occurs)
 		{
-			using (MockingContext.BeginFailureAggregation())
+			using (MockingContext.BeginFailureAggregation(message))
 			{
 				var callPattern = ConvertMethodInfoToCallPattern(instance, method, arguments);
 				AssertForCallPattern(callPattern, null, occurs);
 			}
 		}
 
-		internal void AssertIgnoreInstance(Type type, bool ignoreMethodMockOccurrences)
+		internal void AssertIgnoreInstance(string message, Type type, bool ignoreMethodMockOccurrences)
 		{
-			using (MockingContext.BeginFailureAggregation())
+			using (MockingContext.BeginFailureAggregation(message))
 			{
 				var methodMocks = GetMethodMocksFromObject(null, type);
 				AssertBehaviorsForMocks(methodMocks.Select(m => m.MethodMock), ignoreMethodMockOccurrences);
@@ -881,7 +881,7 @@ namespace Telerik.JustMock.Core
 			var mocks = CountMethodMockInvocations(callPattern, args, out callsCount);
 			if (occurs != null)
 			{
-				InvocationOccurrenceBehavior.Assert(occurs.LowerBound, occurs.UpperBound, callsCount, null);
+				InvocationOccurrenceBehavior.Assert(occurs.LowerBound, occurs.UpperBound, callsCount, null, null);
 			}
 
 			if (mocks.Count == 0)
@@ -898,7 +898,7 @@ namespace Telerik.JustMock.Core
 			}
 			if (occurs == null && mocks.Count == 0)
 			{
-				InvocationOccurrenceBehavior.Assert(Occurs.AtLeastOnce().LowerBound, Occurs.AtLeastOnce().UpperBound, callsCount, null);
+				InvocationOccurrenceBehavior.Assert(Occurs.AtLeastOnce().LowerBound, Occurs.AtLeastOnce().UpperBound, callsCount, null, null);
 			}
 			else
 			{

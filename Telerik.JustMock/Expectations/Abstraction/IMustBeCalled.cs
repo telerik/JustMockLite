@@ -25,6 +25,6 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <summary>
 		/// Specifies that the mock call should be invoked to pass <see cref="Mock.Assert{T}(T)"/>
 		/// </summary>
-		void MustBeCalled();
+		void MustBeCalled(string message = null);
 	}
 }

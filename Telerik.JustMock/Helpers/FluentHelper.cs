@@ -41,7 +41,7 @@ namespace Telerik.JustMock.Helpers
 			return repo.Arrange(parameterlessArrangeStmt, containerFactory);
 		}
 
-		private static void DoAssert(object obj, Type objType, LambdaExpression expression, Args args, Occurs occurs)
+		private static void DoAssert(string message, object obj, Type objType, LambdaExpression expression, Args args, Occurs occurs)
 		{
 			var repo = MockingContext.CurrentRepository;
 			Expression parameterlessArrangeStmt = null;
@@ -52,7 +52,7 @@ namespace Telerik.JustMock.Helpers
 				var parameterlessBody = ExpressionReplacer.Replace(expression.Body, instanceParam, instanceConstant);
 				parameterlessArrangeStmt = Expression.Lambda(parameterlessBody);
 			}
-			repo.Assert(obj, parameterlessArrangeStmt, args, occurs);
+			repo.Assert(message, obj, parameterlessArrangeStmt, args, occurs);
 		}
 
 		/// <summary>
@@ -127,11 +127,11 @@ namespace Telerik.JustMock.Helpers
 		/// <typeparam name="TReturn">Return type for the target setup.</typeparam>
 		/// <param name="obj">Target object.</param>
 		/// <param name="action">Target action.</param>
-		public static void Assert<T, TReturn>(this T obj, Expression<Func<T, TReturn>> action)
+		public static void Assert<T, TReturn>(this T obj, Expression<Func<T, TReturn>> action, string message = null)
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 			{
-				obj.Assert(action, null);
+				obj.Assert(action, null, message);
 			});
 		}
 
@@ -143,11 +143,11 @@ namespace Telerik.JustMock.Helpers
 		/// <param name="obj">Target object.</param>
 		/// <param name="expression">Target expression</param>
 		/// <param name="occurs">Specifies the number of times a mock call should occur.</param>
-		public static void Assert<T, TReturn>(this T obj, Expression<Func<T, TReturn>> expression, Occurs occurs)
+		public static void Assert<T, TReturn>(this T obj, Expression<Func<T, TReturn>> expression, Occurs occurs, string message = null)
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 			{
-				DoAssert(obj, typeof(T), expression, null, occurs);
+				DoAssert(message, obj, typeof(T), expression, null, occurs);
 			});
 		}
 
@@ -157,11 +157,11 @@ namespace Telerik.JustMock.Helpers
 		/// <typeparam name="T">Type of the mock.</typeparam>
 		/// <param name="obj">Target object.</param>
 		/// <param name="action">Target action.</param>
-		public static void Assert<T>(this T obj, Expression<Action<T>> action)
+		public static void Assert<T>(this T obj, Expression<Action<T>> action, string message = null)
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 			{
-				DoAssert(obj, typeof(T), action, null, null);
+				DoAssert(message, obj, typeof(T), action, null, null);
 			});
 		}
 
@@ -172,11 +172,11 @@ namespace Telerik.JustMock.Helpers
 		/// <param name="obj">Target mock object</param>
 		/// <param name="expression">Target expression</param>
 		/// <param name="occurs">Specifies the number of times a mock call should occur.</param>
-		public static void Assert<T>(this T obj, Expression<Action<T>> expression, Occurs occurs)
+		public static void Assert<T>(this T obj, Expression<Action<T>> expression, Occurs occurs, string message = null)
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 			{
-				DoAssert(obj, typeof(T), expression, null, occurs);
+				DoAssert(message, obj, typeof(T), expression, null, occurs);
 			});
 		}
 
@@ -228,9 +228,9 @@ namespace Telerik.JustMock.Helpers
 		/// </summary>
 		/// <typeparam name="T">Type of the mock.</typeparam>
 		/// <param name="target">Target instance.</param>
-		public static void Assert<T>(this T target)
+		public static void Assert<T>(this T target, string message = null)
 		{
-			ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.Assert(target));
+			ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.Assert(message, target));
 		}
 
 		/// <summary>
@@ -238,9 +238,9 @@ namespace Telerik.JustMock.Helpers
 		/// </summary>
 		/// <typeparam name="T">Type of the mock.</typeparam>
 		/// <param name="target">Target instance.</param>
-		public static void AssertAll<T>(this T target)
+		public static void AssertAll<T>(this T target, string message = null)
 		{
-			ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.AssertAll(target));
+			ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.AssertAll(message, target));
 		}
 	}
 }

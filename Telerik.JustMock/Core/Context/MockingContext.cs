@@ -98,15 +98,15 @@ namespace Telerik.JustMock.Core.Context
 					.Select(p => indent + p.Trim()));
 		}
 
-		public static IDisposable BeginFailureAggregation()
+		public static IDisposable BeginFailureAggregation(string message)
 		{
 			if (failureAggregator == null)
 			{
-				failureAggregator = new FailureAggregator();
+				failureAggregator = new FailureAggregator(message);
 			}
 			else
 			{
-				failureAggregator.AddRef();
+				failureAggregator.AddRef(message);
 			}
 
 			return failureAggregator;
@@ -166,10 +166,17 @@ namespace Telerik.JustMock.Core.Context
 		{
 			private List<string> failures;
 			private int references = 1;
+			private string userMessage;
 
-			public void AddRef()
+			public FailureAggregator(string message)
+			{
+				userMessage = message;
+			}
+
+			public void AddRef(string message)
 			{
 				references++;
+				userMessage = message;
 			}
 
 			public void AddFailure(string msg)
@@ -194,9 +201,11 @@ namespace Telerik.JustMock.Core.Context
 					return;
 
 				if (failures.Count == 1)
-					Fail(failures[0]);
+					Fail((userMessage != null ? userMessage + Environment.NewLine : null) + failures[0]);
 
 				var sb = new StringBuilder();
+				if (userMessage != null)
+					sb.AppendLine(userMessage);
 				sb.AppendLine("Multiple assertion failures:");
 				for (int i = 0; i < failures.Count; ++i)
 				{

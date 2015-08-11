@@ -468,5 +468,19 @@ namespace Telerik.JustMock.Tests
 			var obj = c.Instance;
 			Assert.NotNull(obj.Dep);
 		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+		public void ShouldIncludeAssertionMessageWhenAssertingContainer()
+		{
+			var c = new MockingContainer<FileLog>();
+			c.Arrange<ICalendar>(x => x.Now).MustBeCalled("Calendar must be used!");
+			c.Arrange<IFileSystem>(x => x.Refresh()).MustBeCalled("Should use latest data!");
+
+			var ex = Assert.Throws<AssertFailedException>(() => c.Assert("Container must be alright!"));
+
+			Assert.True(ex.Message.Contains("Calendar must be used!"));
+			Assert.True(ex.Message.Contains("Should use latest data!"));
+			Assert.True(ex.Message.Contains("Container must be alright!"));
+		}
 	}
 }

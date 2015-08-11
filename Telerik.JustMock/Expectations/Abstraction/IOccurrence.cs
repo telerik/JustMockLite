@@ -31,28 +31,28 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// Specifies how many times the call should occur.
 		/// </summary>
 		/// <param name="numberOfTimes">Specified number of times</param>
-		void Occurs(int numberOfTimes);
+		void Occurs(int numberOfTimes, string message = null);
 
 		/// <summary>
 		/// Specifies how many times at least the call should occur.
 		/// </summary>
 		/// <param name="numberOfTimes">Specified number of times</param>
-		void OccursAtLeast(int numberOfTimes);
+		void OccursAtLeast(int numberOfTimes, string message = null);
 
 		/// <summary>
 		/// Specifies how many times maximum the call can occur.
 		/// </summary>
 		/// <param name="numberOfTimes">Specified number of times</param>
-		void OccursAtMost(int numberOfTimes);
+		void OccursAtMost(int numberOfTimes, string message = null);
 
 		/// <summary>
 		/// Specifies that the call must occur once.
 		/// </summary>
-		void OccursOnce();
+		void OccursOnce(string message = null);
 
 		/// <summary>
 		/// Specifies that the call must never occur.
 		/// </summary>
-		void OccursNever();
+		void OccursNever(string message = null);
 	}
 }
