@@ -86,7 +86,80 @@ namespace Telerik.JustMock
 					args = args ?? MockingUtil.NoObjects;
 					var candidates = type.GetAllMethods()
 						.Where(m => m.Name == name && CanCall(m, this.instance != null))
+						.Select(m => TrySpecializeGenericMethod(m, args) ?? m)
 						.ToArray();
+					object state;
+					var method = MockingUtil.BindToMethod(MockingUtil.AllMembers,
+						candidates, ref args, null, null, null, out state);
+
+					return CallInvoke(method, args);
+				});
+		}
+
+		private static MethodBase TrySpecializeGenericMethod(MethodBase methodBase, object[] args)
+		{
+			var method = methodBase as MethodInfo;
+			if (method == null || !method.IsGenericMethodDefinition)
+				return null;
+
+			var parameters = method.GetParameters();
+			var typeArgs = method.GetGenericArguments();
+
+			for (int i = 0; i < args.Length; ++i)
+			{
+				var arg = args[i];
+				if (arg == null)
+					continue;
+				var argType = arg.GetType();
+
+				var paramType = parameters[i].ParameterType;
+				ApplyTypeSubstitutions(paramType, argType, typeArgs);
+			}
+
+			if (typeArgs.Any(t => t.ContainsGenericParameters))
+				return null;
+
+			try
+			{
+				return method.MakeGenericMethod(typeArgs);
+			}
+			catch
+			{
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// Calls the specified generic method by name.
+		/// </summary>
+		/// <param name="name">The name of the method to call.</param>
+		/// <param name="typeArguments">The type arguments to specialize the generic method.</param>
+		/// <param name="args">Arguments to pass to the method.</param>
+		/// <returns>The value returned by the specified method.</returns>
+		public object CallMethodWithTypeArguments(string name, ICollection<Type> typeArguments, params object[] args)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+				{
+					var candidates = type.GetAllMethods()
+						.Where(m => m.Name == name
+							&& CanCall(m, this.instance != null)
+							&& m.IsGenericMethodDefinition
+							&& m.GetGenericArguments().Length == typeArguments.Count)
+						.Select(m =>
+						{
+							try
+							{
+								return m.MakeGenericMethod(typeArguments.ToArray());
+							}
+							catch (ArgumentException)
+							{
+								return null;
+							}
+						})
+						.Where(m => m != null)
+						.ToArray();
+
+					args = args ?? MockingUtil.NoObjects;
 					object state;
 					var method = MockingUtil.BindToMethod(MockingUtil.AllMembers,
 						candidates, ref args, null, null, null, out state);
@@ -308,6 +381,50 @@ namespace Telerik.JustMock
 		private object CallInvoke(MethodBase method, object[] args)
 		{
 			return ProfilerInterceptor.GuardExternal(() => SecuredReflectionMethods.Invoke(method, this.instance, args));
+		}
+
+		private static void ApplyTypeSubstitutions(Type paramType, Type argType, Type[] typeArgs)
+		{
+			if (paramType.IsGenericParameter)
+			{
+				var i = typeArgs.IndexOf(t => t == paramType);
+				if (i != -1)
+				{
+					typeArgs[i] = argType;
+				}
+			}
+			else if (!paramType.ContainsGenericParameters)
+			{
+				return;
+			}
+			else if (paramType.IsArray || paramType.IsByRef)
+			{
+				var argElementType = (paramType.IsArray && argType.IsArray) || (paramType.IsByRef && argType.IsByRef) ? argType.GetElementType() : argType;
+				ApplyTypeSubstitutions(paramType.GetElementType(), argElementType, typeArgs);
+			}
+			else if (paramType.IsGenericType && argType.IsGenericType && paramType.GetGenericTypeDefinition() == argType.GetGenericTypeDefinition())
+			{
+				var paramTypeArgs = paramType.GetGenericArguments();
+				var argTypeArgs = argType.GetGenericArguments();
+				if (paramTypeArgs.Length != argTypeArgs.Length)
+					return;
+
+				for (int i = 0; i < argTypeArgs.Length; ++i)
+				{
+					ApplyTypeSubstitutions(paramTypeArgs[i], argTypeArgs[i], typeArgs);
+				}
+			}
+			else
+			{
+				foreach (var intf in argType.GetInterfaces())
+				{
+					ApplyTypeSubstitutions(paramType, intf, typeArgs);
+				}
+				if (argType.BaseType != null)
+				{
+					ApplyTypeSubstitutions(paramType, argType.BaseType, typeArgs);
+				}
+			}
 		}
 
 		DynamicMetaObject IDynamicMetaObjectProvider.GetMetaObject(Expression parameter)
