@@ -138,8 +138,23 @@ namespace Telerik.JustMock.Expectations.DynaMock
 			var wrapper = this.Value as ExpressionContainer;
 			var valueExpr = wrapper.Expression;
 
+			var typeArgs = MockingUtil.TryGetTypeArgumentsFromBinder(binder);
+
 			var candidateMethods = valueExpr.Type.GetAllMethods()
 				.Where(m => MockingUtil.StringEqual(m.Name, binder.Name, binder.IgnoreCase) && m.IsStatic == wrapper.IsStatic)
+				.Where(m => m.GetParameters().Length >= args.Length)
+				.Select(m =>
+				{
+					if (typeArgs == null)
+					{
+						return MockingUtil.TrySpecializeGenericMethod(m, args.Select(a => a.RuntimeType).ToArray()) ?? m;
+					}
+					else
+					{
+						return MockingUtil.TryApplyTypeArguments(m, typeArgs);
+					}
+				})
+				.Where(m => m != null)
 				.Where(m =>
 				{
 					var methodParams = m.GetParameters();

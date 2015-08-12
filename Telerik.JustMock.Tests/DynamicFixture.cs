@@ -16,6 +16,8 @@
 */
 
 using System;
+using System.Linq;
+using System.Collections.Generic;
 
 #if NUNIT
 using NUnit.Framework;
@@ -63,6 +65,16 @@ namespace Telerik.JustMock.Tests
 				set { throw new NotImplementedException(); }
 			}
 
+			protected virtual T Get<T>()
+			{
+				throw new NotImplementedException();
+			}
+
+			protected virtual ICollection<T> Digest<T>(IList<T> value)
+			{
+				return value;
+			}
+
 			public class Accessor
 			{
 				private readonly TestBed testBed;
@@ -81,6 +93,16 @@ namespace Telerik.JustMock.Tests
 				public int Get(int x, string y)
 				{
 					return this.testBed.Get(x, y);
+				}
+
+				public T Get<T>()
+				{
+					return this.testBed.Get<T>();
+				}
+
+				public ICollection<T> Digest<T>(IList<T> x)
+				{
+					return this.testBed.Digest(x);
 				}
 
 				public int this[string x]
@@ -219,6 +241,32 @@ namespace Telerik.JustMock.Tests
 			new TestBed.Accessor(mock).Value = 123;
 			Mock.NonPublic.Assert(wrapper.Value = 123, Occurs.Once());
 			Mock.NonPublic.Assert(wrapper.Value = ArgExpr.IsAny<int>(), Occurs.Once());
+		}
+
+#if !COREFX
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+		public void ShouldArrangeNonPublicGenericMethodWithExplicitTypeArgumentsViaDynaMock()
+		{
+			var mock = Mock.Create<TestBed>();
+			var wrapper = Mock.NonPublic.Wrap(mock);
+
+			Mock.NonPublic.Arrange<int>(wrapper.Get<int>()).Returns(123);
+
+			var result = new TestBed.Accessor(mock).Get<int>();
+			Assert.Equal(123, result);
+		}
+#endif
+
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+		public void ShouldArrangeNonPublicGenericMethodViaDynaMock()
+		{
+			var mock = Mock.Create<TestBed>();
+			var wrapper = Mock.NonPublic.Wrap(mock);
+
+			Mock.NonPublic.Arrange<ICollection<int>>(wrapper.Digest(new[] { 123 })).Returns(new[] { 321 });
+
+			var result = new TestBed.Accessor(mock).Digest(new[] { 123 });
+			Assert.Equal(321, result.First());
 		}
 	}
 }

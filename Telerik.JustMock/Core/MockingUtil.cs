@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -785,6 +786,115 @@ namespace Telerik.JustMock.Core
 		public static bool StringEqual(string a, string b, bool ignoreCase)
 		{
 			return String.Equals(a, b, ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+		}
+
+		public static MethodBase TrySpecializeGenericMethod(MethodBase methodBase, Type[] argTypes)
+		{
+			var method = methodBase as MethodInfo;
+			if (method == null || !method.IsGenericMethodDefinition)
+				return null;
+
+			var parameters = method.GetParameters();
+			if (parameters.Length < argTypes.Length)
+				return null;
+
+			var typeArgs = method.GetGenericArguments();
+			for (int i = 0; i < argTypes.Length; ++i)
+			{
+				var argType = argTypes[i];
+				if (argType == null)
+					continue;
+
+				var paramType = parameters[i].ParameterType;
+				ApplyTypeSubstitutions(paramType, argType, typeArgs);
+			}
+
+			if (typeArgs.Any(t => t.ContainsGenericParameters))
+				return null;
+
+			try
+			{
+				return method.MakeGenericMethod(typeArgs);
+			}
+			catch
+			{
+				return null;
+			}
+		}
+
+		private static void ApplyTypeSubstitutions(Type paramType, Type argType, Type[] typeArgs)
+		{
+			if (paramType.IsGenericParameter)
+			{
+				var i = typeArgs.IndexOf(t => t == paramType);
+				if (i != -1)
+				{
+					typeArgs[i] = argType;
+				}
+			}
+			else if (!paramType.ContainsGenericParameters)
+			{
+				return;
+			}
+			else if (paramType.IsArray || paramType.IsByRef)
+			{
+				var argElementType = (paramType.IsArray && argType.IsArray) || (paramType.IsByRef && argType.IsByRef) ? argType.GetElementType() : argType;
+				ApplyTypeSubstitutions(paramType.GetElementType(), argElementType, typeArgs);
+			}
+			else if (paramType.IsGenericType && argType.IsGenericType && paramType.GetGenericTypeDefinition() == argType.GetGenericTypeDefinition())
+			{
+				var paramTypeArgs = paramType.GetGenericArguments();
+				var argTypeArgs = argType.GetGenericArguments();
+				if (paramTypeArgs.Length != argTypeArgs.Length)
+					return;
+
+				for (int i = 0; i < argTypeArgs.Length; ++i)
+				{
+					ApplyTypeSubstitutions(paramTypeArgs[i], argTypeArgs[i], typeArgs);
+				}
+			}
+			else
+			{
+				foreach (var intf in argType.GetInterfaces())
+				{
+					ApplyTypeSubstitutions(paramType, intf, typeArgs);
+				}
+				if (argType.BaseType != null)
+				{
+					ApplyTypeSubstitutions(paramType, argType.BaseType, typeArgs);
+				}
+			}
+		}
+
+		public static Type[] TryGetTypeArgumentsFromBinder(InvokeMemberBinder binder)
+		{
+			if (SecuredReflection.IsAvailable)
+			{
+				var csharpInvoke = binder.GetType().GetInterfaces()
+					.FirstOrDefault(intf => intf.FullName == "Microsoft.CSharp.RuntimeBinder.ICSharpInvokeOrInvokeMemberBinder");
+				if (csharpInvoke != null)
+				{
+					var typeArgs = (ICollection<Type>)SecuredReflectionMethods.GetProperty(csharpInvoke.GetProperty("TypeArguments"), binder, null);
+					if (typeArgs != null && typeArgs.Count > 0)
+						return typeArgs.ToArray();
+				}
+			}
+			return null;
+		}
+
+		public static MethodBase TryApplyTypeArguments(MethodBase method, Type[] typeArguments)
+		{
+			var methodInfo = method as MethodInfo;
+			if (methodInfo == null || !method.IsGenericMethodDefinition || method.GetGenericArguments().Length != typeArguments.Length)
+				return null;
+			try
+			{
+				return methodInfo.MakeGenericMethod(typeArguments.ToArray());
+			}
+			catch (ArgumentException)
+			{
+			}
+			return null;
 		}
 
 #if !COREFX

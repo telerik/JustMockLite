@@ -453,7 +453,7 @@ namespace Telerik.JustMock.Core
 
 		public static void RunClassConstructor(RuntimeTypeHandle typeHandle)
 		{
-			if (runClassConstructor != null && !SecuredReflectionMethods.HasReflectionPermission)
+			if (runClassConstructor != null && !SecuredReflection.HasReflectionPermission)
 				GuardExternal(() => runClassConstructor(typeHandle));
 			else
 				GuardExternal(() => RuntimeHelpers.RunClassConstructor(typeHandle));

@@ -67,6 +67,22 @@ namespace Telerik.JustMock
 			return ProfilerInterceptor.GuardInternal(() => new PrivateAccessor(null, type));
 		}
 
+		/// <summary>
+		/// Gets the value of a dynamic private accessor expression. Use this when the value to get
+		/// is of type Object, otherwise cast the expression to the desired type.
+		/// </summary>
+		/// <param name="privateAccessor">A PrivateAccessor expression built from a dynamic variable.</param>
+		/// <returns>The value of the private accessor expression</returns>
+		public static object Unwrap(dynamic privateAccessor)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				var obj = (object)privateAccessor;
+				var acc = obj as PrivateAccessor;
+				return acc != null ? acc.Instance : obj;
+			});
+		}
+
 		private PrivateAccessor(object instance, Type type)
 		{
 			this.instance = instance;
@@ -86,7 +102,34 @@ namespace Telerik.JustMock
 					args = args ?? MockingUtil.NoObjects;
 					var candidates = type.GetAllMethods()
 						.Where(m => m.Name == name && CanCall(m, this.instance != null))
+						.Select(m => MockingUtil.TrySpecializeGenericMethod(m, args.Select(a => a != null ? a.GetType() : null).ToArray()) ?? m)
 						.ToArray();
+					object state;
+					var method = MockingUtil.BindToMethod(MockingUtil.AllMembers,
+						candidates, ref args, null, null, null, out state);
+
+					return CallInvoke(method, args);
+				});
+		}
+
+		/// <summary>
+		/// Calls the specified generic method by name.
+		/// </summary>
+		/// <param name="name">The name of the method to call.</param>
+		/// <param name="typeArguments">The type arguments to specialize the generic method.</param>
+		/// <param name="args">Arguments to pass to the method.</param>
+		/// <returns>The value returned by the specified method.</returns>
+		public object CallMethodWithTypeArguments(string name, ICollection<Type> typeArguments, params object[] args)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+				{
+					var candidates = type.GetAllMethods()
+						.Where(m => m.Name == name && CanCall(m, this.instance != null))
+						.Select(m => MockingUtil.TryApplyTypeArguments(m, typeArguments.ToArray()))
+						.Where(m => m != null)
+						.ToArray();
+
+					args = args ?? MockingUtil.NoObjects;
 					object state;
 					var method = MockingUtil.BindToMethod(MockingUtil.AllMembers,
 						candidates, ref args, null, null, null, out state);
@@ -352,16 +395,28 @@ namespace Telerik.JustMock
 
 			public override DynamicMetaObject BindInvokeMember(InvokeMemberBinder binder, DynamicMetaObject[] args)
 			{
-				var invoke = typeof(PrivateAccessor).GetMethod("CallMethod", new[] { typeof(string), typeof(object[]) });
-
 				var callResult = Expression.Variable(typeof(object));
 				var argsVar = Expression.Variable(typeof(object[]));
+
+				MethodInfo invoke = typeof(PrivateAccessor).GetMethod("CallMethod", new[] { typeof(string), typeof(object[]) });
+				var invokeArgs = new List<Expression>
+				{
+					Expression.Constant(binder.Name),
+					argsVar
+				};
+
+				var typeArgs = MockingUtil.TryGetTypeArgumentsFromBinder(binder);
+				if (typeArgs != null)
+				{
+					invoke = typeof(PrivateAccessor).GetMethod("CallMethodWithTypeArguments");
+					invokeArgs.Insert(1, Expression.Constant(typeArgs));
+				}
 
 				var executionList = new List<Expression>
 				{
 					Expression.Assign(argsVar, Expression.NewArrayInit(typeof(object), args.Select(a => Expression.Convert(a.Expression, typeof(object))))),
 					Expression.Assign(callResult, Expression.Call(
-						Expression.Convert(this.Expression, typeof(PrivateAccessor)), invoke, Expression.Constant(binder.Name), argsVar)),
+						Expression.Convert(this.Expression, typeof(PrivateAccessor)), invoke, invokeArgs.ToArray())),
 				};
 
 				executionList.AddRange(args
@@ -436,6 +491,38 @@ namespace Telerik.JustMock
 		}
 	}
 
+	internal static class SecuredReflection
+	{
+		internal static bool HasReflectionPermission { get; private set; }
+
+		internal static bool IsAvailable
+		{
+			get { return HasReflectionPermission || ProfilerInterceptor.IsProfilerAttached; }
+		}
+
+		static SecuredReflection()
+		{
+			HasReflectionPermission = CheckReflectionPermission();
+		}
+
+		private static bool CheckReflectionPermission()
+		{
+#if COREFX
+			return false;
+#else
+			try
+			{
+				new ReflectionPermission(ReflectionPermissionFlag.MemberAccess).Demand();
+				return true;
+			}
+			catch (SecurityException)
+			{
+				return false;
+			}
+#endif
+		}
+	}
+
 	internal static class SecuredReflectionMethods
 	{
 		public delegate object InvokeDelegate(MethodBase method, object instance, object[] args);
@@ -452,7 +539,7 @@ namespace Telerik.JustMock
 
 		static SecuredReflectionMethods()
 		{
-			if (!HasReflectionPermission)
+			if (!SecuredReflection.HasReflectionPermission)
 			{
 				if (!ProfilerInterceptor.IsProfilerAttached)
 					ProfilerInterceptor.ThrowElevatedMockingException();
@@ -470,26 +557,6 @@ namespace Telerik.JustMock
 				SetProperty = (prop, instance, value, indexArgs) => prop.SetValue(instance, value, indexArgs);
 				GetField = (field, instance) => field.GetValue(instance);
 				SetField = (field, instance, value) => field.SetValue(instance, value);
-			}
-		}
-
-		internal static bool HasReflectionPermission
-		{
-			get
-			{
-#if COREFX
-				return false;
-#else
-				try
-				{
-					new ReflectionPermission(ReflectionPermissionFlag.MemberAccess).Demand();
-					return true;
-				}
-				catch (SecurityException)
-				{
-					return false;
-				}
-#endif
 			}
 		}
 	}
