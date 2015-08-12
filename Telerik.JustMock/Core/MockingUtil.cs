@@ -868,13 +868,16 @@ namespace Telerik.JustMock.Core
 
 		public static Type[] TryGetTypeArgumentsFromBinder(InvokeMemberBinder binder)
 		{
-			var csharpInvoke = binder.GetType().GetInterfaces()
-				.FirstOrDefault(intf => intf.FullName == "Microsoft.CSharp.RuntimeBinder.ICSharpInvokeOrInvokeMemberBinder");
-			if (csharpInvoke != null)
+			if (SecuredReflection.IsAvailable)
 			{
-				var typeArgs = (ICollection<Type>)SecuredReflectionMethods.GetProperty(csharpInvoke.GetProperty("TypeArguments"), binder, null);
-				if (typeArgs != null && typeArgs.Count > 0)
-					return typeArgs.ToArray();
+				var csharpInvoke = binder.GetType().GetInterfaces()
+					.FirstOrDefault(intf => intf.FullName == "Microsoft.CSharp.RuntimeBinder.ICSharpInvokeOrInvokeMemberBinder");
+				if (csharpInvoke != null)
+				{
+					var typeArgs = (ICollection<Type>)SecuredReflectionMethods.GetProperty(csharpInvoke.GetProperty("TypeArguments"), binder, null);
+					if (typeArgs != null && typeArgs.Count > 0)
+						return typeArgs.ToArray();
+				}
 			}
 			return null;
 		}

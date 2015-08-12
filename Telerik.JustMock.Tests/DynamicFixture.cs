@@ -243,6 +243,7 @@ namespace Telerik.JustMock.Tests
 			Mock.NonPublic.Assert(wrapper.Value = ArgExpr.IsAny<int>(), Occurs.Once());
 		}
 
+#if !COREFX
 		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
 		public void ShouldArrangeNonPublicGenericMethodWithExplicitTypeArgumentsViaDynaMock()
 		{
@@ -254,6 +255,7 @@ namespace Telerik.JustMock.Tests
 			var result = new TestBed.Accessor(mock).Get<int>();
 			Assert.Equal(123, result);
 		}
+#endif
 
 		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
 		public void ShouldArrangeNonPublicGenericMethodViaDynaMock()

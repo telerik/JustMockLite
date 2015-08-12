@@ -75,9 +75,12 @@ namespace Telerik.JustMock
 		/// <returns>The value of the private accessor expression</returns>
 		public static object Unwrap(dynamic privateAccessor)
 		{
-			var obj = (object)privateAccessor;
-			var acc = obj as PrivateAccessor;
-			return acc != null ? acc.Instance : obj;
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				var obj = (object)privateAccessor;
+				var acc = obj as PrivateAccessor;
+				return acc != null ? acc.Instance : obj;
+			});
 		}
 
 		private PrivateAccessor(object instance, Type type)
@@ -488,6 +491,38 @@ namespace Telerik.JustMock
 		}
 	}
 
+	internal static class SecuredReflection
+	{
+		internal static bool HasReflectionPermission { get; private set; }
+
+		internal static bool IsAvailable
+		{
+			get { return HasReflectionPermission || ProfilerInterceptor.IsProfilerAttached; }
+		}
+
+		static SecuredReflection()
+		{
+			HasReflectionPermission = CheckReflectionPermission();
+		}
+
+		private static bool CheckReflectionPermission()
+		{
+#if COREFX
+			return false;
+#else
+			try
+			{
+				new ReflectionPermission(ReflectionPermissionFlag.MemberAccess).Demand();
+				return true;
+			}
+			catch (SecurityException)
+			{
+				return false;
+			}
+#endif
+		}
+	}
+
 	internal static class SecuredReflectionMethods
 	{
 		public delegate object InvokeDelegate(MethodBase method, object instance, object[] args);
@@ -504,7 +539,7 @@ namespace Telerik.JustMock
 
 		static SecuredReflectionMethods()
 		{
-			if (!HasReflectionPermission)
+			if (!SecuredReflection.HasReflectionPermission)
 			{
 				if (!ProfilerInterceptor.IsProfilerAttached)
 					ProfilerInterceptor.ThrowElevatedMockingException();
@@ -522,26 +557,6 @@ namespace Telerik.JustMock
 				SetProperty = (prop, instance, value, indexArgs) => prop.SetValue(instance, value, indexArgs);
 				GetField = (field, instance) => field.GetValue(instance);
 				SetField = (field, instance, value) => field.SetValue(instance, value);
-			}
-		}
-
-		internal static bool HasReflectionPermission
-		{
-			get
-			{
-#if COREFX
-				return false;
-#else
-				try
-				{
-					new ReflectionPermission(ReflectionPermissionFlag.MemberAccess).Demand();
-					return true;
-				}
-				catch (SecurityException)
-				{
-					return false;
-				}
-#endif
 			}
 		}
 	}
