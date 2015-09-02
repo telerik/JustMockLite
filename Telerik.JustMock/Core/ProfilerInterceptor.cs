@@ -134,6 +134,40 @@ namespace Telerik.JustMock.Core
 			}
 		}
 
+		private static bool InterceptGetField(object instance, RuntimeTypeHandle typeHandle, RuntimeFieldHandle fieldHandle, out object value)
+		{
+			value = null;
+
+			try
+			{
+				ReentrancyCounter++;
+
+				var field = FieldInfo.GetFieldFromHandle(fieldHandle, typeHandle);
+
+				return false;
+			}
+			finally
+			{
+				ReentrancyCounter--;
+			}
+		}
+
+		private static object InterceptSetField(object instance, RuntimeTypeHandle typeHandle, RuntimeFieldHandle fieldHandle, object value)
+		{
+			try
+			{
+				ReentrancyCounter++;
+
+				var field = FieldInfo.GetFieldFromHandle(fieldHandle, typeHandle);
+
+				return value;
+			}
+			finally
+			{
+				ReentrancyCounter--;
+			}
+		}
+
 		static ProfilerInterceptor()
 		{
 #if !LITE_EDITION
@@ -213,6 +247,16 @@ namespace Telerik.JustMock.Core
 					var interceptNewobjDelegate = Delegate.CreateDelegate(processNewobjType, interceptNewobjAsAction.Method);
 					bridge.GetField("ProcessNewobj").SetValue(null, interceptNewobjDelegate);
 
+					var processSetFieldType = typeof(object).Assembly.GetType("Telerik.JustMock.ProcessSetFieldDelegate");
+					Func<object, RuntimeTypeHandle, RuntimeFieldHandle, object, object> interceptSetFieldAsAction = InterceptSetField;
+					var interceptSetFieldDelegate = Delegate.CreateDelegate(processSetFieldType, interceptSetFieldAsAction.Method);
+					bridge.GetField("ProcessSetField").SetValue(null, interceptSetFieldDelegate);
+
+					var processGetFieldType = typeof(object).Assembly.GetType("Telerik.JustMock.ProcessGetFieldDelegate");
+					InterceptGetFieldSignature interceptGetFieldAsAction = InterceptGetField;
+					var interceptGetFieldDelegate = Delegate.CreateDelegate(processGetFieldType, interceptGetFieldAsAction.Method);
+					bridge.GetField("ProcessGetField").SetValue(null, interceptGetFieldDelegate);
+
 					var arrangedTypesField = bridge.GetField("ArrangedTypesArray");
 					arrangedTypesField.SetValue(null, arrangedTypesArray);
 
@@ -220,6 +264,8 @@ namespace Telerik.JustMock.Core
 				}
 			}
 		}
+
+		private delegate bool InterceptGetFieldSignature(object instance, RuntimeTypeHandle typeHandle, RuntimeFieldHandle fieldHandle, out object value);
 
 		public static int ReentrancyCounter
 		{
