@@ -26,6 +26,8 @@ using Telerik.JustMock.Core;
 #if !COREFX
 using System.Security;
 using System.Security.Permissions;
+using System.Runtime.Remoting;
+using Telerik.JustMock.Core.TransparentProxy;
 #endif
 
 namespace Telerik.JustMock
@@ -54,7 +56,7 @@ namespace Telerik.JustMock
 		/// </summary>
 		/// <param name="instance">The instance to wrap.</param>
 		public PrivateAccessor(object instance)
-			: this(instance, instance.GetType())
+			: this(instance, null)
 		{ }
 
 		/// <summary>
@@ -85,8 +87,23 @@ namespace Telerik.JustMock
 
 		private PrivateAccessor(object instance, Type type)
 		{
+			ProfilerInterceptor.GuardInternal(() =>
+				{
+					if (instance != null)
+					{
+#if !COREFX
+						var realProxy = RemotingServices.GetRealProxy(instance) as MockingProxy;
+						if (realProxy != null)
+							instance = realProxy.WrappedInstance;
+#endif
+						type = instance.GetType();
+					}
+					if (type.IsProxy() && type.BaseType != typeof(object))
+						type = type.BaseType;
+				});
+
 			this.instance = instance;
-			this.type = type.IsProxy() && type.BaseType != typeof(object) ? type.BaseType : type;
+			this.type = type;
 		}
 
 		/// <summary>
