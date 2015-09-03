@@ -15,12 +15,14 @@
    limitations under the License.
 */
 
+using System;
+
 namespace Telerik.JustMock.Expectations.Abstraction
 {
 	/// <summary>
 	/// Mark the statement as assertable in <see cref="Mock.Assert{T}(T)"/>.
 	/// </summary>
-	public interface IAssertable : IMustBeCalled, ISetupBehavior, IOccurrence, IOrder
+	public interface IAssertable : IMustBeCalled, ISetupBehavior, IOccurrence, IOrder, IDisposable
 	{
 		/// <summary>
 		/// Use it to call the real implementation.

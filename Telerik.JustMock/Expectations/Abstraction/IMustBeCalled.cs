@@ -15,6 +15,8 @@
    limitations under the License.
 */
 
+using System;
+
 namespace Telerik.JustMock.Expectations.Abstraction
 {
 	/// <summary>
@@ -25,6 +27,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <summary>
 		/// Specifies that the mock call should be invoked to pass <see cref="Mock.Assert{T}(T)"/>
 		/// </summary>
-		void MustBeCalled(string message = null);
+		/// <returns>Disposable object that can be used to disable this arrangement.</returns>
+		IDisposable MustBeCalled(string message = null);
 	}
 }

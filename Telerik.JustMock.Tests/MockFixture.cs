@@ -958,6 +958,28 @@ namespace Telerik.JustMock.Tests
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+		public void ShouldDisposeArrangementEffects()
+		{
+			var mock = Mock.Create<IBar>();
+			using (Mock.Arrange(() => mock.Value).Returns(123))
+			{
+				Assert.Equal(123, mock.Value);
+			}
+			Assert.Equal(0, mock.Value);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+		public void ShouldDisposeArrangementExpectations()
+		{
+			var mock = Mock.Create<IBar>();
+			using (Mock.Arrange(() => mock.Value).MustBeCalled())
+			{
+				Assert.Throws<AssertionException>(() => Mock.Assert(mock));
+			}
+			Mock.Assert(mock);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldAssertExpectedWithDynamicQuery()
 		{
 			var bookRepo = Mock.Create<IBookRepository>();

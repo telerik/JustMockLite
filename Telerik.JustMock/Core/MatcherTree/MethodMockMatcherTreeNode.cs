@@ -25,7 +25,7 @@ namespace Telerik.JustMock.Core.MatcherTree
 		public int Id { get; private set; }
 		public IMethodMock MethodMock { get; set; }
 		public MethodMockMatcherTreeNode(IMethodMock methodMock = null, int id = 0)
-			:base(null)
+			: base(null)
 		{
 			MethodMock = methodMock;
 			Id = id;
@@ -36,7 +36,7 @@ namespace Telerik.JustMock.Core.MatcherTree
 			return new MethodMockMatcherTreeNode(MethodMock, Id);
 		}
 
-		public void ReattachMethodMock()
+		public IMatcherTreeNode DetachMethodMock()
 		{
 			IMatcherTreeNode current = this;
 			while (current.Parent != null && current.Parent.Children.Count == 1)
@@ -45,13 +45,19 @@ namespace Telerik.JustMock.Core.MatcherTree
 				current = current.Parent;
 			}
 
-			if(current.Parent != null)
+			if (current.Parent != null)
 				current.Parent.Children.Remove(current);
 
 			while (current.Parent != null)
 				current = current.Parent;
 
-			((MethodInfoMatcherTreeNode) current).AddChild(MethodMock.CallPattern, this);
+			return current;
+		}
+
+		public void ReattachMethodMock()
+		{
+			var root = DetachMethodMock();
+			((MethodInfoMatcherTreeNode)root).AddChild(MethodMock.CallPattern, this);
 		}
 	}
 }

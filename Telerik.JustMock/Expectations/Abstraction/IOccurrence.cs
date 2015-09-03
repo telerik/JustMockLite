@@ -31,28 +31,33 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// Specifies how many times the call should occur.
 		/// </summary>
 		/// <param name="numberOfTimes">Specified number of times</param>
-		void Occurs(int numberOfTimes, string message = null);
+		/// <returns>Disposable object that can be used to disable this arrangement.</returns>
+		IDisposable Occurs(int numberOfTimes, string message = null);
 
 		/// <summary>
 		/// Specifies how many times at least the call should occur.
 		/// </summary>
 		/// <param name="numberOfTimes">Specified number of times</param>
-		void OccursAtLeast(int numberOfTimes, string message = null);
+		/// <returns>Disposable object that can be used to disable this arrangement.</returns>
+		IDisposable OccursAtLeast(int numberOfTimes, string message = null);
 
 		/// <summary>
 		/// Specifies how many times maximum the call can occur.
 		/// </summary>
 		/// <param name="numberOfTimes">Specified number of times</param>
-		void OccursAtMost(int numberOfTimes, string message = null);
+		/// <returns>Disposable object that can be used to disable this arrangement.</returns>
+		IDisposable OccursAtMost(int numberOfTimes, string message = null);
 
 		/// <summary>
 		/// Specifies that the call must occur once.
 		/// </summary>
-		void OccursOnce(string message = null);
+		/// <returns>Disposable object that can be used to disable this arrangement.</returns>
+		IDisposable OccursOnce(string message = null);
 
 		/// <summary>
 		/// Specifies that the call must never occur.
 		/// </summary>
-		void OccursNever(string message = null);
+		/// <returns>Disposable object that can be used to disable this arrangement.</returns>
+		IDisposable OccursNever(string message = null);
 	}
 }

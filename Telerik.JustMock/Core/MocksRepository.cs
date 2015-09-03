@@ -1525,7 +1525,7 @@ namespace Telerik.JustMock.Core
 			else
 			{
 				instanceMatcher = new ValueMatcher(mock);
-				rootMatcher = node => node.Children[0].Matcher.Matches(instanceMatcher);
+				rootMatcher = node => node.Children.Count > 0 && node.Children[0].Matcher.Matches(instanceMatcher);
 			}
 
 			foreach (var funcRoot in arrangementTreeRoots.Values.Where(rootMatcher))
