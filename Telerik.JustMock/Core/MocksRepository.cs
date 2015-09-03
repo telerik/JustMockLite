@@ -175,12 +175,12 @@ namespace Telerik.JustMock.Core
 			return Object.Equals(queryObj, objInRegistry); // no guard - Object.Equals on a value type can't get intercepted
 		}
 
-		private readonly Dictionary<MethodBase, MethodInfoMatcherTreeNode> arrangementTreeRoots = new Dictionary<MethodBase, MethodInfoMatcherTreeNode>();
-		private readonly Dictionary<MethodBase, MethodInfoMatcherTreeNode> invocationTreeRoots = new Dictionary<MethodBase, MethodInfoMatcherTreeNode>();
+		private readonly Dictionary<MemberInfo, MethodInfoMatcherTreeNode> arrangementTreeRoots = new Dictionary<MemberInfo, MethodInfoMatcherTreeNode>();
+		private readonly Dictionary<MemberInfo, MethodInfoMatcherTreeNode> invocationTreeRoots = new Dictionary<MemberInfo, MethodInfoMatcherTreeNode>();
 		private readonly Dictionary<KeyValuePair<object, object>, object> valueStore = new Dictionary<KeyValuePair<object, object>, object>();
 		private readonly HashSet<Type> arrangedTypes = new HashSet<Type>();
 		private readonly HashSet<Type> disabledTypes = new HashSet<Type>();
-		private readonly HashSet<MethodBase> globallyInterceptedMethods = new HashSet<MethodBase>();
+		private readonly HashSet<MemberInfo> globallyInterceptedMembers = new HashSet<MemberInfo>();
 
 		private readonly List<IMatcher> matchersInContext = new List<IMatcher>();
 
@@ -330,11 +330,11 @@ namespace Telerik.JustMock.Core
 			this.Reset();
 		}
 
-		internal void InterceptGlobally(MethodBase method)
+		internal void InterceptGlobally(MemberInfo member)
 		{
-			if (globallyInterceptedMethods.Add(method))
+			if (globallyInterceptedMembers.Add(member))
 			{
-				ProfilerInterceptor.RegisterGlobalInterceptor(method, this);
+				ProfilerInterceptor.RegisterGlobalInterceptor(member, this);
 			}
 		}
 
@@ -346,9 +346,9 @@ namespace Telerik.JustMock.Core
 				ProfilerInterceptor.EnableInterception(type, false, this);
 			this.arrangedTypes.Clear();
 			this.staticMixinDatabase.Clear();
-			foreach (var method in this.globallyInterceptedMethods)
-				ProfilerInterceptor.UnregisterGlobalInterceptor(method, this);
-			this.globallyInterceptedMethods.Clear();
+			foreach (var member in this.globallyInterceptedMembers)
+				ProfilerInterceptor.UnregisterGlobalInterceptor(member, this);
+			this.globallyInterceptedMembers.Clear();
 
 			lock (externalMixinDatabase)
 			{
@@ -371,7 +371,7 @@ namespace Telerik.JustMock.Core
 		{
 			DebugView.TraceEvent(IndentLevel.DispatchResult, () => String.Format("Handling dispatch in repo #{0} servicing {1}", this.repositoryId, this.method));
 
-			if (this.disabledTypes.Contains(invocation.Method.DeclaringType))
+			if (this.disabledTypes.Contains(invocation.Member.DeclaringType))
 			{
 				invocation.CallOriginal = true;
 				return;
@@ -408,8 +408,8 @@ namespace Telerik.JustMock.Core
 				}
 			}
 
-			if (!invocation.CallOriginal && !invocation.IsReturnValueSet && invocation.Method.GetReturnType() != typeof(void))
-				invocation.ReturnValue = invocation.Method.GetReturnType().GetDefaultValue();
+			if (!invocation.CallOriginal && !invocation.IsReturnValueSet && invocation.ReturnType != typeof(void))
+				invocation.ReturnValue = invocation.ReturnType.GetDefaultValue();
 		}
 
 		internal T GetValue<T>(object owner, object key, T dflt)
@@ -656,7 +656,7 @@ namespace Telerik.JustMock.Core
 			}
 
 #if !PORTABLE
-			var createInstanceLambda = ActivatorCreateInstanceTBehavior.TryCreateArrangementExpression(callPattern.Method);
+			var createInstanceLambda = ActivatorCreateInstanceTBehavior.TryCreateArrangementExpression(callPattern.Member);
 			if (createInstanceLambda != null)
 			{
 				var createInstanceMethodMock = Arrange(createInstanceLambda, methodMockFactory);
@@ -682,14 +682,14 @@ namespace Telerik.JustMock.Core
 		}
 
 		[ArrangeMethod]
-		internal TMethodMock Arrange<TMethodMock>(object instance, MethodBase method, object[] arguments, Func<TMethodMock> methodMockFactory)
+		internal TMethodMock Arrange<TMethodMock>(object instance, MemberInfo member, object[] arguments, Func<TMethodMock> methodMockFactory)
 			where TMethodMock : IMethodMock
 		{
 			using (this.sharedContext.StartArrange())
 			{
 				var result = methodMockFactory();
 				result.Repository = this;
-				result.CallPattern = ConvertMethodInfoToCallPattern(instance, method, arguments);
+				result.CallPattern = ConvertMemberInfoToCallPattern(instance, member, arguments);
 
 				AddArrange(result);
 				return result;
@@ -779,11 +779,11 @@ namespace Telerik.JustMock.Core
 			}
 		}
 
-		internal void AssertMethodInfo(string message, object instance, MethodBase method, object[] arguments, Occurs occurs)
+		internal void AssertMethodInfo(string message, object instance, MemberInfo member, object[] arguments, Occurs occurs)
 		{
 			using (MockingContext.BeginFailureAggregation(message))
 			{
-				var callPattern = ConvertMethodInfoToCallPattern(instance, method, arguments);
+				var callPattern = ConvertMemberInfoToCallPattern(instance, member, arguments);
 				AssertForCallPattern(callPattern, null, occurs);
 			}
 		}
@@ -814,9 +814,9 @@ namespace Telerik.JustMock.Core
 			return callsCount;
 		}
 
-		internal int GetTimesCalledFromMethodInfo(object instance, MethodBase method, object[] arguments)
+		internal int GetTimesCalledFromMethodInfo(object instance, MemberInfo member, object[] arguments)
 		{
-			var callPattern = ConvertMethodInfoToCallPattern(instance, method, arguments);
+			var callPattern = ConvertMemberInfoToCallPattern(instance, member, arguments);
 			int callsCount;
 			CountMethodMockInvocations(callPattern, null, out callsCount);
 			return callsCount;
@@ -837,9 +837,9 @@ namespace Telerik.JustMock.Core
 					{
 						args.IsIgnored = true;
 					}
-					if (!callPattern.Method.IsStatic
+					if (!callPattern.Member.IsStatic()
 						&& args.IsInstanceIgnored == null
-						&& args.Filter.Method.GetParameters().Length == callPattern.Method.GetParameters().Length + 1)
+						&& args.Filter.Method.GetParameters().Length == callPattern.ArgumentMatchers.Count + 1)
 					{
 						args.IsInstanceIgnored = true;
 					}
@@ -862,7 +862,7 @@ namespace Telerik.JustMock.Core
 			MethodInfoMatcherTreeNode root;
 			callsCount = 0;
 			var mocks = new HashSet<IMethodMock>();
-			var method = callPattern.Method;
+			var method = callPattern.Member;
 			if (invocationTreeRoots.TryGetValue(method, out root))
 			{
 				var occurences = root.GetOccurences(callPattern);
@@ -887,7 +887,7 @@ namespace Telerik.JustMock.Core
 			if (mocks.Count == 0)
 			{
 				MethodInfoMatcherTreeNode funcRoot;
-				if (arrangementTreeRoots.TryGetValue(callPattern.Method, out funcRoot))
+				if (arrangementTreeRoots.TryGetValue(callPattern.Member, out funcRoot))
 				{
 					var arranges = funcRoot.GetAllMethodMocks(callPattern);
 					foreach (var arrange in arranges)
@@ -906,11 +906,11 @@ namespace Telerik.JustMock.Core
 			}
 		}
 
-		private MethodBase GetMethodFromCallPattern(CallPattern callPattern)
+		private MemberInfo GetMethodFromCallPattern(CallPattern callPattern)
 		{
-			var method = callPattern.Method as MethodInfo;
+			var method = callPattern.Member as MethodInfo;
 			if (method == null || !method.IsVirtual)
-				return callPattern.Method;
+				return callPattern.Member;
 
 			method = method.NormalizeComInterfaceMethod();
 			var valueMatcher = callPattern.InstanceMatcher as IValueMatcher;
@@ -944,7 +944,7 @@ namespace Telerik.JustMock.Core
 
 		private void ConvertInvocationToCallPattern(Invocation invocation, CallPattern callPattern)
 		{
-			callPattern.SetMethod(invocation.Method, checkCompatibility: false);
+			callPattern.SetMethod(invocation.Member, checkCompatibility: false);
 			callPattern.InstanceMatcher = new ReferenceMatcher(invocation.Instance);
 
 			var args = invocation.Args;
@@ -972,7 +972,7 @@ namespace Telerik.JustMock.Core
 			if (lastInvocation == null)
 				throw new MockException("The specified action did not call a mocked method.");
 
-			callPattern.SetMethod(lastInvocation.Method, checkCompatibility: true);
+			callPattern.SetMethod(lastInvocation.Member, checkCompatibility: true);
 			callPattern.InstanceMatcher = new ReferenceMatcher(lastInvocation.Instance);
 
 			var matchers = this.matchersInContext;
@@ -1002,7 +1002,7 @@ namespace Telerik.JustMock.Core
 				expr = ((UnaryExpression)expr).Operand;
 
 			Expression target;
-			MethodBase method = null;
+			MemberInfo member = null;
 			Expression[] args;
 
 			// We're parsing either a property/field expression or a method call.
@@ -1011,32 +1011,36 @@ namespace Telerik.JustMock.Core
 			if (expr is MemberExpression)
 			{
 				var memberExpr = (MemberExpression)expr;
-				if (!(memberExpr.Member is PropertyInfo))
-					throw new MockException("Fields cannot be mocked, only properties.");
-
-				var property = (PropertyInfo)memberExpr.Member;
 				target = memberExpr.Expression;
-				method = property.GetGetMethod(true);
 				args = null;
+				var property = memberExpr.Member as PropertyInfo;
+				if (property != null)
+				{
+					member = property.GetGetMethod(true);
+				}
+				else
+				{
+					member = (FieldInfo)memberExpr.Member;
+				}
 			}
 			else if (expr is MethodCallExpression)
 			{
 				var methodCall = (MethodCallExpression)expr;
 
-				method = methodCall.Method;
+				member = methodCall.Method;
 				target = methodCall.Object;
 				args = methodCall.Arguments.ToArray();
 
-				if (target != null && !target.Type.IsInterface && !target.Type.IsProxy() && target.Type != method.DeclaringType)
-					method = MockingUtil.GetConcreteImplementer((MethodInfo)method, target.Type);
+				if (target != null && !target.Type.IsInterface && !target.Type.IsProxy() && target.Type != member.DeclaringType)
+					member = MockingUtil.GetConcreteImplementer((MethodInfo)member, target.Type);
 			}
 			else if (expr is NewExpression)
 			{
 				var newExpr = (NewExpression)expr;
 
-				method = newExpr.Constructor;
+				member = newExpr.Constructor;
 
-				if (method == null && newExpr.Type.IsValueType)
+				if (member == null && newExpr.Type.IsValueType)
 				{
 					throw new MockException("Empty constructor of value type is not associated with runnable code and cannot be intercepted.");
 				}
@@ -1061,14 +1065,14 @@ namespace Telerik.JustMock.Core
 
 					var property = (PropertyInfo)memberExpr.Member;
 					target = memberExpr.Expression;
-					method = property.GetSetMethod(true);
+					member = property.GetSetMethod(true);
 					args = new[] { binary.Right };
 				}
 				else if (binary.Left is IndexExpression)
 				{
 					var indexExpr = (IndexExpression)binary.Left;
 					target = indexExpr.Object;
-					method = indexExpr.Indexer.GetSetMethod(true);
+					member = indexExpr.Indexer.GetSetMethod(true);
 					args = indexExpr.Arguments.Concat(new[] { binary.Right }).ToArray();
 				}
 				else throw new MockException("Left-hand of assignment is not a member or indexer.");
@@ -1078,7 +1082,7 @@ namespace Telerik.JustMock.Core
 				var index = (IndexExpression)expr;
 				target = index.Object;
 				var property = index.Indexer;
-				method = property.GetGetMethod(true);
+				member = property.GetGetMethod(true);
 				args = index.Arguments.ToArray();
 			}
 			else throw new MockException("The expression does not represent a method call, property access, new expression or a delegate invocation.");
@@ -1218,19 +1222,20 @@ namespace Telerik.JustMock.Core
 
 				var delgMethod = UnwrapDelegateTarget(ref targetValue);
 				if (delgMethod != null)
-					method = delgMethod.GetInheritanceChain().First(m => !m.DeclaringType.IsProxy());
+					member = delgMethod.GetInheritanceChain().Cast<MethodBase>().First(m => !m.DeclaringType.IsProxy());
 
 				callPattern.InstanceMatcher = new ReferenceMatcher(targetValue);
 			}
 
 			// now we have the method part of the call pattern
-			Debug.Assert(method != null);
-			callPattern.SetMethod(method, checkCompatibility: true);
+			Debug.Assert(member != null);
+			callPattern.SetMethod(member, checkCompatibility: true);
 
 			//Finally, construct the arguments part of the call pattern.
 			bool hasParams = false;
 			bool hasSingleValueInParams = false;
-			if (args != null && args.Length > 0)
+			var method = member as MethodBase;
+			if (args != null && args.Length > 0 && method != null)
 			{
 				var lastParameter = method.GetParameters().Last();
 				if (Attribute.IsDefined(lastParameter, typeof(ParamArrayAttribute)) && args.Last() is NewArrayExpression)
@@ -1385,24 +1390,28 @@ namespace Telerik.JustMock.Core
 			}
 		}
 
-		private CallPattern ConvertMethodInfoToCallPattern(object instance, MethodBase method, object[] arguments)
+		private CallPattern ConvertMemberInfoToCallPattern(object instance, MemberInfo member, object[] arguments)
 		{
 			var callPattern = new CallPattern
 			{
 				InstanceMatcher =
-					method.IsStatic ? new ReferenceMatcher(null)
+					member.IsStatic() ? new ReferenceMatcher(null)
 					: instance == null ? (IMatcher)new AnyMatcher()
 					: new ReferenceMatcher(instance),
 			};
-			callPattern.SetMethod(method, checkCompatibility: true);
-			var parameters = method.GetParameters();
-			if (arguments == null || arguments.Length == 0)
+			callPattern.SetMethod(member, checkCompatibility: true);
+			var argCount = arguments == null ? 0 : arguments.Length;
+			var parameters = member is MethodBase
+				? ((MethodBase)member).GetParameters().Select(p => p.ParameterType).ToArray()
+				: argCount == 0 ? MockingUtil.EmptyTypes
+				: new[] { ((FieldInfo)member).FieldType };
+			if (argCount == 0)
 			{
-				callPattern.ArgumentMatchers.AddRange(method.GetParameters().Select(p => (IMatcher)new TypeMatcher(p.ParameterType)));
+				callPattern.ArgumentMatchers.AddRange(parameters.Select(t => (IMatcher)new TypeMatcher(t)));
 			}
 			else
 			{
-				if (arguments.Length != method.GetParameters().Length)
+				if (arguments.Length != parameters.Length)
 					throw new MockException("Argument count mismatch.");
 				callPattern.ArgumentMatchers.AddRange(arguments.Select(arg => CreateMatcherForArgument(arg)));
 			}
@@ -1414,7 +1423,7 @@ namespace Telerik.JustMock.Core
 
 		private void AddArrange(IMethodMock methodMock)
 		{
-			var method = methodMock.CallPattern.Method;
+			var method = methodMock.CallPattern.Member;
 
 			if (methodMock.CallPattern.IsDerivedFromObjectEquals && method.ReflectedType.IsValueType())
 				throw new MockException("Cannot mock Equals method because JustMock depends on it. Also, when Equals is called internally by JustMock, all methods called by it will not be intercepted and will have only their original implementations called.");
@@ -1456,7 +1465,7 @@ namespace Telerik.JustMock.Core
 			funcRoot.AddChild(methodMock.CallPattern, methodMock, this.sharedContext.GetNextArrangeId());
 		}
 
-		private void CheckMethodInterceptorAvailable(IMatcher instanceMatcher, MethodBase method)
+		private void CheckMethodInterceptorAvailable(IMatcher instanceMatcher, MemberInfo member)
 		{
 			if (ProfilerInterceptor.IsProfilerAttached)
 				return;
@@ -1468,10 +1477,12 @@ namespace Telerik.JustMock.Core
 			var instance = valueMatcher.Value;
 			if (instance == null)
 				return;
-			if (MockingProxy.CanIntercept(instance, method))
-				return;
 
-			if (!(instance is IMockMixin) || !method.IsInheritable())
+			var method = member as MethodBase;
+			if (method == null
+				|| !MockingProxy.CanIntercept(instance, method)
+				|| !(instance is IMockMixin)
+				|| !method.IsInheritable())
 				ProfilerInterceptor.ThrowElevatedMockingException(method);
 		}
 
@@ -1520,7 +1531,7 @@ namespace Telerik.JustMock.Core
 			if (mockType != null)
 			{
 				instanceMatcher = new AnyMatcher();
-				rootMatcher = node => mockType.IsAssignableFrom(node.MethodInfo.DeclaringType);
+				rootMatcher = node => mockType.IsAssignableFrom(node.MemberInfo.DeclaringType);
 			}
 			else
 			{
@@ -1530,7 +1541,7 @@ namespace Telerik.JustMock.Core
 
 			foreach (var funcRoot in arrangementTreeRoots.Values.Where(rootMatcher))
 			{
-				var callPattern = CallPattern.CreateUniversalCallPattern(funcRoot.MethodInfo);
+				var callPattern = CallPattern.CreateUniversalCallPattern(funcRoot.MemberInfo);
 				callPattern.InstanceMatcher = instanceMatcher;
 
 				var results = funcRoot.GetAllMethodMocks(callPattern);
@@ -1556,10 +1567,10 @@ namespace Telerik.JustMock.Core
 			MethodInfoMatcherTreeNode funcRoot = null;
 			if (!invocation.InArrange)
 			{
-				if (!invocationTreeRoots.TryGetValue(callPattern.Method, out funcRoot))
+				if (!invocationTreeRoots.TryGetValue(callPattern.Member, out funcRoot))
 				{
-					funcRoot = new MethodInfoMatcherTreeNode(callPattern.Method);
-					invocationTreeRoots.Add(callPattern.Method, funcRoot);
+					funcRoot = new MethodInfoMatcherTreeNode(callPattern.Member);
+					invocationTreeRoots.Add(callPattern.Member, funcRoot);
 				}
 			}
 
@@ -1578,8 +1589,8 @@ namespace Telerik.JustMock.Core
 			MethodInfoMatcherTreeNode arrangeFuncRoot;
 			var methodMockNodes = new List<MethodMockMatcherTreeNode>();
 
-			var allMethods = new[] { callPattern.Method }
-				.Concat(callPattern.Method.GetInheritanceChain().Where(m => m.DeclaringType.IsInterface));
+			var allMethods = new[] { callPattern.Member }
+				.Concat(callPattern.Member.GetInheritanceChain().Where(m => m.DeclaringType.IsInterface));
 			foreach (var method in allMethods)
 			{
 				DebugView.TraceEvent(IndentLevel.MethodMatch, () => String.Format("Inspect arrangements on {0} on {1}", method, method.DeclaringType));

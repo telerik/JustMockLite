@@ -92,7 +92,7 @@ namespace Telerik.JustMock.Expectations
 		{
 			if (delg == null)
 			{
-				var returnType = CallPattern.Method.GetReturnType();
+				var returnType = CallPattern.ReturnType;
 				if (returnType == typeof(void))
 					returnType = typeof(object);
 				if (returnType.IsValueType && Nullable.GetUnderlyingType(returnType) == null)
@@ -435,7 +435,7 @@ namespace Telerik.JustMock.Expectations
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 				{
-					this.Repository.InterceptGlobally(this.CallPattern.Method);
+					this.Repository.InterceptGlobally(this.CallPattern.Member);
 					return this;
 				});
 		}

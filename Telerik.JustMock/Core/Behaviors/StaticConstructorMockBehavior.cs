@@ -24,8 +24,8 @@ namespace Telerik.JustMock.Core.Behaviors
 	{
 		public void Process(Invocation invocation)
 		{
-			var method = invocation.Method;
-			if (method is ConstructorInfo && method.IsPrivate && method.IsStatic)
+			var ctorInfo = invocation.Member as ConstructorInfo;
+			if (ctorInfo != null && ctorInfo.IsPrivate && ctorInfo.IsStatic)
 			{
 				var mixin = invocation.MockMixin;
 				invocation.CallOriginal = mixin == null || !mixin.IsStaticConstructorMocked;

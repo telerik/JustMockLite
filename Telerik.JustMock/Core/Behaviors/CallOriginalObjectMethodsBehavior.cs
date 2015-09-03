@@ -17,6 +17,7 @@
 
 using System;
 using System.Linq;
+using System.Reflection;
 
 namespace Telerik.JustMock.Core.Behaviors
 {
@@ -24,11 +25,14 @@ namespace Telerik.JustMock.Core.Behaviors
 	{
 		public void Process(Invocation invocation)
 		{
-			if (invocation.Method.IsVirtual
-				&& typeof(object).GetMethods().Any(method =>
-					method.Name == invocation.Method.Name
-					&& method.ReturnType == invocation.Method.GetReturnType()
-					&& method.GetParameters().Select(p => p.ParameterType).SequenceEqual(invocation.Method.GetParameters().Select(p => p.ParameterType))
+			var method = invocation.Member as MethodBase;
+
+			if (method != null
+				&& method.IsVirtual
+				&& typeof(object).GetMethods().Any(m =>
+					m.Name == method.Name
+					&& m.ReturnType == invocation.ReturnType
+					&& m.GetParameters().Select(p => p.ParameterType).SequenceEqual(method.GetParameters().Select(p => p.ParameterType))
 				))
 			{
 				invocation.CallOriginal = true;

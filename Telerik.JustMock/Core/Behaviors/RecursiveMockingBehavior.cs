@@ -36,8 +36,8 @@ namespace Telerik.JustMock.Core.Behaviors
 
 	internal class RecursiveMockingBehavior : IBehavior
 	{
-		private readonly Dictionary<MethodBase, List<KeyValuePair<object, object>>> mocks
-			= new Dictionary<MethodBase, List<KeyValuePair<object, object>>>();
+		private readonly Dictionary<MemberInfo, List<KeyValuePair<object, object>>> mocks
+			= new Dictionary<MemberInfo, List<KeyValuePair<object, object>>>();
 
 		private readonly RecursiveMockingBehaviorType type;
 
@@ -51,16 +51,16 @@ namespace Telerik.JustMock.Core.Behaviors
 			if (invocation.IsReturnValueSet)
 				return;
 
-			var returnType = invocation.Method.GetReturnType();
+			var returnType = invocation.ReturnType;
 			if (returnType == typeof(void) || returnType.IsValueType)
 				return;
 
-			if (invocation.Method.Name == "ToString" && invocation.Method.GetParameters().Length == 0 && invocation.UserProvidedImplementation)
+			if (invocation.Member.Name == "ToString" && invocation.Args.Length == 0 && invocation.UserProvidedImplementation)
 				return;
 
 			object mock = null;
 			List<KeyValuePair<object, object>> mocksList;
-			if (mocks.TryGetValue(invocation.Method, out mocksList))
+			if (mocks.TryGetValue(invocation.Member, out mocksList))
 			{
 				// can't put the key part in a Dictionary,
 				// because we can't be sure that GetHashCode() works
@@ -83,7 +83,7 @@ namespace Telerik.JustMock.Core.Behaviors
 				if (mocksList == null)
 				{
 					mocksList = new List<KeyValuePair<object, object>>();
-					mocks.Add(invocation.Method, mocksList);
+					mocks.Add(invocation.Member, mocksList);
 				}
 				mocksList.Add(new KeyValuePair<object, object>(invocation.Instance, mock));
 
@@ -108,7 +108,7 @@ namespace Telerik.JustMock.Core.Behaviors
 					.SkipWhile(m => m.Module.Assembly == typeof(MocksRepository).Assembly)
 					.FirstOrDefault();
 
-				if (methodCallingArrange != null && invocation.Method.DeclaringType.IsAssignableFrom(methodCallingArrange.DeclaringType))
+				if (methodCallingArrange != null && invocation.Member.DeclaringType.IsAssignableFrom(methodCallingArrange.DeclaringType))
 					return false;
 #endif
 			}

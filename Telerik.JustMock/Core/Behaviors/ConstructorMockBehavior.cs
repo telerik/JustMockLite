@@ -38,12 +38,13 @@ namespace Telerik.JustMock.Core.Behaviors
 		public static void Attach(IMethodMock methodMock)
 		{
 			var callPattern = methodMock.CallPattern;
-			if (!(callPattern.Method is ConstructorInfo)
-				|| callPattern.Method.IsStatic
+			var ctor = callPattern.Member as ConstructorInfo;
+			if (ctor == null
+				|| ctor.IsStatic
 				|| !(callPattern.InstanceMatcher is AnyMatcher)
-				|| typeof(string) == callPattern.Method.DeclaringType
+				|| typeof(string) == ctor.DeclaringType
 #if !COREFX
-				|| typeof(ContextBoundObject).IsAssignableFrom(callPattern.Method.DeclaringType)
+				|| typeof(ContextBoundObject).IsAssignableFrom(ctor.DeclaringType)
 #endif
 				)
 				return;

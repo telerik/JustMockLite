@@ -15,9 +15,10 @@ namespace Telerik.JustMock.Core.Behaviors
 
 		public void Process(Invocation invocation)
 		{
+			var method = delegatedMock.CallPattern.Member as MethodBase;
 			var delegatedInvocation = new Invocation(
-				MockingUtil.TryGetUninitializedObject(invocation.Method.GetReturnType()),
-				delegatedMock.CallPattern.Method,
+				MockingUtil.TryGetUninitializedObject(invocation.ReturnType),
+				method,
 				new object[0]);
 
 			this.delegatedMock.Repository.DispatchInvocation(delegatedInvocation);
@@ -30,17 +31,17 @@ namespace Telerik.JustMock.Core.Behaviors
 			invocation.ExceptionThrower = delegatedInvocation.ExceptionThrower;
 
 			if (invocation.CallOriginal)
-				ProfilerInterceptor.SkipMethodInterceptionOnce(delegatedMock.CallPattern.Method);
+				ProfilerInterceptor.SkipMethodInterceptionOnce(method);
 		}
 
-		public static LambdaExpression TryCreateArrangementExpression(MethodBase method)
+		public static LambdaExpression TryCreateArrangementExpression(MemberInfo member)
 		{
-			var ctor = method as ConstructorInfo;
+			var ctor = member as ConstructorInfo;
 			if (ctor == null)
 				return null;
 
 			var createInstance = typeof(Activator).GetMethod("CreateInstance", MockingUtil.EmptyTypes);
-			createInstance = createInstance.MakeGenericMethod(method.DeclaringType);
+			createInstance = createInstance.MakeGenericMethod(member.DeclaringType);
 			return Expression.Lambda(Expression.Call(createInstance));
 		}
 

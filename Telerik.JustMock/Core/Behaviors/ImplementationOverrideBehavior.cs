@@ -40,16 +40,16 @@ namespace Telerik.JustMock.Core.Behaviors
 		{
 			var args = implementationOverride.Method.GetParameters().Length > 0 && invocation.Args != null ? invocation.Args : Empty;
 
-			var paramsCount = invocation.Method.GetParameters().Length;
+			var paramsCount = args.Length;
 			var implementationParamsCount = implementationOverride.Method.GetParameters().Length;
 
-			if (invocation.Method.IsExtensionMethod() && paramsCount - 1 == implementationParamsCount)
+			if (invocation.Member.IsExtensionMethod() && paramsCount - 1 == implementationParamsCount)
 			{
 				args = args.Skip(1).ToArray();
 			}
 
 			int extraParamCount = 1 + (implementationOverride.Target != null && implementationOverride.Method.IsStatic ? 1 : 0);
-			if (!invocation.Method.IsStatic && extraParamCount + paramsCount == implementationParamsCount)
+			if (!invocation.Member.IsStatic() && extraParamCount + paramsCount == implementationParamsCount)
 			{
 				args = new[] { invocation.Instance }.Concat(args).ToArray();
 			}

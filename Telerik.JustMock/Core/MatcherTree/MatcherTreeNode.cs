@@ -170,7 +170,7 @@ namespace Telerik.JustMock.Core.MatcherTree
 				nodeIter = nodeIter.Parent;
 			}
 
-			if (!callPattern.Method.IsStatic && filter.Method.GetParameters().Length + 1 == args.Count)
+			if (!callPattern.Member.IsStatic() && filter.Method.GetParameters().Length + 1 == args.Count)
 			{
 				args.RemoveAt(args.Count - 1);
 			}
@@ -186,7 +186,7 @@ namespace Telerik.JustMock.Core.MatcherTree
 
 			DebugView.TraceEvent(IndentLevel.Matcher, () => String.Format("Matcher predicate {0} call to {2} with arguments ({1})",
 				isMatch ? "passed" : "rejected", String.Join(", ", args.Select(x => x.ToString()).ToArray()),
-				callPattern.Method));
+				callPattern.Member));
 
 			return isMatch;
 		}

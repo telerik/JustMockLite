@@ -40,30 +40,45 @@ namespace Telerik.JustMock.Core
 
 		public Delegate Filter;
 
-		private MethodBase method;
-		public MethodBase Method
+		private MemberInfo member;
+		public MemberInfo Member
 		{
 			get
 			{
-				return this.method;
+				return this.member;
 			}
 		}
 
-		public void SetMethod(MethodBase method, bool checkCompatibility)
+		internal Type ReturnType
+		{
+			get
+			{
+				var asField = this.member as FieldInfo;
+				if (asField != null)
+					return ArgumentMatchers.Count == 0 ? asField.FieldType : typeof(void);
+
+				var asMethod = this.member as MethodInfo;
+				return asMethod != null ? asMethod.ReturnType : typeof(void);
+			}
+		}
+
+		public void SetMethod(MemberInfo member, bool checkCompatibility)
 		{
 			if (checkCompatibility)
 			{
-				if (method == typeof(object).GetConstructor(MockingUtil.EmptyTypes))
+				if (member == typeof(object).GetConstructor(MockingUtil.EmptyTypes))
 					DebugView.TraceEvent(Diagnostics.IndentLevel.Warning, () => "System.Object constructor will be intercepted only in 'new' expressions, i.e. 'new object()'.");
 
-				CheckMethodCompatibility(method);
-				CheckInstrumentationAvailability(method);
+				CheckMethodCompatibility(member as MethodBase);
+				CheckInstrumentationAvailability(member);
 			}
-			this.method = method;
+			this.member = member;
 		}
 
 		private static void CheckMethodCompatibility(MethodBase method)
 		{
+			if (method == null)
+				return;
 			var sigTypes = method.GetParameters().Select(p => p.ParameterType).Concat(new[] { method.GetReturnType() });
 			if (sigTypes.Any(sigType =>
 			{
@@ -85,46 +100,52 @@ namespace Telerik.JustMock.Core
 			return method.IsConstructor;
 		}
 
-		private static void CheckInstrumentationAvailability(MethodBase value)
+		private static void CheckInstrumentationAvailability(MemberInfo member)
 		{
-			if (IsInterceptedAtTheCallSite(value))
+			var method = member as MethodBase;
+			if (method != null)
 			{
-				return;
-			}
-
+				if (IsInterceptedAtTheCallSite(method))
+					return;
 #if !PORTABLE
-			var methodImpl = value.GetMethodImplementationFlags();
-			if ((((methodImpl & MethodImplAttributes.InternalCall) != 0
-				   || (methodImpl & MethodImplAttributes.CodeTypeMask) != MethodImplAttributes.IL)
-				  && value.Module.Assembly == typeof(object).Assembly)
-				  && !value.IsInheritable())
-				throw new MockException("Cannot mock a method that is implemented internally by the CLR.");
+				var methodImpl = method.GetMethodImplementationFlags();
+				if ((((methodImpl & MethodImplAttributes.InternalCall) != 0
+					   || (methodImpl & MethodImplAttributes.CodeTypeMask) != MethodImplAttributes.IL)
+					  && method.Module.Assembly == typeof(object).Assembly)
+					  && !method.IsInheritable())
+					throw new MockException("Cannot mock a method that is implemented internally by the CLR.");
 #endif
 
-			if (!value.IsInheritable() && !ProfilerInterceptor.TypeSupportsInstrumentation(value.DeclaringType))
-				throw new MockException(String.Format("Cannot mock non-inheritable member '{0}' on type '{1}' due to CLR limitations.", value, value.DeclaringType));
+				if (!method.IsInheritable() && !ProfilerInterceptor.TypeSupportsInstrumentation(method.DeclaringType))
+					throw new MockException(String.Format("Cannot mock non-inheritable member '{0}' on type '{1}' due to CLR limitations.", method, method.DeclaringType));
 
-			if ((value.Attributes & MethodAttributes.PinvokeImpl) != 0)
-			{
-				if (!ProfilerInterceptor.IsProfilerAttached)
-					throw new MockException("The profiler must be enabled to mock DllImport methods.");
+				if ((method.Attributes & MethodAttributes.PinvokeImpl) != 0)
+				{
+					if (!ProfilerInterceptor.IsProfilerAttached)
+						throw new MockException("The profiler must be enabled to mock DllImport methods.");
 
-				string fullName = value.DeclaringType.FullName + "." + value.Name;
-				if ((value.Attributes & MethodAttributes.HasSecurity) != 0)
-					throw new MockException(string.Format("DllImport method {0} cannot be mocked because it has security information attached.", fullName));
+					string fullName = method.DeclaringType.FullName + "." + method.Name;
+					if ((method.Attributes & MethodAttributes.HasSecurity) != 0)
+						throw new MockException(string.Format("DllImport method {0} cannot be mocked because it has security information attached.", fullName));
 
-				// method could be the profiler generated shadow method or is inside an assembly which doesn't contain managed code (valid RVA)
-				throw new MockException(string.Format("DllImport method {0} cannot be mocked due to internal limitation.", fullName));
+					// method could be the profiler generated shadow method or is inside an assembly which doesn't contain managed code (valid RVA)
+					throw new MockException(string.Format("DllImport method {0} cannot be mocked due to internal limitation.", fullName));
+				}
+
+				if (uninterceptedMethods.Contains(method))
+					throw new MockException("Cannot mock Object..ctor, Object.Equals, Object.ReferenceEquals or Finalize");
+
+				var asMethodInfo = method as MethodInfo;
+				if (asMethodInfo != null)
+				{
+					if (uninterceptedMethods.Contains(asMethodInfo.GetBaseDefinition()))
+						throw new MockException("Cannot mock Object.Equals, Object.ReferenceEquals or Finalize");
+				}
 			}
-
-			if (uninterceptedMethods.Contains(value))
-				throw new MockException("Cannot mock Object..ctor, Object.Equals, Object.ReferenceEquals or Finalize");
-
-			var asMethodInfo = value as MethodInfo;
-			if (asMethodInfo != null)
+			var field = member as FieldInfo;
+			if (field != null)
 			{
-				if (uninterceptedMethods.Contains(asMethodInfo.GetBaseDefinition()))
-					throw new MockException("Cannot mock Object.Equals, Object.ReferenceEquals or Finalize");
+				// TODO: check that field mocking is enabled
 			}
 		}
 
@@ -132,7 +153,7 @@ namespace Telerik.JustMock.Core
 		{
 			get
 			{
-				var asMethodInfo = this.Method as MethodInfo;
+				var asMethodInfo = this.Member as MethodInfo;
 				return asMethodInfo != null && asMethodInfo.GetBaseDefinition() == ObjectEqualsMethod;
 			}
 		}
@@ -140,7 +161,7 @@ namespace Telerik.JustMock.Core
 		internal CallPattern Clone()
 		{
 			var newCallPattern = new CallPattern();
-			newCallPattern.method = this.method;
+			newCallPattern.member = this.member;
 			newCallPattern.InstanceMatcher = this.InstanceMatcher;
 			for (int i = 0; i < this.ArgumentMatchers.Count; i++)
 			{
@@ -150,19 +171,21 @@ namespace Telerik.JustMock.Core
 			return newCallPattern;
 		}
 
-		internal static CallPattern CreateUniversalCallPattern(MethodBase method)
+		internal static CallPattern CreateUniversalCallPattern(MemberInfo member)
 		{
+			/// TODO: cannot create universal CP for both field load and store
 			var result = new CallPattern();
-			result.SetMethod(method, checkCompatibility: true);
+			result.SetMethod(member, checkCompatibility: true);
 			result.InstanceMatcher = new AnyMatcher();
-			result.ArgumentMatchers.AddRange(Enumerable.Repeat((IMatcher)new AnyMatcher(), method.GetParameters().Length));
+			var paramCount = member is MethodBase ? ((MethodBase)member).GetParameters().Length : 0;
+			result.ArgumentMatchers.AddRange(Enumerable.Repeat((IMatcher)new AnyMatcher(), paramCount));
 			result.AdjustForExtensionMethod();
 			return result;
 		}
 
 		internal void AdjustForExtensionMethod()
 		{
-			if (Method.IsExtensionMethod())
+			if (Member.IsExtensionMethod())
 			{
 				var thisMatcher = ArgumentMatchers[0];
 				var valueMatcher = thisMatcher as IValueMatcher;

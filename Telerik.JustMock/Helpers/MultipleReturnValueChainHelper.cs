@@ -65,7 +65,7 @@ namespace Telerik.JustMock.Helpers
 				var func = assertable as IFunc<TReturn>;
 				if (func == null)
 				{
-					var methodReturnType = callPattern.Method.GetReturnType();
+					var methodReturnType = callPattern.ReturnType;
 					var returnTypeMessage = methodReturnType.IsAssignableFrom(typeof(TReturn))
 						? String.Format("The arranged function is not set up to return a value of type {0}.  If this is a non-public arrangement then make sure that the call to Arrange specifies the correct return type, e.g. Mock.NonPublic.Arrange<int>(...) if the method returns 'int'.", typeof(TReturn))
 						: String.Format("The chained return value type '{0}' is not compatible with the arranged method's return type '{1}'", typeof(TReturn), methodReturnType);

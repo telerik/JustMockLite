@@ -30,7 +30,7 @@ namespace Telerik.JustMock.Core.Behaviors
 		public PreserveRefOutValuesBehavior(IMethodMock methodMock)
 		{
 			var argMatchers = methodMock.CallPattern.ArgumentMatchers;
-			var method = methodMock.CallPattern.Method;
+			var method = (MethodBase) methodMock.CallPattern.Member;
 			var parameters = GetParameters(method);
 			var offsetDueToExtensionMethod = method.IsExtensionMethod() ? 1 : 0;
 
@@ -58,6 +58,8 @@ namespace Telerik.JustMock.Core.Behaviors
 
 		public static void Attach(IMethodMock methodMock)
 		{
+			if (!(methodMock.CallPattern.Member is MethodBase))
+				return;
 			var behavior = new PreserveRefOutValuesBehavior(methodMock);
 			var madeReplacements = ReplaceRefOutArgsWithAnyMatcher(methodMock.CallPattern);
 			if (madeReplacements)
@@ -67,7 +69,7 @@ namespace Telerik.JustMock.Core.Behaviors
 		public static bool ReplaceRefOutArgsWithAnyMatcher(CallPattern callPattern)
 		{
 			bool madeReplacements = false;
-			var parameters = GetParameters(callPattern.Method);
+			var parameters = GetParameters((MethodBase)callPattern.Member);
 			for (int i = 0; i < parameters.Length; ++i)
 			{
 				if (parameters[i].ParameterType.IsByRef && !callPattern.ArgumentMatchers[i].ProtectRefOut)

@@ -45,7 +45,9 @@ namespace Telerik.JustMock.Core.Behaviors
 
 		public void Process(Invocation invocation)
 		{
-			var method = invocation.Method;
+			var method = invocation.Member as MethodBase;
+			if (method == null)
+				return;
 
 			var candidateEvent = method.GetEventFromAddOrRemove();
 			if (candidateEvent == null)
@@ -54,7 +56,7 @@ namespace Telerik.JustMock.Core.Behaviors
 			invocation.UserProvidedImplementation = true;
 
 			var delg = (Delegate)invocation.Args[0];
-			if (candidateEvent.GetAddMethod() == invocation.Method)
+			if (candidateEvent.GetAddMethod() == invocation.Member)
 				this.AddEventHandler(candidateEvent, delg);
 			else
 				this.RemoveEventHandler(candidateEvent, delg);

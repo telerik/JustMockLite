@@ -19,6 +19,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Telerik.JustMock.Core;
 using Telerik.JustMock.Core.Behaviors;
 using Telerik.JustMock.Expectations.Abstraction;
@@ -76,16 +77,16 @@ namespace Telerik.JustMock.Expectations
 		private void CheckConstructorArrangement()
 		{
 			var mock = (IMethodMock)this;
-			var method = mock.CallPattern.Method;
-			if (!method.IsConstructor)
+			var ctor = mock.CallPattern.Member as ConstructorInfo;
+			if (ctor == null)
 				return;
 
-			if (method.GetParameters().Any(p => p.ParameterType == typeof(IntPtr)))
+			if (ctor.GetParameters().Any(p => p.ParameterType == typeof(IntPtr)))
 			{
 				throw new MockException("Arranging the return value of a constructor that has an IntPtr argument is not supported.");
 			}
 
-			if (method.DeclaringType.IsValueType)
+			if (ctor.DeclaringType.IsValueType)
 			{
 				throw new MockException("Arranging the return value of a constructor call is not supported for value types.");
 			}

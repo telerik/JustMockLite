@@ -39,9 +39,10 @@ namespace Telerik.JustMock.Core
 		public const BindingFlags AllMembers = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
 		public const BindingFlags Default = (BindingFlags)0;
 
-		public static bool IsExtensionMethod(this MethodBase method)
+		public static bool IsExtensionMethod(this MemberInfo member)
 		{
-			return method.IsStatic && method.GetCustomAttributes(typeof(ExtensionAttribute), false).Any();
+			var method = member as MethodBase;
+			return method != null && method.IsStatic && method.GetCustomAttributes(typeof(ExtensionAttribute), false).Any();
 		}
 
 		public static EventInfo GetEventFromAddOrRemove(this MethodBase addOrRemoveMethod)
@@ -66,7 +67,11 @@ namespace Telerik.JustMock.Core
 			var recorder = new DelegatingRecorder();
 			recorder.Record += invocation =>
 			{
-				var candidateEvent = invocation.Method.GetEventFromAddOrRemove();
+				var method = invocation.Member as MethodBase;
+				if (method == null)
+					return;
+
+				var candidateEvent = method.GetEventFromAddOrRemove();
 
 				if (candidateEvent != null)
 				{
@@ -354,11 +359,11 @@ namespace Telerik.JustMock.Core
 			}
 		}
 
-		public static IEnumerable<MethodBase> GetInheritanceChain(this MethodBase methodBase)
+		public static IEnumerable<MemberInfo> GetInheritanceChain(this MemberInfo member)
 		{
-			yield return methodBase;
+			yield return member;
 
-			var method = methodBase as MethodInfo;
+			var method = member as MethodInfo;
 			if (method != null && !method.IsStatic && method.DeclaringType != null && !method.DeclaringType.IsInterface)
 			{
 				foreach (var currentInterface in method.DeclaringType.GetInterfaces())
@@ -922,5 +927,19 @@ namespace Telerik.JustMock.Core
 			return false;
 		}
 #endif
+
+		public static bool IsPrivate(this MemberInfo member)
+		{
+			return member is MethodBase ? ((MethodBase)member).IsPrivate
+				: member is FieldInfo ? ((FieldInfo)member).IsPrivate
+				: false;
+		}
+
+		public static bool IsStatic(this MemberInfo member)
+		{
+			return member is MethodBase ? ((MethodBase)member).IsStatic
+				: member is FieldInfo ? ((FieldInfo)member).IsStatic
+				: false;
+		}
 	}
 }

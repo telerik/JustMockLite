@@ -61,22 +61,22 @@ namespace Telerik.JustMock.Core.MatcherTree
 			}
 			matchers.Reverse();
 
-			var method = ((MethodInfoMatcherTreeNode)parent).MethodInfo;
+			var member = ((MethodInfoMatcherTreeNode)parent).MemberInfo;
 
 			var sb = new StringBuilder();
-			bool isInstance = !method.IsStatic || method.IsExtensionMethod();
+			bool isInstance = !member.IsStatic() || member.IsExtensionMethod();
 			var argMatchers = isInstance ? matchers.Skip(1) : matchers;
 
 			if (isInstance)
 				sb.AppendFormat("({0}).", matchers[0].Matcher.DebugView);
 			else
-				sb.AppendFormat("{0}.", method.DeclaringType);
+				sb.AppendFormat("{0}.", member.DeclaringType);
 
 			sb.AppendFormat("{0}({1}) called {2} time{3}; (signature: {4})",
-				method.Name,
+				member.Name,
 				", ".Join(argMatchers.Select(m => m.Matcher.DebugView)),
 				this.Calls, this.Calls != 1 ? "s" : "",
-				method);
+				member);
 
 			return sb.ToString();
 		}

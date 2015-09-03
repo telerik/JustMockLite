@@ -36,7 +36,7 @@ namespace Telerik.JustMock.Core.Behaviors
 		public void Process(Invocation invocation)
 		{
 			invocation.UserProvidedImplementation = true;
-			Process(invocation.Args, invocation.Method.DeclaringType);
+			Process(invocation.Args, invocation.Member.DeclaringType);
 		}
 
 		public void Process(object[] invocationArgs, Type declaringType)

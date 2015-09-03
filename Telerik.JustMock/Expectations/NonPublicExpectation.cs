@@ -31,12 +31,12 @@ namespace Telerik.JustMock.Expectations
 {
 	internal sealed class NonPublicExpectation : INonPublicExpectation
 	{
-		private static bool ReturnTypeMatches(Type returnType, MethodInfo method)
+		private static bool ReturnTypeMatches(Type expectedReturnType, Type returnType)
 		{
-			return returnType == null || method.ReturnType == returnType || (method.ReturnType.IsPointer && returnType == typeof(IntPtr));
+			return expectedReturnType == null || returnType == expectedReturnType || (returnType.IsPointer && expectedReturnType == typeof(IntPtr));
 		}
 
-		private static MethodInfo GetMethodByName(Type type, Type returnType, string memberName, ref object[] args)
+		private static MemberInfo GetMethodByName(Type type, Type returnType, string memberName, ref object[] args)
 		{
 			if (type.IsProxy())
 				type = type.BaseType;
@@ -54,7 +54,7 @@ namespace Telerik.JustMock.Expectations
 			if (candidateMethods.Length == 1)
 			{
 				var singleCandidate = candidateMethods[0];
-				var returnTypeMatches = ReturnTypeMatches(returnType, singleCandidate);
+				var returnTypeMatches = ReturnTypeMatches(returnType, singleCandidate.ReturnType);
 				var argsIgnored = args == null || args.Length == 0;
 				if (returnTypeMatches && argsIgnored)
 				{
@@ -106,6 +106,16 @@ namespace Telerik.JustMock.Expectations
 				}
 			}
 
+			if (mockedMethod == null && (args == null || args.Length == 0 || args.Length == 1))
+			{
+				var field = type.GetAllFields()
+					.FirstOrDefault(f => f.Name == memberName);
+				if (field != null)
+				{
+					return field;
+				}
+			}
+
 			if (mockedMethod == null)
 				throw new MissingMemberException(BuildMissingMethodMessage(type, null, memberName));
 
@@ -116,7 +126,7 @@ namespace Telerik.JustMock.Expectations
 
 			if (mockedMethod.DeclaringType != mockedMethod.ReflectedType)
 			{
-				mockedMethod = GetMethodByName(mockedMethod.DeclaringType, returnType, memberName, ref args);
+				mockedMethod = (MethodInfo)MethodBase.GetMethodFromHandle(mockedMethod.MethodHandle, mockedMethod.DeclaringType.TypeHandle);
 			}
 
 			return mockedMethod;
@@ -210,7 +220,7 @@ namespace Telerik.JustMock.Expectations
 
 		private static MethodInfo FindMethodBySignature(IEnumerable<MethodInfo> candidates, Type returnType, object[] args)
 		{
-			return candidates.FirstOrDefault(method => method.ArgumentsMatchSignature(args) && ReturnTypeMatches(returnType, method));
+			return candidates.FirstOrDefault(method => method.ArgumentsMatchSignature(args) && ReturnTypeMatches(returnType, method.ReturnType));
 		}
 
 		private static string GetAssertionMessage(object[] args)

@@ -41,7 +41,7 @@ namespace Telerik.JustMock.Core
 			var repo = mockMixin != null ? mockMixin.Repository : MockingContext.ResolveRepository(UnresolvedContextBehavior.CreateNewContextual);
 
 			if (repo == null)
-				repo = TryFindGlobalInterceptor(invocation.Method);
+				repo = TryFindGlobalInterceptor(invocation.Member);
 			if (repo == null)
 				return false;
 
@@ -137,12 +137,20 @@ namespace Telerik.JustMock.Core
 		private static bool InterceptGetField(object instance, RuntimeTypeHandle typeHandle, RuntimeFieldHandle fieldHandle, out object value)
 		{
 			value = null;
+			if (!IsInterceptionEnabled || isFinalizerThread)
+				return false;
 
 			try
 			{
 				ReentrancyCounter++;
 
 				var field = FieldInfo.GetFieldFromHandle(fieldHandle, typeHandle);
+				var invocation = new Invocation(instance, field, new object[0]);
+				if (DispatchInvocation(invocation) && !invocation.CallOriginal)
+				{
+					value = invocation.ReturnValue;
+					return true;
+				}
 
 				return false;
 			}
@@ -152,15 +160,27 @@ namespace Telerik.JustMock.Core
 			}
 		}
 
-		private static object InterceptSetField(object instance, RuntimeTypeHandle typeHandle, RuntimeFieldHandle fieldHandle, object value)
+		/// <param name="value">The value to be stored</param>
+		/// <returns>false if 'value' should be stored, true if field should be left unchanged</returns>
+		private static bool InterceptSetField(object instance, RuntimeTypeHandle typeHandle, RuntimeFieldHandle fieldHandle, ref object value)
 		{
+			if (!IsInterceptionEnabled || isFinalizerThread)
+				return false;
+
 			try
 			{
 				ReentrancyCounter++;
 
 				var field = FieldInfo.GetFieldFromHandle(fieldHandle, typeHandle);
+				var invocation = new Invocation(instance, field, new object[] { value });
+				if (DispatchInvocation(invocation) && !invocation.CallOriginal)
+				{
+					if (!invocation.IsReturnValueSet)
+						return true;
+					value = invocation.ReturnValue;
+				}
 
-				return value;
+				return false;
 			}
 			finally
 			{
@@ -248,7 +268,7 @@ namespace Telerik.JustMock.Core
 					bridge.GetField("ProcessNewobj").SetValue(null, interceptNewobjDelegate);
 
 					var processSetFieldType = typeof(object).Assembly.GetType("Telerik.JustMock.ProcessSetFieldDelegate");
-					Func<object, RuntimeTypeHandle, RuntimeFieldHandle, object, object> interceptSetFieldAsAction = InterceptSetField;
+					InterceptSetFieldSignature interceptSetFieldAsAction = InterceptSetField;
 					var interceptSetFieldDelegate = Delegate.CreateDelegate(processSetFieldType, interceptSetFieldAsAction.Method);
 					bridge.GetField("ProcessSetField").SetValue(null, interceptSetFieldDelegate);
 
@@ -266,6 +286,7 @@ namespace Telerik.JustMock.Core
 		}
 
 		private delegate bool InterceptGetFieldSignature(object instance, RuntimeTypeHandle typeHandle, RuntimeFieldHandle fieldHandle, out object value);
+		private delegate bool InterceptSetFieldSignature(object instance, RuntimeTypeHandle typeHandle, RuntimeFieldHandle fieldHandle, ref object value);
 
 		public static int ReentrancyCounter
 		{
@@ -363,36 +384,36 @@ namespace Telerik.JustMock.Core
 			return (arrangedTypesArray[arrayIndex] & arrayMask) != 0;
 		}
 
-		internal static void RegisterGlobalInterceptor(MethodBase method, MocksRepository repo)
+		internal static void RegisterGlobalInterceptor(MemberInfo member, MocksRepository repo)
 		{
 			lock (globalInterceptors)
 			{
 				List<MocksRepository> repos;
-				if (!globalInterceptors.TryGetValue(method, out repos))
+				if (!globalInterceptors.TryGetValue(member, out repos))
 				{
-					globalInterceptors[method] = repos = new List<MocksRepository>();
+					globalInterceptors[member] = repos = new List<MocksRepository>();
 				}
 				repos.Add(repo);
 			}
 		}
 
-		internal static void UnregisterGlobalInterceptor(MethodBase method, MocksRepository repo)
+		internal static void UnregisterGlobalInterceptor(MemberInfo member, MocksRepository repo)
 		{
 			lock (globalInterceptors)
 			{
-				var repos = globalInterceptors[method];
+				var repos = globalInterceptors[member];
 				repos.Remove(repo);
 				if (repos.Count == 0)
-					globalInterceptors.Remove(method);
+					globalInterceptors.Remove(member);
 			}
 		}
 
-		private static MocksRepository TryFindGlobalInterceptor(MethodBase method)
+		private static MocksRepository TryFindGlobalInterceptor(MemberInfo member)
 		{
 			lock (globalInterceptors)
 			{
 				List<MocksRepository> repos;
-				if (globalInterceptors.TryGetValue(method, out repos))
+				if (globalInterceptors.TryGetValue(member, out repos))
 					return repos.LastOrDefault();
 			}
 			return null;
@@ -631,7 +652,7 @@ namespace Telerik.JustMock.Core
 		private static readonly Action<bool> setIsInterceptionSetup;
 		private static readonly Action<RuntimeTypeHandle> runClassConstructor;
 
-		private static readonly Dictionary<MethodBase, List<MocksRepository>> globalInterceptors = new Dictionary<MethodBase, List<MocksRepository>>();
+		private static readonly Dictionary<MemberInfo, List<MocksRepository>> globalInterceptors = new Dictionary<MemberInfo, List<MocksRepository>>();
 
 		[ThreadStatic]
 		private static int surrogateReentrancyCounter;

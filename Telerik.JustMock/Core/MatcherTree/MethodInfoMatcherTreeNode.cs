@@ -24,17 +24,17 @@ namespace Telerik.JustMock.Core.MatcherTree
 {
 	internal class MethodInfoMatcherTreeNode : MatcherTreeNode
 	{
-		public MethodBase MethodInfo { get; private set; }
+		public MemberInfo MemberInfo { get; private set; }
 
-		public MethodInfoMatcherTreeNode(MethodBase m)
+		public MethodInfoMatcherTreeNode(MemberInfo m)
 			: base(null)
 		{
-			this.MethodInfo = m;
+			this.MemberInfo = m;
 		}
 
 		public override IMatcherTreeNode Clone()
 		{
-			return new MethodInfoMatcherTreeNode(MethodInfo);
+			return new MethodInfoMatcherTreeNode(MemberInfo);
 		}
 
 		public void AddChild(CallPattern callPattern, MethodMockMatcherTreeNode node)

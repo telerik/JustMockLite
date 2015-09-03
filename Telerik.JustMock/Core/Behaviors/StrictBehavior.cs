@@ -37,15 +37,15 @@ namespace Telerik.JustMock.Core.Behaviors
 		{
 			if (!invocation.UserProvidedImplementation
 				&& !invocation.Recording
-				&& (invocation.Method.GetReturnType() != typeof(void) || !throwOnlyOnValueReturningMethods)
-				&& !(invocation.Method is ConstructorInfo))
+				&& (invocation.ReturnType != typeof(void) || !throwOnlyOnValueReturningMethods)
+				&& !(invocation.Member is ConstructorInfo))
 			{
 				if (strictnessViolationMessage == null)
 					strictnessViolationMessage = new StringBuilder();
 				strictnessViolationMessage.AppendFormat("Called unarranged member '{0}' on strict mock of type '{1}'\n",
-					invocation.Method, invocation.Method.DeclaringType);
+					invocation.Member, invocation.Member.DeclaringType);
 
-				throw new StrictMockException(invocation.Method.DeclaringType);
+				throw new StrictMockException(invocation.Member.DeclaringType);
 			}
 		}
 

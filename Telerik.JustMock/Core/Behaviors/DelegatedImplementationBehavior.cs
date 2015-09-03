@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Telerik.JustMock.Core.Behaviors
 {
@@ -34,10 +35,10 @@ namespace Telerik.JustMock.Core.Behaviors
 
 		public void Process(Invocation invocation)
 		{
-			var mockMethod = invocation.Method;
+			var mockMethod = invocation.Member;
 			var inheritanceChain = mockMethod.GetInheritanceChain();
 
-			var delegatedImplMethod = inheritanceChain.FirstOrDefault(method => types.Any(t => method.DeclaringType.IsAssignableFrom(t)));
+			var delegatedImplMethod = inheritanceChain.FirstOrDefault(method => types.Any(t => method.DeclaringType.IsAssignableFrom(t))) as MethodBase;
 			if (delegatedImplMethod != null)
 			{
 				invocation.ReturnValue = delegatedImplMethod.Invoke(implementer, invocation.Args);

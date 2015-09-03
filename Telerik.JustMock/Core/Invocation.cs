@@ -26,7 +26,7 @@ namespace Telerik.JustMock.Core
 	/// </summary>
 	public sealed class Invocation
 	{
-		private MethodBase method;
+		private MemberInfo member;
 
 		private object returnValue;
 		private bool isReturnValueSet;
@@ -65,15 +65,28 @@ namespace Telerik.JustMock.Core
 
 		internal IMockMixin MockMixin { get; private set; }
 
-		internal Invocation(object instance, MethodBase method, object[] args)
+		internal Type ReturnType
+		{
+			get
+			{
+				var asField = member as FieldInfo;
+				if (asField != null)
+					return Args.Length == 0 ? asField.FieldType : typeof(void);
+
+				var asMethod = member as MethodInfo;
+				return asMethod != null ? asMethod.ReturnType : typeof(void);
+			}
+		}
+
+		internal Invocation(object instance, MemberInfo member, object[] args)
 		{
 			this.Instance = instance;
-			this.Method = method;
+			this.Member = member;
 			this.Args = args;
 
-			this.MockMixin = method.IsExtensionMethod() && args.Length >= 1
+			this.MockMixin = member.IsExtensionMethod() && args.Length >= 1
 				? MocksRepository.GetMockMixin(args[0], null)
-				: MocksRepository.GetMockMixin(instance, method.DeclaringType);
+				: MocksRepository.GetMockMixin(instance, member.DeclaringType);
 		}
 
 		internal void ThrowExceptionIfNecessary()
@@ -82,17 +95,18 @@ namespace Telerik.JustMock.Core
 				ExceptionThrower();
 		}
 
-		internal MethodBase Method
+		internal MemberInfo Member
 		{
 			get
 			{
-				return this.method;
+				return this.member;
 			}
 			private set
 			{
-				if (value != null)
+				var asMethod = value as MethodBase;
+				if (asMethod != null)
 				{
-					if (value.ContainsGenericParameters)
+					if (asMethod.ContainsGenericParameters)
 						throw new ArgumentException("Invocation method must be a concrete method");
 				}
 
@@ -100,14 +114,14 @@ namespace Telerik.JustMock.Core
 				if (asMethodInfo != null)
 					value = asMethodInfo.NormalizeComInterfaceMethod();
 
-				this.method = value;
+				this.member = value;
 			}
 		}
 
 		internal string InputToString()
 		{
 			var sb = new StringBuilder();
-			sb.AppendFormat("{0}.{1}(", Instance != null ? MockingUtil.GetUnproxiedType(Instance) : method.DeclaringType, method.Name);
+			sb.AppendFormat("{0}.{1}(", Instance != null ? MockingUtil.GetUnproxiedType(Instance) : member.DeclaringType, member.Name);
 			sb.Append(", ".Join(Args));
 			sb.Append(")");
 			return sb.ToString();
