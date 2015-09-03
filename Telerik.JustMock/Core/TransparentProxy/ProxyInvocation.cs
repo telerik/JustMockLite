@@ -59,6 +59,14 @@ namespace Telerik.JustMock.Core.TransparentProxy
 
 		public void Proceed()
 		{
+			var method = this.message.MethodBase;
+			var signature = this.message.MethodSignature as Type[];
+			if (method.Name == "Equals" && signature.Length == 1 && signature[0] == typeof(object))
+			{
+				this.ReturnValue = ReferenceEquals(this.proxy.GetTransparentProxy(), this.message.Args[0]);
+				return;
+			}
+
 			var returnMsg = RemotingServices.ExecuteMessage(this.proxy.WrappedInstance, this.message);
 			if (returnMsg.Exception != null)
 			{

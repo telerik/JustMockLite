@@ -156,5 +156,15 @@ namespace Telerik.JustMock.Tests
 			mock.CallDo();
 			Mock.Assert(() => mock.Do());
 		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+		public void ShouldAssertMarshalByRefMocksSelfEqual()
+		{
+			var mock = Mock.Create<LikeStream>();
+			Assert.True(mock.Equals(mock));
+
+			Mock.Arrange(() => mock.Equals(mock)).Returns(false);
+			Assert.False(mock.Equals(mock));
+		}
 	}
 }
