@@ -48,12 +48,12 @@ namespace Telerik.JustMock.Core
 			throw new NotSupportedException();
 		}
 
-		public static void RegisterGlobalInterceptor(MethodBase method, MocksRepository repo)
+		public static void RegisterGlobalInterceptor(MemberInfo member, MocksRepository repo)
 		{
 			throw new NotSupportedException();
 		}
 
-		public static void UnregisterGlobalInterceptor(MethodBase method, MocksRepository repo)
+		public static void UnregisterGlobalInterceptor(MemberInfo member, MocksRepository repo)
 		{
 			throw new NotSupportedException();
 		}
