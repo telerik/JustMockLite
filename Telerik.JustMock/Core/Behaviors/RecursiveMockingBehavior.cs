@@ -48,16 +48,15 @@ namespace Telerik.JustMock.Core.Behaviors
 
 		public void Process(Invocation invocation)
 		{
-			if (invocation.IsReturnValueSet)
-				return;
-			var returnType = invocation.ReturnType;
-
-			if (invocation.Member is FieldInfo && returnType.IsValueType)
+			if (invocation.Member is FieldInfo)
 			{
 				invocation.CallOriginal = true;
 				return;
 			}
 
+			if (invocation.IsReturnValueSet)
+				return;
+			var returnType = invocation.ReturnType;
 			if (returnType == typeof(void) || returnType.IsValueType)
 				return;
 
