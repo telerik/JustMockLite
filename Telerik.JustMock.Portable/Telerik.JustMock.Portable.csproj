@@ -229,6 +229,9 @@
     <Compile Include="..\Telerik.JustMock\Core\IMockFactory.cs">
       <Link>Core\IMockFactory.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\InstrumentationOptions.cs">
+      <Link>Core\InstrumentationOptions.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Core\Invocation.cs">
       <Link>Core\Invocation.cs</Link>
     </Compile>

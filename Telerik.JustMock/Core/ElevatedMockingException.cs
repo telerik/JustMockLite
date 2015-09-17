@@ -30,8 +30,13 @@ namespace Telerik.JustMock.Core
 #if LITE_EDITION
  " JustMock Lite can only mock interface members, virtual/abstract members in non-sealed classes, delegates and all members on classes derived from MarshalByRefObject on instances created with Mock.Create or Mock.CreateLike. For any other scenario you need to use the full version of JustMock.";
 #else
-			" The profiler must be enabled to mock, arrange or execute the specified target.";
+ " The profiler must be enabled to mock, arrange or execute the specified target.";
 #endif
+
+		internal ElevatedMockingException(InstrumentationOptions requiredOption, MemberInfo target)
+			: this(String.Format("Mocking of member '{0}' is not enabled. Define an environment variable called JUSTMOCK_OPTIONS with value containing the word '{1}'.",
+				target, OptionNameAttribute.NameFromOption(requiredOption)))
+		{ }
 
 		internal ElevatedMockingException(MemberInfo target)
 			: this(String.Format("Cannot mock '{0}'.", target))

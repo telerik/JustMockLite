@@ -1060,13 +1060,10 @@ namespace Telerik.JustMock.Core
 				if (binary.Left is MemberExpression)
 				{
 					var memberExpr = (MemberExpression)binary.Left;
-					if (!(memberExpr.Member is PropertyInfo))
-						throw new MockException("Fields cannot be mocked, only properties.");
-
-					var property = (PropertyInfo)memberExpr.Member;
 					target = memberExpr.Expression;
-					member = property.GetSetMethod(true);
 					args = new[] { binary.Right };
+					var property = memberExpr.Member as PropertyInfo;
+					member = property != null ? property.GetSetMethod(true) : memberExpr.Member;
 				}
 				else if (binary.Left is IndexExpression)
 				{
@@ -1085,7 +1082,7 @@ namespace Telerik.JustMock.Core
 				member = property.GetGetMethod(true);
 				args = index.Arguments.ToArray();
 			}
-			else throw new MockException("The expression does not represent a method call, property access, new expression or a delegate invocation.");
+			else throw new MockException("The expression does not represent a method call, field access, property access, new expression or a delegate invocation.");
 
 			// Create the matcher for the instance part of the call pattern.
 			// If the base of the target expression is a new expression (new T()),
@@ -1196,7 +1193,7 @@ namespace Telerik.JustMock.Core
 
 			if (callPattern.InstanceMatcher != null && prevToRoot != expr && prevToRoot != null)
 			{
-				throw new MockException("Using a matcher for the root member together with recursive mocking is not supported. Arrange the property or method of the root member in a separate statement.");
+				throw new MockException("Using a matcher for the root member together with recursive mocking is not supported. Arrange the field, property or method of the root member in a separate statement.");
 			}
 
 			if (callPattern.InstanceMatcher == null)
@@ -1423,14 +1420,14 @@ namespace Telerik.JustMock.Core
 
 		private void AddArrange(IMethodMock methodMock)
 		{
-			var method = methodMock.CallPattern.Member;
+			var member = methodMock.CallPattern.Member;
 
-			if (methodMock.CallPattern.IsDerivedFromObjectEquals && method.ReflectedType.IsValueType())
+			if (methodMock.CallPattern.IsDerivedFromObjectEquals && member.ReflectedType.IsValueType())
 				throw new MockException("Cannot mock Equals method because JustMock depends on it. Also, when Equals is called internally by JustMock, all methods called by it will not be intercepted and will have only their original implementations called.");
 
-			CheckMethodInterceptorAvailable(methodMock.CallPattern.InstanceMatcher, method);
+			CheckMemberInterceptorAvailable(methodMock.CallPattern.InstanceMatcher, member);
 
-			Type declaringType = method.DeclaringType;
+			Type declaringType = member.DeclaringType;
 
 			// If we're arranging a call to a mock object, overwrite its repository.
 			// This will ensure correct behavior when a mock object is arranged
@@ -1456,19 +1453,24 @@ namespace Telerik.JustMock.Core
 			ConstructorMockBehavior.Attach(methodMock);
 
 			MethodInfoMatcherTreeNode funcRoot;
-			if (!arrangementTreeRoots.TryGetValue(method, out funcRoot))
+			if (!arrangementTreeRoots.TryGetValue(member, out funcRoot))
 			{
-				funcRoot = new MethodInfoMatcherTreeNode(method);
-				arrangementTreeRoots.Add(method, funcRoot);
+				funcRoot = new MethodInfoMatcherTreeNode(member);
+				arrangementTreeRoots.Add(member, funcRoot);
 			}
 
 			funcRoot.AddChild(methodMock.CallPattern, methodMock, this.sharedContext.GetNextArrangeId());
 		}
 
-		private void CheckMethodInterceptorAvailable(IMatcher instanceMatcher, MemberInfo member)
+		private void CheckMemberInterceptorAvailable(IMatcher instanceMatcher, MemberInfo member)
 		{
 			if (ProfilerInterceptor.IsProfilerAttached)
+			{
+				if (member is FieldInfo)
+					ProfilerInterceptor.RequireInstrumentationOption(InstrumentationOptions.ioFieldMocking, member);
+
 				return;
+			}
 
 			var valueMatcher = instanceMatcher as IValueMatcher;
 			if (valueMatcher == null)
@@ -1477,12 +1479,11 @@ namespace Telerik.JustMock.Core
 			var instance = valueMatcher.Value;
 			if (instance == null)
 				return;
-
 			var method = member as MethodBase;
 			if (method == null
-				|| !MockingProxy.CanIntercept(instance, method)
-				|| !(instance is IMockMixin)
-				|| !method.IsInheritable())
+				|| (!MockingProxy.CanIntercept(instance, method)
+					&& (!(instance is IMockMixin)
+						|| !method.IsInheritable())))
 				ProfilerInterceptor.ThrowElevatedMockingException(method);
 		}
 
@@ -1541,11 +1542,13 @@ namespace Telerik.JustMock.Core
 
 			foreach (var funcRoot in arrangementTreeRoots.Values.Where(rootMatcher))
 			{
-				var callPattern = CallPattern.CreateUniversalCallPattern(funcRoot.MemberInfo);
-				callPattern.InstanceMatcher = instanceMatcher;
+				foreach (var callPattern in CallPattern.CreateUniversalCallPatterns(funcRoot.MemberInfo))
+				{
+					callPattern.InstanceMatcher = instanceMatcher;
 
-				var results = funcRoot.GetAllMethodMocks(callPattern);
-				methodMocks.AddRange(results);
+					var results = funcRoot.GetAllMethodMocks(callPattern);
+					methodMocks.AddRange(results);
+				}
 			}
 
 			if (mock != null)
@@ -1675,7 +1678,7 @@ namespace Telerik.JustMock.Core
 			else
 			{
 				nodes = from kvp in this.arrangementTreeRoots
-						let universalCP = CallPattern.CreateUniversalCallPattern(kvp.Key)
+						from universalCP in CallPattern.CreateUniversalCallPatterns(kvp.Key)
 						from node in kvp.Value.GetAllMethodMocks(universalCP)
 						select node;
 			}
@@ -1703,7 +1706,7 @@ namespace Telerik.JustMock.Core
 			sb.AppendLine("\nInvocations:");
 			var invocations =
 				(from kvp in this.invocationTreeRoots
-				 let universalCP = CallPattern.CreateUniversalCallPattern(kvp.Key)
+				 from universalCP in CallPattern.CreateUniversalCallPatterns(kvp.Key)
 				 from node in kvp.Value.GetOccurences(universalCP)
 				 select node).ToList();
 

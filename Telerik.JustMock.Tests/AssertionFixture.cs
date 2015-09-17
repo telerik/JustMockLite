@@ -327,20 +327,6 @@ namespace Telerik.JustMock.Tests
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
-		public void ShouldThrowForNonSpecificLambdaCallsOnAssert()
-		{
-			var foo = Mock.Create<IFoo>();
-
-			Mock.Arrange(() => foo.Echo(1)).Returns(2);
-
-			foo.Echo(1);
-
-			Assert.Throws<MockException>(() => Mock.Assert(() => foo));
-
-			Mock.Assert(foo);
-		}
-
-		[TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
 		public void ShouldAssertPropertySetUsingAssertable()
 		{
 			var foo = Mock.Create<IFoo>();

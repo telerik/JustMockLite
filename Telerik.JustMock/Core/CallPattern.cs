@@ -171,16 +171,28 @@ namespace Telerik.JustMock.Core
 			return newCallPattern;
 		}
 
-		internal static CallPattern CreateUniversalCallPattern(MemberInfo member)
+		internal static IEnumerable<CallPattern> CreateUniversalCallPatterns(MemberInfo member)
 		{
-			/// TODO: cannot create universal CP for both field load and store
 			var result = new CallPattern();
 			result.SetMethod(member, checkCompatibility: true);
 			result.InstanceMatcher = new AnyMatcher();
-			var paramCount = member is MethodBase ? ((MethodBase)member).GetParameters().Length : 0;
-			result.ArgumentMatchers.AddRange(Enumerable.Repeat((IMatcher)new AnyMatcher(), paramCount));
-			result.AdjustForExtensionMethod();
-			return result;
+
+			var asMethod = member as MethodBase;
+			if (asMethod != null)
+			{
+				var paramCount = asMethod.GetParameters().Length;
+				result.ArgumentMatchers.AddRange(Enumerable.Repeat((IMatcher)new AnyMatcher(), paramCount));
+				result.AdjustForExtensionMethod();
+				yield return result;
+			}
+
+			var asField = member as FieldInfo;
+			if (asField != null)
+			{
+				yield return result;
+				result.ArgumentMatchers.Add(new AnyMatcher());
+				yield return result;
+			}
 		}
 
 		internal void AdjustForExtensionMethod()

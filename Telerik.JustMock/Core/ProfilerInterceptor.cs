@@ -280,6 +280,8 @@ namespace Telerik.JustMock.Core
 					var arrangedTypesField = bridge.GetField("ArrangedTypesArray");
 					arrangedTypesField.SetValue(null, arrangedTypesArray);
 
+					instrumentationOptions = (InstrumentationOptions)(int)bridge.GetMethod("GetInstrumentationOptions").Invoke(null, null);
+
 					IsInterceptionSetup = true;
 				}
 			}
@@ -621,12 +623,14 @@ namespace Telerik.JustMock.Core
 			}
 		}
 
-		public static void ThrowElevatedMockingException(MemberInfo member = null)
+		public static void ThrowElevatedMockingException(MemberInfo member = null, InstrumentationOptions? options = null)
 		{
 			var marker = typeof(object).Assembly.GetType("Telerik.JustMock.TrialExpiredMarker");
 			if (marker == null)
 			{
-				var ex = member != null ? new ElevatedMockingException(member) : new ElevatedMockingException();
+				var ex = options != null ? new ElevatedMockingException(options.Value, member)
+					: member != null ? new ElevatedMockingException(member)
+					: new ElevatedMockingException();
 				throw ex;
 			}
 			else
@@ -668,5 +672,15 @@ namespace Telerik.JustMock.Core
 			Debug.Assert(skipMethodInterceptionOnce == null || skipMethodInterceptionOnce == method);
 			skipMethodInterceptionOnce = method;
 		}
+
+		internal static void RequireInstrumentationOption(InstrumentationOptions option, MemberInfo member)
+		{
+			if (!IsProfilerAttached)
+				ThrowElevatedMockingException(member);
+			if ((instrumentationOptions & option) == 0)
+				ThrowElevatedMockingException(member, option);
+		}
+
+		private static InstrumentationOptions instrumentationOptions;
 	}
 }

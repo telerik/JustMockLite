@@ -50,8 +50,14 @@ namespace Telerik.JustMock.Core.Behaviors
 		{
 			if (invocation.IsReturnValueSet)
 				return;
-
 			var returnType = invocation.ReturnType;
+
+			if (invocation.Member is FieldInfo && returnType.IsValueType)
+			{
+				invocation.CallOriginal = true;
+				return;
+			}
+
 			if (returnType == typeof(void) || returnType.IsValueType)
 				return;
 

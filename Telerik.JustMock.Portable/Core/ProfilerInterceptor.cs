@@ -78,6 +78,11 @@ namespace Telerik.JustMock.Core
 		{
 		}
 
+		public static void RequireInstrumentationOption(InstrumentationOptions options, MemberInfo member)
+		{
+			throw new NotSupportedException();
+		}
+
 		public static bool TypeSupportsInstrumentation(Type type)
 		{
 			return false;

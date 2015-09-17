@@ -62,7 +62,7 @@ namespace Telerik.JustMock.Core.MatcherTree
 
 		protected void AddChildInternal(CallPattern callPattern, int depth, MatcherTreeNode leaf)
 		{
-			if (depth == callPattern.ArgumentMatchers.Count+1)
+			if (depth == callPattern.ArgumentMatchers.Count + 1)
 			{
 				this.Children.Add(leaf);
 				leaf.Parent = this;
@@ -73,14 +73,14 @@ namespace Telerik.JustMock.Core.MatcherTree
 			var found = this.GetMatchingChild(matcher, MatchingOptions.Exact, depth);
 			if (found != null)
 			{
-				found.AddChildInternal(callPattern, depth+1, leaf);
+				found.AddChildInternal(callPattern, depth + 1, leaf);
 			}
 			else
 			{
 				var node = new MatcherTreeNode(matcher);
 				Children.Add(node);
 				node.Parent = this;
-				node.AddChildInternal(callPattern, depth+1, leaf);
+				node.AddChildInternal(callPattern, depth + 1, leaf);
 			}
 		}
 
@@ -88,16 +88,19 @@ namespace Telerik.JustMock.Core.MatcherTree
 		{
 			if (depth == callPattern.ArgumentMatchers.Count + 1)
 			{
-				var resultNode = this.Children.Select(x => x as MethodMockMatcherTreeNode).ToList();
-				results.AddRange(resultNode);
-
-				foreach (var result in resultNode)
+				var resultNode = this.Children.OfType<MethodMockMatcherTreeNode>().ToList();
+				if (resultNode.Count != 0)
 				{
-					DebugView.TraceEvent(IndentLevel.Matcher, () => String.Format("Found candidate arrangement (id={0}) {1} {2}",
-						result.Id, result.MethodMock.ArrangementExpression,
-						result.MethodMock.IsSequential ? String.Format("(in sequence, used: {0})", result.MethodMock.IsUsed ? "yes" : "no") : ""));
-				}
+					results.AddRange(resultNode);
 
+					foreach (var result in resultNode)
+					{
+						DebugView.TraceEvent(IndentLevel.Matcher, () => String.Format("Found candidate arrangement (id={0}) {1} {2}",
+							result.Id, result.MethodMock.ArrangementExpression,
+							result.MethodMock.IsSequential ? String.Format("(in sequence, used: {0})", result.MethodMock.IsUsed ? "yes" : "no") : ""));
+					}
+
+				}
 				return;
 			}
 
@@ -112,12 +115,15 @@ namespace Telerik.JustMock.Core.MatcherTree
 
 		protected void AddOrUpdateOccurenceInternal(CallPattern callPattern, int depth, IMethodMock mock)
 		{
-			if (depth == callPattern.ArgumentMatchers.Count+1)
+			if (depth == callPattern.ArgumentMatchers.Count + 1)
 			{
 				var resultNode = this.Children.FirstOrDefault() as OccurrencesMatcherTreeNode;
-				if(mock != null)
-					resultNode.Mocks.Add(mock);
-				resultNode.Calls++;
+				if (resultNode != null)
+				{
+					if (mock != null)
+						resultNode.Mocks.Add(mock);
+					resultNode.Calls++;
+				}
 				return;
 			}
 
@@ -136,19 +142,19 @@ namespace Telerik.JustMock.Core.MatcherTree
 
 		protected void GetOccurencesInternal(CallPattern callPattern, int depth, List<OccurrencesMatcherTreeNode> results)
 		{
-			if (depth == callPattern.ArgumentMatchers.Count+1)
+			if (depth == callPattern.ArgumentMatchers.Count + 1)
 			{
-				var resultNode = this.Children.Cast<OccurrencesMatcherTreeNode>()
+				var resultNode = this.Children.OfType<OccurrencesMatcherTreeNode>()
 					.Where(node => NodeMatchesFilter(callPattern, node));
 				results.AddRange(resultNode);
 				return;
 			}
 
-			var matcher = depth == 0 ? callPattern.InstanceMatcher : callPattern.ArgumentMatchers[depth-1];
+			var matcher = depth == 0 ? callPattern.InstanceMatcher : callPattern.ArgumentMatchers[depth - 1];
 			var children = this.GetMatchingChildren(matcher, MatchingOptions.Concretizing, depth);
 			foreach (var child in children)
 			{
-				child.GetOccurencesInternal(callPattern, depth+1, results);
+				child.GetOccurencesInternal(callPattern, depth + 1, results);
 			}
 		}
 
@@ -182,7 +188,7 @@ namespace Telerik.JustMock.Core.MatcherTree
 			MockingUtil.BindToMethod(MockingUtil.Default, new[] { filter.Method }, ref argsArray, null, null, null, out state);
 
 			var filterFunc = MockingUtil.MakeFuncCaller(filter);
-			var isMatch = (bool) ProfilerInterceptor.GuardExternal(() => filterFunc(argsArray, filter));
+			var isMatch = (bool)ProfilerInterceptor.GuardExternal(() => filterFunc(argsArray, filter));
 
 			DebugView.TraceEvent(IndentLevel.Matcher, () => String.Format("Matcher predicate {0} call to {2} with arguments ({1})",
 				isMatch ? "passed" : "rejected", String.Join(", ", args.Select(x => x.ToString()).ToArray()),
@@ -193,14 +199,15 @@ namespace Telerik.JustMock.Core.MatcherTree
 
 		private IEnumerable<MatcherTreeNode> GetMatchingChildren(IMatcher matcher, MatchingOptions options, int depth)
 		{
+			var matchableChildren = this.Children.Where(child => child.Matcher != null);
 			switch (options)
 			{
 				case MatchingOptions.Concretizing:
-					return this.Children.Where(child => TraceMatch(matcher, child.Matcher, depth)).Cast<MatcherTreeNode>();
+					return matchableChildren.Where(child => TraceMatch(matcher, child.Matcher, depth)).Cast<MatcherTreeNode>();
 				case MatchingOptions.Generalizing:
-					return this.Children.Where(child => TraceMatch(child.Matcher, matcher, depth)).Cast<MatcherTreeNode>();
+					return matchableChildren.Where(child => TraceMatch(child.Matcher, matcher, depth)).Cast<MatcherTreeNode>();
 				case MatchingOptions.Exact:
-					return this.Children.Where(child => child.Matcher.Equals(matcher)).Cast<MatcherTreeNode>();
+					return matchableChildren.Where(child => child.Matcher.Equals(matcher)).Cast<MatcherTreeNode>();
 				default:
 					throw new ArgumentException("options");
 			}
