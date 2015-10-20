@@ -1189,6 +1189,8 @@ namespace Telerik.JustMock.Core
 					}
 				}
 			}
+			if (targetMockObject != null)
+				targetMockType = targetMockObject.GetType();
 
 			if (callPattern.InstanceMatcher != null && prevToRoot != expr && prevToRoot != null)
 			{
