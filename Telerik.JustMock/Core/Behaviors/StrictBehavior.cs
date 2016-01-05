@@ -38,7 +38,8 @@ namespace Telerik.JustMock.Core.Behaviors
 			if (!invocation.UserProvidedImplementation
 				&& !invocation.Recording
 				&& (invocation.Method.GetReturnType() != typeof(void) || !throwOnlyOnValueReturningMethods)
-				&& !(invocation.Method is ConstructorInfo))
+				&& !(invocation.Method is ConstructorInfo)
+				&& !invocation.InArrange)
 			{
 				if (strictnessViolationMessage == null)
 					strictnessViolationMessage = new StringBuilder();
