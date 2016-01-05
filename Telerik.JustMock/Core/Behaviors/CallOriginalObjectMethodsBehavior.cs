@@ -24,12 +24,19 @@ namespace Telerik.JustMock.Core.Behaviors
 	{
 		public void Process(Invocation invocation)
 		{
-			if (invocation.Method.IsVirtual
-				&& typeof(object).GetMethods().Any(method =>
-					method.Name == invocation.Method.Name
-					&& method.ReturnType == invocation.Method.GetReturnType()
-					&& method.GetParameters().Select(p => p.ParameterType).SequenceEqual(invocation.Method.GetParameters().Select(p => p.ParameterType))
-				))
+			var method = invocation.Method;
+			var isObjectMethod = method.IsVirtual
+				&& typeof(object).GetMethods().Any(m =>
+					m.Name == method.Name
+					&& m.ReturnType == method.GetReturnType()
+					&& m.GetParameters().Select(p => p.ParameterType).SequenceEqual(method.GetParameters().Select(p => p.ParameterType))
+				);
+
+			var isGetType = method.Name == "GetType"
+				&& method.GetReturnType() == typeof(Type)
+				&& method.GetParameters().Length == 0;
+
+			if (isObjectMethod || isGetType)
 			{
 				invocation.CallOriginal = true;
 				invocation.UserProvidedImplementation = true;
