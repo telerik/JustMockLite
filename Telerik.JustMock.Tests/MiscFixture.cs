@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Net;
+using Telerik.JustMock.Core;
 
 #if !COREFX
 using Telerik.JustMock.DemoLib;
@@ -997,6 +998,31 @@ namespace Telerik.JustMock.Tests
 		public interface IMyClass
 		{
 			IEnumerable<string> GetValuesSince(DateTime since);
+		}
+	}
+
+	[TestClass]
+	public class MockingContextFixture
+	{
+		private bool doCheck;
+
+		[TestMethod]
+		public void ShouldDisallowCallingOfTestMethodFromAnotherInner()
+		{
+			if (!doCheck)
+				return;
+
+			var ex = Assert.Throws<MockException>(() => Mock.Create<object>());
+			var expected = "Calling one test method from another results in unexpected behavior and must be avoided. Extract common mocking logic in a non-test method.";
+			Assert.Equal(expected, ex.Message);
+		}
+
+		[TestMethod]
+		public void ShouldDisallowCallingOfTestMethodFromAnother()
+		{
+			doCheck = true;
+			ShouldDisallowCallingOfTestMethodFromAnotherInner();
+			doCheck = false;
 		}
 	}
 }

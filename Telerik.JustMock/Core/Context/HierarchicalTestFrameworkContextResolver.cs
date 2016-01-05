@@ -110,7 +110,17 @@ namespace Telerik.JustMock.Core.Context
 			var q = from method in stackTrace.EnumerateFrames()
 					where repoOperations.Any(repo => repo.MatchesMethod(method))
 					select method;
-			var testMethod = q.FirstOrDefault();
+
+			MethodBase testMethod;
+			try
+			{
+				testMethod = q.SingleOrDefault();
+			}
+			catch (InvalidOperationException)
+			{
+				throw new MockException("Calling one test method from another could result in unexpected behavior and must be avoided. Extract common mocking logic in a non-test method.");
+			}
+
 			if (testMethod != null)
 			{
 				var disableAttr = Attribute.GetCustomAttribute(testMethod, typeof(DisableAutomaticRepositoryResetAttribute)) as DisableAutomaticRepositoryResetAttribute;
