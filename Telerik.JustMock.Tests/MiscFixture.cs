@@ -1013,7 +1013,7 @@ namespace Telerik.JustMock.Tests
 				return;
 
 			var ex = Assert.Throws<MockException>(() => Mock.Create<object>());
-			var expected = "Calling one test method from another results in unexpected behavior and must be avoided. Extract common mocking logic in a non-test method.";
+			var expected = "Calling one test method from another could result in unexpected behavior and must be avoided. Extract common mocking logic in a non-test method.";
 			Assert.Equal(expected, ex.Message);
 		}
 

@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -490,6 +491,41 @@ namespace Telerik.JustMock.Tests
 		{
 			var mock = Mock.Create<NonPublicOverloads>();
 			Assert.Throws<MissingMemberException>(() => Mock.NonPublic.Arrange<int>(mock, "Overloaded"));
+		}
+
+		public abstract class GenericTest
+		{
+			protected abstract T Do<T>(T x);
+
+			protected abstract IEnumerable<T> Enumerate<T>();
+
+			public int TestDo()
+			{
+				return Do(10);
+			}
+
+			public IEnumerable<int> TestEnumerate()
+			{
+				return Enumerate<int>();
+			}
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
+		public void ShouldArrangeNonPublicMethodReturningGenericValue()
+		{
+			var mock = Mock.Create<GenericTest>(Behavior.CallOriginal);
+			Mock.NonPublic.Arrange<int>(mock, "Do", ArgExpr.IsAny<int>()).Returns(123);
+			Assert.Equal(123, mock.TestDo());
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
+		public void ShouldArrangeNonPublicMethodReturningGenericValueComplexType()
+		{
+			var mock = Mock.Create<GenericTest>(Behavior.CallOriginal);
+			Mock.NonPublic.Arrange<IEnumerable<int>>(mock, "Enumerate").Returns(new[] { 123 });
+			var actual = mock.TestEnumerate().ToArray();
+			Assert.Equal(1, actual.Length);
+			Assert.Equal(123, actual[0]);
 		}
 	}
 }

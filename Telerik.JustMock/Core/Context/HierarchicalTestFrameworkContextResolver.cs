@@ -114,7 +114,7 @@ namespace Telerik.JustMock.Core.Context
 			MethodBase testMethod;
 			try
 			{
-				testMethod = q.SingleOrDefault();
+				testMethod = q.Distinct().SingleOrDefault();
 			}
 			catch (InvalidOperationException)
 			{

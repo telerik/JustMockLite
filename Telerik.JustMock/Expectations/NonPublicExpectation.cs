@@ -33,7 +33,9 @@ namespace Telerik.JustMock.Expectations
 	{
 		private static bool ReturnTypeMatches(Type returnType, MethodInfo method)
 		{
-			return returnType == null || method.ReturnType == returnType || (method.ReturnType.IsPointer && returnType == typeof(IntPtr));
+			return returnType == null
+				|| method.ReturnType == returnType
+				|| (method.ReturnType.IsPointer && returnType == typeof(IntPtr));
 		}
 
 		private static MethodInfo GetMethodByName(Type type, Type returnType, string memberName, ref object[] args)
@@ -47,6 +49,21 @@ namespace Telerik.JustMock.Expectations
 					.Where(p => p.Name == memberName)
 					.SelectMany(p => new[] { p.GetGetMethod(true), p.GetSetMethod(true) })
 					.Where(m => m != null))
+				.Select(m =>
+					{
+						if (m.IsGenericMethodDefinition
+							&& returnType != typeof(void)
+							&& m.GetGenericArguments().Length == 1
+							&& m.ReturnType.ContainsGenericParameters)
+						{
+							var generics = new Dictionary<Type, Type>();
+							if (MockingUtil.GetGenericsTypesFromActualType(m.ReturnType, returnType, generics))
+							{
+								return m.MakeGenericMethod(generics.Values.Single());
+							}
+						}
+						return m;
+					})
 				.ToArray();
 
 			MethodInfo mockedMethod = null;
