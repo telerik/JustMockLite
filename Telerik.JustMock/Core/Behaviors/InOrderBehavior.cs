@@ -23,7 +23,7 @@ namespace Telerik.JustMock.Core.Behaviors
 {
 	internal class InOrderBehavior : IAssertableBehavior
 	{
-		private readonly IMockMixin mock;
+		private readonly MocksRepository repository;
 		private readonly int arrangementId;
 		private readonly string message;
 		private bool calledInWrongOrder = false;
@@ -34,29 +34,29 @@ namespace Telerik.JustMock.Core.Behaviors
 			get { return String.Format("{0}: in-order execution expectation. {1}", IsExpectationMet ? "Met" : "Unmet", this.message ?? ""); }
 		}
 
-		public InOrderBehavior(IMockMixin mock, string message)
+		public InOrderBehavior(MocksRepository repository, string message)
 		{
-			this.mock = mock;
+			this.repository = repository;
 			this.arrangementId = InOrderArrangementCount++;
 			this.message = message;
 		}
 
 		private int InOrderArrangementCount
 		{
-			get { return this.mock.Repository.GetValue<int>(typeof(InOrderBehavior), "count", 0); }
-			set { this.mock.Repository.StoreValue(typeof(InOrderBehavior), "count", value); }
+			get { return this.repository.GetValue<int>(typeof(InOrderBehavior), "count", 0); }
+			set { this.repository.StoreValue(typeof(InOrderBehavior), "count", value); }
 		}
 
 		private int LastIdInOrder
 		{
-			get { return this.mock.Repository.GetValue<int>(typeof(InOrderBehavior), "id", -1); }
-			set { this.mock.Repository.StoreValue(typeof(InOrderBehavior), "id", value); }
+			get { return this.repository.GetValue<int>(typeof(InOrderBehavior), "id", -1); }
+			set { this.repository.StoreValue(typeof(InOrderBehavior), "id", value); }
 		}
 
 		private string InOrderExecutionLog
 		{
-			get { return this.mock.Repository.GetValue<string>(typeof(InOrderBehavior), "log", null); }
-			set { this.mock.Repository.StoreValue<string>(typeof(InOrderBehavior), "log", value); }
+			get { return this.repository.GetValue<string>(typeof(InOrderBehavior), "log", null); }
+			set { this.repository.StoreValue<string>(typeof(InOrderBehavior), "log", value); }
 		}
 
 		private string InOrderExecutionMessage

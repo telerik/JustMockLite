@@ -166,5 +166,11 @@ namespace Telerik.JustMock.Tests
 			void Save();
 			void CommitChanges();
 		}
+
+		[TestMethod]
+		public void ShouldCreateInOrderArrangementOnNonMock()
+		{
+			Mock.Arrange(() => Arg.IsAny<List<string>>().Add("a")).InOrder();
+		}
 	}
 }
