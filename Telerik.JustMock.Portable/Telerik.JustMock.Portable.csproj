@@ -325,6 +325,9 @@
     <Compile Include="..\Telerik.JustMock\Core\SourceLanguage.cs">
       <Link>Core\SourceLanguage.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\StrictMockException.cs">
+      <Link>Core\StrictMockException.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Core\ThreadLocalProperty.cs">
       <Link>Core\ThreadLocalProperty.cs</Link>
     </Compile>
