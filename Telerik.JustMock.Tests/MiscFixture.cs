@@ -1004,25 +1004,18 @@ namespace Telerik.JustMock.Tests
 	[TestClass]
 	public class MockingContextFixture
 	{
-		private bool doCheck;
-
 		[TestMethod]
 		public void ShouldDisallowCallingOfTestMethodFromAnotherInner()
 		{
-			if (!doCheck)
-				return;
-
-			var ex = Assert.Throws<MockException>(() => Mock.Create<object>());
-			var expected = "Calling one test method from another could result in unexpected behavior and must be avoided. Extract common mocking logic in a non-test method.";
-			Assert.Equal(expected, ex.Message);
+			Mock.Create<object>();
 		}
 
 		[TestMethod]
 		public void ShouldDisallowCallingOfTestMethodFromAnother()
 		{
-			doCheck = true;
-			ShouldDisallowCallingOfTestMethodFromAnotherInner();
-			doCheck = false;
+			var ex = Assert.Throws<MockException>(() => ShouldDisallowCallingOfTestMethodFromAnotherInner());
+			var expected = "Calling one test method from another could result in unexpected behavior and must be avoided. Extract common mocking logic in a non-test method.";
+			Assert.Equal(expected, ex.Message);
 		}
 	}
 }
