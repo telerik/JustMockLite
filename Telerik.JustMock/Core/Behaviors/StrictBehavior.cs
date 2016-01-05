@@ -24,6 +24,11 @@ namespace Telerik.JustMock.Core.Behaviors
 {
 	internal class StrictBehavior : IAssertableBehavior
 	{
+		private static readonly string MissingReturnValueMessage =
+			"Member '{0}' on strict mock of type '{1}' has a non-void return value but no return value given in arrangement.\n";
+		private static readonly string GenericErrorMessage =
+			"Called unarranged member '{0}' on strict mock of type '{1}'\n";
+
 		private readonly bool throwOnlyOnValueReturningMethods;
 
 		private StringBuilder strictnessViolationMessage;
@@ -43,10 +48,11 @@ namespace Telerik.JustMock.Core.Behaviors
 			{
 				if (strictnessViolationMessage == null)
 					strictnessViolationMessage = new StringBuilder();
-				strictnessViolationMessage.AppendFormat("Called unarranged member '{0}' on strict mock of type '{1}'\n",
+				strictnessViolationMessage.AppendFormat(
+					throwOnlyOnValueReturningMethods ? MissingReturnValueMessage : GenericErrorMessage,
 					invocation.Method, invocation.Method.DeclaringType);
 
-				throw new StrictMockException(invocation.Method.DeclaringType);
+				throw new StrictMockException(strictnessViolationMessage.ToString());
 			}
 		}
 
@@ -64,20 +70,6 @@ namespace Telerik.JustMock.Core.Behaviors
 					? "Strict mock violations:\n" + this.strictnessViolationMessage
 					: "Strict mock with no violations";
 			}
-		}
-	}
-}
-
-namespace Telerik.JustMock.Core
-{
-	/// <summary>
-	/// Thrown when a strict mock is accessed inappropriately.
-	/// </summary>
-	public sealed class StrictMockException : MockException
-	{
-		internal StrictMockException(MemberInfo member)
-			: base(String.Format("All calls on '{0}' should be arranged first.", member))
-		{
 		}
 	}
 }

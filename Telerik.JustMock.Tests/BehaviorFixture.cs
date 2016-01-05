@@ -70,7 +70,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IFoo>(Behavior.Strict);
 
-			string expected = "All calls on 'Telerik.JustMock.Tests.BehaviorFixture+IFoo' should be arranged first.";
+			string expected = "Called unarranged member 'System.Guid GetGuid()' on strict mock of type 'Telerik.JustMock.Tests.BehaviorFixture+IFoo'";
 			string actual = Assert.Throws<MockException>(() => foo.GetGuid()).Message;
 
 			Assert.Equal(expected, actual);
@@ -157,7 +157,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IFoo>(Behavior.Strict);
 			Mock.Arrange(() => foo.GetString());
-			Assert.Throws<MockException>(() => foo.GetString());
+			Assert.Throws<StrictMockException>(() => foo.GetString());
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
@@ -238,6 +238,16 @@ namespace Telerik.JustMock.Tests
 			var mock = Mock.Create<DontCallOriginal>(Behavior.CallOriginal);
 			Mock.Arrange(() => mock.CallMe()).Returns(1);
 			Assert.Equal(1, mock.CallMe());
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior"), TestCategory("Strict")]
+		public void ShouldRequireReturnValueInStrictMockArrangements()
+		{
+			var mock = Mock.Create<IFoo>(Behavior.Strict);
+			Mock.Arrange(() => mock.GetInt32()).OccursOnce();
+			var strictEx = Assert.Throws<StrictMockException>(() => mock.GetInt32());
+			var expected = "Member 'Int32 GetInt32()' on strict mock of type 'Telerik.JustMock.Tests.BehaviorFixture+IFoo' has a non-void return value but no return value given in arrangement.";
+			Assert.Equal(strictEx.Message, expected);
 		}
 
 		public class DontCallOriginal
