@@ -111,15 +111,12 @@ namespace Telerik.JustMock.Core.Context
 					where repoOperations.Any(repo => repo.MatchesMethod(method))
 					select method;
 
-			MethodBase testMethod;
-			try
+			var allTestMethods = q.Distinct().ToArray();
+			if (allTestMethods.Length > 1)
 			{
-				testMethod = q.Distinct().SingleOrDefault();
+				Debug.WriteLine("Calling one test method from another could result in unexpected behavior and must be avoided. Extract common mocking logic in a non-test method. At:\n" + stackTrace);
 			}
-			catch (InvalidOperationException)
-			{
-				throw new MockException("Calling one test method from another could result in unexpected behavior and must be avoided. Extract common mocking logic in a non-test method.");
-			}
+			var testMethod = allTestMethods.FirstOrDefault();
 
 			if (testMethod != null)
 			{
