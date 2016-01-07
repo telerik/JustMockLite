@@ -1000,22 +1000,4 @@ namespace Telerik.JustMock.Tests
 			IEnumerable<string> GetValuesSince(DateTime since);
 		}
 	}
-
-	[TestClass]
-	public class MockingContextFixture
-	{
-		[TestMethod]
-		public void ShouldDisallowCallingOfTestMethodFromAnotherInner()
-		{
-			Mock.Create<object>();
-		}
-
-		[TestMethod]
-		public void ShouldDisallowCallingOfTestMethodFromAnother()
-		{
-			var ex = Assert.Throws<MockException>(() => ShouldDisallowCallingOfTestMethodFromAnotherInner());
-			var expected = "Calling one test method from another could result in unexpected behavior and must be avoided. Extract common mocking logic in a non-test method.";
-			Assert.Equal(expected, ex.Message);
-		}
-	}
 }

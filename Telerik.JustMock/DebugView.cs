@@ -182,6 +182,8 @@ namespace Telerik.JustMock
 			DynamicProxyMockFactory.SaveAssembly();
 		}
 #endif
+
+		internal static Action<string> DebugTrace = s => System.Diagnostics.Trace.WriteLine(s);
 	}
 }
 
