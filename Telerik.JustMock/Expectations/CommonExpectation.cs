@@ -400,7 +400,7 @@ namespace Telerik.JustMock.Expectations
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 				{
-					this.behaviors.Add(new InOrderBehavior(this.Repository, message));
+					this.behaviors.Add(new InOrderBehavior(this.Repository, this.Mock, message));
 					return this;
 				});
 		}

@@ -23,7 +23,8 @@ namespace Telerik.JustMock.Core.Behaviors
 {
 	internal class InOrderBehavior : IAssertableBehavior
 	{
-		private readonly MocksRepository repository;
+		private readonly MocksRepository originalRepository;
+		private readonly IMockMixin mock;
 		private readonly int arrangementId;
 		private readonly string message;
 		private bool calledInWrongOrder = false;
@@ -34,29 +35,35 @@ namespace Telerik.JustMock.Core.Behaviors
 			get { return String.Format("{0}: in-order execution expectation. {1}", IsExpectationMet ? "Met" : "Unmet", this.message ?? ""); }
 		}
 
-		public InOrderBehavior(MocksRepository repository, string message)
+		public InOrderBehavior(MocksRepository originalRepository, IMockMixin mock, string message)
 		{
-			this.repository = repository;
+			this.originalRepository = originalRepository;
+			this.mock = mock;
 			this.arrangementId = InOrderArrangementCount++;
 			this.message = message;
 		}
 
+		private MocksRepository Repository
+		{
+			get { return this.mock != null ? this.mock.Repository : this.originalRepository; }
+		}
+
 		private int InOrderArrangementCount
 		{
-			get { return this.repository.GetValue<int>(typeof(InOrderBehavior), "count", 0); }
-			set { this.repository.StoreValue(typeof(InOrderBehavior), "count", value); }
+			get { return this.Repository.GetValue<int>(typeof(InOrderBehavior), "count", 0); }
+			set { this.Repository.StoreValue(typeof(InOrderBehavior), "count", value); }
 		}
 
 		private int LastIdInOrder
 		{
-			get { return this.repository.GetValue<int>(typeof(InOrderBehavior), "id", -1); }
-			set { this.repository.StoreValue(typeof(InOrderBehavior), "id", value); }
+			get { return this.Repository.GetValue<int>(typeof(InOrderBehavior), "id", -1); }
+			set { this.Repository.StoreValue(typeof(InOrderBehavior), "id", value); }
 		}
 
 		private string InOrderExecutionLog
 		{
-			get { return this.repository.GetValue<string>(typeof(InOrderBehavior), "log", null); }
-			set { this.repository.StoreValue<string>(typeof(InOrderBehavior), "log", value); }
+			get { return this.Repository.GetValue<string>(typeof(InOrderBehavior), "log", null); }
+			set { this.Repository.StoreValue<string>(typeof(InOrderBehavior), "log", value); }
 		}
 
 		private string InOrderExecutionMessage
