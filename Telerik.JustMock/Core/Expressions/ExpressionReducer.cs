@@ -42,7 +42,7 @@ namespace Telerik.JustMock.Core.Expressions
 
 		public override Expression Visit(Expression exp)
 		{
-			if (exp != null && !this.dependentExpressions.Contains(exp))
+			if (exp != null && !this.dependentExpressions.Contains(exp) && !(exp is LambdaExpression))
 			{
 				return Expression.Constant(exp.EvaluateExpression());
 			}

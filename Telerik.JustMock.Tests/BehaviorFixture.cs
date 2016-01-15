@@ -172,6 +172,18 @@ namespace Telerik.JustMock.Tests
 			Assert.Throws<ArgumentException>(() => foo.StrValue = string.Empty);
 		}
 
+		public interface ICallBool
+		{
+			void CallBool(System.Linq.Expressions.Expression<Func<ICallBool, bool>> arg);
+		}
+
+		[TestMethod]
+		public void ShouldCompareConstantExpressions()
+		{
+			var person = Mock.Create<ICallBool>(Behavior.Strict);
+			Mock.Arrange(() => person.CallBool(p => true));
+			person.CallBool(p => true); // doesn't throw
+		}
 
 #if !NUNIT
 		// BCL issue - Reflection.Emit fails for multidimensional arrays until .NET4
