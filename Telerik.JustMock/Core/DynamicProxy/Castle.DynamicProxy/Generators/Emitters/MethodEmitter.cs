@@ -156,7 +156,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 				{
 					parameterBuilder.SetCustomAttribute(attribute);
 				}
-				if (parameter.DefaultValue != DBNull.Value && parameter.DefaultValue != null)
+				if (parameter.DefaultValue != DBNull.Value
+					&& parameter.DefaultValue != null
+					&& parameter.DefaultValue != Missing.Value)
 				{
 					if (parameter.ParameterType == typeof(Boolean)
 						|| parameter.ParameterType == typeof(SByte)
