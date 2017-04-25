@@ -18,9 +18,9 @@
 using System.Reflection;
 
 #if LITE_EDITION
-[assembly: AssemblyProduct("Telerik JustMock Lite")]
+[assembly: AssemblyProduct("Progress® Telerik® JustMock Lite")]
 #else
-[assembly: AssemblyProduct("Telerik JustMock")]
+[assembly: AssemblyProduct("Progress® Telerik® JustMock")]
 #endif
 
 [assembly: AssemblyTrademark("")]
