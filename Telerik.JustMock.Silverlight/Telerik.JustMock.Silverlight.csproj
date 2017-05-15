@@ -743,6 +743,9 @@
     <Compile Include="..\Telerik.JustMock\Core\Context\MSTestMockingContextResolver.cs">
       <Link>Core\Context\MSTestMockingContextResolver.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Context\MSTestV2MockingContextResolver.cs">
+      <Link>Core\Context\MSTestV2MockingContextResolver.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Core\Context\NUnitMockingContextResolver.cs">
       <Link>Core\Context\NUnitMockingContextResolver.cs</Link>
     </Compile>

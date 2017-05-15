@@ -262,6 +262,7 @@
     <Compile Include="Core\Behaviors\PropertyStubsBehavior.cs" />
     <Compile Include="Core\Behaviors\RaiseEventBehavior.cs" />
     <Compile Include="Core\Behaviors\StaticConstructorMockBehavior.cs" />
+    <Compile Include="Core\Context\MSTestV2MockingContextResolver.cs" />
     <Compile Include="Core\StrictMockException.cs" />
     <Compile Include="Core\ByRefComparer.cs" />
     <Compile Include="Core\ClrProfilerSetupHelper.cs" />
