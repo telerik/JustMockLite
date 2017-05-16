@@ -179,7 +179,7 @@ namespace Telerik.JustMock
 #if DEBUG && !COREFX
 		public static void SaveProxyAssembly()
 		{
-			DynamicProxyMockFactory.SaveAssembly();
+            ProfilerInterceptor.GuardInternal(() => DynamicProxyMockFactory.SaveAssembly());
 		}
 #endif
 
