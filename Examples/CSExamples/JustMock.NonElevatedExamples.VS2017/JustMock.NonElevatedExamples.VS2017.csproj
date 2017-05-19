@@ -52,69 +52,27 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\JustMock.NonElevatedExamples\AdvancedUsage\ConcreteMocking.cs">
-      <Link>AdvancedUsage\ConcreteMocking.cs</Link>
-    </Compile>
-    <Compile Include="..\JustMock.NonElevatedExamples\AdvancedUsage\MockingDelegates.cs">
-      <Link>AdvancedUsage\MockingDelegates.cs</Link>
-    </Compile>
-    <Compile Include="..\JustMock.NonElevatedExamples\AdvancedUsage\PrivateAccessor.cs">
-      <Link>AdvancedUsage\PrivateAccessor.cs</Link>
-    </Compile>
-    <Compile Include="..\JustMock.NonElevatedExamples\BasicUsage\AssertingOccurrence.cs">
-      <Link>BasicUsage\AssertingOccurrence.cs</Link>
-    </Compile>
-    <Compile Include="..\JustMock.NonElevatedExamples\BasicUsage\Automocking.cs">
-      <Link>BasicUsage\Automocking.cs</Link>
-    </Compile>
-    <Compile Include="..\JustMock.NonElevatedExamples\BasicUsage\CreateMocksByExample.cs">
-      <Link>BasicUsage\CreateMocksByExample.cs</Link>
-    </Compile>
-    <Compile Include="..\JustMock.NonElevatedExamples\BasicUsage\FluentMocking.cs">
-      <Link>BasicUsage\FluentMocking.cs</Link>
-    </Compile>
-    <Compile Include="..\JustMock.NonElevatedExamples\BasicUsage\Generics.cs">
-      <Link>BasicUsage\Generics.cs</Link>
-    </Compile>
-    <Compile Include="..\JustMock.NonElevatedExamples\BasicUsage\Matchers.cs">
-      <Link>BasicUsage\Matchers.cs</Link>
-    </Compile>
-    <Compile Include="..\JustMock.NonElevatedExamples\BasicUsage\Mock.CallOriginal.cs">
-      <Link>BasicUsage\Mock.CallOriginal.cs</Link>
-    </Compile>
-    <Compile Include="..\JustMock.NonElevatedExamples\BasicUsage\Mock.DoInstead.cs">
-      <Link>BasicUsage\Mock.DoInstead.cs</Link>
-    </Compile>
-    <Compile Include="..\JustMock.NonElevatedExamples\BasicUsage\Mock.DoNothing.cs">
-      <Link>BasicUsage\Mock.DoNothing.cs</Link>
-    </Compile>
-    <Compile Include="..\JustMock.NonElevatedExamples\BasicUsage\Mock.MustBeCalled.cs">
-      <Link>BasicUsage\Mock.MustBeCalled.cs</Link>
-    </Compile>
-    <Compile Include="..\JustMock.NonElevatedExamples\BasicUsage\Mock.Raise.cs">
-      <Link>BasicUsage\Mock.Raise.cs</Link>
-    </Compile>
-    <Compile Include="..\JustMock.NonElevatedExamples\BasicUsage\Mock.Raises.cs">
-      <Link>BasicUsage\Mock.Raises.cs</Link>
-    </Compile>
-    <Compile Include="..\JustMock.NonElevatedExamples\BasicUsage\Mock.Returns.cs">
-      <Link>BasicUsage\Mock.Returns.cs</Link>
-    </Compile>
-    <Compile Include="..\JustMock.NonElevatedExamples\BasicUsage\Mock.Throws.cs">
-      <Link>BasicUsage\Mock.Throws.cs</Link>
-    </Compile>
-    <Compile Include="..\JustMock.NonElevatedExamples\BasicUsage\MockingProperties.cs">
-      <Link>BasicUsage\MockingProperties.cs</Link>
-    </Compile>
-    <Compile Include="..\JustMock.NonElevatedExamples\BasicUsage\RecursiveMocking.cs">
-      <Link>BasicUsage\RecursiveMocking.cs</Link>
-    </Compile>
-    <Compile Include="..\JustMock.NonElevatedExamples\BasicUsage\SequentialMocking.cs">
-      <Link>BasicUsage\SequentialMocking.cs</Link>
-    </Compile>
-    <Compile Include="..\JustMock.NonElevatedExamples\BasicUsage\StrictMocking.cs">
-      <Link>BasicUsage\StrictMocking.cs</Link>
-    </Compile>
+    <Compile Include="AdvancedUsage\ConcreteMocking.cs" />
+    <Compile Include="AdvancedUsage\MockingDelegates.cs" />
+    <Compile Include="AdvancedUsage\PrivateAccessor.cs" />
+    <Compile Include="BasicUsage\AssertingOccurrence.cs" />
+    <Compile Include="BasicUsage\Automocking.cs" />
+    <Compile Include="BasicUsage\CreateMocksByExample.cs" />
+    <Compile Include="BasicUsage\FluentMocking.cs" />
+    <Compile Include="BasicUsage\Generics.cs" />
+    <Compile Include="BasicUsage\Matchers.cs" />
+    <Compile Include="BasicUsage\Mock.CallOriginal.cs" />
+    <Compile Include="BasicUsage\Mock.DoInstead.cs" />
+    <Compile Include="BasicUsage\Mock.DoNothing.cs" />
+    <Compile Include="BasicUsage\Mock.MustBeCalled.cs" />
+    <Compile Include="BasicUsage\Mock.Raise.cs" />
+    <Compile Include="BasicUsage\Mock.Raises.cs" />
+    <Compile Include="BasicUsage\Mock.Returns.cs" />
+    <Compile Include="BasicUsage\Mock.Throws.cs" />
+    <Compile Include="BasicUsage\MockingProperties.cs" />
+    <Compile Include="BasicUsage\RecursiveMocking.cs" />
+    <Compile Include="BasicUsage\SequentialMocking.cs" />
+    <Compile Include="BasicUsage\StrictMocking.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
