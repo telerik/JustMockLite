@@ -1,13 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telerik.JustMock", "Telerik.JustMock\Telerik.JustMock.csproj", "{0749EBC2-4E83-4960-BF28-1FF5C2DEB2B9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telerik.JustMock.Silverlight", "Telerik.JustMock.Silverlight\Telerik.JustMock.Silverlight.csproj", "{C06AD7FF-E22C-4EAD-B1DB-0588E906D6CA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telerik.JustMock.Silverlight.Tests", "Telerik.JustMock.Silverlight.Tests\Telerik.JustMock.Silverlight.Tests.csproj", "{0652C434-40F7-4C58-92C8-F4FAE0CB5922}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telerik.JustMock.Tests", "Telerik.JustMock.Tests\Telerik.JustMock.Tests.csproj", "{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}"
 EndProject
@@ -34,26 +30,6 @@ Global
 		{0749EBC2-4E83-4960-BF28-1FF5C2DEB2B9}.ReleaseFree|Any CPU.Build.0 = ReleaseFree|Any CPU
 		{0749EBC2-4E83-4960-BF28-1FF5C2DEB2B9}.ReleaseTrial|Any CPU.ActiveCfg = ReleaseFree|Any CPU
 		{0749EBC2-4E83-4960-BF28-1FF5C2DEB2B9}.ReleaseTrial|Any CPU.Build.0 = ReleaseFree|Any CPU
-		{C06AD7FF-E22C-4EAD-B1DB-0588E906D6CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C06AD7FF-E22C-4EAD-B1DB-0588E906D6CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C06AD7FF-E22C-4EAD-B1DB-0588E906D6CA}.DebugFree|Any CPU.ActiveCfg = DebugFree|Any CPU
-		{C06AD7FF-E22C-4EAD-B1DB-0588E906D6CA}.DebugFree|Any CPU.Build.0 = DebugFree|Any CPU
-		{C06AD7FF-E22C-4EAD-B1DB-0588E906D6CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C06AD7FF-E22C-4EAD-B1DB-0588E906D6CA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C06AD7FF-E22C-4EAD-B1DB-0588E906D6CA}.ReleaseFree|Any CPU.ActiveCfg = ReleaseFree|Any CPU
-		{C06AD7FF-E22C-4EAD-B1DB-0588E906D6CA}.ReleaseFree|Any CPU.Build.0 = ReleaseFree|Any CPU
-		{C06AD7FF-E22C-4EAD-B1DB-0588E906D6CA}.ReleaseTrial|Any CPU.ActiveCfg = ReleaseFree|Any CPU
-		{C06AD7FF-E22C-4EAD-B1DB-0588E906D6CA}.ReleaseTrial|Any CPU.Build.0 = ReleaseFree|Any CPU
-		{0652C434-40F7-4C58-92C8-F4FAE0CB5922}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0652C434-40F7-4C58-92C8-F4FAE0CB5922}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0652C434-40F7-4C58-92C8-F4FAE0CB5922}.DebugFree|Any CPU.ActiveCfg = DebugFree|Any CPU
-		{0652C434-40F7-4C58-92C8-F4FAE0CB5922}.DebugFree|Any CPU.Build.0 = DebugFree|Any CPU
-		{0652C434-40F7-4C58-92C8-F4FAE0CB5922}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0652C434-40F7-4C58-92C8-F4FAE0CB5922}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0652C434-40F7-4C58-92C8-F4FAE0CB5922}.ReleaseFree|Any CPU.ActiveCfg = ReleaseFree|Any CPU
-		{0652C434-40F7-4C58-92C8-F4FAE0CB5922}.ReleaseFree|Any CPU.Build.0 = ReleaseFree|Any CPU
-		{0652C434-40F7-4C58-92C8-F4FAE0CB5922}.ReleaseTrial|Any CPU.ActiveCfg = ReleaseFree|Any CPU
-		{0652C434-40F7-4C58-92C8-F4FAE0CB5922}.ReleaseTrial|Any CPU.Build.0 = ReleaseFree|Any CPU
 		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.DebugFree|Any CPU.ActiveCfg = DebugFree|Any CPU
