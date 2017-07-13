@@ -19,24 +19,55 @@ using System;
 
 namespace Telerik.JustMock.Core.Context
 {
-	internal class NUnitMockingContextResolver : HierarchicalTestFrameworkContextResolver
-	{
-		private const string NunitAssertionExceptionName = "NUnit.Framework.AssertionException, nunit.framework";
+    internal abstract class NUnitMockingContextResolver : HierarchicalTestFrameworkContextResolver
+    {
+        private const string NunitAssertionExceptionName = "NUnit.Framework.AssertionException, nunit.framework";
 
-		public NUnitMockingContextResolver()
-			: base(NunitAssertionExceptionName)
-		{
-			this.SetupStandardHierarchicalTestStructure(
-				new[] { "NUnit.Framework.TestAttribute, nunit.framework", "NUnit.Framework.TestCaseAttribute, nunit.framework", "NUnit.Framework.TestCaseSourceAttribute, nunit.framework" },
-				new[] { "NUnit.Framework.SetUpAttribute, nunit.framework", "NUnit.Framework.TearDownAttribute, nunit.framework" },
-				new[] { "NUnit.Framework.TestFixtureSetUpAttribute, nunit.framework", "NUnit.Framework.TestFixtureTearDownAttribute, nunit.framework" },
-				null,
-				FixtureConstuctorSemantics.InstanceConstructorCalledOncePerFixture);
-		}
+        public NUnitMockingContextResolver()
+            : base(NunitAssertionExceptionName)
+        {
+        }
+    }
 
-		public static bool IsAvailable
-		{
-			get { return FindType(NunitAssertionExceptionName, false) != null; }
-		}
-	}
+    internal class NUnit2xMockingContextResolver : NUnitMockingContextResolver
+    {
+        private const string ExpectedExceptionAttributeName = "NUnit.Framework.ExpectedExceptionAttribute, nunit.framework";
+
+        public NUnit2xMockingContextResolver()
+            : base()
+        {
+            this.SetupStandardHierarchicalTestStructure(
+                new[] { "NUnit.Framework.TestAttribute, nunit.framework", "NUnit.Framework.TestCaseAttribute, nunit.framework", "NUnit.Framework.TestCaseSourceAttribute, nunit.framework" },
+                new[] { "NUnit.Framework.SetUpAttribute, nunit.framework", "NUnit.Framework.TearDownAttribute, nunit.framework" },
+                new[] { "NUnit.Framework.TestFixtureSetUpAttribute, nunit.framework", "NUnit.Framework.TestFixtureTearDownAttribute, nunit.framework" },
+                null,
+                FixtureConstuctorSemantics.InstanceConstructorCalledOncePerFixture);
+        }
+
+        public static bool IsAvailable
+        {
+            get { return FindType(ExpectedExceptionAttributeName, false) != null; }
+        }
+    }
+
+    internal class NUnit3xMockingContextResolver : NUnitMockingContextResolver
+    {
+        private const string NunitOneTimeSetUpAttributeName = "NUnit.Framework.OneTimeSetUpAttribute, nunit.framework";
+
+        public NUnit3xMockingContextResolver()
+            : base()
+        {
+            this.SetupStandardHierarchicalTestStructure(
+                new[] { "NUnit.Framework.TestAttribute, nunit.framework", "NUnit.Framework.TestCaseAttribute, nunit.framework", "NUnit.Framework.TestCaseSourceAttribute, nunit.framework" },
+                new[] { "NUnit.Framework.SetUpAttribute, nunit.framework", "NUnit.Framework.TearDownAttribute, nunit.framework", "NUnit.Framework.OneTimeSetUpAttribute, nunit.framework", "NUnit.Framework.OneTimeTearDownAttribute, nunit.framework" },
+                new[] { "NUnit.Framework.TestFixtureSetUpAttribute, nunit.framework", "NUnit.Framework.TestFixtureTearDownAttribute, nunit.framework" },
+                null,
+                FixtureConstuctorSemantics.InstanceConstructorCalledOncePerFixture);
+        }
+
+        public static bool IsAvailable
+        {
+            get { return FindType(NunitOneTimeSetUpAttributeName, false) != null; }
+        }
+    }
 }
