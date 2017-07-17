@@ -1089,14 +1089,22 @@ namespace Telerik.JustMock.Tests
 	[SetUpFixture]
 	public class DebugViewTests
 	{
-		[SetUp]
-		public void AssemblyInit()
+#if NUNIT3
+        [OneTimeSetUp]
+#else
+        [SetUp]
+#endif
+        public void AssemblyInit()
 		{
 			DebugView.IsTraceEnabled = true;
 		}
 
-		[TearDown]
-		public void AssemblyUninit()
+#if NUNIT3
+        [OneTimeSetUp]
+#else
+        [SetUp]
+#endif
+        public void AssemblyUninit()
 		{
 			var trace = DebugView.FullTrace;
 			DebugView.IsTraceEnabled = false;

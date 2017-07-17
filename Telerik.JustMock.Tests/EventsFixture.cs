@@ -359,7 +359,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Raise(() => this.solutionService.ProjectAdded += null, new ProjectEventArgs(null));
 		}
 
-		private IEnumerable<TestCaseData> DummyTestCaseSource = new[] { new TestCaseData(null), new TestCaseData(null) };
+		private static IEnumerable<TestCaseData> DummyTestCaseSource = new[] { new TestCaseData(null), new TestCaseData(null) };
 
 #endif
 
