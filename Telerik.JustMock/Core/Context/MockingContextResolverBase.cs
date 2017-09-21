@@ -68,16 +68,22 @@ namespace Telerik.JustMock.Core.Context
 		}
 
 		protected static Type FindType(string assemblyAndTypeName, bool throwOnNotFound = true)
-		{
-			var parts = assemblyAndTypeName.Split(',').Select(s => s.Trim()).ToArray();
-			var assembly = AppDomain.CurrentDomain.GetAssemblies()
-				.FirstOrDefault(a => String.Equals(a.GetAssemblyName(), parts[1], StringComparison.OrdinalIgnoreCase));
+        {
+            string[] parts = assemblyAndTypeName.Split(',').Select(s => s.Trim()).ToArray();
+            string assemblyName = parts[1];
 
-			var foundType = assembly != null ? assembly.GetType(parts[0]) : null;
-			if (foundType == null && throwOnNotFound)
-				throw new InvalidOperationException(String.Format("Test framework type '{0}' not found", assemblyAndTypeName));
+            Assembly assembly = GetAssembly(assemblyName);
+            Type foundType = assembly != null ? assembly.GetType(parts[0]) : null;
+            if (foundType == null && throwOnNotFound)
+                throw new InvalidOperationException(String.Format("Test framework type '{0}' not found", assemblyAndTypeName));
 
-			return foundType;
-		}
-	}
+            return foundType;
+        }
+
+        protected static Assembly GetAssembly(string assemblyName)
+        {
+            return AppDomain.CurrentDomain.GetAssemblies()
+                .FirstOrDefault(a => String.Equals(a.GetAssemblyName(), assemblyName, StringComparison.OrdinalIgnoreCase));
+        }
+    }
 }
