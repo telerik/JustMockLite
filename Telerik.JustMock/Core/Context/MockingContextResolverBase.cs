@@ -54,7 +54,7 @@ namespace Telerik.JustMock.Core.Context
 
 		protected virtual Expression<Func<string, Exception, Exception>> CreateExceptionFactory()
 		{
-			var assertionException = FindType(this.assertFailedExceptionTypeName);
+            Type assertionException = FindType(this.assertFailedExceptionTypeName);
 			return this.CreateExceptionFactory(assertionException);
 		}
 

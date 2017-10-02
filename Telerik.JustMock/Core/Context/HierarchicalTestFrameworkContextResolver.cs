@@ -42,9 +42,9 @@ namespace Telerik.JustMock.Core.Context
 			if (testMethod == null)
 				return null;
 
-			var entryKey = entryOps.GetKey(testMethod);
+			object entryKey = entryOps.GetKey(testMethod);
 
-			MocksRepository repo = FindRepositoryInOps(entryOps, entryKey);
+			MocksRepository repo = this.FindRepositoryInOps(entryOps, entryKey);
 			if (repo != null)
 				return repo;
 			if (unresolvedContextBehavior == UnresolvedContextBehavior.DoNotCreateNew)
@@ -60,7 +60,7 @@ namespace Telerik.JustMock.Core.Context
 					if (ops.IsLeaf)
 						continue;
 
-					var parentKey = ops.GetKey(testMethod);
+					object parentKey = ops.GetKey(testMethod);
 					if (ops.IsUsedOnAllThreads)
 						parentRepo = ops.FindRepositoryFromAnyThread(parentKey);
 					else
@@ -152,7 +152,7 @@ namespace Telerik.JustMock.Core.Context
 		{
 			if (entryOps.IsUsedOnAllThreads)
 			{
-				var repo = entryOps.FindRepositoryFromAnyThread(entryKey);
+                MocksRepository repo = entryOps.FindRepositoryFromAnyThread(entryKey);
 				if (repo != null)
 				{
 					if (repo.IsRetired)
@@ -165,7 +165,7 @@ namespace Telerik.JustMock.Core.Context
 			}
 			else
 			{
-				var repo = entryOps.FindRepository(entryKey);
+				MocksRepository repo = entryOps.FindRepository(entryKey);
 				if (repo != null)
 				{
 					if (repo.IsParentToAnotherRepository || repo.IsRetired)
@@ -191,17 +191,17 @@ namespace Telerik.JustMock.Core.Context
 			return method => attributeTypes.Any(attr => Attribute.IsDefined(method, attr));
 		}
 
-		protected void AddRepository(string[] attributeTypeNames, Func<MethodBase, object> getKey, Func<MethodBase, object, bool> isInheritingContext, bool isLeaf, bool isUsedOnAllThreads)
+		protected void AddRepositoryOperations(string[] attributeTypeNames, Func<MethodBase, object> getKey, Func<MethodBase, object, bool> isInheritingContext, bool isLeaf, bool isUsedOnAllThreads)
 		{
-			AddRepository(CreateAttributeMatcher(attributeTypeNames), getKey, isInheritingContext, isLeaf, isUsedOnAllThreads);
+			this.AddRepositoryOperations(CreateAttributeMatcher(attributeTypeNames), getKey, isInheritingContext, isLeaf, isUsedOnAllThreads);
 		}
 
-		protected void AddRepository(Func<MethodBase, bool> matchesMethod, Func<MethodBase, object> getKey, Func<MethodBase, object, bool> isInheritingContext, bool isLeaf, bool isUsedOnAllThreads)
+		protected void AddRepositoryOperations(Func<MethodBase, bool> matchesMethod, Func<MethodBase, object> getKey, Func<MethodBase, object, bool> isInheritingContext, bool isLeaf, bool isUsedOnAllThreads)
 		{
 			if (isInheritingContext == null)
 				isInheritingContext = (_, __) => false;
 
-			var ops = CreateRepositoryOperations(getKey, matchesMethod, isLeaf, isUsedOnAllThreads, isInheritingContext);
+            RepositoryOperationsBase ops = this.CreateRepositoryOperations(getKey, matchesMethod, isLeaf, isUsedOnAllThreads, isInheritingContext);
 
 			this.repoOperations.Add(ops);
 		}
@@ -234,17 +234,18 @@ namespace Telerik.JustMock.Core.Context
 			string[] testMethodAttrs, string[] testSetupAttrs, string[] fixtureSetupAttrs,
 			string[] assemblySetupAttrs, FixtureConstuctorSemantics fixtureConstructorSemantics)
 		{
-			this.AddRepository(testMethodAttrs, method => method, null, true, true);
+			this.AddRepositoryOperations(testMethodAttrs, method => method, null, true, true);
 
 			switch (fixtureConstructorSemantics)
 			{
 				case FixtureConstuctorSemantics.InstanceConstructorCalledOncePerFixture:
 					{
-						this.AddRepository(testSetupAttrs, method => method.DeclaringType,
+						this.AddRepositoryOperations(testSetupAttrs, method => method.DeclaringType,
 							(method, prevType) => IsTypeAssignableIgnoreGenericArgs((Type)prevType, method.DeclaringType),
 							false, false);
+
 						var fixtureSetupMatcher = CreateAttributeMatcher(fixtureSetupAttrs);
-						this.AddRepository(
+						this.AddRepositoryOperations(
 							method => fixtureSetupMatcher(method)
 								|| MatchTestClassConstructor(ConstructorKind.Both, method, testMethodAttrs),
 							method => method.DeclaringType, null, false, true);
@@ -255,7 +256,7 @@ namespace Telerik.JustMock.Core.Context
 						var testSetupMatcher = CreateAttributeMatcher(testSetupAttrs);
 						var fixtureSetupMatcher = CreateAttributeMatcher(fixtureSetupAttrs);
 
-						this.AddRepository(
+						this.AddRepositoryOperations(
 							method => testSetupMatcher(method)
 								|| MatchTestClassConstructor(ConstructorKind.Instance, method, testMethodAttrs)
 								|| MatchTestClassDispose(method, testMethodAttrs),
@@ -263,7 +264,7 @@ namespace Telerik.JustMock.Core.Context
 							(method, prevType) => IsTypeAssignableIgnoreGenericArgs((Type)prevType, method.DeclaringType),
 							false, false);
 
-						this.AddRepository(
+						this.AddRepositoryOperations(
 							method => fixtureSetupMatcher(method)
 								|| MatchTestClassConstructor(ConstructorKind.Static, method, testMethodAttrs),
 							method => method.DeclaringType, null, false, true);
@@ -271,9 +272,10 @@ namespace Telerik.JustMock.Core.Context
 					break;
 			}
 
-
-			if (assemblySetupAttrs != null)
-				this.AddRepository(assemblySetupAttrs, method => method.DeclaringType.Assembly, null, false, true);
+            if (assemblySetupAttrs != null)
+            {
+                this.AddRepositoryOperations(assemblySetupAttrs, method => method.DeclaringType.Assembly, null, false, true);
+            }
 		}
 
 		private static bool IsTypeAssignableIgnoreGenericArgs(Type typeToCheck, Type derivedType)

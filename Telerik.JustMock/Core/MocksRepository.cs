@@ -92,12 +92,16 @@ namespace Telerik.JustMock.Core
 
 		internal static IMockMixin GetMockMixin(object obj, Type objType)
 		{
-			var asMixin = GetMockMixinFromAnyMock(obj);
-			if (asMixin != null)
-				return asMixin;
+            IMockMixin asMixin = GetMockMixinFromAnyMock(obj);
+            if (asMixin != null)
+            {
+                return asMixin;
+            }
 
-			if (obj != null && objType == null)
-				objType = obj.GetType();
+            if (obj != null && objType == null)
+            {
+                objType = obj.GetType();
+            }
 
 			if (obj != null)
 			{
@@ -105,7 +109,7 @@ namespace Telerik.JustMock.Core
 			}
 			else if (objType != null)
 			{
-				var repo = MockingContext.ResolveRepository(UnresolvedContextBehavior.CreateNewContextual);
+				MocksRepository repo = MockingContext.ResolveRepository(UnresolvedContextBehavior.CreateNewContextual);
 				if (repo != null)
 				{
 					lock (repo.staticMixinDatabase)
@@ -282,9 +286,9 @@ namespace Telerik.JustMock.Core
 
 			while (queue.Count > 0)
 			{
-				var current = queue.Dequeue();
-				var newCurrent = current.Node.Clone();
-				foreach (var node in current.Node.Children)
+				MatcherNodeAndParent current = queue.Dequeue();
+                IMatcherTreeNode newCurrent = current.Node.Clone();
+				foreach (IMatcherTreeNode node in current.Node.Children)
 				{
 					queue.Enqueue(new MatcherNodeAndParent(node, newCurrent));
 				}
@@ -305,16 +309,24 @@ namespace Telerik.JustMock.Core
 
 			if (parentRepository != null)
 			{
-				foreach (var root in parentRepository.arrangementTreeRoots)
-					this.arrangementTreeRoots.Add(root.Key, DeepCopy(root.Value));
-				foreach (var root in parentRepository.invocationTreeRoots)
-					this.invocationTreeRoots.Add(root.Key, DeepCopy(root.Value));
-				foreach (var kvp in parentRepository.valueStore)
-					this.valueStore.Add(kvp.Key, kvp.Value);
+                foreach (var root in parentRepository.arrangementTreeRoots)
+                {
+                    this.arrangementTreeRoots.Add(root.Key, DeepCopy(root.Value));
+                }
 
-				foreach (var mockRef in parentRepository.controlledMocks)
+                foreach (var root in parentRepository.invocationTreeRoots)
+                {
+                    this.invocationTreeRoots.Add(root.Key, DeepCopy(root.Value));
+                }
+
+                foreach (var kvp in parentRepository.valueStore)
+                {
+                    this.valueStore.Add(kvp.Key, kvp.Value);
+                }
+
+				foreach (WeakReference mockRef in parentRepository.controlledMocks)
 				{
-					var mixin = GetMockMixinFromAnyMock(mockRef.Target);
+					IMockMixin mixin = GetMockMixinFromAnyMock(mockRef.Target);
 					if (mixin != null)
 					{
 						mixin.Repository = this;
@@ -332,7 +344,7 @@ namespace Telerik.JustMock.Core
 
 		internal void InterceptGlobally(MethodBase method)
 		{
-			if (globallyInterceptedMethods.Add(method))
+			if (this.globallyInterceptedMethods.Add(method))
 			{
 				ProfilerInterceptor.RegisterGlobalInterceptor(method, this);
 			}
@@ -342,19 +354,25 @@ namespace Telerik.JustMock.Core
 		{
 			DebugView.TraceEvent(IndentLevel.Configuration, () => String.Format("Resetting mock repository related to {0}.", this.method));
 
-			foreach (var type in this.arrangedTypes)
-				ProfilerInterceptor.EnableInterception(type, false, this);
-			this.arrangedTypes.Clear();
+            foreach (var type in this.arrangedTypes)
+            {
+                ProfilerInterceptor.EnableInterception(type, false, this);
+            }
+
+            this.arrangedTypes.Clear();
 			this.staticMixinDatabase.Clear();
-			foreach (var method in this.globallyInterceptedMethods)
-				ProfilerInterceptor.UnregisterGlobalInterceptor(method, this);
+
+            foreach (var method in this.globallyInterceptedMethods)
+            {
+                ProfilerInterceptor.UnregisterGlobalInterceptor(method, this);
+            }
 			this.globallyInterceptedMethods.Clear();
 
 			lock (externalMixinDatabase)
 			{
-				foreach (var mockRef in this.controlledMocks)
+				foreach (WeakReference mockRef in this.controlledMocks)
 				{
-					var mock = GetMockMixinFromAnyMock(mockRef.Target);
+					IMockMixin mock = GetMockMixinFromAnyMock(mockRef.Target);
 					if (mock != null && mock.ExternalizedMock != null && mock.Originator == this)
 					{
 						externalMixinDatabase.RemoveAll(kvp => kvp.Value == mock);
@@ -362,9 +380,10 @@ namespace Telerik.JustMock.Core
 					}
 				}
 			}
+
 			this.controlledMocks.Clear();
 
-			CopyConfigurationFromParent();
+			this.CopyConfigurationFromParent();
 		}
 
 		internal void DispatchInvocation(Invocation invocation)
@@ -415,9 +434,14 @@ namespace Telerik.JustMock.Core
 		internal T GetValue<T>(object owner, object key, T dflt)
 		{
 			object value;
-			if (valueStore.TryGetValue(new KeyValuePair<object, object>(owner, key), out value))
-				return (T)value;
-			else return dflt;
+            if (valueStore.TryGetValue(new KeyValuePair<object, object>(owner, key), out value))
+            {
+                return (T)value;
+            }
+            else
+            {
+                return dflt;
+            }
 		}
 
 		internal void StoreValue<T>(object owner, object key, T value)
@@ -432,26 +456,30 @@ namespace Telerik.JustMock.Core
 
 		internal void AddMatcherInContext(IMatcher matcher)
 		{
-			if (!this.sharedContext.InArrange || this.sharedContext.Recorder != null)
-				this.matchersInContext.Add(matcher);
+            if (!this.sharedContext.InArrange || this.sharedContext.Recorder != null)
+            {
+                this.matchersInContext.Add(matcher);
+            }
 		}
 
 		internal object Create(Type type, MockCreationSettings settings)
 		{
 			object delegateResult;
-			if (TryCreateDelegate(type, settings, out delegateResult))
-				return delegateResult;
+            if (TryCreateDelegate(type, settings, out delegateResult))
+            {
+                return delegateResult;
+            }
 
 			bool isSafeMock = settings.FallbackBehaviors.OfType<CallOriginalBehavior>().Any();
-			CheckIfCanMock(type, !isSafeMock);
+			this.CheckIfCanMock(type, !isSafeMock);
 
-			EnableInterception(type);
+			this.EnableInterception(type);
 
 			bool canCreateProxy = !type.IsSealed;
 
-			var mockMixinImpl = CreateMockMixin(type, settings.SupplementaryBehaviors, settings.FallbackBehaviors, settings.MockConstructorCall);
+			MockMixin mockMixinImpl = this.CreateMockMixin(type, settings.SupplementaryBehaviors, settings.FallbackBehaviors, settings.MockConstructorCall);
 
-			var ctors = type.GetConstructors();
+			ConstructorInfo[] ctors = type.GetConstructors();
 			bool isCoclass = ctors.Any(ctor => ctor.IsExtern());
 
 			bool hasAdditionalInterfaces = settings.AdditionalMockedInterfaces != null && settings.AdditionalMockedInterfaces.Length > 0;
@@ -466,7 +494,7 @@ namespace Telerik.JustMock.Core
 				|| !ProfilerInterceptor.IsProfilerAttached
 				|| !ProfilerInterceptor.TypeSupportsInstrumentation(type);
 
-			var createTransparentProxy = MockingProxy.CanCreate(type) && !ProfilerInterceptor.IsProfilerAttached;
+			bool createTransparentProxy = MockingProxy.CanCreate(type) && !ProfilerInterceptor.IsProfilerAttached;
 
 			Exception proxyFailure = null;
 			object instance = null;
@@ -481,7 +509,8 @@ namespace Telerik.JustMock.Core
 					proxyFailure = ex.InnerException;
 				}
 			}
-			var mockMixin = instance as IMockMixin;
+
+            IMockMixin mockMixin = instance as IMockMixin;
 
 			if (instance == null)
 			{

@@ -95,6 +95,11 @@ namespace Telerik.JustMock.Core.Context
             get
             {
                 Assembly assembly = GetAssembly(AssemblyName);
+                if (assembly == null)
+                {
+                    return false;
+                }
+
                 Version version = assembly.GetName().Version;
                 if (version > MaxVersion)
                 {
@@ -134,6 +139,11 @@ namespace Telerik.JustMock.Core.Context
             get
             {
                 Assembly assembly = GetAssembly(AssemblyName);
+                if (assembly == null)
+                {
+                    return false;
+                }
+
                 Version version = assembly.GetName().Version;
                 if (version <= MinVersion)
                 {
