@@ -277,7 +277,7 @@ namespace Telerik.JustMock.Core
 
 				lock (enabledInterceptions)
 				{
-					var hasKey = enabledInterceptions.ContainsKey(type);
+					bool hasKey = enabledInterceptions.ContainsKey(type);
 					if (!hasKey)
 					{
 						enabledInterceptions.Add(type, enabled ? 1 : 0);
@@ -285,7 +285,7 @@ namespace Telerik.JustMock.Core
 					}
 					else
 					{
-						var count = enabledInterceptions[type];
+						int count = enabledInterceptions[type];
 						if (!enabled && count > 0)
 							count--;
 						else if (enabled)
@@ -295,9 +295,9 @@ namespace Telerik.JustMock.Core
 					}
 				}
 
-				var typeId = GetTypeId(type);
-				var arrayIndex = typeId >> 3;
-				var arrayMask = 1 << (typeId & ((1 << 3) - 1));
+				int typeId = GetTypeId(type);
+                int arrayIndex = typeId >> 3;
+                int arrayMask = 1 << (typeId & ((1 << 3) - 1));
 				lock (arrangedTypesArray)
 				{
 					if (enabledInAnyRepository)

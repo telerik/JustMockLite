@@ -16,30 +16,49 @@
 */
 
 using System;
+using System.Reflection;
 
 namespace Telerik.JustMock.Core.Context
 {
     internal abstract class NUnitMockingContextResolver : HierarchicalTestFrameworkContextResolver
     {
-        private const string NunitAssertionExceptionName = "NUnit.Framework.AssertionException, nunit.framework";
+        private const string NunitAssertionExceptionName = "NUnit.Framework.AssertionException";
+
+        protected const string AssemblyName = "nunit.framework";
+        protected const string TestAttributeName = "NUnit.Framework.TestAttribute";
+        protected const string TestCaseAttributeName = "NUnit.Framework.TestCaseAttribute";
+        protected const string TestCaseSourceAttributeName = "NUnit.Framework.TestCaseSourceAttribute";
+        protected const string SetUpAttributeAttributeName = "NUnit.Framework.SetUpAttribute";
+        protected const string TearDownAttributeName = "NUnit.Framework.TearDownAttribute";
+        protected const string TestFixtureSetUpAttributeName = "NUnit.Framework.TestFixtureSetUpAttribute";
+        protected const string TestFixtureTearDownAttributeName = "NUnit.Framework.TestFixtureTearDownAttribute";
+        protected const string OneTimeSetUpAttributeName = "NUnit.Framework.OneTimeSetUpAttribute";
+        protected const string OneTimeTearDownAttributeName = "NUnit.Framework.OneTimeTearDownAttribute";
 
         public NUnitMockingContextResolver()
-            : base(NunitAssertionExceptionName)
+            : base(GetAttributeFullName(NunitAssertionExceptionName))
         {
+        }
+
+        protected static string GetAttributeFullName(string attributeName)
+        {
+            string fullName = attributeName + ", " + AssemblyName;
+
+            return fullName;
         }
     }
 
     internal class NUnit2xMockingContextResolver : NUnitMockingContextResolver
     {
-        private const string ExpectedExceptionAttributeName = "NUnit.Framework.ExpectedExceptionAttribute, nunit.framework";
+        private const string ExpectedExceptionAttributeName = "NUnit.Framework.ExpectedExceptionAttribute, " + AssemblyName;
 
         public NUnit2xMockingContextResolver()
             : base()
         {
             this.SetupStandardHierarchicalTestStructure(
-                new[] { "NUnit.Framework.TestAttribute, nunit.framework", "NUnit.Framework.TestCaseAttribute, nunit.framework", "NUnit.Framework.TestCaseSourceAttribute, nunit.framework" },
-                new[] { "NUnit.Framework.SetUpAttribute, nunit.framework", "NUnit.Framework.TearDownAttribute, nunit.framework" },
-                new[] { "NUnit.Framework.TestFixtureSetUpAttribute, nunit.framework", "NUnit.Framework.TestFixtureTearDownAttribute, nunit.framework" },
+                new[] { GetAttributeFullName(TestAttributeName), GetAttributeFullName(TestCaseAttributeName), GetAttributeFullName(TestCaseSourceAttributeName) },
+                new[] { GetAttributeFullName(SetUpAttributeAttributeName), GetAttributeFullName(TearDownAttributeName) },
+                new[] { GetAttributeFullName(TestFixtureTearDownAttributeName), GetAttributeFullName(TestFixtureTearDownAttributeName) },
                 null,
                 FixtureConstuctorSemantics.InstanceConstructorCalledOncePerFixture);
         }
@@ -52,22 +71,89 @@ namespace Telerik.JustMock.Core.Context
 
     internal class NUnit3xMockingContextResolver : NUnitMockingContextResolver
     {
-        private const string NunitOneTimeSetUpAttributeName = "NUnit.Framework.OneTimeSetUpAttribute, nunit.framework";
+        private static readonly Version MaxVersion = new Version(3, 8);
 
         public NUnit3xMockingContextResolver()
             : base()
         {
             this.SetupStandardHierarchicalTestStructure(
-                new[] { "NUnit.Framework.TestAttribute, nunit.framework", "NUnit.Framework.TestCaseAttribute, nunit.framework", "NUnit.Framework.TestCaseSourceAttribute, nunit.framework" },
-                new[] { "NUnit.Framework.SetUpAttribute, nunit.framework", "NUnit.Framework.TearDownAttribute, nunit.framework", "NUnit.Framework.OneTimeSetUpAttribute, nunit.framework", "NUnit.Framework.OneTimeTearDownAttribute, nunit.framework" },
-                new[] { "NUnit.Framework.TestFixtureSetUpAttribute, nunit.framework", "NUnit.Framework.TestFixtureTearDownAttribute, nunit.framework" },
+                new[] {
+                    GetAttributeFullName(TestAttributeName), GetAttributeFullName(TestCaseAttributeName),
+                    GetAttributeFullName(TestCaseSourceAttributeName)
+                },
+                new[] {
+                    GetAttributeFullName(SetUpAttributeAttributeName), GetAttributeFullName(TearDownAttributeName),
+                    GetAttributeFullName(OneTimeSetUpAttributeName), GetAttributeFullName(OneTimeTearDownAttributeName)
+                },
+                new[] { GetAttributeFullName(TestFixtureSetUpAttributeName), GetAttributeFullName(TestFixtureTearDownAttributeName) },
                 null,
                 FixtureConstuctorSemantics.InstanceConstructorCalledOncePerFixture);
         }
 
         public static bool IsAvailable
         {
-            get { return FindType(NunitOneTimeSetUpAttributeName, false) != null; }
+            get
+            {
+                Assembly assembly = GetAssembly(AssemblyName);
+                if (assembly == null)
+                {
+                    return false;
+                }
+
+                Version version = assembly.GetName().Version;
+                if (version > MaxVersion)
+                {
+                    return false;
+                }
+
+                bool returnValue = FindType(GetAttributeFullName(OneTimeSetUpAttributeName), false) != null;
+
+                return returnValue;
+            }
+        }
+    }
+
+    internal class NUnit3_8_xMockingContextResolver : NUnitMockingContextResolver
+    {
+        private static readonly Version MinVersion = new Version(3, 8);
+
+        public NUnit3_8_xMockingContextResolver()
+            : base()
+        {
+            this.SetupStandardHierarchicalTestStructure(
+                new[] {
+                    GetAttributeFullName(TestAttributeName), GetAttributeFullName(TestCaseAttributeName),
+                    GetAttributeFullName(TestCaseSourceAttributeName)
+                },
+                new[] {
+                    GetAttributeFullName(SetUpAttributeAttributeName), GetAttributeFullName(TearDownAttributeName),
+                    GetAttributeFullName(OneTimeSetUpAttributeName), GetAttributeFullName(OneTimeTearDownAttributeName)
+                },
+                null,
+                null,
+                FixtureConstuctorSemantics.InstanceConstructorCalledOncePerFixture);
+        }
+
+        public static bool IsAvailable
+        {
+            get
+            {
+                Assembly assembly = GetAssembly(AssemblyName);
+                if (assembly == null)
+                {
+                    return false;
+                }
+
+                Version version = assembly.GetName().Version;
+                if (version <= MinVersion)
+                {
+                    return false;
+                }
+
+                bool returnValue = FindType(GetAttributeFullName(OneTimeSetUpAttributeName), false) != null;
+
+                return returnValue;
+            }
         }
     }
 }
