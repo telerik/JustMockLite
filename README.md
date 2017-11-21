@@ -1,10 +1,10 @@
-##Welcome to the Telerik JustMock Lite source code repository!
+## Welcome to the Telerik JustMock Lite source code repository!
 
 ### About
 **JustMock Lite by Telerik** is a powerful free mocking library available for .NET developers.  For more information, refer to our <a href="http://www.telerik.com/justmock/free-mocking" target="_blank">JustMock Lite website</a>. You can suggest and vote for feature requests in our <a href="http://www.telerik.com/justmock/feedback" target="_blank">JustMock feedback website</a>.
 
 ### Nuget
-**JustMock Lite** is also available in a <a href="https://www.nuget.org/packages/JustMock/" target="_blank">Nuget package</a>.
+**JustMock Lite** is also available in a <a href="https://www.nuget.org/packages/JustMock/" target="_blank">NuGet package</a>.
 
 ### Building
 
