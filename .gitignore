@@ -5,6 +5,8 @@
 *.suo
 *.user
 *.sln.docstates
+*.ide
+.vs
 
 # Build results
 
@@ -153,5 +155,3 @@ $RECYCLE.BIN/
 
 # Mac crap
 .DS_Store
-*.ide
-/.vs
