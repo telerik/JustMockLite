@@ -13,6 +13,26 @@
     <Compile Include="$(MSBuildThisFileDirectory)AsyncFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BehaviorFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ConstructorFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Coverage\DoInsteadFixture.cs">
+      <DependentUpon>DoInsteadFixture.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Coverage\MatchersFixture.cs">
+      <DependentUpon>MatchersFixture.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Coverage\ReturnsFixture.cs">
+      <DependentUpon>ReturnsFixture.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Coverage\WhenFixture.cs">
+      <DependentUpon>WhenFixture.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)DelegateFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DynamicFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EventClassFactory.cs" />
@@ -32,5 +52,24 @@
     <Compile Include="$(MSBuildThisFileDirectory)ReturnsFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SequenceFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WaitEventFixture.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Coverage\DoInsteadFixture.tt">
+      <LastGenOutput>DoInsteadFixture.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)Coverage\MatchersFixture.tt">
+      <LastGenOutput>MatchersFixture.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)Coverage\ReturnsFixture.tt">
+      <LastGenOutput>ReturnsFixture.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)Coverage\TestBuilder.include" />
+    <None Include="$(MSBuildThisFileDirectory)Coverage\WhenFixture.tt">
+      <LastGenOutput>WhenFixture.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
   </ItemGroup>
 </Project>
