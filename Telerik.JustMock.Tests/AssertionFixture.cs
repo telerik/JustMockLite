@@ -38,7 +38,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException;
 #endif
 
-namespace Telerik.JustMock.Tests
+namespace Telerik.JustMock.MSTest.Tests
 {
 	/// <summary>
 	/// Validates Mock.Assert capabilities
@@ -1089,22 +1089,14 @@ namespace Telerik.JustMock.Tests
 	[SetUpFixture]
 	public class DebugViewTests
 	{
-#if NUNIT3
-        [OneTimeSetUp]
-#else
-        [SetUp]
-#endif
-        public void AssemblyInit()
+		[OneTimeSetUp]
+		public void AssemblyInit()
 		{
 			DebugView.IsTraceEnabled = true;
 		}
 
-#if NUNIT3
-        [OneTimeSetUp]
-#else
-        [SetUp]
-#endif
-        public void AssemblyUninit()
+		[OneTimeTearDown]
+		public void AssemblyUninit()
 		{
 			var trace = DebugView.FullTrace;
 			DebugView.IsTraceEnabled = false;

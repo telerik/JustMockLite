@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Assert.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AssertionFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AsyncFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BehaviorFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ConstructorFixture.cs" />
