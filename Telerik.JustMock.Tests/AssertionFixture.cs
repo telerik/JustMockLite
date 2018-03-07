@@ -38,7 +38,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException;
 #endif
 
-namespace Telerik.JustMock.MSTest.Tests
+namespace Telerik.JustMock.Tests
 {
 	/// <summary>
 	/// Validates Mock.Assert capabilities
