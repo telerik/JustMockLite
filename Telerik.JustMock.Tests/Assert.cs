@@ -18,14 +18,13 @@
 using System;
 
 
-#if !NUNIT
-#if !PORTABLE
-using FrameworkAssert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
-#else
-using FrameworkAssert = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.Assert;
-#endif
-#else
+#if NUNIT
 using FrameworkAssert = NUnit.Framework.Assert;
+#elif XUNIT
+#elif PORTABLE
+using FrameworkAssert = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.Assert;
+#else
+using FrameworkAssert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 #endif
 
 namespace Telerik.JustMock.Tests
