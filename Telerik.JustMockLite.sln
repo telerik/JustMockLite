@@ -15,9 +15,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telerik.JustMock.MSTest.Tes
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Telerik.JustMock.Tests", "Telerik.JustMock.Tests\Telerik.JustMock.Tests.shproj", "{6F2AEA8B-7295-4446-9686-663993AE0B18}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telerik.JustMock.NUnit.Tests", "Telerik.JustMock.NUnit.Tests\Telerik.JustMock.NUnit.Tests.csproj", "{1B34A434-AA3F-412A-B843-F6C082A92BDA}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Telerik.JustMock.Tests\Telerik.JustMock.Tests.projitems*{12629109-a1aa-4abb-852a-087dd15205f3}*SharedItemsImports = 4
+		Telerik.JustMock.Tests\Telerik.JustMock.Tests.projitems*{1b34a434-aa3f-412a-b843-f6c082a92bda}*SharedItemsImports = 4
 		Telerik.JustMock.Tests\Telerik.JustMock.Tests.projitems*{6f2aea8b-7295-4446-9686-663993ae0b18}*SharedItemsImports = 13
 		Telerik.JustMock.Tests\Telerik.JustMock.Tests.projitems*{83f0c270-db35-4b80-beda-5aed79c0fb2d}*SharedItemsImports = 4
 	EndGlobalSection
@@ -79,6 +82,16 @@ Global
 		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.ReleaseFree|Any CPU.Build.0 = ReleaseFree|Any CPU
 		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.ReleaseTrial|Any CPU.ActiveCfg = ReleaseFree|Any CPU
 		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.ReleaseTrial|Any CPU.Build.0 = ReleaseFree|Any CPU
+		{1B34A434-AA3F-412A-B843-F6C082A92BDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B34A434-AA3F-412A-B843-F6C082A92BDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B34A434-AA3F-412A-B843-F6C082A92BDA}.DebugFree|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B34A434-AA3F-412A-B843-F6C082A92BDA}.DebugFree|Any CPU.Build.0 = Debug|Any CPU
+		{1B34A434-AA3F-412A-B843-F6C082A92BDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B34A434-AA3F-412A-B843-F6C082A92BDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B34A434-AA3F-412A-B843-F6C082A92BDA}.ReleaseFree|Any CPU.ActiveCfg = Release|Any CPU
+		{1B34A434-AA3F-412A-B843-F6C082A92BDA}.ReleaseFree|Any CPU.Build.0 = Release|Any CPU
+		{1B34A434-AA3F-412A-B843-F6C082A92BDA}.ReleaseTrial|Any CPU.ActiveCfg = Release|Any CPU
+		{1B34A434-AA3F-412A-B843-F6C082A92BDA}.ReleaseTrial|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
