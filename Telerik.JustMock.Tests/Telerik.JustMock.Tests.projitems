@@ -9,5 +9,28 @@
     <Import_RootNamespace>Telerik.JustMock.Tests</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Assert.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AsyncFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BehaviorFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ConstructorFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DelegateFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DynamicFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EventClassFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FluentFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FuncSpecFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InOrderFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InteropFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MarshalByRefFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MatchersFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MiscFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MockFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NinjectAutoMockFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NonPublicFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OccurrenceFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OutRefFixure.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertiesFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ReturnsFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SequenceFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WaitEventFixture.cs" />
   </ItemGroup>
 </Project>
