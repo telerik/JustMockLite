@@ -1,15 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.4
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telerik.JustMock", "Telerik.JustMock\Telerik.JustMock.csproj", "{0749EBC2-4E83-4960-BF28-1FF5C2DEB2B9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telerik.JustMock.Tests", "Telerik.JustMock.Tests\Telerik.JustMock.Tests.csproj", "{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telerik.JustMock.DemoLib", "Telerik.JustMock.DemoLib\Telerik.JustMock.DemoLib.csproj", "{1F725764-5FB5-475D-9BF2-355F073E3233}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telerik.JustMock.DemoLibSigned", "Telerik.JustMock.DemoLibSigned\Telerik.JustMock.DemoLibSigned.csproj", "{84156592-CA84-4B6D-83F2-DCFE9E4843F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telerik.JustMock.MSTest2.Tests", "Telerik.JustMock.MSTest2.Tests\Telerik.JustMock.MSTest2.Tests.csproj", "{12629109-A1AA-4ABB-852A-087DD15205F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telerik.JustMock.MSTest.Tests", "Telerik.JustMock.MSTest.Tests\Telerik.JustMock.MSTest.Tests.csproj", "{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,16 +32,6 @@ Global
 		{0749EBC2-4E83-4960-BF28-1FF5C2DEB2B9}.ReleaseFree|Any CPU.Build.0 = ReleaseFree|Any CPU
 		{0749EBC2-4E83-4960-BF28-1FF5C2DEB2B9}.ReleaseTrial|Any CPU.ActiveCfg = ReleaseFree|Any CPU
 		{0749EBC2-4E83-4960-BF28-1FF5C2DEB2B9}.ReleaseTrial|Any CPU.Build.0 = ReleaseFree|Any CPU
-		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.DebugFree|Any CPU.ActiveCfg = DebugFree|Any CPU
-		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.DebugFree|Any CPU.Build.0 = DebugFree|Any CPU
-		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.ReleaseFree|Any CPU.ActiveCfg = ReleaseFree|Any CPU
-		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.ReleaseFree|Any CPU.Build.0 = ReleaseFree|Any CPU
-		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.ReleaseTrial|Any CPU.ActiveCfg = ReleaseFree|Any CPU
-		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.ReleaseTrial|Any CPU.Build.0 = ReleaseFree|Any CPU
 		{1F725764-5FB5-475D-9BF2-355F073E3233}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1F725764-5FB5-475D-9BF2-355F073E3233}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F725764-5FB5-475D-9BF2-355F073E3233}.DebugFree|Any CPU.ActiveCfg = DebugFree|Any CPU
@@ -60,8 +52,31 @@ Global
 		{84156592-CA84-4B6D-83F2-DCFE9E4843F0}.ReleaseFree|Any CPU.Build.0 = Release|Any CPU
 		{84156592-CA84-4B6D-83F2-DCFE9E4843F0}.ReleaseTrial|Any CPU.ActiveCfg = Release|Any CPU
 		{84156592-CA84-4B6D-83F2-DCFE9E4843F0}.ReleaseTrial|Any CPU.Build.0 = Release|Any CPU
+		{12629109-A1AA-4ABB-852A-087DD15205F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12629109-A1AA-4ABB-852A-087DD15205F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12629109-A1AA-4ABB-852A-087DD15205F3}.DebugFree|Any CPU.ActiveCfg = DebugFree|Any CPU
+		{12629109-A1AA-4ABB-852A-087DD15205F3}.DebugFree|Any CPU.Build.0 = DebugFree|Any CPU
+		{12629109-A1AA-4ABB-852A-087DD15205F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12629109-A1AA-4ABB-852A-087DD15205F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12629109-A1AA-4ABB-852A-087DD15205F3}.ReleaseFree|Any CPU.ActiveCfg = ReleaseFree|Any CPU
+		{12629109-A1AA-4ABB-852A-087DD15205F3}.ReleaseFree|Any CPU.Build.0 = ReleaseFree|Any CPU
+		{12629109-A1AA-4ABB-852A-087DD15205F3}.ReleaseTrial|Any CPU.ActiveCfg = ReleaseFree|Any CPU
+		{12629109-A1AA-4ABB-852A-087DD15205F3}.ReleaseTrial|Any CPU.Build.0 = ReleaseFree|Any CPU
+		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.DebugFree|Any CPU.ActiveCfg = DebugFree|Any CPU
+		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.DebugFree|Any CPU.Build.0 = DebugFree|Any CPU
+		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.ReleaseFree|Any CPU.ActiveCfg = ReleaseFree|Any CPU
+		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.ReleaseFree|Any CPU.Build.0 = ReleaseFree|Any CPU
+		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.ReleaseTrial|Any CPU.ActiveCfg = ReleaseFree|Any CPU
+		{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}.ReleaseTrial|Any CPU.Build.0 = ReleaseFree|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B1939414-37EA-4C22-A10B-EED091960D98}
 	EndGlobalSection
 EndGlobal
