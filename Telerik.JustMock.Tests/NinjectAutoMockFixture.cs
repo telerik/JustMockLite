@@ -105,7 +105,7 @@ namespace Telerik.JustMock.Tests
 			container.Arrange<IFileSystem>(x => x.Exists("123")).Returns(true).MustBeCalled();
 			container.Arrange<ICalendar>(x => x.Now).Returns(new DateTime(123)).MustBeCalled();
 
-			Assert.Throws<AssertFailedException>(() => container.Assert());
+			Assert.Throws<AssertionException>(() => container.Assert());
 
 			container.Instance.LogExists();
 
@@ -119,9 +119,9 @@ namespace Telerik.JustMock.Tests
 
 			container.Arrange<ICalendar>(x => x.Now).Returns(new DateTime(123));
 
-			Assert.Throws<AssertFailedException>(() => container.Assert<IFileSystem>(x => x.Refresh(), Occurs.Once()));
-			Assert.Throws<AssertFailedException>(() => container.Assert<IFileSystem>(x => x.Exists("123"), Occurs.Once()));
-			Assert.Throws<AssertFailedException>(() => container.Assert<ICalendar>(x => x.Now, Occurs.Once()));
+			Assert.Throws<AssertionException>(() => container.Assert<IFileSystem>(x => x.Refresh(), Occurs.Once()));
+			Assert.Throws<AssertionException>(() => container.Assert<IFileSystem>(x => x.Exists("123"), Occurs.Once()));
+			Assert.Throws<AssertionException>(() => container.Assert<ICalendar>(x => x.Now, Occurs.Once()));
 
 			container.Instance.LogExists();
 
@@ -318,7 +318,7 @@ namespace Telerik.JustMock.Tests
 
 			container.Arrange<IUnitOfWork>(uow => uow.DoWork()).MustBeCalled();
 
-			Assert.Throws<AssertFailedException>(() => container.Assert());
+			Assert.Throws<AssertionException>(() => container.Assert());
 
 			container.Instance.DoWork();
 
@@ -495,7 +495,7 @@ namespace Telerik.JustMock.Tests
 			c.Arrange<ICalendar>(x => x.Now).MustBeCalled("Calendar must be used!");
 			c.Arrange<IFileSystem>(x => x.Refresh()).MustBeCalled("Should use latest data!");
 
-			var ex = Assert.Throws<AssertFailedException>(() => c.Assert("Container must be alright!"));
+			var ex = Assert.Throws<AssertionException>(() => c.Assert("Container must be alright!"));
 
 			Assert.True(ex.Message.Contains("Calendar must be used!"));
 			Assert.True(ex.Message.Contains("Should use latest data!"));
