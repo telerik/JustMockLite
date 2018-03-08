@@ -210,8 +210,8 @@ namespace Telerik.JustMock.Tests
 			var matrix = Mock.Create<IMatrix>();
 			var array = matrix.GetMultidimensionalArray();
 			Assert.NotNull(array);
-			Assert.Equals(0, array.GetLength(0));
-			Assert.Equals(0, array.GetLength(1));
+			Assert.Equal(0, array.GetLength(0));
+			Assert.Equal(0, array.GetLength(1));
 			Assert.Same(array, matrix.GetMultidimensionalArray());
 		}
 

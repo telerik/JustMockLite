@@ -163,10 +163,10 @@ namespace Telerik.JustMock.Tests
 			foo.Arrange(x => x.Add(Arg.AnyInt, Arg.AnyInt)).Returns(7).InSequence();
 			//The parameters don't matter
 			Assert.Equals(3, foo.Add(2, 2));
-			Assert.Equals(5, foo.Add(2, 2));
-			Assert.Equals(7, foo.Add(2, 2));
+			Assert.Equal(5, foo.Add(2, 2));
+			Assert.Equal(7, foo.Add(2, 2));
 			//Anything after the last configured InSequence/Returns follows rule of the last arrange
-			Assert.Equals(7, foo.Add(2, 5));
+			Assert.Equal(7, foo.Add(2, 5));
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Sequence")]
@@ -175,11 +175,11 @@ namespace Telerik.JustMock.Tests
 			var foo = Mock.Create<IFoo2>();
 			foo.Arrange(x => x.Add(Arg.AnyInt, Arg.AnyInt)).Returns(3).Returns(5).Returns(7);
 			//The parameters don't matter
-			Assert.Equals(3, foo.Add(2, 2));
-			Assert.Equals(5, foo.Add(2, 2));
-			Assert.Equals(7, foo.Add(2, 2));
+			Assert.Equal(3, foo.Add(2, 2));
+			Assert.Equal(5, foo.Add(2, 2));
+			Assert.Equal(7, foo.Add(2, 2));
 			//Anything after the last configured InSequence/Returns follows rule of the last arrange
-			Assert.Equals(7, foo.Add(2, 2));
+			Assert.Equal(7, foo.Add(2, 2));
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Sequence"), TestCategory("InOrder")]
