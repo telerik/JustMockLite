@@ -10,7 +10,7 @@ using TestInitialize = NUnit.Framework.SetUpAttribute;
 using TestCleanup = NUnit.Framework.TearDownAttribute;
 using AssertionException = NUnit.Framework.AssertionException;
 #elif XUNIT
-using Telerik.JustMock.XUnit.Test.Assert;
+using Xunit;
 using Telerik.JustMock.XUnit.Test.Attributes;
 using TestCategory = Telerik.JustMock.XUnit.Test.Attributes.XUnitCategoryAttribute;
 using TestClass = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestClassAttribute;
