@@ -79,4 +79,5 @@
   </Target>
   <Import Project="..\packages\MSTest.TestAdapter.1.2.0\build\net45\MSTest.TestAdapter.targets" Condition="Exists('..\packages\MSTest.TestAdapter.1.2.0\build\net45\MSTest.TestAdapter.targets')" />
   <Import Project="..\Telerik.JustMock.Tests\Telerik.JustMock.Tests.projitems" Label="Shared" />
+  <Import Project="..\Telerik.JustMock.Tests.Base\Telerik.JustMock.Tests.Base.projitems" Label="Shared" />
 </Project>

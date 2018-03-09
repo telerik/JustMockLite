@@ -104,6 +104,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="..\Telerik.JustMock.Tests\Telerik.JustMock.Tests.projitems" Label="Shared" />
+  <Import Project="..\Telerik.JustMock.Tests.Base\Telerik.JustMock.Tests.Base.projitems" Label="Shared" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

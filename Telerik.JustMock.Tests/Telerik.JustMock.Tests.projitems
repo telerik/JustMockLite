@@ -9,7 +9,6 @@
     <Import_RootNamespace>Telerik.JustMock.Tests</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Assert.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AssertionFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AsyncFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BehaviorFixture.cs" />
