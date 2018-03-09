@@ -400,6 +400,12 @@ namespace Telerik.JustMock.Tests
 	{
 		IDisposable mock;
 
+#if XUNIT
+		public FluentContextFixture()
+		{
+			TestInit();
+		}
+#endif
 		[TestInitialize]
 		public void TestInit()
 		{

@@ -57,6 +57,12 @@ namespace Telerik.JustMock.Tests
 		private ProjectNavigatorViewModel viewModel;
 		private ISolutionService solutionService;
 
+#if XUNIT
+		public EventsFixture()
+		{
+			Initialize();
+		}
+#endif
 		[TestInitialize]
 		public void Initialize()
 		{
@@ -524,6 +530,13 @@ namespace Telerik.JustMock.Tests
 	public class RecordingWorksWhenTestClassHasMockMixin
 	{
 		private IDocumentView activeView;
+
+#if XUNIT
+		public RecordingWorksWhenTestClassHasMockMixin()
+		{
+			BeforeEach();
+		}
+#endif
 
 		[TestInitialize]
 		public void BeforeEach()

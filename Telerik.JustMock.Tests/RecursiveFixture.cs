@@ -389,6 +389,12 @@ namespace Telerik.JustMock.Tests
 
 		private IDataProcessor mock;
 
+#if XUNIT
+		public RecursiveMockRepositoryInheritance()
+		{
+			BeforeEach();
+		}
+#endif
 		[TestInitialize]
 		public void BeforeEach()
 		{
