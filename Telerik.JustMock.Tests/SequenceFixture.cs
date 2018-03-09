@@ -162,7 +162,7 @@ namespace Telerik.JustMock.Tests
 			foo.Arrange(x => x.Add(Arg.AnyInt, Arg.AnyInt)).Returns(5).InSequence();
 			foo.Arrange(x => x.Add(Arg.AnyInt, Arg.AnyInt)).Returns(7).InSequence();
 			//The parameters don't matter
-			Assert.Equals(3, foo.Add(2, 2));
+			Assert.Equal(3, foo.Add(2, 2));
 			Assert.Equal(5, foo.Add(2, 2));
 			Assert.Equal(7, foo.Add(2, 2));
 			//Anything after the last configured InSequence/Returns follows rule of the last arrange
