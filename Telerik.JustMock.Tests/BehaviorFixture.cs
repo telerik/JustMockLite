@@ -200,7 +200,6 @@ namespace Telerik.JustMock.Tests
 			person.CallBool(p => true); // doesn't throw
 		}
 
-#if !NUNIT
 		// BCL issue - Reflection.Emit fails for multidimensional arrays until .NET4
 		// with System.TypeLoadException : Signature of the body and declaration in a method implementation do not match.
 
@@ -238,7 +237,6 @@ namespace Telerik.JustMock.Tests
 		{
 			int[, ,] GetMultidimensionalArray();
 		}
-#endif
 
 		public interface IFoo
 		{
