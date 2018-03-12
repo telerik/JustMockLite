@@ -37,6 +37,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)DynamicFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EventClassFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EventsFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EventsFixtureDependencies.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FluentFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FuncSpecFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)InOrderFixture.cs" />
