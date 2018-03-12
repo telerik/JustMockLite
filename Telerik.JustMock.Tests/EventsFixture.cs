@@ -368,18 +368,6 @@ namespace Telerik.JustMock.Tests
 			Assert.Throws<Exception>(() => Mock.Raise(() => doc.IsDirtyChanged += null, 1, 2));
 		}
 
-#if NUNIT
-		[TestMethod, TestCategory("Lite"), TestCategory("Events")]
-		[TestCaseSource("DummyTestCaseSource")]
-		public void ShouldRaiseEventsOnDataDrivenTests(object _)
-		{
-			Mock.Raise(() => this.solutionService.ProjectAdded += null, new ProjectEventArgs(null));
-		}
-
-		private static IEnumerable<TestCaseData> DummyTestCaseSource = new[] { new TestCaseData(null), new TestCaseData(null) };
-
-#endif
-
 		public interface IDocumentView
 		{
 			IDocument Document { get; }
