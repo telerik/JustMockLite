@@ -5,9 +5,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Telerik.JustMock.NUnit.Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
 [assembly: AssemblyProduct("Telerik.JustMock.NUnit.Tests")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
