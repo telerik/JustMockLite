@@ -18,15 +18,17 @@
 using System;
 
 
-#if !NUNIT
-#if !PORTABLE
-using FrameworkAssert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
-#else
-using FrameworkAssert = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.Assert;
-#endif
-#else
+#if NUNIT
 using FrameworkAssert = NUnit.Framework.Assert;
+#elif XUNIT
+using FrameworkAssert = Xunit.Assert;
+#elif PORTABLE
+using FrameworkAssert = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.Assert;
+#else
+using FrameworkAssert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 #endif
+
+
 
 namespace Telerik.JustMock.Tests
 {
@@ -64,51 +66,90 @@ namespace Telerik.JustMock.Tests
 #endif
 			catch (Exception ex)
 			{
+#if XUNIT
+				FrameworkAssert.True(false,String.Format("Wrong exception type thrown. Expected {0}, got {1}.", typeof(T), ex.GetType()));
+#else
 				FrameworkAssert.Fail(String.Format("Wrong exception type thrown. Expected {0}, got {1}.", typeof(T), ex.GetType()));
+#endif
 			}
-
+#if XUNIT
+			FrameworkAssert.True(false, String.Format("No Expected {0} was thrown", typeof(T).FullName));
+#else
 			FrameworkAssert.Fail(String.Format("No Expected {0} was thrown", typeof(T).FullName));
+#endif
 			throw new Exception();
 		}
-
+		
 		public static void NotNull(object value)
 		{
+#if XUNIT
+			FrameworkAssert.NotNull(value);
+#else
 			FrameworkAssert.IsNotNull(value);
+#endif
 		}
 
 		public static void Null(object value)
 		{
+#if XUNIT
+			FrameworkAssert.Null(value);
+#else
 			FrameworkAssert.IsNull(value);
+#endif
 		}
 
 		public static void Equal<T>(T expected, T actual)
 		{
+#if XUNIT
+			FrameworkAssert.Equal(expected, actual);
+#else
 			FrameworkAssert.AreEqual(expected, actual);
+#endif
 		}
 
 		public static void NotEqual<T>(T notExpected, T actual)
 		{
+#if XUNIT
+			FrameworkAssert.NotEqual(notExpected, actual);
+#else
 			FrameworkAssert.AreNotEqual(notExpected, actual);
+#endif
 		}
 
 		public static void True(bool condition)
 		{
+#if XUNIT
+			FrameworkAssert.True(condition);
+#else
 			FrameworkAssert.IsTrue(condition);
+#endif
 		}
 
 		public static void False(bool condition)
 		{
+#if XUNIT
+			FrameworkAssert.False(condition);
+#else
 			FrameworkAssert.IsFalse(condition);
+#endif
 		}
 
 		public static void Same(object expected, object actual)
 		{
+#if XUNIT
+			FrameworkAssert.Same(expected, actual);
+#else
 			FrameworkAssert.AreSame(expected, actual);
+#endif
 		}
 
 		public static void NotSame(object expected, object actual)
 		{
+#if XUNIT
+			FrameworkAssert.NotSame(expected, actual);
+#else
 			FrameworkAssert.AreNotSame(expected, actual);
+#endif
 		}
 	}
 }

@@ -18,6 +18,8 @@
 using System;
 using Telerik.JustMock.Core;
 
+
+#region JustMock Test Attributes
 #if NUNIT
 using NUnit.Framework;
 using TestCategory = NUnit.Framework.CategoryAttribute;
@@ -26,6 +28,15 @@ using TestMethod = NUnit.Framework.TestAttribute;
 using TestInitialize = NUnit.Framework.SetUpAttribute;
 using TestCleanup = NUnit.Framework.TearDownAttribute;
 using AssertionException = NUnit.Framework.AssertionException;
+#elif XUNIT
+using Xunit;
+using Telerik.JustMock.XUnit.Test.Attributes;
+using TestCategory = Telerik.JustMock.XUnit.Test.Attributes.XUnitCategoryAttribute;
+using TestClass = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestClassAttribute;
+using TestMethod = Xunit.FactAttribute;
+using TestInitialize = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestInitializeAttribute;
+using TestCleanup = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestCleanupAttribute;
+using AssertionException = Xunit.Sdk.AssertException;
 #elif VSTEST_PORTABLE
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
@@ -33,6 +44,8 @@ using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException;
 #endif
+#endregion
+
 
 namespace Telerik.JustMock.Tests
 {

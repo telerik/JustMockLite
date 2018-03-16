@@ -20,7 +20,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using Telerik.JustMock.Core;
+using Telerik.JustMock.Tests.EventFixureDependencies;
 
+#region JustMock Test Attributes
 #if NUNIT
 using NUnit.Framework;
 using TestCategory = NUnit.Framework.CategoryAttribute;
@@ -29,6 +31,15 @@ using TestMethod = NUnit.Framework.TestAttribute;
 using TestInitialize = NUnit.Framework.SetUpAttribute;
 using TestCleanup = NUnit.Framework.TearDownAttribute;
 using AssertionException = NUnit.Framework.AssertionException;
+#elif XUNIT
+using Xunit;
+using Telerik.JustMock.XUnit.Test.Attributes;
+using TestCategory = Telerik.JustMock.XUnit.Test.Attributes.XUnitCategoryAttribute;
+using TestClass = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestClassAttribute;
+using TestMethod = Xunit.FactAttribute;
+using TestInitialize = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestInitializeAttribute;
+using TestCleanup = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestCleanupAttribute;
+using AssertionException = Xunit.Sdk.AssertException;
 #elif VSTEST_PORTABLE
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
@@ -36,6 +47,7 @@ using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException;
 #endif
+#endregion
 
 namespace Telerik.JustMock.Tests
 {
@@ -46,6 +58,12 @@ namespace Telerik.JustMock.Tests
 		private ProjectNavigatorViewModel viewModel;
 		private ISolutionService solutionService;
 
+#if XUNIT
+		public EventsFixture()
+		{
+			Initialize();
+		}
+#endif
 		[TestInitialize]
 		public void Initialize()
 		{
@@ -351,18 +369,6 @@ namespace Telerik.JustMock.Tests
 			Assert.Throws<Exception>(() => Mock.Raise(() => doc.IsDirtyChanged += null, 1, 2));
 		}
 
-#if NUNIT
-		[TestMethod, TestCategory("Lite"), TestCategory("Events")]
-		[TestCaseSource("DummyTestCaseSource")]
-		public void ShouldRaiseEventsOnDataDrivenTests(object _)
-		{
-			Mock.Raise(() => this.solutionService.ProjectAdded += null, new ProjectEventArgs(null));
-		}
-
-		private static IEnumerable<TestCaseData> DummyTestCaseSource = new[] { new TestCaseData(null), new TestCaseData(null) };
-
-#endif
-
 		public interface IDocumentView
 		{
 			IDocument Document { get; }
@@ -372,91 +378,6 @@ namespace Telerik.JustMock.Tests
 		{
 			event EventHandler IsDirtyChanged;
 		}
-
-		#region Dependencies
-
-		public class FooArgs : EventArgs
-		{
-			public FooArgs()
-			{
-			}
-
-			public FooArgs(string value)
-			{
-				this.Value = value;
-			}
-
-			public string Value { get; set; }
-		}
-
-		public interface IExecutor<T>
-		{
-			event EventHandler<FooArgs> Done;
-			event EventHandler Executed;
-			void Execute(T value);
-			void Execute(string value);
-			void Execute(string s, int i);
-			void Execute(string s, int i, bool b);
-			void Execute(string s, int i, bool b, string v);
-
-			string Echo(string s);
-		}
-
-		public class Foo
-		{
-
-		}
-
-		public interface IFoo
-		{
-			event CustomEvent CustomEvent;
-			event EchoEvent EchoEvent;
-			void RaiseMethod();
-			string Echo(string arg);
-			void Execute();
-		}
-
-		public class ProjectNavigatorViewModel
-		{
-			public ProjectNavigatorViewModel(ISolutionService solutionService)
-			{
-				this.SolutionService = solutionService;
-				SolutionService.ProjectAdded += new EventHandler<ProjectEventArgs>(SolutionService_ProjectAdded);
-			}
-
-			void SolutionService_ProjectAdded(object sender, ProjectEventArgs e)
-			{
-				IsProjectAddedCalled = true;
-			}
-
-			public ISolutionService SolutionService { get; set; }
-			public bool IsProjectAddedCalled { get; set; }
-		}
-
-		public class ProjectEventArgs : EventArgs
-		{
-			private IFoo foo;
-
-			public ProjectEventArgs(IFoo foo)
-			{
-				this.foo = foo;
-			}
-		}
-
-		public interface ISolutionService
-		{
-			event EventHandler<ProjectEventArgs> ProjectAdded;
-		}
-
-		public delegate void CustomEvent(string value);
-		public delegate void EchoEvent(bool echoed);
-
-		public class SolutionService : ISolutionService
-		{
-			public event EventHandler<ProjectEventArgs> ProjectAdded;
-		}
-
-		#endregion
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Events"), TestCategory("NonPublic")]
 		public void ShouldRaiseCSharpEventOnNonmock()
@@ -513,6 +434,13 @@ namespace Telerik.JustMock.Tests
 	public class RecordingWorksWhenTestClassHasMockMixin
 	{
 		private IDocumentView activeView;
+
+#if XUNIT
+		public RecordingWorksWhenTestClassHasMockMixin()
+		{
+			BeforeEach();
+		}
+#endif
 
 		[TestInitialize]
 		public void BeforeEach()

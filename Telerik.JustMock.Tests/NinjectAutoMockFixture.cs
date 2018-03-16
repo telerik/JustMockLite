@@ -22,15 +22,34 @@ using Telerik.JustMock.AutoMock.Ninject;
 using Telerik.JustMock.AutoMock.Ninject.Parameters;
 using Telerik.JustMock.Core;
 
-#if !NUNIT
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-#else
+
+#region JustMock Test Attributes
+#if NUNIT
 using NUnit.Framework;
 using TestCategory = NUnit.Framework.CategoryAttribute;
 using TestClass = NUnit.Framework.TestFixtureAttribute;
 using TestMethod = NUnit.Framework.TestAttribute;
-using AssertFailedException = NUnit.Framework.AssertionException;
+using TestInitialize = NUnit.Framework.SetUpAttribute;
+using TestCleanup = NUnit.Framework.TearDownAttribute;
+using AssertionException = NUnit.Framework.AssertionException;
+#elif XUNIT
+using Xunit;
+using Telerik.JustMock.XUnit.Test.Attributes;
+using TestCategory = Telerik.JustMock.XUnit.Test.Attributes.XUnitCategoryAttribute;
+using TestClass = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestClassAttribute;
+using TestMethod = Xunit.FactAttribute;
+using TestInitialize = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestInitializeAttribute;
+using TestCleanup = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestCleanupAttribute;
+using AssertionException = Xunit.Sdk.AssertException;
+#elif VSTEST_PORTABLE
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
+using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
+#else
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException;
 #endif
+#endregion
+
 
 namespace Telerik.JustMock.Tests
 {
@@ -86,7 +105,7 @@ namespace Telerik.JustMock.Tests
 			container.Arrange<IFileSystem>(x => x.Exists("123")).Returns(true).MustBeCalled();
 			container.Arrange<ICalendar>(x => x.Now).Returns(new DateTime(123)).MustBeCalled();
 
-			Assert.Throws<AssertFailedException>(() => container.Assert());
+			Assert.Throws<AssertionException>(() => container.Assert());
 
 			container.Instance.LogExists();
 
@@ -100,9 +119,9 @@ namespace Telerik.JustMock.Tests
 
 			container.Arrange<ICalendar>(x => x.Now).Returns(new DateTime(123));
 
-			Assert.Throws<AssertFailedException>(() => container.Assert<IFileSystem>(x => x.Refresh(), Occurs.Once()));
-			Assert.Throws<AssertFailedException>(() => container.Assert<IFileSystem>(x => x.Exists("123"), Occurs.Once()));
-			Assert.Throws<AssertFailedException>(() => container.Assert<ICalendar>(x => x.Now, Occurs.Once()));
+			Assert.Throws<AssertionException>(() => container.Assert<IFileSystem>(x => x.Refresh(), Occurs.Once()));
+			Assert.Throws<AssertionException>(() => container.Assert<IFileSystem>(x => x.Exists("123"), Occurs.Once()));
+			Assert.Throws<AssertionException>(() => container.Assert<ICalendar>(x => x.Now, Occurs.Once()));
 
 			container.Instance.LogExists();
 
@@ -299,7 +318,7 @@ namespace Telerik.JustMock.Tests
 
 			container.Arrange<IUnitOfWork>(uow => uow.DoWork()).MustBeCalled();
 
-			Assert.Throws<AssertFailedException>(() => container.Assert());
+			Assert.Throws<AssertionException>(() => container.Assert());
 
 			container.Instance.DoWork();
 
@@ -476,7 +495,7 @@ namespace Telerik.JustMock.Tests
 			c.Arrange<ICalendar>(x => x.Now).MustBeCalled("Calendar must be used!");
 			c.Arrange<IFileSystem>(x => x.Refresh()).MustBeCalled("Should use latest data!");
 
-			var ex = Assert.Throws<AssertFailedException>(() => c.Assert("Container must be alright!"));
+			var ex = Assert.Throws<AssertionException>(() => c.Assert("Container must be alright!"));
 
 			Assert.True(ex.Message.Contains("Calendar must be used!"));
 			Assert.True(ex.Message.Contains("Should use latest data!"));

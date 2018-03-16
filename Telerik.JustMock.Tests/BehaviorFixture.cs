@@ -21,6 +21,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Telerik.JustMock.Core;
 
+
+
+#region JustMock Test Attributes
 #if NUNIT
 using NUnit.Framework;
 using TestCategory = NUnit.Framework.CategoryAttribute;
@@ -29,6 +32,15 @@ using TestMethod = NUnit.Framework.TestAttribute;
 using TestInitialize = NUnit.Framework.SetUpAttribute;
 using TestCleanup = NUnit.Framework.TearDownAttribute;
 using AssertionException = NUnit.Framework.AssertionException;
+#elif XUNIT
+using Xunit;
+using Telerik.JustMock.XUnit.Test.Attributes;
+using TestCategory = Telerik.JustMock.XUnit.Test.Attributes.XUnitCategoryAttribute;
+using TestClass = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestClassAttribute;
+using TestMethod = Xunit.FactAttribute;
+using TestInitialize = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestInitializeAttribute;
+using TestCleanup = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestCleanupAttribute;
+using AssertionException = Xunit.Sdk.AssertException;
 #elif VSTEST_PORTABLE
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
@@ -36,6 +48,9 @@ using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException;
 #endif
+#endregion
+
+
 
 namespace Telerik.JustMock.Tests
 {
@@ -185,7 +200,6 @@ namespace Telerik.JustMock.Tests
 			person.CallBool(p => true); // doesn't throw
 		}
 
-#if !NUNIT
 		// BCL issue - Reflection.Emit fails for multidimensional arrays until .NET4
 		// with System.TypeLoadException : Signature of the body and declaration in a method implementation do not match.
 
@@ -195,8 +209,8 @@ namespace Telerik.JustMock.Tests
 			var matrix = Mock.Create<IMatrix>();
 			var array = matrix.GetMultidimensionalArray();
 			Assert.NotNull(array);
-			Assert.Equals(0, array.GetLength(0));
-			Assert.Equals(0, array.GetLength(1));
+			Assert.Equal(0, array.GetLength(0));
+			Assert.Equal(0, array.GetLength(1));
 			Assert.Same(array, matrix.GetMultidimensionalArray());
 		}
 
@@ -223,7 +237,6 @@ namespace Telerik.JustMock.Tests
 		{
 			int[, ,] GetMultidimensionalArray();
 		}
-#endif
 
 		public interface IFoo
 		{

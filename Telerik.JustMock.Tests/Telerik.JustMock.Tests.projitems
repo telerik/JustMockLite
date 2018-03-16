@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>6f2aea8b-7295-4446-9686-663993ae0b18</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Telerik.JustMock.Tests</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AssertionFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AsyncFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BehaviorFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ConstructorFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Coverage\DoInsteadFixture.cs">
+      <DependentUpon>DoInsteadFixture.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Coverage\MatchersFixture.cs">
+      <DependentUpon>MatchersFixture.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Coverage\ReturnsFixture.cs">
+      <DependentUpon>ReturnsFixture.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Coverage\WhenFixture.cs">
+      <DependentUpon>WhenFixture.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)DelegateFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DynamicFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EventClassFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EventsFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EventsFixtureDependencies.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FluentFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FuncSpecFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InOrderFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)InteropFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MarshalByRefFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MatchersFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MiscFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MockFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NinjectAutoMockFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NonPublicFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OccurrenceFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OutRefFixure.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertiesFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RecursiveFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ReturnsFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SequenceFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WaitEventFixture.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Coverage\DoInsteadFixture.tt">
+      <LastGenOutput>DoInsteadFixture.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)Coverage\MatchersFixture.tt">
+      <LastGenOutput>MatchersFixture.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)Coverage\ReturnsFixture.tt">
+      <LastGenOutput>ReturnsFixture.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)Coverage\TestBuilder.include" />
+    <None Include="$(MSBuildThisFileDirectory)Coverage\WhenFixture.tt">
+      <LastGenOutput>WhenFixture.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+  </ItemGroup>
+</Project>

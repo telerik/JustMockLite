@@ -14,7 +14,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+using System;
+using Telerik.JustMock.Helpers;
 
+
+#region JustMock Test Attributes
 #if NUNIT
 using NUnit.Framework;
 using TestCategory = NUnit.Framework.CategoryAttribute;
@@ -23,6 +27,15 @@ using TestMethod = NUnit.Framework.TestAttribute;
 using TestInitialize = NUnit.Framework.SetUpAttribute;
 using TestCleanup = NUnit.Framework.TearDownAttribute;
 using AssertionException = NUnit.Framework.AssertionException;
+#elif XUNIT
+using Xunit;
+using Telerik.JustMock.XUnit.Test.Attributes;
+using TestCategory = Telerik.JustMock.XUnit.Test.Attributes.XUnitCategoryAttribute;
+using TestClass = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestClassAttribute;
+using TestMethod = Xunit.FactAttribute;
+using TestInitialize = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestInitializeAttribute;
+using TestCleanup = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestCleanupAttribute;
+using AssertionException = Xunit.Sdk.AssertException;
 #elif VSTEST_PORTABLE
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
@@ -30,9 +43,8 @@ using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException;
 #endif
+#endregion
 
-using System;
-using Telerik.JustMock.Helpers;
 
 namespace Telerik.JustMock.Tests
 {
@@ -150,11 +162,11 @@ namespace Telerik.JustMock.Tests
 			foo.Arrange(x => x.Add(Arg.AnyInt, Arg.AnyInt)).Returns(5).InSequence();
 			foo.Arrange(x => x.Add(Arg.AnyInt, Arg.AnyInt)).Returns(7).InSequence();
 			//The parameters don't matter
-			Assert.Equals(3, foo.Add(2, 2));
-			Assert.Equals(5, foo.Add(2, 2));
-			Assert.Equals(7, foo.Add(2, 2));
+			Assert.Equal(3, foo.Add(2, 2));
+			Assert.Equal(5, foo.Add(2, 2));
+			Assert.Equal(7, foo.Add(2, 2));
 			//Anything after the last configured InSequence/Returns follows rule of the last arrange
-			Assert.Equals(7, foo.Add(2, 5));
+			Assert.Equal(7, foo.Add(2, 5));
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Sequence")]
@@ -163,11 +175,11 @@ namespace Telerik.JustMock.Tests
 			var foo = Mock.Create<IFoo2>();
 			foo.Arrange(x => x.Add(Arg.AnyInt, Arg.AnyInt)).Returns(3).Returns(5).Returns(7);
 			//The parameters don't matter
-			Assert.Equals(3, foo.Add(2, 2));
-			Assert.Equals(5, foo.Add(2, 2));
-			Assert.Equals(7, foo.Add(2, 2));
+			Assert.Equal(3, foo.Add(2, 2));
+			Assert.Equal(5, foo.Add(2, 2));
+			Assert.Equal(7, foo.Add(2, 2));
 			//Anything after the last configured InSequence/Returns follows rule of the last arrange
-			Assert.Equals(7, foo.Add(2, 2));
+			Assert.Equal(7, foo.Add(2, 2));
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Sequence"), TestCategory("InOrder")]
