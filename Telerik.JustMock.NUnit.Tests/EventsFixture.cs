@@ -15,56 +15,27 @@
    limitations under the License.
 */
 
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using Telerik.JustMock.Core;
 using Telerik.JustMock.Tests.EventFixureDependencies;
-
-#region JustMock Test Attributes
-#if NUNIT
 using NUnit.Framework;
-using TestCategory = NUnit.Framework.CategoryAttribute;
-using TestClass = NUnit.Framework.TestFixtureAttribute;
-using TestMethod = NUnit.Framework.TestAttribute;
-using TestInitialize = NUnit.Framework.SetUpAttribute;
-using TestCleanup = NUnit.Framework.TearDownAttribute;
-using AssertionException = NUnit.Framework.AssertionException;
-#elif XUNIT
-using Xunit;
-using Telerik.JustMock.XUnit.Test.Attributes;
-using TestCategory = Telerik.JustMock.XUnit.Test.Attributes.XUnitCategoryAttribute;
-using TestClass = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestClassAttribute;
-using TestMethod = Xunit.FactAttribute;
-using TestInitialize = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestInitializeAttribute;
-using TestCleanup = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestCleanupAttribute;
-using AssertionException = Xunit.Sdk.AssertException;
-#elif VSTEST_PORTABLE
-using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
-using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
-#else
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException;
-#endif
-#endregion
+
 
 namespace Telerik.JustMock.Tests
 {
-	[TestClass]
+	[TestFixture]
 	public class EventsFixtureNUnit
 	{
 		private ProjectNavigatorViewModel viewModel;
 		private ISolutionService solutionService;
 
-		[TestInitialize]
+		[SetUp]
 		public void Initialize()
 		{
 			this.solutionService = Mock.Create<ISolutionService>();
 			this.viewModel = new ProjectNavigatorViewModel(this.solutionService);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Events")]
+		[Test, Category("Lite"), Category("Events")]
 		[TestCaseSource("DummyTestCaseSource")]
 		public void ShouldRaiseEventsOnDataDrivenTests(object _)
 		{
