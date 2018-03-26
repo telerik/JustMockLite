@@ -86,6 +86,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Telerik.JustMock.DemoLibSigned\Telerik.JustMock.DemoLibSigned.csproj">
       <Project>{84156592-ca84-4b6d-83f2-dcfe9e4843f0}</Project>
       <Name>Telerik.JustMock.DemoLibSigned</Name>
