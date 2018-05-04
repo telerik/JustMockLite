@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik AD
+ Copyright © 2010-2015 Telerik EAD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@ using System.Reflection;
 #endif
 
 [assembly: AssemblyTrademark("")]
-[assembly: AssemblyCompany("Telerik AD")]
-[assembly: AssemblyCopyright("Copyright © 2010-2015 Telerik AD")]
+[assembly: AssemblyCompany("Telerik EAD")]
+[assembly: AssemblyCopyright("Copyright © 2010-2015 Telerik EAD")]
 
 [assembly: AssemblyVersion("2013.3.1021.0")]
 [assembly: AssemblyFileVersion("2013.3.1021.0")]
