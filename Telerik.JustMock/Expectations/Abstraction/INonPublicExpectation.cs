@@ -78,6 +78,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <returns>Reference to setup actions calls</returns>
 		FuncExpectation<TReturn> Arrange<TReturn>(object target, MethodInfo method, params object[] args);
 
+		FuncExpectation<TReturn> ArrangeLocal<TReturn>(object target, MethodInfo method, string localMemberName, params object[] args);
 
 		/// <summary>
 		/// Asserts the specified member that it is called as expected.

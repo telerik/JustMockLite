@@ -303,6 +303,14 @@ namespace Telerik.JustMock.Expectations
 			MethodInfo method = type.GetMethod(memberName);
 			MethodInfo localMethod = GetLocalMethod(type, method, localMemberName);
 
+			return Arrange<TReturn>(target, localMethod.Name, args);
+		}
+
+		public FuncExpectation<TReturn> ArrangeLocal<TReturn>(object target, MethodInfo method, string localMemberName, params object[] args)
+		{
+			Type type = target.GetType();
+			MethodInfo localMethod = GetLocalMethod(type, method, localMemberName);
+
 			return Arrange<TReturn>(target, localMethod, args);
 		}
 
