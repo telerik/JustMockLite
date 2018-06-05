@@ -249,7 +249,7 @@ namespace Telerik.JustMock.Expectations
 				});
 		}
 
-		public ActionExpectation Arrange(object target, string memberName, string localMemberName, params object[] args)
+		public ActionExpectation ArrangeLocal(object target, string memberName, string localMemberName, params object[] args)
 		{
 			Type type = target.GetType();
 
