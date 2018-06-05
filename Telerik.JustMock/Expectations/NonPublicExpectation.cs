@@ -249,46 +249,11 @@ namespace Telerik.JustMock.Expectations
 				});
 		}
 
-		public ActionExpectation ArrangeLocal(object target, string memberName, string localMemberName, params object[] args)
-		{
-			Type type = target.GetType();
 
+		private MethodInfo GetLocalMethod(Type type, MethodInfo method, string localMemberName)
+		{
 			MethodInfo[] allMethods = type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
 
-			MethodInfo method = type.GetMethod(memberName);
-			MethodBody body = method.GetMethodBody();
-			byte[] il = body.GetILAsByteArray();
-
-			MethodInfo localMethod = null;
-			for (int i = 0; i < il.Length; i++)
-			{
-				byte opCode = il[i];
-				if (opCode == 0x28) ////System.Reflection.Emit.OpCodes.Call)
-				{
-					int token = BitConverter.ToInt32(il, i + 1);
-					foreach(var m in allMethods)
-					{
-						if(token == m.MetadataToken && m.Name.Contains(localMemberName))
-						{
-							localMethod = m;
-							break;
-						}
-					}
-				}
-				if(localMethod != null)
-				{
-					break;
-				}
-			}
-
-			return Arrange(target, localMethod.Name, args);
-		}
-		public ActionExpectation ArrangeLocal(object target, MethodInfo method, string localMemberName, params object[] args)
-		{
-			Type type = target.GetType();
-
-			MethodInfo[] allMethods = type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
-			
 			MethodBody body = method.GetMethodBody();
 			byte[] il = body.GetILAsByteArray();
 
@@ -313,6 +278,21 @@ namespace Telerik.JustMock.Expectations
 					break;
 				}
 			}
+			return localMethod;
+		}
+
+		public ActionExpectation ArrangeLocal(object target, string memberName, string localMemberName, params object[] args)
+		{
+			Type type = target.GetType();
+			MethodInfo method = type.GetMethod(memberName);
+			MethodInfo localMethod = GetLocalMethod(type, method, localMemberName);
+
+			return Arrange(target, localMethod.Name, args);
+		}
+		public ActionExpectation ArrangeLocal(object target, MethodInfo method, string localMemberName, params object[] args)
+		{
+			Type type = target.GetType();
+			MethodInfo localMethod = GetLocalMethod(type, method, localMemberName);
 
 			return Arrange(target, localMethod, args);
 		}
