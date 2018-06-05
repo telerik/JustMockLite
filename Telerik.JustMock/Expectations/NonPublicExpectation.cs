@@ -249,6 +249,42 @@ namespace Telerik.JustMock.Expectations
 				});
 		}
 
+		public ActionExpectation Arrange(object target, string memberName, string localMemberName, params object[] args)
+		{
+			Type type = target.GetType();
+
+			MethodInfo[] allMethods = type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
+
+			MethodInfo method = type.GetMethod(memberName);
+			MethodBody body = method.GetMethodBody();
+			byte[] il = body.GetILAsByteArray();
+
+			MethodInfo localMethod = null;
+			for (int i = 0; i < il.Length; i++)
+			{
+				byte opCode = il[i];
+				if (opCode == 0x28) ////System.Reflection.Emit.OpCodes.Call)
+				{
+					int token = BitConverter.ToInt32(il, i + 1);
+					foreach(var m in allMethods)
+					{
+						if(token == m.MetadataToken && m.Name.Contains(localMemberName))
+						{
+							localMethod = m;
+							break;
+						}
+					}
+				}
+				if(localMethod != null)
+				{
+					break;
+				}
+			}
+
+			return Arrange(target, localMethod.Name, args);
+
+		}
+
 		public ActionExpectation Arrange(object target, MethodInfo method, params object[] args)
 		{
 			return ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.Arrange(target, method, args, () => new ActionExpectation()));
