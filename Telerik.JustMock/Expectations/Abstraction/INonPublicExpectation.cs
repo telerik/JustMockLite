@@ -55,6 +55,8 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <returns>Reference to setup actions calls</returns>
 		ActionExpectation Arrange(object target, MethodInfo method, params object[] args);
 
+		ActionExpectation ArrangeLocal(object target, MethodInfo method, string localMemberName, params object[] args);
+
 		/// <summary>
 		/// Arranges a method for mocking.
 		/// </summary>
@@ -63,6 +65,8 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <param name="memberName">Target member name</param>
 		/// <param name="args">Method arguments</param>
 		FuncExpectation<TReturn> Arrange<TReturn>(object target, string memberName, params object[] args);
+
+		FuncExpectation<TReturn> ArrangeLocal<TReturn>(object target, string memberName, string localMemberName, params object[] args);
 
 		/// <summary>
 		/// Setups a non-public method for mocking.
@@ -74,7 +78,6 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <returns>Reference to setup actions calls</returns>
 		FuncExpectation<TReturn> Arrange<TReturn>(object target, MethodInfo method, params object[] args);
 
-		ActionExpectation ArrangeLocal(object target, MethodInfo method, string localMemberName, params object[] args);
 
 		/// <summary>
 		/// Asserts the specified member that it is called as expected.

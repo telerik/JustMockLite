@@ -297,6 +297,15 @@ namespace Telerik.JustMock.Expectations
 			return Arrange(target, localMethod, args);
 		}
 
+		public FuncExpectation<TReturn> ArrangeLocal<TReturn>(object target, string memberName, string localMemberName, params object[] args)
+		{
+			Type type = target.GetType();
+			MethodInfo method = type.GetMethod(memberName);
+			MethodInfo localMethod = GetLocalMethod(type, method, localMemberName);
+
+			return Arrange<TReturn>(target, localMethod, args);
+		}
+
 		public ActionExpectation Arrange(object target, MethodInfo method, params object[] args)
 		{
 			return ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.Arrange(target, method, args, () => new ActionExpectation()));
