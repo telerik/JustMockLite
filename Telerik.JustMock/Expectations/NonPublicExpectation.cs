@@ -278,6 +278,9 @@ namespace Telerik.JustMock.Expectations
 					break;
 				}
 			}
+			if (localMethod == null)
+				throw new MissingMemberException(BuildMissingMethodMessage(type, null, localMemberName));
+
 			return localMethod;
 		}
 
