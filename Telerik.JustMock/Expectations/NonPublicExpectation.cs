@@ -282,7 +282,39 @@ namespace Telerik.JustMock.Expectations
 			}
 
 			return Arrange(target, localMethod.Name, args);
+		}
+		public ActionExpectation ArrangeLocal(object target, MethodInfo method, string localMemberName, params object[] args)
+		{
+			Type type = target.GetType();
 
+			MethodInfo[] allMethods = type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
+			
+			MethodBody body = method.GetMethodBody();
+			byte[] il = body.GetILAsByteArray();
+
+			MethodInfo localMethod = null;
+			for (int i = 0; i < il.Length; i++)
+			{
+				byte opCode = il[i];
+				if (opCode == 0x28) ////System.Reflection.Emit.OpCodes.Call)
+				{
+					int token = BitConverter.ToInt32(il, i + 1);
+					foreach (var m in allMethods)
+					{
+						if (token == m.MetadataToken && m.Name.Contains(localMemberName))
+						{
+							localMethod = m;
+							break;
+						}
+					}
+				}
+				if (localMethod != null)
+				{
+					break;
+				}
+			}
+
+			return Arrange(target, localMethod, args);
 		}
 
 		public ActionExpectation Arrange(object target, MethodInfo method, params object[] args)
