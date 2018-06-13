@@ -397,6 +397,7 @@ namespace Telerik.JustMock.Core
 			}
 
 			invocation.InArrange = this.sharedContext.InArrange;
+			invocation.InAssertSet = this.sharedContext.InAssertSet;
 			invocation.Recording = this.Recorder != null;
 			invocation.RetainBehaviorDuringRecording = this.sharedContext.DispatchToMethodMocks;
 			invocation.Repository = this;
@@ -415,15 +416,18 @@ namespace Telerik.JustMock.Core
 
 			if (!methodMockProcessed)
 			{
+				// We have to be cearfull for the potential exception throwing in the assertion context, so skip CallOriginalBehavior processing
 				var mock = invocation.MockMixin;
 				if (mock != null)
 				{
-					foreach (var behavior in mock.FallbackBehaviors)
-						behavior.Process(invocation);
+                    mock.FallbackBehaviors
+                        .Where(behavior => !invocation.InAssertSet || !(behavior is CallOriginalBehavior))
+                        .ToList()
+                        .ForEach(behavior => behavior.Process(invocation));
 				}
 				else
 				{
-					invocation.CallOriginal = CallOriginalBehavior.ShouldCallOriginal(invocation);
+					invocation.CallOriginal = CallOriginalBehavior.ShouldCallOriginal(invocation) && !invocation.InAssertSet;
 				}
 			}
 
@@ -803,8 +807,20 @@ namespace Telerik.JustMock.Core
 		{
 			using (MockingContext.BeginFailureAggregation(message))
 			{
-				var callPattern = ConvertActionToCallPattern(memberAction);
+				var callPattern = ConvertActionToCallPattern(memberAction, true);
 				AssertForCallPattern(callPattern, args, occurs);
+			}
+		}
+
+		internal void AssertSetAction(string message, Action memberAction, Args args = null, Occurs occurs = null)
+		{
+			using (MockingContext.BeginFailureAggregation(message))
+			{
+				using (this.sharedContext.StartAssertSet())
+				{
+					var callPattern = ConvertActionToCallPattern(memberAction, true);
+					AssertForCallPattern(callPattern, args, occurs);
+				}
 			}
 		}
 
@@ -985,7 +1001,7 @@ namespace Telerik.JustMock.Core
 			callPattern.AdjustForExtensionMethod();
 		}
 
-		private CallPattern ConvertActionToCallPattern(Action memberAction)
+		private CallPattern ConvertActionToCallPattern(Action memberAction, bool dispatchToMethodMocks = false)
 		{
 			var callPattern = new CallPattern();
 
@@ -993,7 +1009,7 @@ namespace Telerik.JustMock.Core
 
 			var recorder = new DelegatingRecorder();
 			recorder.Record += invocation => lastInvocation = invocation;
-			using (this.StartRecording(recorder, false))
+			using (this.StartRecording(recorder, dispatchToMethodMocks))
 			{
 				memberAction();
 			}
@@ -1585,7 +1601,7 @@ namespace Telerik.JustMock.Core
 			ConvertInvocationToCallPattern(invocation, callPattern);
 
 			MethodInfoMatcherTreeNode funcRoot = null;
-			if (!invocation.InArrange)
+			if (!invocation.InArrange && !invocation.InAssertSet)
 			{
 				if (!invocationTreeRoots.TryGetValue(callPattern.Method, out funcRoot))
 				{
@@ -1596,7 +1612,7 @@ namespace Telerik.JustMock.Core
 
 			var methodMock = DispatchInvocationToArrangements(callPattern, invocation);
 
-			if (!invocation.InArrange)
+			if (!invocation.InArrange && !invocation.InAssertSet)
 			{
 				funcRoot.AddOrUpdateOccurence(callPattern, methodMock);
 			}
@@ -1633,16 +1649,39 @@ namespace Telerik.JustMock.Core
 
 			methodMock.IsUsed = true; //used to correctly determine inSequence arranges
 
-			foreach (var behavior in methodMock.Behaviors)
-				behavior.Process(invocation);
+            GetBehaviorsToProcess(invocation, methodMock)
+                .ForEach(behavior => behavior.Process(invocation));
+
+			return methodMock;
+		}
+
+		private static List<IBehavior> GetBehaviorsToProcess(Invocation invocation, IMethodMock methodMock)
+		{
+			var behaviorsToExecute = new List<IBehavior>();
+
+			var behaviorTypesToSkip = GetBehaviorTypesToSkip(invocation);
+			behaviorsToExecute.AddRange(
+				methodMock.Behaviors.Where(behavior => !behaviorTypesToSkip.Contains(behavior.GetType())));
 
 			var mock = invocation.MockMixin;
 			if (mock != null)
 			{
-				foreach (var behavior in mock.SupplementaryBehaviors)
-					behavior.Process(invocation);
+				behaviorsToExecute.AddRange(mock.SupplementaryBehaviors);
 			}
-			return methodMock;
+
+			return behaviorsToExecute;
+		}
+
+		private static List<Type> GetBehaviorTypesToSkip(Invocation invocation)
+		{
+			var behaviorTypesToSkip = new List<Type>();
+
+			if (invocation.InAssertSet)
+			{
+				behaviorTypesToSkip.Add(typeof(InvocationOccurrenceBehavior));
+			}
+
+			return behaviorTypesToSkip;
 		}
 
 		private bool TryCreateDelegate(Type type, MockCreationSettings settings, out object delegateResult)
