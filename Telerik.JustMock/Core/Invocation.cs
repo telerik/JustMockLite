@@ -59,6 +59,7 @@ namespace Telerik.JustMock.Core
 		#endregion
 
 		internal bool InArrange { get; set; }
+		internal bool InAssertSet { get; set; }
 		internal bool Recording { get; set; }
 		internal bool RetainBehaviorDuringRecording { get; set; }
 		internal MocksRepository Repository { get; set; }

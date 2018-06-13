@@ -29,6 +29,7 @@ namespace Telerik.JustMock.Core
 		private readonly ThreadLocalProperty<IRecorder> recorder = new ThreadLocalProperty<IRecorder>();
 		private readonly ThreadLocalProperty<object> inArrange = new ThreadLocalProperty<object>();
 		private readonly ThreadLocalProperty<object> dispatchToMethodMocks = new ThreadLocalProperty<object>();
+        private readonly ThreadLocalProperty<object> inAssertSet = new ThreadLocalProperty<object>();
 
 		public IRecorder Recorder
 		{
@@ -42,7 +43,13 @@ namespace Telerik.JustMock.Core
 			private set { this.inArrange.Set(value ? (object)value : null); }
 		}
 
-		public bool DispatchToMethodMocks
+        public bool InAssertSet
+        {
+            get { return this.inAssertSet.Get() != null; }
+            private set { this.inAssertSet.Set(value ? (object)value : null); }
+        }
+
+        public bool DispatchToMethodMocks
 		{
 			get { return this.dispatchToMethodMocks.Get() != null; }
 			private set { this.dispatchToMethodMocks.Set(value ? (object)value : null); }
@@ -53,7 +60,7 @@ namespace Telerik.JustMock.Core
 			Monitor.Enter(this);
 			this.Recorder = recorder;
 			this.DispatchToMethodMocks = dispatchToMethodMocks;
-			return new RecordingSession(this);
+			return new InRecordingContext(this);
 		}
 
 		public IDisposable StartArrange()
@@ -62,50 +69,83 @@ namespace Telerik.JustMock.Core
 			return new InArrangeContext(this);
 		}
 
-		public int GetNextArrangeId()
+        public IDisposable StartAssertSet()
+        {
+            Monitor.Enter(this);
+            return new InAssertSetContext(this);
+        }
+
+        public int GetNextArrangeId()
 		{
 			lock (this)
 				return nextArrangeId++;
 		}
 
-		private class RecordingSession : IDisposable
+        abstract private class ContextSession : IDisposable
+        {
+            private readonly RepositorySharedContext context;
+
+            public RepositorySharedContext Context { get { return context; } }
+
+            public ContextSession(RepositorySharedContext context)
+            {
+                this.context = context;
+            }
+
+            public abstract void Dispose();
+        }
+
+		private class InRecordingContext : ContextSession
 		{
-			private readonly RepositorySharedContext context;
 			private readonly int oldCounter;
 
-			public RecordingSession(RepositorySharedContext context)
+			public InRecordingContext(RepositorySharedContext context)
+                : base(context)
 			{
-				this.context = context;
 				this.oldCounter = ProfilerInterceptor.ReentrancyCounter;
 
 				ProfilerInterceptor.ReentrancyCounter = 0;
 			}
 
-			public void Dispose()
+			public override void Dispose()
 			{
 				ProfilerInterceptor.ReentrancyCounter = this.oldCounter;
 
-				context.Recorder = null;
-				Monitor.Exit(context);
+				this.Context.Recorder = null;
+				Monitor.Exit(this.Context);
 			}
 		}
 
-		private class InArrangeContext : IDisposable
+		private class InArrangeContext : ContextSession
 		{
-			private readonly RepositorySharedContext context;
-
 			public InArrangeContext(RepositorySharedContext context)
+                : base(context)
 			{
-				this.context = context;
-				Debug.Assert(!context.InArrange);
+				Debug.Assert(!this.Context.InArrange);
 				context.InArrange = true;
 			}
 
-			public void Dispose()
+			public override void Dispose()
 			{
-				context.InArrange = false;
-				Monitor.Exit(context);
+				this.Context.InArrange = false;
+				Monitor.Exit(this.Context);
 			}
 		}
-	}
+
+        private class InAssertSetContext : ContextSession
+        {
+            public InAssertSetContext(RepositorySharedContext context)
+                : base(context)
+            {
+                Debug.Assert(!this.Context.InAssertSet);
+                context.InAssertSet = true;
+            }
+
+            public override void Dispose()
+            {
+                this.Context.InAssertSet = false;
+                Monitor.Exit(this.Context);
+            }
+        }
+    }
 }
