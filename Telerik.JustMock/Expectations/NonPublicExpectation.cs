@@ -301,11 +301,19 @@ namespace Telerik.JustMock.Expectations
 
 		public ActionExpectation ArrangeLocal(object target, string memberName, string localMemberName, params object[] args)
 		{
-			Type type = target.GetType();
-			MethodInfo method = GetMethodByName(type, typeof(void), memberName, ref args);
-			MethodInfo localMethod = GetLocalMethod(type, method, localMemberName);
+			Type[] emptyParamTypes = new Type[] {};
+			return ArrangeLocal(target, memberName, emptyParamTypes, localMemberName, args);
+		}
 
-			return Arrange(target, localMethod.Name, args);
+		public ActionExpectation ArrangeLocal(object target, string memberName, Type[] memberParamTypes, string localMemberName, params object[] args)
+		{
+			Type type = target.GetType();
+			MethodInfo method = type.GetMethod(memberName, memberParamTypes);
+			if(method == null)
+			{
+				throw new MissingMemberException(BuildMissingMethodMessage(type, null, memberName));
+			}
+			return ArrangeLocal(target, method, localMemberName, args);
 		}
 		public ActionExpectation ArrangeLocal(object target, MethodInfo method, string localMemberName, params object[] args)
 		{
@@ -317,11 +325,20 @@ namespace Telerik.JustMock.Expectations
 
 		public FuncExpectation<TReturn> ArrangeLocal<TReturn>(object target, string memberName, string localMemberName, params object[] args)
 		{
-			Type type = target.GetType();
-			MethodInfo method = GetMethodByName(type, typeof(void), memberName, ref args);
-			MethodInfo localMethod = GetLocalMethod(type, method, localMemberName);
+			Type[] emptyParamTypes = new Type[] { };
+			return ArrangeLocal<TReturn>(target, memberName, emptyParamTypes, localMemberName, args);
+		}
 
-			return Arrange<TReturn>(target, localMethod.Name, args);
+		public FuncExpectation<TReturn> ArrangeLocal<TReturn>(object target, string memberName, Type[] memberParamTypes, string localMemberName, params object[] args)
+		{
+			Type type = target.GetType();
+			MethodInfo method = type.GetMethod(memberName, memberParamTypes);
+			if (method == null)
+			{
+				throw new MissingMemberException(BuildMissingMethodMessage(type, null, memberName));
+			}
+
+			return ArrangeLocal<TReturn>(target, method, localMemberName, args);
 		}
 
 		public FuncExpectation<TReturn> ArrangeLocal<TReturn>(object target, MethodInfo method, string localMemberName, params object[] args)
