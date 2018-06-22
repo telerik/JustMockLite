@@ -252,50 +252,44 @@ namespace Telerik.JustMock.Expectations
 
 		private MethodInfo GetLocalMethod(Type type, MethodInfo method, string localMemberName)
 		{
-			MethodInfo[] allMethods = type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
-			MethodInfo[] potentialLocalMethods = allMethods.Where(m => (m.Name.Contains(method.Name) && m.Name.Contains(localMemberName))).ToArray();
+			MethodInfo[] allStaticNonPublicMethods = type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Instance);
+			MethodInfo[] potentialLocalMethods = allStaticNonPublicMethods.Where(m => (m.Name.Contains(method.Name) && m.Name.Contains(localMemberName))).ToArray();
 
-			if(potentialLocalMethods.Length == 0)
+			if (potentialLocalMethods.Length == 0)
 			{
 				throw new MissingMemberException(BuildMissingMethodMessage(type, null, localMemberName));
-			}else if (potentialLocalMethods.Length == 1)
+			} else if (potentialLocalMethods.Length == 1)
 			{
 				return potentialLocalMethods.First();
-			}
-			else
+			} else
 			{
-				MethodBody body = method.GetMethodBody();
-				byte[] il = body.GetILAsByteArray();
-
 				MethodInfo localMethod = null;
-			for (int i = 0; i < il.Length; i++)
-			{
-				byte opCode = il[i];
-				if (opCode == 0x28) ////System.Reflection.Emit.OpCodes.Call)
+				MethodInfo[] allMethods = type.GetAllMethods().ToArray();
+				int methodIndex = Array.IndexOf(allMethods, method);
+				methodIndex += 1; //Indices in the names of local methods are 1-based
+
+				var regEx = new System.Text.RegularExpressions.Regex(@"<[a-z,A-z]>g__[a-z,A-z]|(?<MethodId>\d+)_(?<LocalId>\d+)");
+				foreach (var candidate in potentialLocalMethods)
 				{
-					int token = BitConverter.ToInt32(il, i + 1);
-					foreach (var m in allMethods)
+					System.Text.RegularExpressions.Match match = regEx.Match(candidate.Name);
+					if (match.Success)
 					{
-						int token = inst.Operand.Int;
-						foreach (var m in potentialLocalMethods)
+						int index = int.Parse(match.Groups["MethodId"].Value);
+						if (methodIndex == index)
 						{
-							if (token == m.MetadataToken && m.Name.Contains(localMemberName))
-							{
-								localMethod = m;
-								break;
-							}
+							localMethod = candidate;
+							break;
 						}
 					}
 				}
 				if (localMethod != null)
 				{
-					break;
+					return localMethod;
 				}
-			}
-				if (localMethod == null)
+				else
+				{
 					throw new MissingMemberException(BuildMissingMethodMessage(type, null, localMemberName));
-
-				return localMethod;
+				}
 			}
 		}
 
