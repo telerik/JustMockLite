@@ -252,12 +252,22 @@ namespace Telerik.JustMock.Expectations
 
 		private MethodInfo GetLocalMethod(Type type, MethodInfo method, string localMemberName)
 		{
-			MethodInfo[] allMethods = type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
+			MethodInfo[] allMethods = type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
+			MethodInfo[] potentialLocalMethods = allMethods.Where(m => (m.Name.Contains(method.Name) && m.Name.Contains(localMemberName))).ToArray();
 
-			MethodBody body = method.GetMethodBody();
-			byte[] il = body.GetILAsByteArray();
+			if(potentialLocalMethods.Length == 0)
+			{
+				throw new MissingMemberException(BuildMissingMethodMessage(type, null, localMemberName));
+			}else if (potentialLocalMethods.Length == 1)
+			{
+				return potentialLocalMethods.First();
+			}
+			else
+			{
+				MethodBody body = method.GetMethodBody();
+				byte[] il = body.GetILAsByteArray();
 
-			MethodInfo localMethod = null;
+				MethodInfo localMethod = null;
 			for (int i = 0; i < il.Length; i++)
 			{
 				byte opCode = il[i];
@@ -266,10 +276,14 @@ namespace Telerik.JustMock.Expectations
 					int token = BitConverter.ToInt32(il, i + 1);
 					foreach (var m in allMethods)
 					{
-						if (token == m.MetadataToken && m.Name.Contains(localMemberName))
+						int token = inst.Operand.Int;
+						foreach (var m in potentialLocalMethods)
 						{
-							localMethod = m;
-							break;
+							if (token == m.MetadataToken && m.Name.Contains(localMemberName))
+							{
+								localMethod = m;
+								break;
+							}
 						}
 					}
 				}
@@ -278,10 +292,11 @@ namespace Telerik.JustMock.Expectations
 					break;
 				}
 			}
-			if (localMethod == null)
-				throw new MissingMemberException(BuildMissingMethodMessage(type, null, localMemberName));
+				if (localMethod == null)
+					throw new MissingMemberException(BuildMissingMethodMessage(type, null, localMemberName));
 
-			return localMethod;
+				return localMethod;
+			}
 		}
 
 		public ActionExpectation ArrangeLocal(object target, string memberName, string localMemberName, params object[] args)
