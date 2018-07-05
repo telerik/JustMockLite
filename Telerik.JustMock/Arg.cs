@@ -166,7 +166,7 @@ namespace Telerik.JustMock
 		/// <returns>A special value with member 'Value' that must be passed by ref.</returns>
 		public static OutRefResult<T> Ref<T>(T value)
 		{
-			return null;
+            return new OutRefResult<T>() { Value = value };
 		}
 	}
 }

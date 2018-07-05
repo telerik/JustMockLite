@@ -46,7 +46,9 @@ namespace Telerik.JustMock.Core.Behaviors
 			this.type = type;
 		}
 
-		public void Process(Invocation invocation)
+        public RecursiveMockingBehaviorType Type { get { return type; } }
+
+        public void Process(Invocation invocation)
 		{
 			if (invocation.IsReturnValueSet)
 				return;
@@ -162,6 +164,17 @@ namespace Telerik.JustMock.Core.Behaviors
 					.Invoke(null, new object[] { taskResultValue });
 			}
 
+            if (mock == null && returnType.IsByRef)
+            {
+                var delegateType = typeof(object).Assembly.GetType("Telerik.JustMock.RefDelegate`1").MakeGenericType(new [] { returnType.GetElementType() });
+                ConstructorInfo constructor = delegateType.GetConstructor(new[] { typeof(object), typeof(IntPtr) });
+
+                MethodInfo genericMethodInfo = this.GetType().GetMethod("GetDefaultRef", BindingFlags.NonPublic | BindingFlags.Instance);
+                MethodInfo methodInfo = genericMethodInfo.MakeGenericMethod(returnType.GetElementType());
+
+                mock = constructor.Invoke(new object[] { this, methodInfo.MethodHandle.GetFunctionPointer() });
+            }
+
 			if (mock == null && MustReturnMock(invocation, checkPropertyOnTestFixture: true))
 			{
 				if (typeof(String) == returnType)
@@ -181,5 +194,17 @@ namespace Telerik.JustMock.Core.Behaviors
 
 			return mock;
 		}
-	}
+
+        ref T GetDefaultRef<T>()
+        {
+            return ref DefaultRef<T>.Ref();
+        }
+    }
+
+    public sealed class DefaultRef<T>
+    {
+        static T value;
+
+        public static ref T Ref() { return ref DefaultRef<T>.value; }
+    }
 }

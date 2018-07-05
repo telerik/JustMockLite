@@ -17,6 +17,7 @@
 
 using System;
 using System.Linq;
+using System.Reflection;
 
 namespace Telerik.JustMock.Core.Behaviors
 {
@@ -65,11 +66,39 @@ namespace Telerik.JustMock.Core.Behaviors
 			}
 		}
 
-		public void Process(Invocation invocation)
+        private ref T GetOverrideRef<T>()
+        {
+            return ref ((Expectations.FuncExpectation<T>.RefDelegate)this.implementationOverride)();
+        }
+
+        public void Process(Invocation invocation)
 		{
-			var returnValue = CallOverride(invocation);
-			if (implementationOverride.Method.ReturnType != typeof(void) && !this.ignoreDelegateReturnValue)
-				invocation.ReturnValue = returnValue;
+            var returnType = invocation.Method.GetReturnType();
+
+            if (returnType.IsByRef)
+            {
+                // check override delegate compatibility
+                if (returnType != this.implementationOverride.Method.ReturnType)
+                {
+                    throw new MockException("Return type of the override delegate does not match to the return type of the invocation");
+                }
+
+                var delegateType = typeof(object).Assembly.GetType("Telerik.JustMock.RefDelegate`1").MakeGenericType(new[] { returnType.GetElementType() });
+                ConstructorInfo constructor = delegateType.GetConstructor(new[] { typeof(object), typeof(IntPtr) });
+
+                MethodInfo genericMethodInfo = this.GetType().GetMethod("GetOverrideRef", BindingFlags.NonPublic | BindingFlags.Instance);
+                MethodInfo methodInfo = genericMethodInfo.MakeGenericMethod(returnType.GetElementType());
+
+                invocation.ReturnValue = constructor.Invoke(new object[] { this, methodInfo.MethodHandle.GetFunctionPointer() });
+            }
+            else
+            {
+                var returnValue = CallOverride(invocation);
+                if (returnType != typeof(void) && !this.ignoreDelegateReturnValue)
+                {
+                    invocation.ReturnValue = returnValue;
+                }
+            }
 			invocation.UserProvidedImplementation = true;
 		}
 	}
