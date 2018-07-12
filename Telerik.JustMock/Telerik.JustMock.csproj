@@ -650,7 +650,7 @@
       <LastGenOutput>Args.Matching.cs</LastGenOutput>
     </None>
     <None Include="Core\DynamicProxy\Castle.DynamicProxy\DynProxy.snk" />
-    <Compile Include="Core\MockingUtil.LocalMethod.cs" />
+    <Compile Include="Core\MockingUtil.PrivateMethods.cs" />
     <None Include="Expectations\Abstraction\IReturns.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>IReturns.cs</LastGenOutput>
