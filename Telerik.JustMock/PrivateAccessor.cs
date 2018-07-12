@@ -129,6 +129,14 @@ namespace Telerik.JustMock
 				});
 		}
 
+		public object CallLocalMehtod(string memberName, string localMethodName, params object[] args)
+		{
+			MethodInfo method = type.GetMethod(memberName);
+			MethodInfo localMethod = MockingUtil.GetLocalMethod(type, method, localMethodName);
+
+			return CallMethod(localMethod, args);
+		}
+
 		/// <summary>
 		/// Calls the specified generic method by name.
 		/// </summary>
