@@ -94,7 +94,7 @@ namespace Telerik.JustMock.Core.Behaviors
             else
             {
                 var returnValue = CallOverride(invocation);
-                if (returnType != typeof(void) && !this.ignoreDelegateReturnValue)
+                if (this.implementationOverride.Method.ReturnType != typeof(void) && !this.ignoreDelegateReturnValue)
                 {
                     invocation.ReturnValue = returnValue;
                 }
