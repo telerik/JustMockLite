@@ -172,19 +172,12 @@ namespace Telerik.JustMock.Expectations
 
 		public ActionExpectation ArrangeLocal(object target, string memberName, Type[] memberParamTypes, string localMemberName, params object[] args)
 		{
-			Type type = target.GetType();
-			MethodInfo method = type.GetMethod(memberName, memberParamTypes);
-			if(method == null)
-			{
-				throw new MissingMemberException(MockingUtil.BuildMissingMethodMessage(type, null, memberName));
-			}
+			MethodInfo method = MockingUtil.GetMethodWithLocalFunction(target, memberName, memberParamTypes);
 			return ArrangeLocal(target, method, localMemberName, args);
 		}
 		public ActionExpectation ArrangeLocal(object target, MethodInfo method, string localMemberName, params object[] args)
 		{
-			Type type = target.GetType();
-			MethodInfo localMethod = MockingUtil.GetLocalMethod(type, method, localMemberName);
-
+			MethodInfo localMethod = MockingUtil.GetLocalMethod(target, method, localMemberName);
 			return Arrange(target, localMethod, args);
 		}
 
@@ -196,13 +189,7 @@ namespace Telerik.JustMock.Expectations
 
 		public FuncExpectation<TReturn> ArrangeLocal<TReturn>(object target, string memberName, Type[] memberParamTypes, string localMemberName, params object[] args)
 		{
-			Type type = target.GetType();
-			MethodInfo method = type.GetMethod(memberName, memberParamTypes);
-			if (method == null)
-			{
-				throw new MissingMemberException(MockingUtil.BuildMissingMethodMessage(type, null, memberName));
-			}
-
+			MethodInfo method = MockingUtil.GetMethodWithLocalFunction(target, memberName, memberParamTypes);
 			return ArrangeLocal<TReturn>(target, method, localMemberName, args);
 		}
 

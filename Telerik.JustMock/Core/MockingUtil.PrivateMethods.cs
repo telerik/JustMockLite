@@ -25,6 +25,11 @@ namespace Telerik.JustMock.Core
 {
 	internal static partial class MockingUtil
 	{
+		public static MethodInfo GetLocalMethod(object target, MethodInfo method, string localMemberName)
+		{
+			Type type = target.GetType();
+			return GetLocalMethod(type, method, localMemberName);
+		}
 		public static MethodInfo GetLocalMethod(Type type, MethodInfo method, string localMemberName)
 		{
 			MethodInfo[] allStaticNonPublicMethods = type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -68,6 +73,34 @@ namespace Telerik.JustMock.Core
 					throw new MissingMemberException(BuildMissingMethodMessage(type, null, localMemberName));
 				}
 			}
+		}
+
+		public static MethodInfo GetMethodWithLocalFunction(object target, string methodName)
+		{
+			Type type = target.GetType();
+			return GetMethodWithLocalFunction(type, methodName);
+		}
+
+		public static MethodInfo GetMethodWithLocalFunction(Type type, string methodName)
+		{
+			Type[] emptyParamTypes = new Type[] { };
+			return GetMethodWithLocalFunction( type, methodName, emptyParamTypes);
+		}
+
+		public static MethodInfo GetMethodWithLocalFunction(object target, string methodName, Type[] methodParamTypes)
+		{
+			Type type = target.GetType();
+			return GetMethodWithLocalFunction(type, methodName, methodParamTypes);
+		}
+
+		public static MethodInfo GetMethodWithLocalFunction(Type type, string methodName, Type[] methodParamTypes)
+		{
+			MethodInfo method = type.GetMethod(methodName, methodParamTypes);
+			if(method == null)
+			{
+				throw new MissingMemberException(MockingUtil.BuildMissingMethodMessage(type, null, methodName));
+			}
+			return method;
 		}
 
 		public static string BuildMissingMethodMessage(Type type, PropertyInfo property, string memberName)
