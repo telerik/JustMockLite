@@ -129,26 +129,48 @@ namespace Telerik.JustMock
 				});
 		}
 
-		public object CallLocalMehtod(string memberName, string localMethodName, params object[] args)
+		/// <summary>
+		/// Calls the specified C# 7.0 local function by name.
+		/// </summary>
+		/// <param name="methodName">Name of the method where the local function is nested</param>
+		/// <param name="localFunctionName">Name of the nested local function</param>
+		/// <param name="args">Local function arguments</param>
+		/// <returns>The value returned by the specified C# 7.0 local function.</returns>
+		public object CallLocalFunction(string methodName, string localFunctionName, params object[] args)
 		{
-			MethodInfo method = MockingUtil.GetMethodWithLocalFunction(instance, memberName);
-			MethodInfo localMethod = MockingUtil.GetLocalMethod(type, method, localMethodName);
+			MethodInfo method = MockingUtil.GetMethodWithLocalFunction(instance, methodName);
+			MethodInfo localFunction = MockingUtil.GetLocalFunction(type, method, localFunctionName);
 
-			return CallMethod(localMethod, args);
+			return CallMethod(localFunction, args);
 		}
 
-		public object CallLocalMehtod(string memberName, Type[] paramTypes, string localMethodName, params object[] args)
+		/// <summary>
+		/// Calls the specified C# 7.0 local function by name.
+		/// </summary>
+		/// <param name="methodName">Name of the method where the local function is nested</param>
+		/// <param name="methodParamTypes">Types of the parameters for the method where the local function is nested</param>
+		/// <param name="localFunctionName">Name of the nested local function</param>
+		/// <param name="args">Local function arguments</param>
+		/// <returns>The value returned by the specified C# 7.0 local function.</returns>
+		public object CallLocalFunction(string methodName, Type[] methodParamTypes, string localFunctionName, params object[] args)
 		{
-			MethodInfo method = MockingUtil.GetMethodWithLocalFunction(instance, memberName, paramTypes);
-			MethodInfo localMethod = MockingUtil.GetLocalMethod(type, method, localMethodName);
+			MethodInfo method = MockingUtil.GetMethodWithLocalFunction(instance, methodName, methodParamTypes);
+			MethodInfo localFunction = MockingUtil.GetLocalFunction(type, method, localFunctionName);
 
-			return CallMethod(localMethod, args);
+			return CallMethod(localFunction, args);
 		}
 
-		public object CallLocalMehtod(MethodInfo method, string localMethodName, params object[] args)
+		/// <summary>
+		/// Setups a non-public method for mocking.
+		/// </summary>
+		/// <param name="method">Method to setup taken from reflection.</param>
+		/// <param name="localFunctionName">Name of the nested local function</param>
+		/// <param name="args">Method arguments</param>
+		/// <returns>Reference to setup actions calls</returns>
+		public object CallLocalFunction(MethodInfo method, string localFunctionName, params object[] args)
 		{
-			MethodInfo localMethod = MockingUtil.GetLocalMethod(type, method, localMethodName);
-			return CallMethod(localMethod, args);
+			MethodInfo localFunction = MockingUtil.GetLocalFunction(type, method, localFunctionName);
+			return CallMethod(localFunction, args);
 		}
 
 		/// <summary>

@@ -164,39 +164,39 @@ namespace Telerik.JustMock.Expectations
 				});
 		}
 
-		public ActionExpectation ArrangeLocal(object target, string memberName, string localMemberName, params object[] args)
+		public ActionExpectation ArrangeLocal(object target, string methodName, string localFunctionName, params object[] args)
 		{
 			Type[] emptyParamTypes = new Type[] {};
-			return ArrangeLocal(target, memberName, emptyParamTypes, localMemberName, args);
+			return ArrangeLocal(target, methodName, emptyParamTypes, localFunctionName, args);
 		}
 
-		public ActionExpectation ArrangeLocal(object target, string memberName, Type[] memberParamTypes, string localMemberName, params object[] args)
+		public ActionExpectation ArrangeLocal(object target, string methodName, Type[] memberParamTypes, string localFunctionName, params object[] args)
 		{
-			MethodInfo method = MockingUtil.GetMethodWithLocalFunction(target, memberName, memberParamTypes);
-			return ArrangeLocal(target, method, localMemberName, args);
+			MethodInfo method = MockingUtil.GetMethodWithLocalFunction(target, methodName, memberParamTypes);
+			return ArrangeLocal(target, method, localFunctionName, args);
 		}
-		public ActionExpectation ArrangeLocal(object target, MethodInfo method, string localMemberName, params object[] args)
+		public ActionExpectation ArrangeLocal(object target, MethodInfo method, string localFunctionName, params object[] args)
 		{
-			MethodInfo localMethod = MockingUtil.GetLocalMethod(target, method, localMemberName);
+			MethodInfo localMethod = MockingUtil.GetLocalFunction(target, method, localFunctionName);
 			return Arrange(target, localMethod, args);
 		}
 
-		public FuncExpectation<TReturn> ArrangeLocal<TReturn>(object target, string memberName, string localMemberName, params object[] args)
+		public FuncExpectation<TReturn> ArrangeLocal<TReturn>(object target, string methodName, string localFunctionName, params object[] args)
 		{
 			Type[] emptyParamTypes = new Type[] { };
-			return ArrangeLocal<TReturn>(target, memberName, emptyParamTypes, localMemberName, args);
+			return ArrangeLocal<TReturn>(target, methodName, emptyParamTypes, localFunctionName, args);
 		}
 
-		public FuncExpectation<TReturn> ArrangeLocal<TReturn>(object target, string memberName, Type[] memberParamTypes, string localMemberName, params object[] args)
+		public FuncExpectation<TReturn> ArrangeLocal<TReturn>(object target, string methodName, Type[] memberParamTypes, string localFunctionName, params object[] args)
 		{
-			MethodInfo method = MockingUtil.GetMethodWithLocalFunction(target, memberName, memberParamTypes);
-			return ArrangeLocal<TReturn>(target, method, localMemberName, args);
+			MethodInfo method = MockingUtil.GetMethodWithLocalFunction(target, methodName, memberParamTypes);
+			return ArrangeLocal<TReturn>(target, method, localFunctionName, args);
 		}
 
-		public FuncExpectation<TReturn> ArrangeLocal<TReturn>(object target, MethodInfo method, string localMemberName, params object[] args)
+		public FuncExpectation<TReturn> ArrangeLocal<TReturn>(object target, MethodInfo method, string localFunctionName, params object[] args)
 		{
 			Type type = target.GetType();
-			MethodInfo localMethod = MockingUtil.GetLocalMethod(type, method, localMemberName);
+			MethodInfo localMethod = MockingUtil.GetLocalFunction(type, method, localFunctionName);
 
 			return Arrange<TReturn>(target, localMethod, args);
 		}

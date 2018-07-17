@@ -25,12 +25,12 @@ namespace Telerik.JustMock.Core
 {
 	internal static partial class MockingUtil
 	{
-		public static MethodInfo GetLocalMethod(object target, MethodInfo method, string localMemberName)
+		public static MethodInfo GetLocalFunction(object target, MethodInfo method, string localMemberName)
 		{
 			Type type = target.GetType();
-			return GetLocalMethod(type, method, localMemberName);
+			return GetLocalFunction(type, method, localMemberName);
 		}
-		public static MethodInfo GetLocalMethod(Type type, MethodInfo method, string localMemberName)
+		public static MethodInfo GetLocalFunction(Type type, MethodInfo method, string localMemberName)
 		{
 			MethodInfo[] allStaticNonPublicMethods = type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Instance);
 			MethodInfo[] potentialLocalMethods = allStaticNonPublicMethods.Where(m => (m.Name.Contains(method.Name) && m.Name.Contains(localMemberName))).ToArray();

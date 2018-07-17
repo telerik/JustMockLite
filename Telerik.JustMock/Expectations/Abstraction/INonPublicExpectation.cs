@@ -44,8 +44,26 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <returns>Reference to setup actions calls</returns>
 		ActionExpectation Arrange(object target, string memberName, params object[] args);
 
-		ActionExpectation ArrangeLocal(object target, string memberName, string localMemberName, params object[] args);
-		ActionExpectation ArrangeLocal(object target, string memberName, Type[] memberParamTypes, string localMemberName, params object[] args);
+		/// <summary>
+		/// Arranges a C# 7.0 local function for mocking.
+		/// </summary>
+		/// <param name="target">Target instance</param>
+		/// <param name="methodName">Name of the method where the local function is nestes</param>
+		/// <param name="localFunctionName">Name of the nested local function</param>
+		/// <param name="args">Local function arguments</param>
+		/// <returns>Reference to setup actions calls</returns>
+		ActionExpectation ArrangeLocal(object target, string methodName, string localFunctionName, params object[] args);
+
+		/// <summary>
+		/// Arranges a C# 7.0 local function for mocking.
+		/// </summary>
+		/// <param name="target">Target instance</param>
+		/// <param name="methodName">Name of the method where the local function is nested</param>
+		/// <param name="methodParamTypes">Types of the parameters for the method where the local function is nested</param>
+		/// <param name="localFunctionName">Name of the nested local function</param>
+		/// <param name="args">Local function arguments</param>
+		/// <returns>Reference to setup actions calls</returns>
+		ActionExpectation ArrangeLocal(object target, string methodName, Type[] methodParamTypes, string localFunctionName, params object[] args);
 
 		/// <summary>
 		/// Setups a non-public method for mocking.
@@ -56,6 +74,14 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <returns>Reference to setup actions calls</returns>
 		ActionExpectation Arrange(object target, MethodInfo method, params object[] args);
 
+		/// <summary>
+		/// Arranges a C# 7.0 local function for mocking.
+		/// </summary>
+		/// <param name="target">Target instance</param>
+		/// <param name="method">Metadata for the method where the local function is nestes</param>
+		/// <param name="localFunctionName">Name of the nested local function</param>
+		/// <param name="args">Local function arguments</param>
+		/// <returns>Reference to setup actions calls</returns>
 		ActionExpectation ArrangeLocal(object target, MethodInfo method, string localMemberName, params object[] args);
 
 		/// <summary>
@@ -67,8 +93,26 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <param name="args">Method arguments</param>
 		FuncExpectation<TReturn> Arrange<TReturn>(object target, string memberName, params object[] args);
 
-		FuncExpectation<TReturn> ArrangeLocal<TReturn>(object target, string memberName, string localMemberName, params object[] args);
-		FuncExpectation<TReturn> ArrangeLocal<TReturn>(object target, string memberName, Type[] memberParamTypes, string localMemberName, params object[] args);
+		/// <summary>
+		/// Arranges a C# 7.0 local function for mocking.
+		/// </summary>
+		/// <param name="target">Target instance</param>
+		/// <param name="methodName">Name of the method where the local function is nested</param>
+		/// <param name="localFunctionName">Name of the nested local function</param>
+		/// <param name="args">Local function arguments</param>
+		/// <returns>Reference to setup actions calls</returns>
+		FuncExpectation<TReturn> ArrangeLocal<TReturn>(object target, string methodName, string localFunctionName, params object[] args);
+
+		/// <summary>
+		/// Arranges a C# 7.0 local function for mocking.
+		/// </summary>
+		/// <param name="target">Target instance</param>
+		/// <param name="methodName">Name of the method where the local function is nested</param>
+		/// <param name="methodParamTypes">Types of the parameters for the method where the local function is nested</param>
+		/// <param name="localFunctionName">Name of the nested local function</param>
+		/// <param name="args">Local function arguments</param>
+		/// <returns>Reference to setup actions calls</returns>
+		FuncExpectation<TReturn> ArrangeLocal<TReturn>(object target, string methodName, Type[] methodParamTypes, string localFunctionName, params object[] args);
 
 		/// <summary>
 		/// Setups a non-public method for mocking.
@@ -80,6 +124,14 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <returns>Reference to setup actions calls</returns>
 		FuncExpectation<TReturn> Arrange<TReturn>(object target, MethodInfo method, params object[] args);
 
+		/// <summary>
+		/// Arranges a C# 7.0 local function for mocking.
+		/// </summary>
+		/// <param name="target">Target instance</param>
+		/// <param name="method">Metadata for the method where the local function is nestes</param>
+		/// <param name="localFunctionName">Name of the nested local function</param>
+		/// <param name="args">Local function arguments</param>
+		/// <returns>Reference to setup actions calls</returns>
 		FuncExpectation<TReturn> ArrangeLocal<TReturn>(object target, MethodInfo method, string localMemberName, params object[] args);
 
 		/// <summary>
