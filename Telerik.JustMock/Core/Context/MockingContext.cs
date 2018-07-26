@@ -21,6 +21,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Telerik.JustMock.Diagnostics;
+using Telerik.JustMock.Helpers;
 
 namespace Telerik.JustMock.Core.Context
 {
@@ -70,6 +71,8 @@ namespace Telerik.JustMock.Core.Context
 			}
 
 			LocalMockingContextResolver.RetireRepository();
+
+			DynamicTypeHelper.Reset();
 		}
 
 		public static void Fail(string message, params object[] args)

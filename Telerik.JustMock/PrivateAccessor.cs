@@ -22,7 +22,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Telerik.JustMock.Core;
-
 #if !COREFX
 using System.Security;
 using System.Security.Permissions;
@@ -46,10 +45,11 @@ namespace Telerik.JustMock
 	/// dynamic acc = new PrivateAccessor(myobj);
 	/// acc.PrivateProperty = acc.PrivateMethod(123); // PrivateProperty and PrivateMethod are private members on myobj's type.
 	/// </remarks>
-	public sealed class PrivateAccessor : IDynamicMetaObjectProvider
+	public sealed class PrivateAccessor : PrivateAccessorBase, IDynamicMetaObjectProvider
 	{
 		private readonly object instance;
 		private readonly Type type;
+		private readonly IPrivateRefReturnAccessor refReturnAccessor;
 
 		/// <summary>
 		/// Creates a new <see cref="PrivateAccessor"/> wrapping the given instance. Can be used to access both instance and static members.
@@ -58,7 +58,6 @@ namespace Telerik.JustMock
 		public PrivateAccessor(object instance)
 			: this(instance, null)
 		{ }
-
 		/// <summary>
 		/// Creates a new <see cref="PrivateAccessor"/> wrapping the given type. Can be used to access the static members of a type.
 		/// </summary>
@@ -104,6 +103,7 @@ namespace Telerik.JustMock
 
 			this.instance = instance;
 			this.type = type;
+			this.refReturnAccessor = new PrivateRefReturnAccessor(this.instance, this.type);
 		}
 
 		/// <summary>
@@ -115,18 +115,18 @@ namespace Telerik.JustMock
 		public object CallMethod(string name, params object[] args)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
-				{
-					args = args ?? MockingUtil.NoObjects;
-					var candidates = type.GetAllMethods()
-						.Where(m => m.Name == name && CanCall(m, this.instance != null))
-						.Select(m => MockingUtil.TrySpecializeGenericMethod(m, args.Select(a => a != null ? a.GetType() : null).ToArray()) ?? m)
-						.ToArray();
-					object state;
-					var method = MockingUtil.BindToMethod(MockingUtil.AllMembers,
-						candidates, ref args, null, null, null, out state);
+			{
+				args = args ?? MockingUtil.NoObjects;
+				var candidates = type.GetAllMethods()
+					.Where(m => m.Name == name && CanCall(m, this.instance != null))
+					.Select(m => MockingUtil.TrySpecializeGenericMethod(m, args.Select(a => a != null ? a.GetType() : null).ToArray()) ?? m)
+					.ToArray();
+				object state;
+				var method = MockingUtil.BindToMethod(MockingUtil.AllMembers,
+					candidates, ref args, null, null, null, out state);
 
-					return CallInvoke(method, args);
-				});
+				return CallInvoke(method, args);
+			});
 		}
 
 		/// <summary>
@@ -212,10 +212,10 @@ namespace Telerik.JustMock
 		public object GetProperty(string name, params object[] indexArgs)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
-				{
-					var prop = ResolveProperty(this.type, name, false, indexArgs, this.instance != null);
-					return ProfilerInterceptor.GuardExternal(() => SecuredReflectionMethods.GetProperty(prop, this.instance, indexArgs));
-				});
+			{
+				var prop = ResolveProperty(this.type, name, false, indexArgs, this.instance != null);
+				return ProfilerInterceptor.GuardExternal(() => SecuredReflectionMethods.GetProperty(prop, this.instance, indexArgs));
+			});
 		}
 
 		/// <summary>
@@ -326,43 +326,23 @@ namespace Telerik.JustMock
 			get { return this.instance; }
 		}
 
+		/// <summary>
+		/// Non public ref return interface for mocking.
+		/// </summary>
+		public IPrivateRefReturnAccessor RefReturn
+		{
+			get { return this.refReturnAccessor; }
+		}
+
 		private void CheckMemberInfo(string kind, string name, MemberInfo mi)
 		{
 			if (mi == null)
 				throw new MissingMemberException(String.Format("Couldn't find {0} '{1}' on type '{2}'.", kind, name, this.type));
 		}
 
-		internal static PropertyInfo ResolveProperty(Type type, string name, bool ignoreCase, object[] indexArgs, bool hasInstance, object setterValue = null, bool getter = true)
-		{
-			var candidates = type.GetAllProperties().Where(prop => MockingUtil.StringEqual(prop.Name, name, ignoreCase)).ToArray();
-			if (candidates.Length == 1)
-				return candidates[0];
-
-			if (!getter)
-			{
-				Array.Resize(ref indexArgs, indexArgs.Length + 1);
-				indexArgs[indexArgs.Length - 1] = setterValue;
-			}
-
-			var propMethods = candidates
-				.Select(prop => getter ? prop.GetGetMethod(true) : prop.GetSetMethod(true))
-				.Where(m => m != null && CanCall(m, hasInstance))
-				.ToArray();
-
-			indexArgs = indexArgs ?? MockingUtil.NoObjects;
-			object state;
-			var foundGetter = MockingUtil.BindToMethod(MockingUtil.AllMembers, propMethods, ref indexArgs, null, null, null, out state);
-			return candidates.First(prop => (getter ? prop.GetGetMethod(true) : prop.GetSetMethod(true)) == foundGetter);
-		}
-
 		private FieldInfo ResolveField(string name)
 		{
 			return type.GetAllFields().FirstOrDefault(f => f.Name == name);
-		}
-
-		private static bool CanCall(MethodBase method, bool hasInstance)
-		{
-			return method.IsStatic || hasInstance;
 		}
 
 		private object CallInvoke(MethodBase method, object[] args)
@@ -416,6 +396,7 @@ namespace Telerik.JustMock
 				var argsVar = Expression.Variable(typeof(object[]));
 
 				MethodInfo invoke = typeof(PrivateAccessor).GetMethod("CallMethod", new[] { typeof(string), typeof(object[]) });
+
 				var invokeArgs = new List<Expression>
 				{
 					Expression.Constant(binder.Name),

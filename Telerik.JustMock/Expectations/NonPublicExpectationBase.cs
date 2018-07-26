@@ -1,0 +1,238 @@
+/*
+ JustMock Lite
+ Copyright © 2010-2018 Telerik EAD
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Text;
+using Telerik.JustMock.Core;
+using Telerik.JustMock.Core.Behaviors;
+using Telerik.JustMock.Core.Context;
+using Telerik.JustMock.Expectations.Abstraction;
+using Telerik.JustMock.Expectations.DynaMock;
+
+namespace Telerik.JustMock.Expectations
+{
+    internal abstract class NonPublicExpectationBase
+    {
+        protected static bool ReturnTypeMatches(Type returnType, MethodInfo method)
+        {
+            return returnType == null
+                || method.ReturnType == returnType
+                || (method.ReturnType.IsPointer && returnType == typeof(IntPtr));
+        }
+
+        protected static MethodInfo GetMethodByName(Type type, Type returnType, string memberName, ref object[] args)
+        {
+            if (type.IsProxy())
+                type = type.BaseType;
+
+            var candidateMethods = type.GetAllMethods()
+                .Where(m => m.Name == memberName)
+                .Concat(type.GetAllProperties()
+                    .Where(p => p.Name == memberName)
+                    .SelectMany(p => new[] { p.GetGetMethod(true), p.GetSetMethod(true) })
+                    .Where(m => m != null))
+                .Select(m =>
+                    {
+                        if (m.IsGenericMethodDefinition
+                            && returnType != typeof(void)
+                            && m.GetGenericArguments().Length == 1
+                            && m.ReturnType.ContainsGenericParameters)
+                        {
+                            var generics = new Dictionary<Type, Type>();
+                            if (MockingUtil.GetGenericsTypesFromActualType(m.ReturnType, returnType, generics))
+                            {
+                                return m.MakeGenericMethod(generics.Values.Single());
+                            }
+                        }
+                        return m;
+                    })
+                .ToArray();
+
+            MethodInfo mockedMethod = null;
+
+            if (candidateMethods.Length == 1)
+            {
+                var singleCandidate = candidateMethods[0];
+                var returnTypeMatches = ReturnTypeMatches(returnType, singleCandidate);
+                var argsIgnored = args == null || args.Length == 0;
+                if (returnTypeMatches && argsIgnored)
+                {
+                    mockedMethod = singleCandidate;
+                    args = mockedMethod.GetParameters()
+                        .Select(p =>
+                        {
+                            var byref = p.ParameterType.IsByRef;
+                            var paramType = byref ? p.ParameterType.GetElementType() : p.ParameterType;
+                            if (paramType.IsPointer)
+                                paramType = typeof(IntPtr);
+                            var isAny = (Expression)typeof(ArgExpr).GetMethod("IsAny").MakeGenericMethod(paramType).Invoke(null, null);
+                            if (byref)
+                            {
+                                isAny = ArgExpr.Ref(isAny);
+                            }
+                            return isAny;
+                        })
+                        .ToArray();
+                }
+            }
+
+            if (mockedMethod == null)
+            {
+                mockedMethod = FindMethodBySignature(candidateMethods, returnType, args);
+                if (mockedMethod == null && returnType == typeof(void))
+                    mockedMethod = FindMethodBySignature(candidateMethods, null, args);
+            }
+
+            if (mockedMethod == null)
+            {
+                var mockedProperty = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
+                    .FirstOrDefault(property => property.Name == memberName);
+                if (mockedProperty != null)
+                {
+                    var getter = mockedProperty.GetGetMethod(true);
+                    if (getter != null && getter.ArgumentsMatchSignature(args))
+                        mockedMethod = getter;
+
+                    if (mockedMethod == null)
+                    {
+                        var setter = mockedProperty.GetSetMethod(true);
+                        if (setter != null && setter.ArgumentsMatchSignature(args))
+                            mockedMethod = setter;
+                    }
+
+                    if (mockedMethod == null)
+                        throw new MissingMemberException(BuildMissingMethodMessage(type, mockedProperty, memberName));
+                }
+            }
+
+            if (mockedMethod == null)
+                throw new MissingMemberException(BuildMissingMethodMessage(type, null, memberName));
+
+            if (mockedMethod.ContainsGenericParameters)
+            {
+                mockedMethod = MockingUtil.GetRealMethodInfoFromGeneric(mockedMethod, args);
+            }
+
+            if (mockedMethod.DeclaringType != mockedMethod.ReflectedType)
+            {
+                mockedMethod = GetMethodByName(mockedMethod.DeclaringType, returnType, memberName, ref args);
+            }
+
+            return mockedMethod;
+        }
+
+        protected static string BuildMissingMethodMessage(Type type, PropertyInfo property, string memberName)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine(
+                property != null
+                ? String.Format("Found property '{0}' on type '{1}' but the passed arguments match the signature neither of the getter nor the setter.", memberName, type)
+                : String.Format("Method '{0}' with the given signature was not found on type {1}", memberName, type));
+
+            var methods = new Dictionary<MethodInfo, string>();
+
+            if (property != null)
+            {
+                var getter = property.GetGetMethod(true);
+                if (getter != null)
+                    methods.Add(getter, property.Name);
+                var setter = property.GetSetMethod(true);
+                if (setter != null)
+                    methods.Add(setter, property.Name);
+            }
+
+            foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static).Where(m => m.Name == memberName))
+            {
+                methods.Add(method, method.Name);
+            }
+
+            if (methods.Count == 0)
+            {
+                sb.AppendLine("No methods or properties found with the given name.");
+            }
+            else
+            {
+                sb.AppendLine("Review the available methods in the message below and optionally paste the appropriate arrangement snippet.");
+                int i = 0;
+                foreach (var kvp in methods)
+                {
+                    sb.AppendLine("----------");
+                    var method = kvp.Key;
+                    sb.AppendLine(String.Format("Method {0}: {1}", i + 1, method));
+                    sb.AppendLine("C#: " + FormatMethodArrangementExpression(kvp.Value, method, SourceLanguage.CSharp));
+                    sb.AppendLine("VB: " + FormatMethodArrangementExpression(kvp.Value, method, SourceLanguage.VisualBasic));
+                    i++;
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        protected static string FormatMethodArrangementExpression(string memberName, MethodBase method, SourceLanguage language)
+        {
+            return String.Format("Mock.NonPublic.Arrange{0}({1}\"{2}\"{3}){4}",
+                FormatGenericArg(method.GetReturnType(), language),
+                method.IsStatic ? String.Empty : "mock, ",
+                memberName,
+                String.Join("", method.GetParameters().Select(p => ", " + FormatMethodParameterMatcher(p.ParameterType, language)).ToArray()),
+                language == SourceLanguage.CSharp ? ";" : "");
+        }
+
+        protected static string FormatMethodParameterMatcher(Type paramType, SourceLanguage language)
+        {
+            if (paramType.IsByRef)
+            {
+                return String.Format("ArgExpr.Ref({0})", FormatMethodParameterMatcher(paramType.GetElementType(), language));
+            }
+            else
+            {
+                return String.Format("ArgExpr.IsAny{0}()", FormatGenericArg(paramType, language));
+            }
+        }
+
+        protected static string FormatGenericArg(Type type, SourceLanguage language)
+        {
+            if (type == typeof(void))
+            {
+                return String.Empty;
+            }
+            switch (language)
+            {
+                case SourceLanguage.CSharp:
+                    return String.Format("<{0}>", type.GetShortCSharpName());
+                case SourceLanguage.VisualBasic:
+                    return String.Format("(Of {0})", type.GetShortVisualBasicName());
+                default:
+                    throw new ArgumentOutOfRangeException("language");
+            }
+        }
+
+        protected static MethodInfo FindMethodBySignature(IEnumerable<MethodInfo> candidates, Type returnType, object[] args)
+        {
+            return candidates.FirstOrDefault(method => method.ArgumentsMatchSignature(args) && ReturnTypeMatches(returnType, method));
+        }
+
+        protected static string GetAssertionMessage(object[] args)
+        {
+            return null;
+        }
+    }
+}

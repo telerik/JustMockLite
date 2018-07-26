@@ -296,8 +296,8 @@ namespace Telerik.JustMock.Core
 				}
 
 				int typeId = GetTypeId(type);
-                int arrayIndex = typeId >> 3;
-                int arrayMask = 1 << (typeId & ((1 << 3) - 1));
+				int arrayIndex = typeId >> 3;
+				int arrayMask = 1 << (typeId & ((1 << 3) - 1));
 				lock (arrangedTypesArray)
 				{
 					if (enabledInAnyRepository)
@@ -402,6 +402,20 @@ namespace Telerik.JustMock.Core
 		}
 
 		[DebuggerHidden]
+		public static ref T GuardInternal<T>(RefReturn<T> @delegate, object target, object[] args)
+		{
+			try
+			{
+				ReentrancyCounter++;
+				return ref @delegate(target, args);
+			}
+			finally
+			{
+				ReentrancyCounter--;
+			}
+		}
+
+		[DebuggerHidden]
 		public static void GuardExternal(Action guardedAction)
 		{
 			var oldCounter = ProfilerInterceptor.ReentrancyCounter;
@@ -424,6 +438,23 @@ namespace Telerik.JustMock.Core
 			{
 				ProfilerInterceptor.ReentrancyCounter = 0;
 				return guardedAction();
+			}
+			finally
+			{
+				ProfilerInterceptor.ReentrancyCounter = oldCounter;
+			}
+		}
+
+		public delegate ref T RefReturn<T>(object target, object[] args);
+
+		[DebuggerHidden]
+		public static ref T GuardExternal<T>(RefReturn<T> @delegate, object target, object[] args)
+		{
+			var oldCounter = ProfilerInterceptor.ReentrancyCounter;
+			try
+			{
+				ProfilerInterceptor.ReentrancyCounter = 0;
+				return ref @delegate(target, args);
 			}
 			finally
 			{
