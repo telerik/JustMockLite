@@ -164,43 +164,6 @@ namespace Telerik.JustMock.Expectations
 				});
 		}
 
-		public ActionExpectation ArrangeLocal(object target, string methodName, string localFunctionName, params object[] args)
-		{
-			Type[] emptyParamTypes = new Type[] {};
-			return ArrangeLocal(target, methodName, emptyParamTypes, localFunctionName, args);
-		}
-
-		public ActionExpectation ArrangeLocal(object target, string methodName, Type[] memberParamTypes, string localFunctionName, params object[] args)
-		{
-			MethodInfo method = MockingUtil.GetMethodWithLocalFunction(target, methodName, memberParamTypes);
-			return ArrangeLocal(target, method, localFunctionName, args);
-		}
-		public ActionExpectation ArrangeLocal(object target, MethodInfo method, string localFunctionName, params object[] args)
-		{
-			MethodInfo localMethod = MockingUtil.GetLocalFunction(target, method, localFunctionName);
-			return Arrange(target, localMethod, args);
-		}
-
-		public FuncExpectation<TReturn> ArrangeLocal<TReturn>(object target, string methodName, string localFunctionName, params object[] args)
-		{
-			Type[] emptyParamTypes = new Type[] { };
-			return ArrangeLocal<TReturn>(target, methodName, emptyParamTypes, localFunctionName, args);
-		}
-
-		public FuncExpectation<TReturn> ArrangeLocal<TReturn>(object target, string methodName, Type[] memberParamTypes, string localFunctionName, params object[] args)
-		{
-			MethodInfo method = MockingUtil.GetMethodWithLocalFunction(target, methodName, memberParamTypes);
-			return ArrangeLocal<TReturn>(target, method, localFunctionName, args);
-		}
-
-		public FuncExpectation<TReturn> ArrangeLocal<TReturn>(object target, MethodInfo method, string localFunctionName, params object[] args)
-		{
-			Type type = target.GetType();
-			MethodInfo localMethod = MockingUtil.GetLocalFunction(type, method, localFunctionName);
-
-			return Arrange<TReturn>(target, localMethod, args);
-		}
-
 		public ActionExpectation Arrange(object target, MethodInfo method, params object[] args)
 		{
 			return ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.Arrange(target, method, args, () => new ActionExpectation()));

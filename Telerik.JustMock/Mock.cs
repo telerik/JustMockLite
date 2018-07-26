@@ -21,6 +21,7 @@ using Telerik.JustMock.Core.Behaviors;
 using Telerik.JustMock.Core.Context;
 using Telerik.JustMock.Expectations;
 using Telerik.JustMock.Expectations.Abstraction;
+using Telerik.JustMock.Expectations.Abstraction.Local;
 
 namespace Telerik.JustMock
 {
@@ -59,6 +60,14 @@ namespace Telerik.JustMock
 			get
 			{
 				return ProfilerInterceptor.GuardInternal(() => new NonPublicExpectation());
+			}
+		}
+
+		public static ILocalExpectation Local
+		{
+			get
+			{
+				return ProfilerInterceptor.GuardInternal(() => new LocalExpectation());
 			}
 		}
 

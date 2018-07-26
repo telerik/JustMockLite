@@ -130,50 +130,6 @@ namespace Telerik.JustMock
 		}
 
 		/// <summary>
-		/// Calls the specified C# 7.0 local function by name.
-		/// </summary>
-		/// <param name="methodName">Name of the method where the local function is nested</param>
-		/// <param name="localFunctionName">Name of the nested local function</param>
-		/// <param name="args">Local function arguments</param>
-		/// <returns>The value returned by the specified C# 7.0 local function.</returns>
-		public object CallLocalFunction(string methodName, string localFunctionName, params object[] args)
-		{
-			MethodInfo method = MockingUtil.GetMethodWithLocalFunction(instance, methodName);
-			MethodInfo localFunction = MockingUtil.GetLocalFunction(type, method, localFunctionName);
-
-			return CallMethod(localFunction, args);
-		}
-
-		/// <summary>
-		/// Calls the specified C# 7.0 local function by name.
-		/// </summary>
-		/// <param name="methodName">Name of the method where the local function is nested</param>
-		/// <param name="methodParamTypes">Types of the parameters for the method where the local function is nested</param>
-		/// <param name="localFunctionName">Name of the nested local function</param>
-		/// <param name="args">Local function arguments</param>
-		/// <returns>The value returned by the specified C# 7.0 local function.</returns>
-		public object CallLocalFunction(string methodName, Type[] methodParamTypes, string localFunctionName, params object[] args)
-		{
-			MethodInfo method = MockingUtil.GetMethodWithLocalFunction(instance, methodName, methodParamTypes);
-			MethodInfo localFunction = MockingUtil.GetLocalFunction(type, method, localFunctionName);
-
-			return CallMethod(localFunction, args);
-		}
-
-		/// <summary>
-		/// Setups a non-public method for mocking.
-		/// </summary>
-		/// <param name="method">Method to setup taken from reflection.</param>
-		/// <param name="localFunctionName">Name of the nested local function</param>
-		/// <param name="args">Method arguments</param>
-		/// <returns>Reference to setup actions calls</returns>
-		public object CallLocalFunction(MethodInfo method, string localFunctionName, params object[] args)
-		{
-			MethodInfo localFunction = MockingUtil.GetLocalFunction(type, method, localFunctionName);
-			return CallMethod(localFunction, args);
-		}
-
-		/// <summary>
 		/// Calls the specified generic method by name.
 		/// </summary>
 		/// <param name="name">The name of the method to call.</param>

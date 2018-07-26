@@ -540,8 +540,12 @@
     <Compile Include="Core\TransparentProxy\ProxyInvocation.cs" />
     <Compile Include="DebugView.cs" />
     <Compile Include="Expectations\Abstraction\IExpressionContainer.cs" />
+    <Compile Include="Expectations\Abstraction\IFunctionExpectation.cs" />
+    <Compile Include="Expectations\Abstraction\ILocalExpectation.cs" />
     <Compile Include="Expectations\DynaMock\ExpressionContainer.cs" />
     <Compile Include="Expectations\DynaMock\ExpressionRecorder.cs" />
+    <Compile Include="Expectations\FunctionExpectation.cs" />
+    <Compile Include="Expectations\LocalExpectation.cs" />
     <Compile Include="Helpers\TaskHelper.cs" />
     <Compile Include="Setup\DisableAutomaticRepositoryResetAttribute.cs">
       <SubType>Code</SubType>
