@@ -57,6 +57,13 @@ namespace Telerik.JustMock.Expectations
 			return Mock.NonPublic.MakePrivateAccessor(target).CallMethod(localFunction, args);
 		}
 
+		public T Call<T>(object target, string methodName, string localFunctionName, params object[] args)
+		{
+			var resObject = Call(target, methodName, localFunctionName, args);
+			T res = (T)resObject;
+			return res;
+		}
+
 		public object Call(object target, string methodName, Type[] methodParamTypes, string localFunctionName, params object[] args)
 		{
 			Type type = target.GetType();
@@ -67,11 +74,25 @@ namespace Telerik.JustMock.Expectations
 
 		}
 
+		public T Call<T>(object target, string methodName, Type[] methodParamTypes, string localFunctionName, params object[] args)
+		{
+			var resObject = Call(target, methodName, methodParamTypes, localFunctionName, args);
+			T res = (T)resObject;
+			return res;
+		}
+
 		public object Call(object target, MethodInfo method, string localFunctionName, params object[] args)
 		{
 			Type type = target.GetType();
 			MethodInfo localFunction = MockingUtil.GetLocalFunction(type, method, localFunctionName);
 			return Mock.NonPublic.MakePrivateAccessor(target).CallMethod(localFunction, args);
+		}
+
+		public T Call<T>(object target, MethodInfo method, string localFunctionName, params object[] args)
+		{
+			var resObject = Call(target, method, localFunctionName, args);
+			T res = (T)resObject;
+			return res;
 		}
 	}
 }
