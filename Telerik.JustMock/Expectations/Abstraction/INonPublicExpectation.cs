@@ -73,6 +73,15 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		FuncExpectation<TReturn> Arrange<TReturn>(object target, MethodInfo method, params object[] args);
 
 		/// <summary>
+		/// Arranges a property for mocking.
+		/// </summary>
+		/// <param name="target">Target instance</param>
+		/// <param name="propertyName">Property name</param>
+		/// <param name="value">Property value</param>
+		/// <returns>Reference to setup actions calls</returns>
+		ActionExpectation ArrangeSet(object target, string propertyName, object value);
+
+		/// <summary>
 		/// Asserts the specified member that it is called as expected.
 		/// </summary>
 		/// <param name="target">Target mock</param>

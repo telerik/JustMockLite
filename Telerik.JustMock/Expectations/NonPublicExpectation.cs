@@ -272,6 +272,11 @@ namespace Telerik.JustMock.Expectations
 		{
 			return ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.Arrange(target, method, args, () => new FuncExpectation<TReturn>()));
 		}
+		
+		public ActionExpectation ArrangeSet(object target, string propertyName, object value)
+		{
+			return Arrange(target, propertyName, value);
+		}
 
 		public void Assert<TReturn>(object target, string memberName, params object[] args)
 		{
