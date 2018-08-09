@@ -36,7 +36,11 @@ using TestClass = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestClassAttribute
 using TestMethod = Xunit.FactAttribute;
 using TestInitialize = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestInitializeAttribute;
 using TestCleanup = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestCleanupAttribute;
+#if XUNIT2
+using AssertionException = Xunit.Sdk.XunitException;
+#else
 using AssertionException = Xunit.Sdk.AssertException;
+#endif
 #elif VSTEST_PORTABLE
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
@@ -236,7 +240,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(5, differentMock.Echo(5));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Matchers")]
 		public void ShouldInferIgnoreInstanceFromNewExpression()
 		{
 			Mock.Arrange(() => new Foo().Echo(5)).Returns(5);
@@ -245,7 +249,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(5, differentMock.Echo(5));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Matchers")]
 		public void ShouldInferIgnoreInstanceFromNullCastToType()
 		{
 			Mock.Arrange(() => ((Foo)null).Echo(5)).Returns(5);
@@ -254,7 +258,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(5, differentMock.Echo(5));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Matchers")]
 		public void ShouldInferIgnoreInstanceFromNullTryCastToType()
 		{
 			Mock.Arrange(() => (null as Foo).Echo(5)).Returns(5);
@@ -263,7 +267,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(5, differentMock.Echo(5));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Matchers")]
 		public void ShouldInferIgnoreInstanceFromTargetPatternContainingCasts()
 		{
 			Mock.Arrange(() => (new Echoer() as IEchoer).Echo(5)).Returns(5);

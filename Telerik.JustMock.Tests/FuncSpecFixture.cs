@@ -37,7 +37,11 @@ using TestClass = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestClassAttribute
 using TestMethod = Xunit.FactAttribute;
 using TestInitialize = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestInitializeAttribute;
 using TestCleanup = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestCleanupAttribute;
+#if XUNIT2
+using AssertionException = Xunit.Sdk.XunitException;
+#else
 using AssertionException = Xunit.Sdk.AssertException;
+#endif
 #elif VSTEST_PORTABLE
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
@@ -71,21 +75,21 @@ namespace Telerik.JustMock.Tests
 			FuncResult Go(FuncResult a);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("FuncSpec")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("FuncSpec")]
 		public void ShouldMakeSpecForProperty()
 		{
 			var mock = Mock.CreateLike<IFuncSpecced>(me => me.Prop == 5);
 			Assert.Equal(5, mock.Prop);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("FuncSpec")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("FuncSpec")]
 		public void ShouldMakeSpecForMethod()
 		{
 			var mock = Mock.CreateLike<IFuncSpecced>(me => me.GetString() == "hooray");
 			Assert.Equal("hooray", mock.GetString());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("FuncSpec")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("FuncSpec")]
 		public void ShouldMakeSpecForMethodWithSpecificParameters()
 		{
 			var mock = Mock.CreateLike<IFuncSpecced>(me => me.Complex(5, "a") == 100);
@@ -93,7 +97,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(0, mock.Complex(5, "b"));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("FuncSpec")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("FuncSpec")]
 		public void ShouldMakeSpecForMethodWithAnyParameterMatchers()
 		{
 			var mock = Mock.CreateLike<IFuncSpecced>(me => me.Complex(Arg.AnyInt, Arg.AnyString) == 100);
@@ -101,7 +105,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(100, mock.Complex(500, "b"));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("FuncSpec")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("FuncSpec")]
 		public void ShouldMakeSpecForMethodWithComplexParameterMatchers()
 		{
 			var mock = Mock.CreateLike<IFuncSpecced>(me => me.Complex(Arg.IsInRange(100, 200, RangeKind.Inclusive), Arg.Matches<string>(s => s.Length >= 2)) == 100);
@@ -111,7 +115,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(0, mock.Complex(13, "xxxxx"));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("FuncSpec")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("FuncSpec")]
 		public void ShouldMakeComplexSpec()
 		{
 			var mock = Mock.CreateLike<IFuncSpecced>(me =>
@@ -124,14 +128,14 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(-1, mock.Complex(5, "none"));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("FuncSpec")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("FuncSpec")]
 		public void ShouldThrowForInvalidSpecFormat()
 		{
 			Assert.Throws<MockException>(() => Mock.CreateLike<IFuncSpecced>(me => me.Prop > 5));
 			Assert.Throws<MockException>(() => Mock.CreateLike<IFuncSpecced>(me => me.Prop == 5 || me.GetString() == "abc"));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("FuncSpec")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("FuncSpec")]
 		public void ShouldArrangeBooleanImplicitly()
 		{
 			var mock = Mock.CreateLike<IFuncSpecced>(me => me.Bool);
@@ -140,7 +144,7 @@ namespace Telerik.JustMock.Tests
 			Assert.True(mock2.Bool);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("FuncSpec")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("FuncSpec")]
 		public void ShouldArrangeNegatedBooleanImplicitly()
 		{
 			var mock = Mock.CreateLike<IFuncSpecced>(me => !me.Bool);
@@ -151,7 +155,7 @@ namespace Telerik.JustMock.Tests
 			Assert.False(mock2.Bool);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("FuncSpec")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("FuncSpec")]
 		public void ShouldMakeSpecWithInnerMocks()
 		{
 			var mock = Mock.CreateLike<IFuncSpecced>(me =>
@@ -172,7 +176,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal("inner 2", list[1].GetString());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("FuncSpec")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("FuncSpec")]
 		public void ShouldMakeSpecUsingAllParametersAndClosureVariable()
 		{
 			int a = 100;
@@ -186,7 +190,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(-80, actual);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("FuncSpec")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("FuncSpec")]
 		public void ShouldMakeSpecNotAllParametersUsed()
 		{
 			var mock = Mock.CreateLike<IFuncSpecced>(me => me.Complex(Arg.AnyInt, Arg.AnyString) == int.Parse(Param<string>._2));
@@ -194,7 +198,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(15, actual);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("FuncSpec")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("FuncSpec")]
 		public void ShouldMakeSpecUsingAllParametersAndClosureVariableImplicitlyTyped()
 		{
 			int a = 100;
@@ -208,7 +212,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(-80, actual);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("FuncSpec")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("FuncSpec")]
 		public void ShouldMakeSpecUsingImplicitlyTypedParametersConvertedToObject()
 		{
 			var mock = Mock.CreateLike<IEqualityComparer>(me => me.Equals(Arg.AnyObject, Arg.AnyObject) == Equals(Param._1, Param._2));
@@ -216,7 +220,7 @@ namespace Telerik.JustMock.Tests
 			Assert.False(mock.Equals(15, 20));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("FuncSpec")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("FuncSpec")]
 		public void ShouldMakeSpecNotAllParametersUsedImplicitlyTyped()
 		{
 			var mock = Mock.CreateLike<IFuncSpecced>(me => me.Complex(Arg.AnyInt, Arg.AnyString) == int.Parse(Param._2));
@@ -224,7 +228,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(15, actual);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("FuncSpec"), TestCategory("Recursive")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("FuncSpec"), TestCategory("Recursive")]
 		public void ShouldMakeSpecForRecursiveArrangement()
 		{
 			var mock = Mock.CreateLike<IFuncSpecced>(me => me.InnerElement.InnerElement.Prop == 5);
@@ -243,7 +247,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(5, mock.Prop);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("FuncSpec"), TestCategory("Recursive")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("FuncSpec"), TestCategory("Recursive")]
 		public void ShouldEvaluateConstantMockExpressionsEarly()
 		{
 			int a = 5;
@@ -256,7 +260,7 @@ namespace Telerik.JustMock.Tests
 			byte Prop { get; }
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("FuncSpec")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("FuncSpec")]
 		public void ShouldArrangeByteReturnValue()
 		{
 			var instance = Mock.CreateLike<IByteProperty>(o => o.Prop == 1);

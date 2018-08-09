@@ -43,7 +43,11 @@ using TestClass = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestClassAttribute
 using TestMethod = Xunit.FactAttribute;
 using TestInitialize = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestInitializeAttribute;
 using TestCleanup = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestCleanupAttribute;
+#if XUNIT2
+using AssertionException = Xunit.Sdk.XunitException;
+#else
 using AssertionException = Xunit.Sdk.AssertException;
+#endif
 #elif VSTEST_PORTABLE
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
@@ -123,14 +127,14 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(10, ret);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Misc")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Misc")]
 		public void ShouldCreateMockWithGenericConstraints()
 		{
 			var target = Mock.Create<ISomething<int>>();
 			Assert.NotNull(target);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Misc")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Misc")]
 		public void ShoudlAssertCallWithGenericConstraint()
 		{
 			var target = Mock.Create<ISomething<int>>();
@@ -138,7 +142,7 @@ namespace Telerik.JustMock.Tests
 			target.DoSomething<int>();
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Misc")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Misc")]
 		public void ShouldAssertInterfaceForGenericConstaint()
 		{
 			var target = Mock.Create<ISomething<IDummy>>();
@@ -159,7 +163,7 @@ namespace Telerik.JustMock.Tests
 		}
 
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Misc")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Misc")]
 		public void ShouldBeAddRemoveConcreteMockItemsFromCollection()
 		{
 			var foo = Mock.Create<Foo>();
@@ -246,7 +250,7 @@ namespace Telerik.JustMock.Tests
 			Assert.True(target.NumberOfTimesCalled == 2);
 		}
 
-		[TestMethod, TestCategory("Lite")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore")]
 		public void ShouldBeToSubscribeEventForStrictMock()
 		{
 			new EventContainer(Mock.Create<IInterface>(Behavior.Strict));
@@ -343,7 +347,7 @@ namespace Telerik.JustMock.Tests
 
 #if !COREFX
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Misc")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Misc")]
 		public void ShouldNotImplementInternalVirtualMemberUsingProxyWhenNotVisible()
 		{
 			var context = Mock.Create<Telerik.JustMock.DemoLibSigned.DummyContext>();
@@ -512,19 +516,6 @@ namespace Telerik.JustMock.Tests
 		}
 
 
-#if !COREFX
-
-		[TestMethod, TestCategory("Lite"), TestCategory("Misc")]
-		public void ShouldBeAbleToMockInternalProtectedVirtualMember()
-		{
-			var visitor = Mock.Create<ExpressionNodeVisitor>(Behavior.CallOriginal);
-			var node = Mock.Create<ExpressionNode>(Behavior.CallOriginal);
-
-			visitor.VisitExtension(node);
-
-			Mock.Assert(() => node.VisitChildren(visitor), Occurs.Once());
-		}
-
 		[TestMethod, TestCategory("Lite"), TestCategory("Misc")]
 		public void ShouldBeAbleToCreateMockWithInternalCtor()
 		{
@@ -538,8 +529,6 @@ namespace Telerik.JustMock.Tests
 
 			Assert.Equal(foo.Name, expected);
 		}
-
-#endif
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Misc")]
 		public void ShouldExecuteEqualsDuringAssertWithMockArgument()
@@ -633,14 +622,14 @@ namespace Telerik.JustMock.Tests
 			event EventHandler DatabaseChangedEvent;
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Misc")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Misc")]
 		public void ShouldAssertCallOriginalOnOverloadsViaProxy()
 		{
 			var dummyExpression = Mock.Create<DummyExpression>(Behavior.CallOriginal);
 			dummyExpression.Evaluate(10);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Misc")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Misc")]
 		public void ShouldAssertSetPropertyOccurenceForAnyValue()
 		{
 			var foo = Mock.Create<IFoo>();
@@ -698,7 +687,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Assert(localPersister);
 		}
 
-		[TestMethod, TestCategory("Lite")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore")]
 		public void ShouldConfirmMockingClassWithMethodHidingItsVirtualBase()
 		{
 			var child = Mock.Create<ChildClass>();

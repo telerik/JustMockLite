@@ -40,7 +40,11 @@ using TestClass = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestClassAttribute
 using TestMethod = Xunit.FactAttribute;
 using TestInitialize = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestInitializeAttribute;
 using TestCleanup = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestCleanupAttribute;
+#if XUNIT2
+using AssertionException = Xunit.Sdk.XunitException;
+#else
 using AssertionException = Xunit.Sdk.AssertException;
+#endif
 #elif VSTEST_PORTABLE
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
@@ -85,7 +89,7 @@ namespace Telerik.JustMock.Tests
 			}
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Ninject")]
 		public void ShouldCreateMocksOfDependencies()
 		{
 			var container = new MockingContainer<FileLog>();
@@ -96,7 +100,7 @@ namespace Telerik.JustMock.Tests
 			Assert.True(container.Instance.LogExists());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Ninject")]
 		public void ShouldAssertArrangedExpectations()
 		{
 			var container = new MockingContainer<FileLog>();
@@ -112,7 +116,7 @@ namespace Telerik.JustMock.Tests
 			container.Assert();
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Ninject")]
 		public void ShouldAssertDependenciesDirectly()
 		{
 			var container = new MockingContainer<FileLog>();
@@ -130,7 +134,7 @@ namespace Telerik.JustMock.Tests
 			container.Assert<ICalendar>(x => x.Now, Occurs.Once());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Ninject")]
 		public void ShouldSpecifyDependencyBehavior()
 		{
 			var container = new MockingContainer<FileLog>(new AutoMockSettings { MockBehavior = Behavior.Strict });
@@ -168,7 +172,7 @@ namespace Telerik.JustMock.Tests
 			}
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Ninject")]
 		public void ShouldArrangeSingletonInstances()
 		{
 			var container = new MockingContainer<TransactionService>();
@@ -236,7 +240,7 @@ namespace Telerik.JustMock.Tests
 			}
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Ninject")]
 		public void ShouldSelectConstructorBasedOnSettings()
 		{
 			// assert the default NInject behavior that injects into the constructor with most parameters
@@ -263,7 +267,7 @@ namespace Telerik.JustMock.Tests
 			}
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Ninject")]
 		public void ShouldMakeSingletonExplicitlyRequestedServices()
 		{
 			var container = new MockingContainer<Module>();
@@ -272,7 +276,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Same(s1, s2);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("AutoMock")]
 		public void ShouldAssertRaisesAgainstMethod()
 		{
 			var container = new MockingContainer<Executor>();
@@ -310,7 +314,7 @@ namespace Telerik.JustMock.Tests
 			void Submit();
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("AutoMock")]
 		public void ShouldAssertMockingNestedDependency()
 		{
 			var container = new MockingContainer<Foo>();
@@ -360,7 +364,7 @@ namespace Telerik.JustMock.Tests
 			void DoWork();
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("AutoMock")]
 		public void ShouldResolveTargetTypeWithInterfaceAndConcreteDependencies()
 		{
 			var container = new MockingContainer<Unit>();
@@ -399,7 +403,7 @@ namespace Telerik.JustMock.Tests
 			}
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("AutoMock")]
 		public void ShouldAssertOccurrenceFromContainerWithoutPriorArrangement()
 		{
 			var c = new MockingContainer<Unit>();
@@ -422,7 +426,7 @@ namespace Telerik.JustMock.Tests
 			}
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("AutoMock")]
 		public void ShouldInjectContainers()
 		{
 			var c = new MockingContainer<DisposableContainer>();
@@ -453,7 +457,7 @@ namespace Telerik.JustMock.Tests
 			}
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("AutoMock")]
 		public void ShouldInjectAbstractType()
 		{
 			var c = new MockingContainer<DependencyBase>();
@@ -470,7 +474,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(5, obj.Value);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("AutoMock")]
 		public void ShouldCheckPropertyMixinOnNonabstractPropertyOnInjectedAbstractType()
 		{
 			var c = new MockingContainer<DependencyBase>();
@@ -479,7 +483,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(10, obj.baseValue);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("AutoMock")]
 		public void ShouldInjectAbstractTypeWithSpecifiedCtor()
 		{
 			var c = new MockingContainer<DependencyBase>(
@@ -488,7 +492,7 @@ namespace Telerik.JustMock.Tests
 			Assert.NotNull(obj.Dep);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("AutoMock")]
 		public void ShouldIncludeAssertionMessageWhenAssertingContainer()
 		{
 			var c = new MockingContainer<FileLog>();

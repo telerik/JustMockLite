@@ -2,8 +2,8 @@
   <PropertyGroup>
     <TargetFrameworks>net451;netcoreapp2.0</TargetFrameworks>
     <Configurations>Debug;Release;ReleaseFree;DebugFree</Configurations>
-    <AssemblyName>Telerik.JustMock.MSTest.Tests</AssemblyName>
-    <RootNamespace>Telerik.JustMock.Tests</RootNamespace>
+    <AssemblyName>Telerik.JustMock.SimpleTests</AssemblyName>
+    <RootNamespace>Telerik.JustMock.SimpleTests</RootNamespace>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -54,21 +54,30 @@
     <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
+    <SccProjectName />
+    <SccLocalPath />
+    <SccAuxPath />
+    <SccProvider />
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{83F0C270-DB35-4B80-BEDA-5AED79C0FB2D}</ProjectGuid>
+    <ProductVersion />
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{BFBACD60-E544-4B35-92CC-E60E521A5093}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Telerik.JustMock.SimpleTests</RootNamespace>
+    <AssemblyName>Telerik.JustMock.SimpleTests</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <SccProjectName />
+    <SccLocalPath />
+    <SccAuxPath />
+    <SccProvider />
     <TargetFrameworkProfile />
   </PropertyGroup>
-  <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
-  <Import Project="..\Telerik.JustMock.Tests\Telerik.JustMock.Tests.projitems" Label="Shared" />
+  <Import Project="..\Telerik.JustMock.SimpleTests\Telerik.JustMock.SimpleTests.projitems" Label="Shared" />
   <Import Project="..\Telerik.JustMock.Tests.Base\Telerik.JustMock.Tests.Base.projitems" Label="Shared" />
   <ItemGroup>
-    <ProjectReference Include="..\Telerik.JustMock.DemoLibSigned\Telerik.JustMock.DemoLibSigned.csproj" />
-    <ProjectReference Include="..\Telerik.JustMock.DemoLib\Telerik.JustMock.DemoLib.csproj" />
     <ProjectReference Include="..\Telerik.JustMock\Telerik.JustMock.csproj" />
   </ItemGroup>
   <ItemGroup>
@@ -77,5 +86,11 @@
     <PackageReference Include="MSTest.TestFramework" Version="1.1.18" />
     <PackageReference Include="System.Dynamic.Runtime " Version="4.3.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="System.XML" />
   </ItemGroup>
 </Project>

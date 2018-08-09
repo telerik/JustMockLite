@@ -38,7 +38,11 @@ using TestClass = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestClassAttribute
 using TestMethod = Xunit.FactAttribute;
 using TestInitialize = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestInitializeAttribute;
 using TestCleanup = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestCleanupAttribute;
+#if XUNIT2
+using AssertionException = Xunit.Sdk.XunitException;
+#else
 using AssertionException = Xunit.Sdk.AssertException;
+#endif
 #elif VSTEST_PORTABLE
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
@@ -140,7 +144,7 @@ namespace Telerik.JustMock.Tests
 			INode Right { get; }
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic"), TestCategory("DynaMock")]
 		public void ShouldArrangeNonPublicGetterViaDynaMock()
 		{
 			var mock = Mock.Create<TestBed>();
@@ -149,7 +153,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(123, new TestBed.Accessor(mock).Value);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic"), TestCategory("DynaMock")]
 		public void ShouldArrangeNonPublicSetterViaDynaMock()
 		{
 			var mock = Mock.Create<TestBed>();
@@ -164,7 +168,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Assert(mock);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic"), TestCategory("DynaMock")]
 		public void ShouldArrangeNonPublicSetterWithMatchersViaDynaMock()
 		{
 			var mock = Mock.Create<TestBed>();
@@ -176,7 +180,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Assert(mock);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic"), TestCategory("DynaMock")]
 		public void ShouldArrangeNonPublicMethodViaDynaMock()
 		{
 			var mock = Mock.Create<TestBed>();
@@ -200,7 +204,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(123, acc.Get(50, "dd"));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic"), TestCategory("DynaMock")]
 		public void ShouldArrangeNonPublicIndexerGetterViaDynaMock()
 		{
 			var mock = Mock.Create<TestBed>();
@@ -213,7 +217,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(123, acc["sss"]);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic"), TestCategory("DynaMock")]
 		public void ShouldArrangeNonPublicIndexerSetterViaDynaMock()
 		{
 			var mock = Mock.Create<TestBed>();
@@ -231,7 +235,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Assert(mock);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic"), TestCategory("DynaMock")]
 		public void ShouldArrangeNonPublicMemberRecursivelyViaDynaMock()
 		{
 			var mock = Mock.Create<TestBed>();
@@ -244,7 +248,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal("abc", acc.Root.Left.Left.Right.Name);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic"), TestCategory("DynaMock")]
 		public void ShouldAssertNonPublicMethodViaDynaMock()
 		{
 			var mock = Mock.Create<TestBed>();
@@ -271,7 +275,7 @@ namespace Telerik.JustMock.Tests
 		}
 #endif
 
-		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic"), TestCategory("DynaMock")]
 		public void ShouldArrangeNonPublicGenericMethodViaDynaMock()
 		{
 			var mock = Mock.Create<TestBed>();

@@ -18,8 +18,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 	using System.Collections.Generic;
 	using System.Reflection.Emit;
 	using Telerik.JustMock.Core.Castle.Core.Internal;
+    using InternalCollectionExtensions = Telerik.JustMock.Core.Castle.Core.Internal.CollectionExtensions;
 
-	internal class ProxyGenerationOptions
+    internal class ProxyGenerationOptions
 	{
 		public static readonly ProxyGenerationOptions Default = new ProxyGenerationOptions();
 
@@ -158,7 +159,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 			{
 				return false;
 			}
-			if (!CollectionExtensions.AreEquivalent(AdditionalAttributes, proxyGenerationOptions.AdditionalAttributes))
+			if (!InternalCollectionExtensions.AreEquivalent(AdditionalAttributes, proxyGenerationOptions.AdditionalAttributes))
 			{
 				return false;
 			}
@@ -174,7 +175,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 			result = 29 * result + (Selector != null ? 1 : 0);
 			result = 29 * result + MixinData.GetHashCode();
 			result = 29 * result + (BaseTypeForInterfaceProxy != null ? BaseTypeForInterfaceProxy.GetHashCode() : 0);
-			result = 29 * result + CollectionExtensions.GetContentsHashCode(AdditionalAttributes);
+			result = 29 * result + InternalCollectionExtensions.GetContentsHashCode(AdditionalAttributes);
 			return result;
 		}
 	}

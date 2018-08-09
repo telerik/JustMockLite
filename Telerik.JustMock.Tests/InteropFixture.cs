@@ -17,7 +17,11 @@ using TestClass = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestClassAttribute
 using TestMethod = Xunit.FactAttribute;
 using TestInitialize = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestInitializeAttribute;
 using TestCleanup = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestCleanupAttribute;
+#if XUNIT2
+using AssertionException = Xunit.Sdk.XunitException;
+#else
 using AssertionException = Xunit.Sdk.AssertException;
+#endif
 #elif VSTEST_PORTABLE
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
@@ -44,7 +48,7 @@ namespace Telerik.JustMock.Tests
 			public abstract int* Realloc(int* x);
 		}
 
-		[TestMethod]
+		[TestMethod, TestCategory("DotNetCore")]
 		public void ShouldArrangeMethodWithPointerArg()
 		{
 			var mock = Mock.Create<UnsafeClass1>();
@@ -56,7 +60,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(2, called);
 		}
 
-		[TestMethod]
+		[TestMethod, TestCategory("DotNetCore")]
 		public void ShouldArrangeMethodWithPointerReturnType()
 		{
 			var mock = Mock.Create<UnsafeClass2>();
@@ -65,7 +69,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(1234, new IntPtr(result).ToInt32());
 		}
 
-		[TestMethod]
+		[TestMethod, TestCategory("DotNetCore")]
 		public void ShouldPassPointersToAndFromReturns()
 		{
 			var mock = Mock.Create<UnsafeClass2>();
@@ -102,7 +106,7 @@ namespace Telerik.JustMock.Tests
 			}
 		}
 
-		[TestMethod]
+		[TestMethod, TestCategory("DotNetCore")]
 		public void ShouldCallOriginalImplementationWithPointers()
 		{
 			var mock = Mock.Create<UnsafeClass3>();

@@ -1,6 +1,6 @@
 ﻿/*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015,2018 Telerik EAD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ namespace Telerik.JustMock.Core
 #endif
 		}
 
-#if DEBUG && !SILVERLIGHT
+#if (DEBUG && !SILVERLIGHT && !NETCORE)
 		internal static void SaveAssembly()
 		{
 			generator.ProxyBuilder.ModuleScope.SaveAssembly();
@@ -69,7 +69,7 @@ namespace Telerik.JustMock.Core
 			}
 
 			var interceptor = repository.Interceptor;
-#if SILVERLIGHT
+#if (SILVERLIGHT || NETCORE)
 			options.Hook = new ProxyGenerationHook(false, settings.InterceptorFilter);
 #else
 			options.Hook = new ProxyGenerationHook(settings.MockConstructorCall, settings.InterceptorFilter);
@@ -99,7 +99,7 @@ namespace Telerik.JustMock.Core
 			{
 				try
 				{
-#if SILVERLIGHT
+#if (SILVERLIGHT || NETCORE)
 					if (settings.Args == null || settings.Args.Length == 0)
 					{
 						ConstructorInfo[] constructors = type.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
@@ -264,7 +264,7 @@ namespace Telerik.JustMock.Core
 			{
 				get
 				{
-#if SILVERLIGHT
+#if (SILVERLIGHT || NETCORE)
 					return ProxyConstructorImplementation.SkipConstructor;
 #else
 					return myMockConstructors ? ProxyConstructorImplementation.DoNotCallBase : ProxyConstructorImplementation.SkipConstructor;

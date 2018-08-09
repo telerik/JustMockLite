@@ -14,14 +14,14 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy
 {
-#if !SILVERLIGHT
-	/// <summary>
-	///   ProxyBuilder that persists the generated type.
-	/// </summary>
-	/// <remarks>
-	///   The saved assembly contains just the last generated type.
-	/// </remarks>
-	internal class PersistentProxyBuilder : DefaultProxyBuilder
+#if (!SILVERLIGHT && !NETCORE)
+    /// <summary>
+    ///   ProxyBuilder that persists the generated type.
+    /// </summary>
+    /// <remarks>
+    ///   The saved assembly contains just the last generated type.
+    /// </remarks>
+    internal class PersistentProxyBuilder : DefaultProxyBuilder
 	{
 		/// <summary>
 		///   Initializes a new instance of the <see cref = "PersistentProxyBuilder" /> class.

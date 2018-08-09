@@ -335,8 +335,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 				AssemblyBuilder assemblyBuilder;
 				try
 				{
+#if !NETCORE
 					assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(
 						assemblyName, AssemblyBuilderAccess.RunAndSave, signStrongName ? StrongNamedModuleDirectory : WeakNamedModuleDirectory);
+#else
+					assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+#endif
 				}
 				catch (ArgumentException e)
 				{
@@ -351,7 +355,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 							GetType());
 					throw new ArgumentException(message, e);
 				}
+#if !NETCORE
 				var module = assemblyBuilder.DefineDynamicModule(moduleName, moduleName, false);
+#else
+				var module = assemblyBuilder.DefineDynamicModule(moduleName);
+#endif
+
 				return module;
 			}
 			else
@@ -360,7 +369,11 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 				AssemblyBuilder assemblyBuilder;
 				try
 				{
+#if !NETCORE
 					assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(
+#else
+					assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(
+#endif
 						assemblyName,
 						AssemblyBuilderAccess.Run);
 				}
@@ -374,7 +387,11 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 #endif
 				}
 
+#if !NETCORE
 				var module = assemblyBuilder.DefineDynamicModule(moduleName, false);
+#else
+				var module = assemblyBuilder.DefineDynamicModule(moduleName);
+#endif
 				return module;
 			}
 		}
@@ -386,7 +403,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 			return MockingUtil.GetStrongAssemblyName(name, keyPairStream);
 		}
 
-#if !SILVERLIGHT
+#if (!SILVERLIGHT && !NETCORE)
 		/// <summary>
 		///   Saves the generated assembly with the name and directory information given when this <see cref = "ModuleScope" /> instance was created (or with
 		///   the <see cref = "DEFAULT_FILE_NAME" /> and current directory if none was given).

@@ -1,6 +1,13 @@
 ﻿#if XUNIT
 using System;
+#if XUNIT2
+using System.Collections.Generic;
+using System.Linq;
+#endif
 using Xunit;
+#if XUNIT2
+using Xunit.Abstractions;
+#endif
 #endif
 
 namespace Telerik.JustMock.XUnit.Test.Attributes
@@ -28,11 +35,30 @@ namespace Telerik.JustMock.XUnit.Test.Attributes
     {
     }
     [AttributeUsageAttribute(AttributeTargets.Method, AllowMultiple = true)]
+#if !XUNIT2
     public class XUnitCategoryAttribute : Xunit.TraitAttribute
     {
-        public XUnitCategoryAttribute(string category) : base("Category", category) 
+        public XUnitCategoryAttribute(string category) : base("Category", category)
         {
         }
     }
+#else
+    [Xunit.Sdk.TraitDiscovererAttribute("Telerik.JustMock.XUnit.Test.Attributes.XunitCategoryDiscoverer", "Telerik.JustMock.XUnit.Tests")]
+    public class XUnitCategoryAttribute : Attribute, Xunit.Sdk.ITraitAttribute
+    {
+        public XUnitCategoryAttribute(string category)
+        {
+        }
+    }
+    public class XunitCategoryDiscoverer : Xunit.Sdk.ITraitDiscoverer
+    {
+        /// <inheritdoc/>
+        public virtual IEnumerable<KeyValuePair<string, string>> GetTraits(IAttributeInfo traitAttribute)
+        {
+            var ctorArgs = traitAttribute.GetConstructorArguments().Cast<string>().ToList();
+            yield return new KeyValuePair<string, string>("Category", ctorArgs[0]);
+        }
+    }
+#endif
 #endif
 }

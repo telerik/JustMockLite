@@ -41,9 +41,11 @@ namespace Telerik.JustMock.Core.Context
 			return exceptionType != null ? this.CreateExceptionFactory(this.exceptionType) : null;
 		}
 
+		protected abstract Type GetExceptionType();
+
 		private void CreateExceptionType()
 		{
-			var baseType = FindType(this.assertFailedExceptionTypeName, throwOnNotFound: false);
+			var baseType = GetExceptionType();
 			if (baseType == null)
 				return;
 			var typeBuilder = MockingUtil.ModuleBuilder.DefineType(
@@ -65,7 +67,7 @@ namespace Telerik.JustMock.Core.Context
 
 	internal class XUnit1xMockingContextResolver : XUnitMockingContextResolver
 	{
-		private const string XunitAssertionExceptionName = "Xunit.Sdk.AssertException, xunit";
+		private const string XunitAssertionExceptionName = "Xunit.Sdk.AssertActualExpectedException, xunit";
 
 		public static bool IsAvailable
 		{
@@ -79,6 +81,17 @@ namespace Telerik.JustMock.Core.Context
 				new[] { "Xunit.FactAttribute, xunit" },
 				null, null, null,
 				FixtureConstuctorSemantics.InstanceConstructorCalledOncePerTest);
+		}
+
+		protected override Type GetExceptionType()
+		{
+			var exceptionType = FindType(this.assertFailedExceptionTypeName, throwOnNotFound: false);
+			if (exceptionType != null)
+			{
+				exceptionType = exceptionType.BaseType;
+			}
+
+			return exceptionType;
 		}
 	}
 
@@ -98,6 +111,11 @@ namespace Telerik.JustMock.Core.Context
 				new[] { "Xunit.FactAttribute, xunit.core", "Xunit.TheoryAttribute, xunit.core" },
 				null, null, null,
 				FixtureConstuctorSemantics.InstanceConstructorCalledOncePerTest);
+		}
+
+		protected override Type GetExceptionType()
+		{
+			return FindType(this.assertFailedExceptionTypeName, throwOnNotFound: false);
 		}
 	}
 }

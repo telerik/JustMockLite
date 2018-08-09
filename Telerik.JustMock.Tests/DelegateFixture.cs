@@ -36,7 +36,11 @@ using TestClass = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestClassAttribute
 using TestMethod = Xunit.FactAttribute;
 using TestInitialize = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestInitializeAttribute;
 using TestCleanup = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestCleanupAttribute;
+#if XUNIT2
+using AssertionException = Xunit.Sdk.XunitException;
+#else
 using AssertionException = Xunit.Sdk.AssertException;
+#endif
 #elif VSTEST_PORTABLE
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
@@ -53,7 +57,7 @@ namespace Telerik.JustMock.Tests
 	public class DelegateFixture
 	{
 #if !PORTABLE
-		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("Delegate")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock"), TestCategory("Delegate")]
 		public void ShouldCreateMockDelegate()
 		{
 			var mock = Mock.Create<Action<int, string>>();
@@ -142,7 +146,7 @@ namespace Telerik.JustMock.Tests
 		}
 
 #if !PORTABLE
-		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("Delegate")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock"), TestCategory("Delegate")]
 		public void ShouldThrowWhenMockingAbstractDelegate()
 		{
 			Assert.Throws<MockException>(() => Mock.Create<Delegate>());

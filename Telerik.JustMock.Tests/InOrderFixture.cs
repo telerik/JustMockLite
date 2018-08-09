@@ -34,7 +34,11 @@ using TestClass = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestClassAttribute
 using TestMethod = Xunit.FactAttribute;
 using TestInitialize = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestInitializeAttribute;
 using TestCleanup = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestCleanupAttribute;
+#if XUNIT2
+using AssertionException = Xunit.Sdk.XunitException;
+#else
 using AssertionException = Xunit.Sdk.AssertException;
+#endif
 #elif VSTEST_PORTABLE
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
@@ -104,7 +108,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Throws<AssertionException>(() => Mock.Assert(foo));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("InOrder")]
 		public void ShouldAsserInOrderExecutionForPropertySet()
 		{
 			var foo = Mock.Create<IFoo>();
@@ -178,7 +182,7 @@ namespace Telerik.JustMock.Tests
 			void CommitChanges();
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("InOrder")]
 		public void ShouldCreateInOrderArrangementOnNonMock()
 		{
 			Mock.Arrange(() => Arg.IsAny<List<string>>().Add("a")).InOrder();

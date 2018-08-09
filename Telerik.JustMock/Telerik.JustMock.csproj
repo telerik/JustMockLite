@@ -1,26 +1,14 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{0749EBC2-4E83-4960-BF28-1FF5C2DEB2B9}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Telerik.JustMock</RootNamespace>
+    <TargetFrameworks>net45;netcoreapp2.0</TargetFrameworks>
+    <Configurations>Debug;Release;ReleaseFree;DebugFree</Configurations>
     <AssemblyName>Telerik.JustMock</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <SccProjectName>
-    </SccProjectName>
-    <SccLocalPath>
-    </SccLocalPath>
-    <SccAuxPath>
-    </SccAuxPath>
-    <SccProvider>
-    </SccProvider>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <RootNamespace>Telerik.JustMock</RootNamespace>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Solution Items\snkey_lite.snk</AssemblyOriginatorKeyFile>
+    <Description></Description>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,12 +27,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>..\..\..\Binaries\Release\Telerik.JustMock.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\Solution Items\snkey_lite.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseFree|AnyCPU'">
     <OutputPath>..\..\..\Binaries\ReleaseFree\</OutputPath>
@@ -66,592 +48,86 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <ItemGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0' ">
+    <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SccProjectName />
+    <SccLocalPath />
+    <SccAuxPath />
+    <SccProvider />
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{0749EBC2-4E83-4960-BF28-1FF5C2DEB2B9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName />
+    <SccLocalPath />
+    <SccAuxPath />
+    <SccProvider />
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Solution Items\snkey_lite.snk</AssemblyOriginatorKeyFile>
+    <PostBuildEvent />
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent />
+  </PropertyGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\CommonAssemblyInfo.cs">
-      <Link>Properties\CommonAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="Abstraction\IFluentConfig.cs" />
-    <Compile Include="Args.Matching.cs">
+    <Compile Include="..\CommonAssemblyInfo.cs" Link="Properties\CommonAssemblyInfo.cs" />
+    <Compile Update="Args.Matching.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Args.Matching.tt</DependentUpon>
     </Compile>
-    <Compile Include="AutoMock\AutoMockSettings.cs" />
-    <Compile Include="AutoMock\MockingContainer.cs" />
-    <Compile Include="AutoMock\MockResolver.cs" />
-    <Compile Include="AutoMock\NinjectMockSyntaxExtensions.cs" />
-    <Compile Include="AutoMock\Ninject\ActivationException.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Blocks\ActivationBlock.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Blocks\IActivationBlock.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Caching\ActivationCache.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Caching\Cache.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Caching\GarbageCollectionCachePruner.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Caching\IActivationCache.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Caching\ICache.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Caching\ICachePruner.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Caching\IPruneable.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Caching\WeakReferenceEqualityComparer.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Context.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\IContext.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\InstanceReference.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\IPipeline.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\IProvider.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\IProvider{T}.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\IRequest.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Pipeline.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Provider.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Providers\CallbackProvider.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Providers\ConstantProvider.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Providers\StandardProvider.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Request.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Strategies\ActivationCacheStrategy.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Strategies\ActivationStrategy.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Strategies\BindingActionStrategy.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Strategies\DisposableStrategy.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Strategies\IActivationStrategy.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Strategies\InitializableStrategy.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Strategies\MethodInjectionStrategy.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Strategies\PropertyInjectionStrategy.cs" />
-    <Compile Include="AutoMock\Ninject\Activation\Strategies\StartableStrategy.cs" />
-    <Compile Include="AutoMock\Ninject\Attributes\ConstraintAttribute.cs" />
-    <Compile Include="AutoMock\Ninject\Attributes\InjectAttribute.cs" />
-    <Compile Include="AutoMock\Ninject\Attributes\NamedAttribute.cs" />
-    <Compile Include="AutoMock\Ninject\Attributes\OptionalAttribute.cs" />
-    <Compile Include="AutoMock\Ninject\Components\ComponentContainer.cs" />
-    <Compile Include="AutoMock\Ninject\Components\IComponentContainer.cs" />
-    <Compile Include="AutoMock\Ninject\Components\INinjectComponent.cs" />
-    <Compile Include="AutoMock\Ninject\Components\NinjectComponent.cs" />
-    <Compile Include="AutoMock\Ninject\GlobalKernelRegistration.cs" />
-    <Compile Include="AutoMock\Ninject\GlobalKernelRegistrationModule.cs" />
-    <Compile Include="AutoMock\Ninject\IInitializable.cs" />
-    <Compile Include="AutoMock\Ninject\IKernel.cs" />
-    <Compile Include="AutoMock\Ninject\Infrastructure\BaseWeakReference.cs" />
-    <Compile Include="AutoMock\Ninject\Infrastructure\Disposal\DisposableObject.cs" />
-    <Compile Include="AutoMock\Ninject\Infrastructure\Disposal\IDisposableObject.cs" />
-    <Compile Include="AutoMock\Ninject\Infrastructure\Disposal\INotifyWhenDisposed.cs" />
-    <Compile Include="AutoMock\Ninject\Infrastructure\Ensure.cs" />
-    <Compile Include="AutoMock\Ninject\Infrastructure\Future.cs" />
-    <Compile Include="AutoMock\Ninject\Infrastructure\IHaveBindingConfiguration.cs" />
-    <Compile Include="AutoMock\Ninject\Infrastructure\IHaveKernel.cs" />
-    <Compile Include="AutoMock\Ninject\Infrastructure\Introspection\ExceptionFormatter.cs" />
-    <Compile Include="AutoMock\Ninject\Infrastructure\Introspection\FormatExtensions.cs" />
-    <Compile Include="AutoMock\Ninject\Infrastructure\Language\ExtensionsForAssembly.cs" />
-    <Compile Include="AutoMock\Ninject\Infrastructure\Language\ExtensionsForICustomAttributeProvider.cs" />
-    <Compile Include="AutoMock\Ninject\Infrastructure\Language\ExtensionsForIEnumerable.cs" />
-    <Compile Include="AutoMock\Ninject\Infrastructure\Language\ExtensionsForIEnumerableOfT.cs" />
-    <Compile Include="AutoMock\Ninject\Infrastructure\Language\ExtensionsForMemberInfo.cs" />
-    <Compile Include="AutoMock\Ninject\Infrastructure\Language\ExtensionsForTargetInvocationException.cs" />
-    <Compile Include="AutoMock\Ninject\Infrastructure\Language\ExtensionsForType.cs" />
-    <Compile Include="AutoMock\Ninject\Infrastructure\Multimap.cs" />
-    <Compile Include="AutoMock\Ninject\Infrastructure\ReferenceEqualWeakReference.cs" />
-    <Compile Include="AutoMock\Ninject\Infrastructure\StandardScopeCallbacks.cs" />
-    <Compile Include="AutoMock\Ninject\Infrastructure\Threading\ReaderWriterLock.cs" />
-    <Compile Include="AutoMock\Ninject\INinjectSettings.cs" />
-    <Compile Include="AutoMock\Ninject\Injection\ConstructorInjector.cs" />
-    <Compile Include="AutoMock\Ninject\Injection\DynamicMethodInjectorFactory.cs" />
-    <Compile Include="AutoMock\Ninject\Injection\IInjectorFactory.cs" />
-    <Compile Include="AutoMock\Ninject\Injection\MethodInjector.cs" />
-    <Compile Include="AutoMock\Ninject\Injection\PropertyInjector.cs" />
-    <Compile Include="AutoMock\Ninject\Injection\ReflectionInjectorFactory.cs" />
-    <Compile Include="AutoMock\Ninject\IStartable.cs" />
-    <Compile Include="AutoMock\Ninject\KernelBase.cs" />
-    <Compile Include="AutoMock\Ninject\Modules\AssemblyNameRetriever.cs" />
-    <Compile Include="AutoMock\Ninject\Modules\CompiledModuleLoaderPlugin.cs" />
-    <Compile Include="AutoMock\Ninject\Modules\IAssemblyNameRetriever.cs" />
-    <Compile Include="AutoMock\Ninject\Modules\IModuleLoader.cs" />
-    <Compile Include="AutoMock\Ninject\Modules\IModuleLoaderPlugin.cs" />
-    <Compile Include="AutoMock\Ninject\Modules\INinjectModule.cs" />
-    <Compile Include="AutoMock\Ninject\Modules\ModuleLoader.cs" />
-    <Compile Include="AutoMock\Ninject\Modules\NinjectModule.cs" />
-    <Compile Include="AutoMock\Ninject\NinjectSettings.cs" />
-    <Compile Include="AutoMock\Ninject\Parameters\ConstructorArgument.cs" />
-    <Compile Include="AutoMock\Ninject\Parameters\IConstructorArgument.cs" />
-    <Compile Include="AutoMock\Ninject\Parameters\IParameter.cs" />
-    <Compile Include="AutoMock\Ninject\Parameters\IPropertyValue.cs" />
-    <Compile Include="AutoMock\Ninject\Parameters\Parameter.cs" />
-    <Compile Include="AutoMock\Ninject\Parameters\PropertyValue.cs" />
-    <Compile Include="AutoMock\Ninject\Parameters\WeakConstructorArgument.cs" />
-    <Compile Include="AutoMock\Ninject\Parameters\WeakPropertyValue.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Bindings\Binding.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Bindings\BindingBuilder.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Bindings\BindingBuilder{T1,T2,T3,T4}.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Bindings\BindingBuilder{T1,T2,T3}.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Bindings\BindingBuilder{T1,T2}.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Bindings\BindingBuilder{T1}.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Bindings\BindingConfiguration.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Bindings\BindingConfigurationBuilder.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Bindings\BindingMetadata.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Bindings\BindingTarget.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Bindings\IBinding.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Bindings\IBindingConfiguration.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Bindings\IBindingMetadata.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Bindings\IBindingSyntax.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Bindings\Resolvers\DefaultValueBindingResolver.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Bindings\Resolvers\IBindingResolver.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Bindings\Resolvers\IMissingBindingResolver.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Bindings\Resolvers\OpenGenericBindingResolver.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Bindings\Resolvers\SelfBindingResolver.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Bindings\Resolvers\StandardBindingResolver.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Directives\ConstructorInjectionDirective.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Directives\IDirective.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Directives\MethodInjectionDirective.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Directives\MethodInjectionDirectiveBase.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Directives\PropertyInjectionDirective.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\IPlan.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\IPlanner.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Plan.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Planner.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Strategies\ConstructorReflectionStrategy.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Strategies\IPlanningStrategy.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Strategies\MethodReflectionStrategy.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Strategies\PropertyReflectionStrategy.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Targets\ITarget.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Targets\ParameterTarget.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Targets\PropertyTarget.cs" />
-    <Compile Include="AutoMock\Ninject\Planning\Targets\Target.cs" />
-    <Compile Include="AutoMock\Ninject\Selection\Heuristics\IConstructorScorer.cs" />
-    <Compile Include="AutoMock\Ninject\Selection\Heuristics\IInjectionHeuristic.cs" />
-    <Compile Include="AutoMock\Ninject\Selection\Heuristics\SpecificConstructorSelector.cs" />
-    <Compile Include="AutoMock\Ninject\Selection\Heuristics\StandardConstructorScorer.cs" />
-    <Compile Include="AutoMock\Ninject\Selection\Heuristics\StandardInjectionHeuristic.cs" />
-    <Compile Include="AutoMock\Ninject\Selection\ISelector.cs" />
-    <Compile Include="AutoMock\Ninject\Selection\Selector.cs" />
-    <Compile Include="AutoMock\Ninject\StandardKernel.cs" />
-    <Compile Include="AutoMock\Ninject\Syntax\BindingRoot.cs" />
-    <Compile Include="AutoMock\Ninject\Syntax\IBindingInNamedWithOrOnSyntax.cs" />
-    <Compile Include="AutoMock\Ninject\Syntax\IBindingInSyntax.cs" />
-    <Compile Include="AutoMock\Ninject\Syntax\IBindingNamedSyntax.cs" />
-    <Compile Include="AutoMock\Ninject\Syntax\IBindingNamedWithOrOnSyntax.cs" />
-    <Compile Include="AutoMock\Ninject\Syntax\IBindingOnSyntax.cs" />
-    <Compile Include="AutoMock\Ninject\Syntax\IBindingRoot.cs" />
-    <Compile Include="AutoMock\Ninject\Syntax\IBindingSyntax.cs" />
-    <Compile Include="AutoMock\Ninject\Syntax\IBindingToSyntax{T1,T2,T3,T4}.cs" />
-    <Compile Include="AutoMock\Ninject\Syntax\IBindingToSyntax{T1,T2,T3}.cs" />
-    <Compile Include="AutoMock\Ninject\Syntax\IBindingToSyntax{T1,T2}.cs" />
-    <Compile Include="AutoMock\Ninject\Syntax\IBindingToSyntax{T1}.cs" />
-    <Compile Include="AutoMock\Ninject\Syntax\IBindingWhenInNamedWithOrOnSyntax.cs" />
-    <Compile Include="AutoMock\Ninject\Syntax\IBindingWhenSyntax.cs" />
-    <Compile Include="AutoMock\Ninject\Syntax\IBindingWithOrOnSyntax.cs" />
-    <Compile Include="AutoMock\Ninject\Syntax\IBindingWithSyntax.cs" />
-    <Compile Include="AutoMock\Ninject\Syntax\IConstructorArgumentSyntax.cs" />
-    <Compile Include="AutoMock\Ninject\Syntax\IFluentSyntax.cs" />
-    <Compile Include="AutoMock\Ninject\Syntax\IResolutionRoot.cs" />
-    <Compile Include="AutoMock\Ninject\Syntax\ModuleLoadExtensions.cs" />
-    <Compile Include="AutoMock\Ninject\Syntax\ResolutionExtensions.cs" />
-    <Compile Include="Core\MockCreationSettings.cs" />
-    <Compile Include="Core\MockingUtils.MethodBodyDisassembler.cs" />
-    <Compile Include="Core\ProxyTypeInfo.cs" />
-    <Compile Include="IPrivateRefReturnAccessor.cs" />
-    <Compile Include="LocalRefHandle.cs" />
-    <Compile Include="Helpers\DynamicTypeHelper.cs" />
-    <Compile Include="LocalRef.cs" />
-    <Compile Include="Core\ArrangeMethodAttribute.cs" />
-    <Compile Include="Core\Behaviors\CallOriginalBehavior.cs" />
-    <Compile Include="Core\Behaviors\CallOriginalObjectMethodsBehavior.cs" />
-    <Compile Include="Core\Behaviors\ConstructorMockBehavior.cs" />
-    <Compile Include="Core\Behaviors\ActivatorCreateInstanceTBehavior.cs" />
-    <Compile Include="Core\Behaviors\EventStubsBehavior.cs" />
-    <Compile Include="Core\Behaviors\ExecuteConstructorBehavior.cs" />
-    <Compile Include="Core\Behaviors\IBehavior.cs" />
-    <Compile Include="Core\Behaviors\IMockReplicator.cs" />
-    <Compile Include="Core\Behaviors\ImplementationOverrideBehavior.cs" />
-    <Compile Include="Core\Behaviors\InOrderBehavior.cs" />
-    <Compile Include="Core\Behaviors\InvocationOccurrenceBehavior.cs" />
-    <Compile Include="Core\Behaviors\MixinAttribute.cs" />
-    <Compile Include="Core\Behaviors\MockCollection.cs" />
-    <Compile Include="Core\Behaviors\PreserveRefOutValuesBehavior.cs" />
-    <Compile Include="Core\Behaviors\PropertyStubsBehavior.cs" />
-    <Compile Include="Core\Behaviors\RaiseEventBehavior.cs" />
-    <Compile Include="Core\Behaviors\StaticConstructorMockBehavior.cs" />
-    <Compile Include="Core\Context\MSTestV2MockingContextResolver.cs" />
-    <Compile Include="Core\StrictMockException.cs" />
-    <Compile Include="Core\ByRefComparer.cs" />
-    <Compile Include="Core\ClrProfilerSetupHelper.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\ClassProxyWithTargetInstanceContributor.cs" />
-    <Compile Include="Core\MockingUtil.CodeGen.cs" />
-    <Compile Include="Core\Context\HierarchicalTestFrameworkContextResolver.cs" />
-    <Compile Include="Core\Context\IMockingContextResolver.cs" />
-    <Compile Include="Core\Context\LocalMockingContextResolver.cs" />
-    <Compile Include="Core\Context\MbUnitContextResolver.cs" />
-    <Compile Include="Core\Context\MockingContextResolverBase.cs" />
-    <Compile Include="Core\Context\MSTestMockingContextResolver.cs" />
-    <Compile Include="Core\Context\NUnitMockingContextResolver.cs" />
-    <Compile Include="Core\Context\MSpecContextResolver.cs" />
-    <Compile Include="Core\Context\StackTraceExtensions.cs" />
-    <Compile Include="Core\DynamicProxyMockFactory.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Serialization\CacheMappingsAttribute.cs" />
-    <Compile Include="Core\IMockFactory.cs" />
-    <Compile Include="Core\Lazy.cs" />
-    <Compile Include="Core\MatcherTree\MatcherNodeAndParent.cs" />
-    <Compile Include="Core\MatcherTree\OutArgAttribute.cs" />
-    <Compile Include="Core\MatcherTree\RefArgAttribute.cs" />
-    <Compile Include="Core\ProxyFailureException.cs" />
-    <Compile Include="Core\SourceLanguage.cs" />
-    <Compile Include="Core\ThreadLocalProperty.cs" />
-    <Compile Include="Core\Context\XUnitMockingContextResolver.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\AbstractInvocation.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\AllMethodsHook.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\ClassMembersCollector.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\ClassProxyInstanceContributor.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\ClassProxyTargetContributor.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\ClassProxyWithTargetTargetContributor.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\CompositeTypeContributor.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\DelegateProxyTargetContributor.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\Delegates.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\DelegateTypeGenerator.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\ForwardingMethodGenerator.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\InterfaceMembersCollector.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\InterfaceMembersOnClassCollector.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\InterfaceProxyInstanceContributor.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\InterfaceProxyTargetContributor.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\InterfaceProxyWithOptionalTargetContributor.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\InterfaceProxyWithoutTargetContributor.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\InterfaceProxyWithTargetInterfaceTargetContributor.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\InvocationWithDelegateContributor.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\InvocationWithGenericDelegateContributor.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\ITypeContributor.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\MembersCollector.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\MinimialisticMethodGenerator.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\MixinContributor.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\OptionallyForwardingMethodGenerator.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\ProxyInstanceContributor.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\WrappedClassMembersCollector.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Extensions\SilverlightExtensions.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Extensions\SimpleConverter.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Internal\AttributesUtil.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Internal\CollectionExtensions.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Internal\ILockHolder.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Internal\InterfaceAttributeUtil.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Internal\IUpgradeableLockHolder.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Internal\Lock.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Internal\MonitorLock.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Internal\MonitorLockHolder.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Internal\MonitorUpgradeableLockHolder.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Internal\NoOpLock.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Internal\NoOpUpgradeableLock.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Internal\PermissionUtil.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Internal\SlimReadLockHolder.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Internal\SlimReadWriteLock.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Internal\SlimUpgradeableReadLockHolder.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Internal\SlimWriteLockHolder.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Internal\WeakKey.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Internal\WeakKeyComparer.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Internal\WeakKeyDictionary.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\IServiceEnabledComponent.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\IServiceProviderEx.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\IServiceProviderExAccessor.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Logging\AbstractExtendedLoggerFactory.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Logging\AbstractLoggerFactory.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Logging\ConsoleFactory.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Logging\ConsoleLogger.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Logging\DiagnosticsLogger.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Logging\DiagnosticsLoggerFactory.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Logging\IContextProperties.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Logging\IContextStack.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Logging\IContextStacks.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Logging\IExtendedLogger.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Logging\IExtendedLoggerFactory.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Logging\ILogger.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Logging\ILoggerFactory.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Logging\LevelFilteredLogger.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Logging\LoggerException.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Logging\LoggerLevel.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Logging\NullLogFactory.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Logging\NullLogger.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Logging\StreamLogger.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Logging\StreamLoggerFactory.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Logging\TraceLogger.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Logging\TraceLoggerFactory.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\Pair.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\ReferenceEqualityComparer.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\ReflectionBasedDictionaryAdapter.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.Core\StringObjectDictionaryAdapter.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\DefaultProxyBuilder.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\AttributeDisassembler.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\AttributesToAvoidReplicating.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\BaseProxyGenerator.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\CacheKey.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\ClassProxyGenerator.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\ClassProxyWithTargetGenerator.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\CompositionInvocationTypeGenerator.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\DelegateMembersCollector.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\DelegateProxyGenerationHook.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\DelegateProxyGenerator.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\AbstractTypeEmitter.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\ArgumentsUtil.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\ClassEmitter.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\CodeBuilders\AbstractCodeBuilder.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\CodeBuilders\ConstructorCodeBuilder.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\CodeBuilders\MethodCodeBuilder.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\ConstructorCollection.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\ConstructorEmitter.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\EventCollection.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\EventEmitter.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\GenericUtil.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\IMemberEmitter.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\LdcOpCodesDictionary.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\LdindOpCodesDictionary.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\MethodCollection.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\MethodEmitter.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\NestedClassCollection.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\NestedClassEmitter.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\OpCodeUtil.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\PropertiesCollection.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\PropertyEmitter.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\AddressOfReferenceExpression.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\ArgumentReference.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\AssignArgumentStatement.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\AssignArrayStatement.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\AssignStatement.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\AsTypeReference.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\BindDelegateExpression.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\ByRefReference.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\ConstReference.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\ConstructorInvocationStatement.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\ConvertExpression.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\DefaultValueExpression.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\EndExceptionBlockStatement.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\Expression.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\ExpressionStatement.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\FieldReference.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\FinallyStatement.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\IfNullExpression.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\IILEmitter.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\IndirectReference.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\LiteralIntExpression.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\LoadArrayElementExpression.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\LoadRefArrayElementExpression.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\LocalReference.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\MethodInvocationExpression.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\MethodTokenExpression.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\MultiStatementExpression.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\NewArrayExpression.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\NewInstanceExpression.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\NopStatement.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\NullCoalescingOperatorExpression.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\NullExpression.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\Reference.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\ReferenceExpression.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\ReferencesToObjectArrayExpression.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\ReturnStatement.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\SelfReference.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\Statement.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\ThrowStatement.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\TryStatement.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\TypeReference.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\SimpleAST\TypeTokenExpression.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\StindOpCodesDictionary.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\StrongNameUtil.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\Emitters\TypeConstructorEmitter.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\GeneratorException.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\GeneratorUtil.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\IGenerator.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\IInvocationCreationContributor.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\INamingScope.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\InheritanceInvocationTypeGenerator.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\InterfaceProxyWithoutTargetGenerator.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\InterfaceProxyWithTargetGenerator.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\InterfaceProxyWithTargetInterfaceGenerator.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\InvocationTypeGenerator.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\MetaEvent.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\MetaMethod.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\MetaProperty.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\MetaType.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\MetaTypeElement.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\MethodFinder.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\MethodGenerator.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\MethodSignatureComparer.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\MethodWithInvocationGenerator.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\NamingScope.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\TypeElementCollection.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\IAttributeDisassembler.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\IChangeProxyTarget.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\IConstructorGenerationHook.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\IInterceptor.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\IInterceptorSelector.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\IInvocation.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Internal\AttributeUtil.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Internal\CompositionInvocation.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Internal\InheritanceInvocation.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Internal\InternalsUtil.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Internal\InvocationHelper.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Internal\TypeUtil.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\InvalidMixinConfigurationException.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\InvalidProxyConstructorArgumentsException.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\IProxyBuilder.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\IProxyGenerationHook.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\IProxyTargetAccessor.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\MixinData.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\ModuleScope.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\PersistentProxyBuilder.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\ProxyGenerationException.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\ProxyGenerationOptions.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\ProxyGenerator.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\ProxyUtil.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\StandardInterceptor.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Tokens\DelegateMethods.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Tokens\InterceptorSelectorMethods.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Tokens\InvocationMethods.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Tokens\MethodBaseMethods.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Tokens\TypeBuilderMethods.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Tokens\TypeMethods.cs" />
-    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Tokens\TypeUtilMethods.cs" />
-    <Compile Include="Core\ElevatedMockingException.cs" />
-    <Compile Include="Core\Expressions\ExpressionComparer.cs" />
-    <Compile Include="Core\Expressions\ExpressionReducer.cs" />
-    <Compile Include="Core\Expressions\ScopedDictionary.cs" />
-    <Compile Include="Core\MatcherTree\CategoricalMatcherBase.cs" />
-    <Compile Include="Core\MatcherTree\IMatcher.cs" />
-    <Compile Include="Core\MatcherTree\ParamsMatcher.cs" />
-    <Compile Include="Core\ProfilerInterceptor.cs" />
-    <Compile Include="Core\Behaviors\RecursiveMockingBehavior.cs" />
-    <Compile Include="Core\Behaviors\StrictBehavior.cs" />
-    <Compile Include="Core\Behaviors\ThrowExceptionBehavior.cs" />
-    <Compile Include="Core\Expressions\ExpressionReplacer.cs" />
-    <Compile Include="Core\ExpressionUtil.cs" />
-    <Compile Include="Core\IMethodMock.cs" />
-    <Compile Include="Action.cs">
+    <Compile Update="Action.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Action.tt</DependentUpon>
     </Compile>
-    <Compile Include="Arg.cs" />
-    <Compile Include="Arg.part.cs">
+    <Compile Update="Arg.part.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Arg.part.tt</DependentUpon>
     </Compile>
-    <Compile Include="ArgExpr.cs" />
-    <Compile Include="Core\MatcherTree\ArgIgnoreAttribute.cs" />
-    <Compile Include="Core\MatcherTree\ArgMatcherAttribute.cs" />
-    <Compile Include="Args.cs" />
-    <Compile Include="Behavior.cs" />
-    <Compile Include="Constructor.cs" />
-    <Compile Include="Core\MatcherTree\StringNullOrEmptyMatcher.cs" />
-    <Compile Include="Core\MockMixin.cs" />
-    <Compile Include="Core\MatcherTree\AnyMatcher.cs" />
-    <Compile Include="Core\MatcherTree\MethodInfoMatcherTreeNode.cs" />
-    <Compile Include="Core\MatcherTree\OccurrencesMatcherTreeNode.cs" />
-    <Compile Include="Core\MockingUtil.cs" />
-    <Compile Include="Core\Recording\DelegatingRecorder.cs" />
-    <Compile Include="Core\Recording\IRecorder.cs" />
-    <Compile Include="Core\MocksRepository.cs" />
-    <Compile Include="Core\RepositorySharedContext.cs" />
-    <Compile Include="Core\TransparentProxy\MockingProxy.cs" />
-    <Compile Include="Core\TransparentProxy\ProxyInvocation.cs" />
-    <Compile Include="DebugView.cs" />
-    <Compile Include="Expectations\Abstraction\IExpressionContainer.cs" />
-    <Compile Include="Expectations\Abstraction\INonPublicRefReturnExpectation.cs" />
-    <Compile Include="Expectations\Local\IFunctionExpectation.cs" />
-    <Compile Include="Expectations\Local\ILocalExpectation.cs" />
-    <Compile Include="Expectations\DynaMock\ExpressionContainer.cs" />
-    <Compile Include="Expectations\DynaMock\ExpressionRecorder.cs" />
-    <Compile Include="Expectations\NonPublicRefReturnExpectation.cs" />
-    <Compile Include="Expectations\Local\FunctionExpectation.cs" />
-    <Compile Include="Expectations\Local\LocalExpectation.cs" />
-    <Compile Include="Helpers\TaskHelper.cs" />
-    <Compile Include="Core\PrivateRefReturnAccessor.cs" />
-    <Compile Include="Core\MockingUtil.PrivateMethods.cs" />
-    <Compile Include="Setup\DisableAutomaticRepositoryResetAttribute.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Core\FunctionalSpecParser.cs" />
-    <Compile Include="Expectations\Abstraction\IReturns.cs">
+    <Compile Update="Expectations\Abstraction\IReturns.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>IReturns.tt</DependentUpon>
     </Compile>
-    <Compile Include="Expectations\Abstraction\IWhen.cs">
+    <Compile Update="Expectations\Abstraction\IWhen.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>IWhen.tt</DependentUpon>
     </Compile>
-    <Compile Include="Mock.Arrange.cs" />
-    <Compile Include="Mock.Assert.cs" />
-    <Compile Include="Mock.SetupStatic.cs" />
-    <Compile Include="Core\MockAssertionFailedException.cs" />
-    <Compile Include="Param.cs" />
-    <Compile Include="PrivateAccessor.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Resources.Designer.cs">
+    <Compile Update="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Expectations\ReturnArranger.cs" />
-    <Compile Include="Core\AllowedMockableTypes.cs" />
-    <Compile Include="Expectations\Abstraction\IAction.cs" />
-    <Compile Include="Expectations\Abstraction\IAssertable.cs" />
-    <Compile Include="Expectations\Abstraction\IDoInstead.cs" />
-    <Compile Include="Expectations\Abstraction\IFunc.cs" />
-    <Compile Include="Expectations\Abstraction\IIgnorable.cs" />
-    <Compile Include="Expectations\Abstraction\IInstanceScope.cs" />
-    <Compile Include="Expectations\Abstraction\IMustBeCalled.cs" />
-    <Compile Include="Expectations\Abstraction\INonPublicExpectation.cs" />
-    <Compile Include="Expectations\Abstraction\IOccurrence.cs" />
-    <Compile Include="Expectations\Abstraction\IOrder.cs" />
-    <Compile Include="Expectations\Abstraction\IReturnCollection.cs" />
-    <Compile Include="Expectations\Abstraction\ISetupBehavior.cs" />
-    <Compile Include="Expectations\Abstraction\IThrows.cs" />
-    <Compile Include="Expectations\Abstraction\IWaitDuration.cs" />
-    <Compile Include="Expectations\ActionExpectation.cs" />
-    <Compile Include="Expectations\CollectionExpectation.cs" />
-    <Compile Include="Expectations\CommonExpectation.cs" />
-    <Compile Include="Expectations\CommonExpectation.partial.cs">
+    <Compile Update="Expectations\CommonExpectation.partial.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>CommonExpectation.tt</DependentUpon>
     </Compile>
-    <Compile Include="Core\Behaviors\DelegatedImplementationBehavior.cs" />
-    <Compile Include="Expectations\EventWaitDuration.cs" />
-    <Compile Include="Expectations\FuncExpectation.cs" />
-    <Compile Include="Expectations\FuncExpectation.partial.cs">
+    <Compile Update="Expectations\FuncExpectation.partial.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>FuncExpectation.tt</DependentUpon>
     </Compile>
-    <Compile Include="Core\Behaviors\MockCollectionBehavior.cs" />
-    <Compile Include="Expectations\NonPublicExpectation.cs" />
-    <Compile Include="Core\Expressions\ExpressionVisitor.cs" />
-    <Compile Include="Func.cs">
+    <Compile Update="Func.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Func.tt</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\FluentHelper.cs" />
-    <Compile Include="Helpers\MultipleReturnValueChainHelper.cs" />
-    <Compile Include="Core\MatcherTree\IMatcherTreeNode.cs" />
-    <Compile Include="Core\MatcherTree\MatcherTreeNode.cs" />
-    <Compile Include="Core\MatcherTree\PredicateMatcher.cs" />
-    <Compile Include="Core\MatcherTree\RangeMatcher.cs" />
-    <Compile Include="Core\MatcherTree\ReferenceMatcher.cs" />
-    <Compile Include="Core\MatcherTree\MethodMockMatcherTreeNode.cs" />
-    <Compile Include="Core\MatcherTree\TypeMatcher.cs" />
-    <Compile Include="Core\MatcherTree\ValueMatcher.cs" />
-    <Compile Include="Trial\JustMockExpiredException.cs" />
-    <Compile Include="Mock.cs" />
-    <Compile Include="Core\MockException.cs" />
-    <Compile Include="Occurs.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RangeKind.cs" />
-    <Compile Include="Core\CallPattern.cs" />
-    <Compile Include="Core\Invocation.cs" />
-    <Compile Include="Core\Context\MockingContext.cs" />
-    <Compile Include="Core\DynamicProxyInterceptor.cs" />
-    <Compile Include="Setup\FluentConfig.cs" />
-    <Compile Include="Setup\IMockingBehaviorConfiguration.cs" />
-    <Compile Include="StaticConstructor.cs" />
-    <Compile Include="Core\SecuredRegistryMethods.cs" />
-    <Compile Include="Wait.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Action.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Action.cs</LastGenOutput>
@@ -685,31 +161,39 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Func.cs</LastGenOutput>
     </None>
-    <Compile Include="Mock.Create.cs" />
     <None Include="../Solution Items/snkey_lite.snk">
       <Link>snkey_lite.snk</Link>
     </None>
     <None Include="TextBuilder.include" />
   </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
+    <None Update="Core\TransparentProxy\JustMockLite.bak\Telerik.JustMock.Tests\Coverage\DoInsteadFixture.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="Core\TransparentProxy\JustMockLite.bak\Telerik.JustMock.Tests\Coverage\MatchersFixture.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="Core\TransparentProxy\JustMockLite.bak\Telerik.JustMock.Tests\Coverage\ReturnsFixture.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="Core\TransparentProxy\JustMockLite.bak\Telerik.JustMock\Arg.part.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="Core\TransparentProxy\JustMockLite.bak\Telerik.JustMock\Expectations\CommonExpectation.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="Core\TransparentProxy\JustMockLite.bak\Telerik.JustMock\Expectations\FuncExpectation.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="Core\TransparentProxy\JustMockLite.bak\Telerik.JustMock\Func.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="Core\TransparentProxy\JustMockLite.bak\Telerik.JustMock\Mock.VisualBasic2008.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target> 
-  -->
 </Project>

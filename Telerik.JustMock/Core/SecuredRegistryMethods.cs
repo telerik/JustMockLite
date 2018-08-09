@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015,2018 Telerik EAD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ namespace Telerik.JustMock.Core
 
 		private static bool GetRegistryValue(bool currentUser, string keyName, string valueName, StringBuilder outValue)
 		{
-#if !SILVERLIGHT
+#if (!SILVERLIGHT && !NETCORE)
 			using (RegistryKey registryKey = currentUser ? Registry.CurrentUser : Registry.LocalMachine)
 			{
 				using (var key = registryKey.OpenSubKey(keyName))
@@ -83,7 +83,7 @@ namespace Telerik.JustMock.Core
 
 		private static bool SetRegistryValue(bool currentUser, string keyName, string valueName, string value)
 		{
-#if !SILVERLIGHT
+#if (!SILVERLIGHT && !NETCORE)
 			using (RegistryKey registryKey = currentUser ? Registry.CurrentUser : Registry.LocalMachine)
 			{
 				using (var key = registryKey.OpenSubKey(keyName, true))

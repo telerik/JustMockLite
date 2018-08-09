@@ -17,9 +17,9 @@ namespace Telerik.JustMock.Core.Castle.Core.Internal
 	using System;
 	using System.Security;
 	using System.Security.Permissions;
-	
-#if !SILVERLIGHT
-	internal static class PermissionUtil
+
+#if (!SILVERLIGHT && !NETCORE)
+    internal static class PermissionUtil
 	{
 #if DOTNET
 		[SecuritySafeCritical]

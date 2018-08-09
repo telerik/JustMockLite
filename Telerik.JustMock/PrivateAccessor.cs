@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015,2018 Telerik EAD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -25,7 +25,9 @@ using Telerik.JustMock.Core;
 #if !COREFX
 using System.Security;
 using System.Security.Permissions;
+#if !NETCORE
 using System.Runtime.Remoting;
+#endif
 using Telerik.JustMock.Core.TransparentProxy;
 #endif
 
@@ -89,8 +91,8 @@ namespace Telerik.JustMock
 				{
 					if (instance != null)
 					{
-#if !COREFX
-						var realProxy = RemotingServices.GetRealProxy(instance) as MockingProxy;
+#if (!COREFX && !NETCORE)
+						var realProxy = MockingProxy.GetRealProxy(instance);
 						if (realProxy != null)
 							instance = realProxy.WrappedInstance;
 #endif
@@ -511,11 +513,11 @@ namespace Telerik.JustMock
 
 		private static bool CheckReflectionPermission()
 		{
-#if COREFX
+#if (COREFX || NETCORE)
 			return false;
 #else
-			try
-			{
+            try
+            {
 				new ReflectionPermission(ReflectionPermissionFlag.MemberAccess).Demand();
 				return true;
 			}

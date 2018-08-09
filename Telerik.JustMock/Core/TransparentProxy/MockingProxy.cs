@@ -1,6 +1,6 @@
 ﻿/*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015,2018 Telerik EAD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -17,17 +17,19 @@
 
 using System;
 using System.Reflection;
+#if !NETCORE
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Messaging;
 using System.Runtime.Remoting.Proxies;
+#endif
 using Telerik.JustMock.Core.Castle.DynamicProxy;
 
 namespace Telerik.JustMock.Core.TransparentProxy
 {
+#if !NETCORE
 	internal sealed class MockingProxy : RealProxy
 	{
 		public readonly MarshalByRefObject WrappedInstance;
-
 		private readonly IMockMixin mockMixin;
 		private readonly IInterceptor interceptor;
 
@@ -85,7 +87,7 @@ namespace Telerik.JustMock.Core.TransparentProxy
 				&& method is MethodInfo;
 		}
 
-		private static MockingProxy GetRealProxy(object instance)
+		public static MockingProxy GetRealProxy(object instance)
 		{
 			return instance != null ? RemotingServices.GetRealProxy(instance) as MockingProxy : null;
 		}
@@ -102,4 +104,38 @@ namespace Telerik.JustMock.Core.TransparentProxy
 			return proxy != null ? proxy.WrappedInstance : maybeProxy;
 		}
 	}
+#else
+	internal class MockingProxy
+	{
+		public static bool CanCreate(Type type)
+		{
+			return false;
+		}
+
+		public static object CreateProxy(object wrappedInstance, MocksRepository repository, IMockMixin mockMixin)
+		{
+			throw new NotImplementedException();
+		}
+
+		public static bool CanIntercept(object instance, MethodBase method)
+		{
+			return false;
+		}
+
+		public static MockingProxy GetRealProxy(object instance)
+		{
+			throw new NotImplementedException();
+		}
+
+		public static IMockMixin GetMockMixin(object instance)
+		{
+			return null;
+		}
+
+		public static object Unwrap(object maybeProxy)
+		{
+			return maybeProxy;
+		}
+	}
+#endif
 }
