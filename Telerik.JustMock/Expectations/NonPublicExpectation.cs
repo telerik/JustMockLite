@@ -275,6 +275,17 @@ namespace Telerik.JustMock.Expectations
 		
 		public ActionExpectation ArrangeSet(object target, string propertyName, object value)
 		{
+			Type type = target.GetType();
+			if (type.IsProxy())
+				type = type.BaseType;
+			var mockedProperty = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
+				.FirstOrDefault(property => property.Name == propertyName);
+
+			if (mockedProperty == null)
+			{
+				throw new MissingMemberException(String.Format("Property '{0}' was not found on type '{1}'.", propertyName, type));
+			}
+
 			return Arrange(target, propertyName, value);
 		}
 
