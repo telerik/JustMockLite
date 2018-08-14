@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015,2018 Telerik EAD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ namespace Telerik.JustMock.Core
 		private readonly ThreadLocalProperty<IRecorder> recorder = new ThreadLocalProperty<IRecorder>();
 		private readonly ThreadLocalProperty<object> inArrange = new ThreadLocalProperty<object>();
 		private readonly ThreadLocalProperty<object> dispatchToMethodMocks = new ThreadLocalProperty<object>();
-        private readonly ThreadLocalProperty<object> inAssertSet = new ThreadLocalProperty<object>();
+		private readonly ThreadLocalProperty<object> inAssertSet = new ThreadLocalProperty<object>();
 
 		public IRecorder Recorder
 		{
@@ -43,13 +43,13 @@ namespace Telerik.JustMock.Core
 			private set { this.inArrange.Set(value ? (object)value : null); }
 		}
 
-        public bool InAssertSet
-        {
-            get { return this.inAssertSet.Get() != null; }
-            private set { this.inAssertSet.Set(value ? (object)value : null); }
-        }
+		public bool InAssertSet
+		{
+			get { return this.inAssertSet.Get() != null; }
+			private set { this.inAssertSet.Set(value ? (object)value : null); }
+		}
 
-        public bool DispatchToMethodMocks
+		public bool DispatchToMethodMocks
 		{
 			get { return this.dispatchToMethodMocks.Get() != null; }
 			private set { this.dispatchToMethodMocks.Set(value ? (object)value : null); }
@@ -69,38 +69,38 @@ namespace Telerik.JustMock.Core
 			return new InArrangeContext(this);
 		}
 
-        public IDisposable StartAssertSet()
-        {
-            Monitor.Enter(this);
-            return new InAssertSetContext(this);
-        }
+		public IDisposable StartAssertSet()
+		{
+			Monitor.Enter(this);
+			return new InAssertSetContext(this);
+		}
 
-        public int GetNextArrangeId()
+		public int GetNextArrangeId()
 		{
 			lock (this)
 				return nextArrangeId++;
 		}
 
-        abstract private class ContextSession : IDisposable
-        {
-            private readonly RepositorySharedContext context;
+		abstract private class ContextSession : IDisposable
+		{
+			private readonly RepositorySharedContext context;
 
-            public RepositorySharedContext Context { get { return context; } }
+			public RepositorySharedContext Context { get { return context; } }
 
-            public ContextSession(RepositorySharedContext context)
-            {
-                this.context = context;
-            }
+			public ContextSession(RepositorySharedContext context)
+			{
+				this.context = context;
+			}
 
-            public abstract void Dispose();
-        }
+			public abstract void Dispose();
+		}
 
 		private class InRecordingContext : ContextSession
 		{
 			private readonly int oldCounter;
 
 			public InRecordingContext(RepositorySharedContext context)
-                : base(context)
+				: base(context)
 			{
 				this.oldCounter = ProfilerInterceptor.ReentrancyCounter;
 
@@ -119,7 +119,7 @@ namespace Telerik.JustMock.Core
 		private class InArrangeContext : ContextSession
 		{
 			public InArrangeContext(RepositorySharedContext context)
-                : base(context)
+				: base(context)
 			{
 				Debug.Assert(!this.Context.InArrange);
 				context.InArrange = true;
@@ -132,20 +132,20 @@ namespace Telerik.JustMock.Core
 			}
 		}
 
-        private class InAssertSetContext : ContextSession
-        {
-            public InAssertSetContext(RepositorySharedContext context)
-                : base(context)
-            {
-                Debug.Assert(!this.Context.InAssertSet);
-                context.InAssertSet = true;
-            }
+		private class InAssertSetContext : ContextSession
+		{
+			public InAssertSetContext(RepositorySharedContext context)
+				: base(context)
+			{
+				Debug.Assert(!this.Context.InAssertSet);
+				context.InAssertSet = true;
+			}
 
-            public override void Dispose()
-            {
-                this.Context.InAssertSet = false;
-                Monitor.Exit(this.Context);
-            }
-        }
-    }
+			public override void Dispose()
+			{
+				this.Context.InAssertSet = false;
+				Monitor.Exit(this.Context);
+			}
+		}
+	}
 }
