@@ -21,7 +21,7 @@ using System.Reflection;
 
 namespace Telerik.JustMock.Core
 {
-    internal class PrivateRefReturnAccessor : PrivateAccessorBase, IPrivateRefReturnAccessor
+    internal class PrivateRefReturnAccessor : IPrivateRefReturnAccessor
     {
         private readonly object instance;
         private readonly Type type;
@@ -38,7 +38,7 @@ namespace Telerik.JustMock.Core
             {
                 arguments = arguments ?? MockingUtil.NoObjects;
                 var candidates = type.GetAllMethods()
-                    .Where(m => m.Name == name && CanCall(m, this.instance != null))
+                    .Where(m => m.Name == name && MockingUtil.CanCall(m, this.instance != null))
                     .Select(m => MockingUtil.TrySpecializeGenericMethod(m, arguments.Select(a => a != null ? a.GetType() : null).ToArray()) ?? m)
                     .ToArray();
                 object state;
@@ -55,7 +55,7 @@ namespace Telerik.JustMock.Core
         {
             return ref ProfilerInterceptor.GuardInternal((target, arguments) =>
             {
-                var prop = ResolveProperty(this.type, name, false, null, this.instance != null);
+                var prop = MockingUtil.ResolveProperty(this.type, name, false, null, this.instance != null);
                 var method = prop.GetGetMethod(true);
 
                 ProfilerInterceptor.RefReturn<TRefReturn> @delegate =

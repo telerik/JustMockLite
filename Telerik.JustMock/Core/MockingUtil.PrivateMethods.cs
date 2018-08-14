@@ -1,4 +1,4 @@
-/*
+﻿/*
  JustMock Lite
  Copyright © 2010-2018 Telerik EAD
 
@@ -21,24 +21,47 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-using Telerik.JustMock.Core;
-using Telerik.JustMock.Core.Behaviors;
-using Telerik.JustMock.Core.Context;
-using Telerik.JustMock.Expectations.Abstraction;
-using Telerik.JustMock.Expectations.DynaMock;
 
-namespace Telerik.JustMock.Expectations
+namespace Telerik.JustMock.Core
 {
-    internal abstract class NonPublicExpectationBase
+    internal static partial class MockingUtil
     {
-        protected static bool ReturnTypeMatches(Type returnType, MethodInfo method)
+        internal static bool CanCall(MethodBase method, bool hasInstance)
+        {
+            return method.IsStatic || hasInstance;
+        }
+
+        internal static PropertyInfo ResolveProperty(Type type, string name, bool ignoreCase, object[] indexArgs, bool hasInstance, object setterValue = null, bool getter = true)
+        {
+            var candidates = type.GetAllProperties().Where(prop => MockingUtil.StringEqual(prop.Name, name, ignoreCase)).ToArray();
+            if (candidates.Length == 1)
+                return candidates[0];
+
+            if (!getter)
+            {
+                Array.Resize(ref indexArgs, indexArgs.Length + 1);
+                indexArgs[indexArgs.Length - 1] = setterValue;
+            }
+
+            var propMethods = candidates
+                .Select(prop => getter ? prop.GetGetMethod(true) : prop.GetSetMethod(true))
+                .Where(m => m != null && CanCall(m, hasInstance))
+                .ToArray();
+
+            indexArgs = indexArgs ?? MockingUtil.NoObjects;
+            object state;
+            var foundGetter = MockingUtil.BindToMethod(MockingUtil.AllMembers, propMethods, ref indexArgs, null, null, null, out state);
+            return candidates.First(prop => (getter ? prop.GetGetMethod(true) : prop.GetSetMethod(true)) == foundGetter);
+        }
+
+        internal static bool ReturnTypeMatches(Type returnType, MethodInfo method)
         {
             return returnType == null
                 || method.ReturnType == returnType
                 || (method.ReturnType.IsPointer && returnType == typeof(IntPtr));
         }
 
-        protected static MethodInfo GetMethodByName(Type type, Type returnType, string memberName, ref object[] args)
+        internal static MethodInfo GetMethodByName(Type type, Type returnType, string memberName, ref object[] args)
         {
             if (type.IsProxy())
                 type = type.BaseType;
@@ -50,20 +73,20 @@ namespace Telerik.JustMock.Expectations
                     .SelectMany(p => new[] { p.GetGetMethod(true), p.GetSetMethod(true) })
                     .Where(m => m != null))
                 .Select(m =>
+                {
+                    if (m.IsGenericMethodDefinition
+                        && returnType != typeof(void)
+                        && m.GetGenericArguments().Length == 1
+                        && m.ReturnType.ContainsGenericParameters)
                     {
-                        if (m.IsGenericMethodDefinition
-                            && returnType != typeof(void)
-                            && m.GetGenericArguments().Length == 1
-                            && m.ReturnType.ContainsGenericParameters)
+                        var generics = new Dictionary<Type, Type>();
+                        if (MockingUtil.GetGenericsTypesFromActualType(m.ReturnType, returnType, generics))
                         {
-                            var generics = new Dictionary<Type, Type>();
-                            if (MockingUtil.GetGenericsTypesFromActualType(m.ReturnType, returnType, generics))
-                            {
-                                return m.MakeGenericMethod(generics.Values.Single());
-                            }
+                            return m.MakeGenericMethod(generics.Values.Single());
                         }
-                        return m;
-                    })
+                    }
+                    return m;
+                })
                 .ToArray();
 
             MethodInfo mockedMethod = null;
@@ -139,7 +162,7 @@ namespace Telerik.JustMock.Expectations
             return mockedMethod;
         }
 
-        protected static string BuildMissingMethodMessage(Type type, PropertyInfo property, string memberName)
+        internal static string BuildMissingMethodMessage(Type type, PropertyInfo property, string memberName)
         {
             var sb = new StringBuilder();
             sb.AppendLine(
@@ -186,7 +209,7 @@ namespace Telerik.JustMock.Expectations
             return sb.ToString();
         }
 
-        protected static string FormatMethodArrangementExpression(string memberName, MethodBase method, SourceLanguage language)
+        internal static string FormatMethodArrangementExpression(string memberName, MethodBase method, SourceLanguage language)
         {
             return String.Format("Mock.NonPublic.Arrange{0}({1}\"{2}\"{3}){4}",
                 FormatGenericArg(method.GetReturnType(), language),
@@ -196,7 +219,7 @@ namespace Telerik.JustMock.Expectations
                 language == SourceLanguage.CSharp ? ";" : "");
         }
 
-        protected static string FormatMethodParameterMatcher(Type paramType, SourceLanguage language)
+        internal static string FormatMethodParameterMatcher(Type paramType, SourceLanguage language)
         {
             if (paramType.IsByRef)
             {
@@ -208,7 +231,7 @@ namespace Telerik.JustMock.Expectations
             }
         }
 
-        protected static string FormatGenericArg(Type type, SourceLanguage language)
+        internal static string FormatGenericArg(Type type, SourceLanguage language)
         {
             if (type == typeof(void))
             {
@@ -225,12 +248,12 @@ namespace Telerik.JustMock.Expectations
             }
         }
 
-        protected static MethodInfo FindMethodBySignature(IEnumerable<MethodInfo> candidates, Type returnType, object[] args)
+        internal static MethodInfo FindMethodBySignature(IEnumerable<MethodInfo> candidates, Type returnType, object[] args)
         {
             return candidates.FirstOrDefault(method => method.ArgumentsMatchSignature(args) && ReturnTypeMatches(returnType, method));
         }
 
-        protected static string GetAssertionMessage(object[] args)
+        internal static string GetAssertionMessage(object[] args)
         {
             return null;
         }

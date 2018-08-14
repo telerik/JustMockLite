@@ -547,11 +547,10 @@
     <Compile Include="Expectations\Abstraction\INonPublicRefReturnExpectation.cs" />
     <Compile Include="Expectations\DynaMock\ExpressionContainer.cs" />
     <Compile Include="Expectations\DynaMock\ExpressionRecorder.cs" />
-    <Compile Include="Expectations\NonPublicExpectationBase.cs" />
     <Compile Include="Expectations\NonPublicRefReturnExpectation.cs" />
     <Compile Include="Helpers\TaskHelper.cs" />
     <Compile Include="Core\PrivateRefReturnAccessor.cs" />
-    <Compile Include="Core\PrivateAccessorBase.cs" />
+    <Compile Include="Core\MockingUtil.PrivateMethods.cs" />
     <Compile Include="Setup\DisableAutomaticRepositoryResetAttribute.cs">
       <SubType>Code</SubType>
     </Compile>

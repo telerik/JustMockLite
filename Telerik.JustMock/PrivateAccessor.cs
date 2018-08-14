@@ -45,7 +45,7 @@ namespace Telerik.JustMock
 	/// dynamic acc = new PrivateAccessor(myobj);
 	/// acc.PrivateProperty = acc.PrivateMethod(123); // PrivateProperty and PrivateMethod are private members on myobj's type.
 	/// </remarks>
-	public sealed class PrivateAccessor : PrivateAccessorBase, IDynamicMetaObjectProvider
+	public sealed class PrivateAccessor : IDynamicMetaObjectProvider
 	{
 		private readonly object instance;
 		private readonly Type type;
@@ -118,7 +118,7 @@ namespace Telerik.JustMock
 			{
 				args = args ?? MockingUtil.NoObjects;
 				var candidates = type.GetAllMethods()
-					.Where(m => m.Name == name && CanCall(m, this.instance != null))
+					.Where(m => m.Name == name && MockingUtil.CanCall(m, this.instance != null))
 					.Select(m => MockingUtil.TrySpecializeGenericMethod(m, args.Select(a => a != null ? a.GetType() : null).ToArray()) ?? m)
 					.ToArray();
 				object state;
@@ -141,7 +141,7 @@ namespace Telerik.JustMock
 			return ProfilerInterceptor.GuardInternal(() =>
 				{
 					var candidates = type.GetAllMethods()
-						.Where(m => m.Name == name && CanCall(m, this.instance != null))
+						.Where(m => m.Name == name && MockingUtil.CanCall(m, this.instance != null))
 						.Select(m => MockingUtil.TryApplyTypeArguments(m, typeArguments.ToArray()))
 						.Where(m => m != null)
 						.ToArray();
@@ -213,7 +213,7 @@ namespace Telerik.JustMock
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
-				var prop = ResolveProperty(this.type, name, false, indexArgs, this.instance != null);
+				var prop = MockingUtil.ResolveProperty(this.type, name, false, indexArgs, this.instance != null);
 				return ProfilerInterceptor.GuardExternal(() => SecuredReflectionMethods.GetProperty(prop, this.instance, indexArgs));
 			});
 		}
@@ -238,7 +238,7 @@ namespace Telerik.JustMock
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
-					var prop = ResolveProperty(this.type, name, false, indexArgs, this.instance != null, value, getter: false);
+					var prop = MockingUtil.ResolveProperty(this.type, name, false, indexArgs, this.instance != null, value, getter: false);
 					ProfilerInterceptor.GuardExternal(() => SecuredReflectionMethods.SetProperty(prop, this.instance, value, indexArgs));
 				});
 		}
