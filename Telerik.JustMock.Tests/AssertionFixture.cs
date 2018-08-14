@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015,2018 Telerik EAD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -1117,6 +1117,7 @@ namespace Telerik.JustMock.Tests
             Mock.AssertSet(() => fooMock.Value = bar.Echo(1), Occurs.Never());
         }
     }
+
 #if !XUNIT
 #if !PORTABLE
 #if !NUNIT
