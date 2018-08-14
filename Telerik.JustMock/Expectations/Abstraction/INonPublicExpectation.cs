@@ -81,14 +81,17 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <returns>Reference to setup actions calls</returns>
 		ActionExpectation ArrangeSet(object target, string propertyName, object value);
 
-		/// <summary>
-		/// Asserts the specified member that it is called as expected.
-		/// </summary>
-		/// <param name="target">Target mock</param>
-		/// <param name="memberName">Name of the member</param>
-		/// <typeparam name="TReturn">Return type of the method</typeparam>
-		/// <param name="args">Method arguments</param>
-		void Assert<TReturn>(object target, string memberName, params object[] args);
+        ActionExpectation ArrangeSet<T>(string propertyName, object value);
+        ActionExpectation ArrangeSet(Type type, string propertyName, object value);
+
+        /// <summary>
+        /// Asserts the specified member that it is called as expected.
+        /// </summary>
+        /// <param name="target">Target mock</param>
+        /// <param name="memberName">Name of the member</param>
+        /// <typeparam name="TReturn">Return type of the method</typeparam>
+        /// <param name="args">Method arguments</param>
+        void Assert<TReturn>(object target, string memberName, params object[] args);
 
 		/// <summary>
 		/// Asserts the specified method that it is called as expected.

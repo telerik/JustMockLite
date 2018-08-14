@@ -273,20 +273,43 @@ namespace Telerik.JustMock.Expectations
 			return ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.Arrange(target, method, args, () => new FuncExpectation<TReturn>()));
 		}
 		
-		public ActionExpectation ArrangeSet(object target, string propertyName, object value)
+		Type GetTypeFromInstance(object instance)
 		{
-			Type type = target.GetType();
+			Type type = instance.GetType();
 			if (type.IsProxy())
 				type = type.BaseType;
+			return type;
+		}
+		PropertyInfo GetNonPublicProperty(Type type, string propertyName)
+		{
 			var mockedProperty = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
 				.FirstOrDefault(property => property.Name == propertyName);
+			return mockedProperty;
+		}
 
+		public ActionExpectation ArrangeSet(object target, string propertyName, object value)
+		{
+			Type type = GetTypeFromInstance(target);
+			var mockedProperty = GetNonPublicProperty(type, propertyName);
 			if (mockedProperty == null)
 			{
 				throw new MissingMemberException(String.Format("Property '{0}' was not found on type '{1}'.", propertyName, type));
 			}
-
 			return Arrange(target, propertyName, value);
+		}
+
+		public ActionExpectation ArrangeSet<T>(string propertyName, object value)
+		{
+			return ArrangeSet(typeof(T), propertyName, value);
+		}
+		public ActionExpectation ArrangeSet(Type type, string propertyName, object value)
+		{
+			var mockedProperty = GetNonPublicProperty(type, propertyName);
+			if (mockedProperty == null)
+			{
+				throw new MissingMemberException(String.Format("Property '{0}' was not found on type '{1}'.", propertyName, type));
+			}
+			return Arrange(type, propertyName, value);
 		}
 
 		public void Assert<TReturn>(object target, string memberName, params object[] args)
