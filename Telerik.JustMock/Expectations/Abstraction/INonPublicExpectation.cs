@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015, 2018 Telerik EAD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -98,14 +98,14 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <returns>Reference to setup actions calls</returns>
 		ActionExpectation ArrangeSet(Type type, string propertyName, object value);
 
-        /// <summary>
-        /// Asserts the specified member that it is called as expected.
-        /// </summary>
-        /// <param name="target">Target mock</param>
-        /// <param name="memberName">Name of the member</param>
-        /// <typeparam name="TReturn">Return type of the method</typeparam>
-        /// <param name="args">Method arguments</param>
-        void Assert<TReturn>(object target, string memberName, params object[] args);
+		/// <summary>
+		/// Asserts the specified member that it is called as expected.
+		/// </summary>
+		/// <param name="target">Target mock</param>
+		/// <param name="memberName">Name of the member</param>
+		/// <typeparam name="TReturn">Return type of the method</typeparam>
+		/// <param name="args">Method arguments</param>
+		void Assert<TReturn>(object target, string memberName, params object[] args);
 
 		/// <summary>
 		/// Asserts the specified method that it is called as expected.
