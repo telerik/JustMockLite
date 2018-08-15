@@ -286,14 +286,17 @@ namespace Telerik.JustMock.Expectations
 				.FirstOrDefault(property => property.Name == propertyName);
 			return mockedProperty;
 		}
+		private static string BuildMissingPropertyMessage(Type type, string propertyName)
+		{
+			return String.Format("Property '{0}' was not found on type '{1}'.", propertyName, type);
+		}
 
 		public ActionExpectation ArrangeSet(object target, string propertyName, object value)
 		{
 			Type type = GetTypeFromInstance(target);
-			var mockedProperty = GetNonPublicProperty(type, propertyName);
-			if (mockedProperty == null)
+			if (GetNonPublicProperty(type, propertyName) == null)
 			{
-				throw new MissingMemberException(String.Format("Property '{0}' was not found on type '{1}'.", propertyName, type));
+				throw new MissingMemberException(BuildMissingPropertyMessage(type, propertyName));
 			}
 			return Arrange(target, propertyName, value);
 		}
@@ -304,10 +307,9 @@ namespace Telerik.JustMock.Expectations
 		}
 		public ActionExpectation ArrangeSet(Type type, string propertyName, object value)
 		{
-			var mockedProperty = GetNonPublicProperty(type, propertyName);
-			if (mockedProperty == null)
+			if (GetNonPublicProperty(type, propertyName) == null)
 			{
-				throw new MissingMemberException(String.Format("Property '{0}' was not found on type '{1}'.", propertyName, type));
+				throw new MissingMemberException(BuildMissingPropertyMessage(type, propertyName));
 			}
 			return Arrange(type, propertyName, value);
 		}
