@@ -81,8 +81,22 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <returns>Reference to setup actions calls</returns>
 		ActionExpectation ArrangeSet(object target, string propertyName, object value);
 
-        ActionExpectation ArrangeSet<T>(string propertyName, object value);
-        ActionExpectation ArrangeSet(Type type, string propertyName, object value);
+		/// <summary>
+		/// Arranges a static property contained by type parameter "T" for mocking.
+		/// </summary>
+		/// <param name="propertyName">Property name</param>
+		/// <param name="value">Property value</param>
+		/// <returns>Reference to setup actions calls</returns>
+		ActionExpectation ArrangeSet<T>(string propertyName, object value);
+
+		/// <summary>
+		/// Arranges a static property for mocking.
+		/// </summary>
+		/// <param name="type">Type that contains the property</param>
+		/// <param name="propertyName">Property name</param>
+		/// <param name="value">Property value</param>
+		/// <returns>Reference to setup actions calls</returns>
+		ActionExpectation ArrangeSet(Type type, string propertyName, object value);
 
         /// <summary>
         /// Asserts the specified member that it is called as expected.
