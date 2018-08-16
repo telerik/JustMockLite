@@ -331,7 +331,10 @@ namespace Telerik.JustMock
 		/// </summary>
 		public IPrivateRefReturnAccessor RefReturn
 		{
-			get { return this.refReturnAccessor; }
+			get
+			{
+				return ProfilerInterceptor.GuardInternal(() => this.refReturnAccessor);
+			}
 		}
 
 		private void CheckMemberInfo(string kind, string name, MemberInfo mi)

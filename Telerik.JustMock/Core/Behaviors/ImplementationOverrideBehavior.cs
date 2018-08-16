@@ -66,39 +66,43 @@ namespace Telerik.JustMock.Core.Behaviors
 			}
 		}
 
-        private ref T GetOverrideRef<T>()
-        {
-            return ref ((Expectations.FuncExpectation<T>.RefDelegate)this.implementationOverride)();
-        }
-
-        public void Process(Invocation invocation)
+		private ref T GetOverrideRef<T>()
 		{
-            var returnType = invocation.Method.GetReturnType();
+			try
+			{
+				return ref ProfilerInterceptor.GuardExternal((target, args) =>
+				{
+					return ref ((Expectations.FuncExpectation<T>.RefDelegate)this.implementationOverride)();
+				}, null, null);
+			}
+			catch (InvalidCastException ex)
+			{
+				throw new MockException("The implementation callback has an incorrect signature", ex);
+			}
+		}
 
-            if (returnType.IsByRef)
-            {
-                // check override delegate compatibility
-                if (returnType != this.implementationOverride.Method.ReturnType)
-                {
-                    throw new MockException("Return type of the override delegate does not match to the return type of the invocation");
-                }
+		public void Process(Invocation invocation)
+		{
+			var returnType = invocation.Method.GetReturnType();
 
-                var delegateType = typeof(object).Assembly.GetType("Telerik.JustMock.RefDelegate`1").MakeGenericType(new[] { returnType.GetElementType() });
-                ConstructorInfo constructor = delegateType.GetConstructor(new[] { typeof(object), typeof(IntPtr) });
+			if (returnType.IsByRef)
+			{
+				var delegateType = typeof(object).Assembly.GetType("Telerik.JustMock.RefDelegate`1").MakeGenericType(new[] { returnType.GetElementType() });
+				ConstructorInfo constructor = delegateType.GetConstructor(new[] { typeof(object), typeof(IntPtr) });
 
-                MethodInfo genericMethodInfo = this.GetType().GetMethod("GetOverrideRef", BindingFlags.NonPublic | BindingFlags.Instance);
-                MethodInfo methodInfo = genericMethodInfo.MakeGenericMethod(returnType.GetElementType());
+				MethodInfo genericMethodInfo = this.GetType().GetMethod("GetOverrideRef", BindingFlags.NonPublic | BindingFlags.Instance);
+				MethodInfo methodInfo = genericMethodInfo.MakeGenericMethod(returnType.GetElementType());
 
-                invocation.ReturnValue = constructor.Invoke(new object[] { this, methodInfo.MethodHandle.GetFunctionPointer() });
-            }
-            else
-            {
-                var returnValue = CallOverride(invocation);
-                if (this.implementationOverride.Method.ReturnType != typeof(void) && !this.ignoreDelegateReturnValue)
-                {
-                    invocation.ReturnValue = returnValue;
-                }
-            }
+				invocation.ReturnValue = constructor.Invoke(new object[] { this, methodInfo.MethodHandle.GetFunctionPointer() });
+			}
+			else
+			{
+				var returnValue = CallOverride(invocation);
+				if (this.implementationOverride.Method.ReturnType != typeof(void) && !this.ignoreDelegateReturnValue)
+				{
+					invocation.ReturnValue = returnValue;
+				}
+			}
 			invocation.UserProvidedImplementation = true;
 		}
 	}

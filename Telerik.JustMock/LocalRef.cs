@@ -17,6 +17,7 @@
 
 using System;
 using System.Reflection;
+using Telerik.JustMock.Core;
 using Telerik.JustMock.Helpers;
 
 namespace Telerik.JustMock
@@ -56,10 +57,13 @@ namespace Telerik.JustMock
         /// <returns>Ref return handle of type <see cref="LocalRefHandle{T}"/></returns>
         public static LocalRefHandle<T> WithValue<T>(T value)
         {
-            Type valueHandleType = typeof(ValueHandle<,>).MakeGenericType(new[] { typeof(T), DynamicTypeHelper.GetNextType<T>() });
-            ConstructorInfo constructor = valueHandleType.GetConstructor(new[] { typeof(T) });
+            return ProfilerInterceptor.GuardInternal(() =>
+            {
+                Type valueHandleType = typeof(ValueHandle<,>).MakeGenericType(new[] { typeof(T), DynamicTypeHelper.GetNextType<T>() });
+                ConstructorInfo constructor = valueHandleType.GetConstructor(new[] { typeof(T) });
 
-            return (LocalRefHandle<T>)constructor.Invoke(new object[] { value });
+                return (LocalRefHandle<T>)constructor.Invoke(new object[] { value });
+            });
         }
     }
 }
