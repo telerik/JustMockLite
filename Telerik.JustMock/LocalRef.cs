@@ -28,9 +28,21 @@ namespace Telerik.JustMock
         {
             private static TValue value;
 
-            public static TValue Value { set { RefProvider.value = value; } }
+            public static TValue Value
+            {
+                set
+                {
+                    ProfilerInterceptor.GuardInternal(() => RefProvider.value = value);
+                }
+            }
 
-            public static ref TValue GetRef() { return ref RefProvider.value; }
+            public static ref TValue GetRef()
+            {
+                return ref ProfilerInterceptor.GuardInternal((target, args) =>
+                {
+                    return ref RefProvider.value;
+                }, null, null);
+            }
         }
 
         public ValueHandle(TValue expected)

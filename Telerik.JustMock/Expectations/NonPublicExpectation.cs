@@ -31,8 +31,6 @@ namespace Telerik.JustMock.Expectations
 {
 	internal sealed class NonPublicExpectation : INonPublicExpectation
 	{
-		private readonly NonPublicRefReturnExpectation refExpectation = new NonPublicRefReturnExpectation();
-
 		public ActionExpectation Arrange(object target, string memberName, params object[] args)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
@@ -425,6 +423,11 @@ namespace Telerik.JustMock.Expectations
 			);
 		}
 
-		public INonPublicRefReturnExpectation RefReturn { get { return this.refExpectation; } }
+#if !PORTABLE
+		public INonPublicRefReturnExpectation RefReturn
+		{
+			get { return ProfilerInterceptor.GuardInternal(() => new NonPublicRefReturnExpectation()); }
+		}
+#endif
 	}
 }

@@ -49,7 +49,6 @@ namespace Telerik.JustMock
 	{
 		private readonly object instance;
 		private readonly Type type;
-		private readonly IPrivateRefReturnAccessor refReturnAccessor;
 
 		/// <summary>
 		/// Creates a new <see cref="PrivateAccessor"/> wrapping the given instance. Can be used to access both instance and static members.
@@ -103,7 +102,6 @@ namespace Telerik.JustMock
 
 			this.instance = instance;
 			this.type = type;
-			this.refReturnAccessor = new PrivateRefReturnAccessor(this.instance, this.type);
 		}
 
 		/// <summary>
@@ -323,9 +321,13 @@ namespace Telerik.JustMock
 		/// </summary>
 		public object Instance
 		{
-			get { return this.instance; }
+			get
+			{
+				return ProfilerInterceptor.GuardInternal(() => this.instance);
+			}
 		}
 
+#if !PORTABLE
 		/// <summary>
 		/// Non public ref return interface for mocking.
 		/// </summary>
@@ -333,9 +335,10 @@ namespace Telerik.JustMock
 		{
 			get
 			{
-				return ProfilerInterceptor.GuardInternal(() => this.refReturnAccessor);
+				return ProfilerInterceptor.GuardInternal(() => new PrivateRefReturnAccessor(this.instance, this.type));
 			}
 		}
+#endif
 
 		private void CheckMemberInfo(string kind, string name, MemberInfo mi)
 		{

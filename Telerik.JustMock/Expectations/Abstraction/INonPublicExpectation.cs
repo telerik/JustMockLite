@@ -410,9 +410,11 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <param name="message">A message to display if the assertion fails.</param>
 		void Assert(dynamic dynamicExpression, Args args, Occurs occurs, string message = null);
 
+#if !PORTABLE
 		/// <summary>
 		/// Non public ref return interface for mocking.
 		/// </summary>
 		INonPublicRefReturnExpectation RefReturn { get; }
+#endif
 	}
 }

@@ -15,6 +15,7 @@
    limitations under the License.
 */
 
+using Telerik.JustMock.Core;
 using Telerik.JustMock.Expectations;
 
 namespace Telerik.JustMock
@@ -44,7 +45,7 @@ namespace Telerik.JustMock
         /// </summary>
         public FuncExpectation<T>.RefDelegate Handle
         {
-            get { return this.refDelegate; }
+            get { return ProfilerInterceptor.GuardInternal(() => this.refDelegate); }
         }
 
         /// <summary>
@@ -52,7 +53,13 @@ namespace Telerik.JustMock
         /// </summary>
         public ref T Ref
         {
-            get { return ref this.refDelegate(); }
+            get
+            {
+                return ref ProfilerInterceptor.GuardInternal((target, args) =>
+                {
+                    return ref this.refDelegate();
+                }, null, null);
+            }
         }
     }
 }

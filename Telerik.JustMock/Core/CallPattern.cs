@@ -72,6 +72,10 @@ namespace Telerik.JustMock.Core
 				return sigType == typeof(TypedReference);
 			}))
 				throw new MockException("Mocking methods with TypedReference in their signature is not supported.");
+#if PORTABLE
+			if (method.GetReturnType().IsByRef)
+				throw new MockException("Cannot mock method with by-ref return value.");
+#endif
 
 			if (method.CallingConvention == CallingConventions.VarArgs)
 				throw new MockException("Cannot mock method with __arglist.");

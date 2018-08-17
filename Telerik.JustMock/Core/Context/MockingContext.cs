@@ -21,7 +21,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Telerik.JustMock.Diagnostics;
+#if !PORTABLE
 using Telerik.JustMock.Helpers;
+#endif
 
 namespace Telerik.JustMock.Core.Context
 {
@@ -72,7 +74,9 @@ namespace Telerik.JustMock.Core.Context
 
 			LocalMockingContextResolver.RetireRepository();
 
+#if !PORTABLE
 			DynamicTypeHelper.Reset();
+#endif
 		}
 
 		public static void Fail(string message, params object[] args)
@@ -137,19 +141,19 @@ namespace Telerik.JustMock.Core.Context
 #else
 			if (MSTestMockingContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new MSTestMockingContextResolver());
-            if (MSTestV2MockingContextResolver.IsAvailable)
-                registeredContextResolvers.Add(new MSTestV2MockingContextResolver());
+			if (MSTestV2MockingContextResolver.IsAvailable)
+				registeredContextResolvers.Add(new MSTestV2MockingContextResolver());
 			if (XUnit1xMockingContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new XUnit1xMockingContextResolver());
 			if (XUnit2xMockingContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new XUnit2xMockingContextResolver());
-            if (NUnit2xMockingContextResolver.IsAvailable)
-                registeredContextResolvers.Add(new NUnit2xMockingContextResolver());
-            if (NUnit3xMockingContextResolver.IsAvailable)
-                registeredContextResolvers.Add(new NUnit3xMockingContextResolver());
-            if (NUnit3_8_xMockingContextResolver.IsAvailable)
-                registeredContextResolvers.Add(new NUnit3_8_xMockingContextResolver());
-            if (MSpecContextResolver.IsAvailable)
+			if (NUnit2xMockingContextResolver.IsAvailable)
+				registeredContextResolvers.Add(new NUnit2xMockingContextResolver());
+			if (NUnit3xMockingContextResolver.IsAvailable)
+				registeredContextResolvers.Add(new NUnit3xMockingContextResolver());
+			if (NUnit3_8_xMockingContextResolver.IsAvailable)
+				registeredContextResolvers.Add(new NUnit3_8_xMockingContextResolver());
+			if (MSpecContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new MSpecContextResolver());
 			if (MbUnitContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new MbUnitContextResolver());

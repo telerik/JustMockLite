@@ -17,7 +17,9 @@
 
 using System;
 using System.Linq;
+#if !PORTABLE
 using System.Reflection;
+#endif
 
 namespace Telerik.JustMock.Core.Behaviors
 {
@@ -66,6 +68,7 @@ namespace Telerik.JustMock.Core.Behaviors
 			}
 		}
 
+#if !PORTABLE
 		private ref T GetOverrideRef<T>()
 		{
 			try
@@ -80,9 +83,11 @@ namespace Telerik.JustMock.Core.Behaviors
 				throw new MockException("The implementation callback has an incorrect signature", ex);
 			}
 		}
+#endif
 
 		public void Process(Invocation invocation)
 		{
+#if !PORTABLE
 			var returnType = invocation.Method.GetReturnType();
 
 			if (returnType.IsByRef)
@@ -97,12 +102,15 @@ namespace Telerik.JustMock.Core.Behaviors
 			}
 			else
 			{
+#endif
 				var returnValue = CallOverride(invocation);
 				if (this.implementationOverride.Method.ReturnType != typeof(void) && !this.ignoreDelegateReturnValue)
 				{
 					invocation.ReturnValue = returnValue;
 				}
+#if !PORTABLE
 			}
+#endif
 			invocation.UserProvidedImplementation = true;
 		}
 	}
