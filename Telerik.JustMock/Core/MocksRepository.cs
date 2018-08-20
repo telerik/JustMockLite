@@ -425,7 +425,10 @@ namespace Telerik.JustMock.Core
 						mock.FallbackBehaviors
 							.Where(behavior => !invocation.InAssertSet || !(behavior is CallOriginalBehavior))
 							.ToList();
-					fallbackBehaviorsToExecute.ForEach(behavior => behavior.Process(invocation));
+					foreach (var fallbackBehavior in fallbackBehaviorsToExecute)
+					{
+						fallbackBehavior.Process(invocation);
+					}
 				}
 				else
 				{
@@ -1651,8 +1654,11 @@ namespace Telerik.JustMock.Core
 
 			methodMock.IsUsed = true; //used to correctly determine inSequence arranges
 
-			GetBehaviorsToProcess(invocation, methodMock)
-				.ForEach(behavior => behavior.Process(invocation));
+			var behaviorsToProcess = GetBehaviorsToProcess(invocation, methodMock);
+			foreach (var behavior in behaviorsToProcess)
+			{
+				behavior.Process(invocation);
+			}
 
 			return methodMock;
 		}
