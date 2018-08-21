@@ -30,6 +30,7 @@ namespace Telerik.JustMock.Core
 			Type type = target.GetType();
 			return GetLocalFunction(type, method, localMemberName);
 		}
+
 		public static MethodInfo GetLocalFunction(Type type, MethodInfo method, string localMemberName)
 		{
 			MethodInfo[] allStaticNonPublicMethods = type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -149,6 +150,7 @@ namespace Telerik.JustMock.Core
 
 			return sb.ToString();
 		}
+
 		private static string FormatMethodArrangementExpression(string memberName, MethodBase method, SourceLanguage language)
 		{
 			return String.Format("Mock.NonPublic.Arrange{0}({1}\"{2}\"{3}){4}",
@@ -158,6 +160,7 @@ namespace Telerik.JustMock.Core
 				String.Join("", method.GetParameters().Select(p => ", " + FormatMethodParameterMatcher(p.ParameterType, language)).ToArray()),
 				language == SourceLanguage.CSharp ? ";" : "");
 		}
+
 		private static string FormatMethodParameterMatcher(Type paramType, SourceLanguage language)
 		{
 			if (paramType.IsByRef)
@@ -169,6 +172,7 @@ namespace Telerik.JustMock.Core
 				return String.Format("ArgExpr.IsAny{0}()", FormatGenericArg(paramType, language));
 			}
 		}
+
 		private static string FormatGenericArg(Type type, SourceLanguage language)
 		{
 			if (type == typeof(void))

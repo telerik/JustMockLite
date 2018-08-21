@@ -6,7 +6,6 @@ using Telerik.JustMock.Expectations.Abstraction.Local.Function;
 
 namespace Telerik.JustMock.Expectations
 {
-
 	internal sealed class FunctionExpectation : IFunctionExpectation
 	{
 		public ActionExpectation Arrange(object target, string methodName, string localFunctionName, params object[] args)
@@ -63,8 +62,6 @@ namespace Telerik.JustMock.Expectations
 				return Mock.NonPublic.Arrange<TReturn>(target, localMethod, args);
 			});
 		}
-
-
 
 		public object Call(object target, string methodName, string localFunctionName, params object[] args)
 		{

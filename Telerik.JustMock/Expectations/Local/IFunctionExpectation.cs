@@ -3,7 +3,6 @@ using System.Reflection;
 
 namespace Telerik.JustMock.Expectations.Abstraction.Local.Function
 {
-
 	public interface IFunctionExpectation
 	{
 		/// <summary>
