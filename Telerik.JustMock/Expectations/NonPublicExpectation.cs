@@ -293,25 +293,34 @@ namespace Telerik.JustMock.Expectations
 
 		public ActionExpectation ArrangeSet(object target, string propertyName, object value)
 		{
-			Type type = GetTypeFromInstance(target);
-			if (GetNonPublicProperty(type, propertyName) == null)
+			ProfilerInterceptor.GuardInternal(() =>
 			{
-				throw new MissingMemberException(BuildMissingPropertyMessage(type, propertyName));
-			}
-			return Arrange(target, propertyName, value);
+				Type type = GetTypeFromInstance(target);
+				if (GetNonPublicProperty(type, propertyName) == null)
+				{
+					throw new MissingMemberException(BuildMissingPropertyMessage(type, propertyName));
+				}
+				return Arrange(target, propertyName, value);
+			});
 		}
 
 		public ActionExpectation ArrangeSet<T>(string propertyName, object value)
 		{
-			return ArrangeSet(typeof(T), propertyName, value);
+			ProfilerInterceptor.GuardInternal(() =>
+			{
+				return ArrangeSet(typeof(T), propertyName, value);
+			});
 		}
 		public ActionExpectation ArrangeSet(Type type, string propertyName, object value)
 		{
-			if (GetNonPublicProperty(type, propertyName) == null)
+			ProfilerInterceptor.GuardInternal(() =>
 			{
-				throw new MissingMemberException(BuildMissingPropertyMessage(type, propertyName));
-			}
-			return Arrange(type, propertyName, value);
+				if (GetNonPublicProperty(type, propertyName) == null)
+				{
+					throw new MissingMemberException(BuildMissingPropertyMessage(type, propertyName));
+				}
+				return Arrange(type, propertyName, value);
+			});
 		}
 
 		public void Assert<TReturn>(object target, string memberName, params object[] args)
