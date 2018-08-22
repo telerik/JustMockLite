@@ -126,5 +126,97 @@ namespace Telerik.JustMock.Expectations
 				return res;
 			});
 		}
+
+		public void Assert<TReturn>(object target, string methodName, string localFunctionName, params object[] args)
+		{
+			ProfilerInterceptor.GuardInternal(() =>
+			{
+				Type type = target.GetType();
+				MethodInfo method = MockingUtil.GetMethodWithLocalFunction(target, methodName);
+				MethodInfo localFunction = MockingUtil.GetLocalFunction(type, method, localFunctionName);
+
+				Mock.NonPublic.Assert<TReturn>(target, localFunction.Name, args);
+			});
+		}
+
+		public void Assert<TReturn>(object target, MethodInfo method, string localFunctionName, params object[] args)
+		{
+			ProfilerInterceptor.GuardInternal(() =>
+			{
+				Type type = target.GetType();
+				MethodInfo localFunction = MockingUtil.GetLocalFunction(type, method, localFunctionName);
+
+				Mock.NonPublic.Assert<TReturn>(target, localFunction.Name, args);
+			});
+		}
+
+		public void Assert(object target, MethodInfo method, string localFunctionName, params object[] args)
+		{
+			ProfilerInterceptor.GuardInternal(() =>
+			{
+				Type type = target.GetType();
+				MethodInfo localFunction = MockingUtil.GetLocalFunction(type, method, localFunctionName);
+
+				Mock.NonPublic.Assert(target, localFunction, args);
+			});
+		}
+
+		public void Assert(object target, string methodName, string localFunctionName, params object[] args)
+		{
+			ProfilerInterceptor.GuardInternal(() =>
+			{
+				Type type = target.GetType();
+				MethodInfo method = MockingUtil.GetMethodWithLocalFunction(target, methodName);
+				MethodInfo localFunction = MockingUtil.GetLocalFunction(type, method, localFunctionName);
+
+				Mock.NonPublic.Assert(target, localFunction.Name, args);
+			});
+		}
+
+		public void Assert<TReturn>(object target, string methodName, string localFunctionName, Occurs occurs, params object[] args)
+		{
+			ProfilerInterceptor.GuardInternal(() =>
+			{
+				Type type = target.GetType();
+				MethodInfo method = MockingUtil.GetMethodWithLocalFunction(target, methodName);
+				MethodInfo localFunction = MockingUtil.GetLocalFunction(type, method, localFunctionName);
+
+				Mock.NonPublic.Assert<TReturn>(target, localFunction.Name, occurs, args);
+			});
+		}
+
+		public void Assert<TReturn>(object target, MethodInfo method, string localFunctionName, Occurs occurs, params object[] args)
+		{
+			ProfilerInterceptor.GuardInternal(() =>
+			{
+				Type type = target.GetType();
+				MethodInfo localFunction = MockingUtil.GetLocalFunction(type, method, localFunctionName);
+
+				Mock.NonPublic.Assert<TReturn>(target, localFunction.Name, occurs, args);
+			});
+		}
+
+		public void Assert(object target, MethodInfo method, string localFunctionName, Occurs occurs, params object[] args)
+		{
+			ProfilerInterceptor.GuardInternal(() =>
+			{
+				Type type = target.GetType();
+				MethodInfo localFunction = MockingUtil.GetLocalFunction(type, method, localFunctionName);
+
+				Mock.NonPublic.Assert(target, localFunction.Name, occurs, args);
+			});
+		}
+
+		public void Assert(object target, string methodName, string localFunctionName, Occurs occurs, params object[] args)
+		{
+			ProfilerInterceptor.GuardInternal(() =>
+			{
+				Type type = target.GetType();
+				MethodInfo method = MockingUtil.GetMethodWithLocalFunction(target, methodName);
+				MethodInfo localFunction = MockingUtil.GetLocalFunction(type, method, localFunctionName);
+
+				Mock.NonPublic.Assert(target, localFunction.Name, occurs, args);
+			});
+		}
 	}
 }
