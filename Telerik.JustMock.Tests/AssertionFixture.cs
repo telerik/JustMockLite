@@ -1158,7 +1158,7 @@ namespace Telerik.JustMock.Tests
 	{
 
 #if !NUNIT3
-		[TestFixtureSetUp]
+		[SetUp]
 #else
 		[OneTimeSetUp]
 #endif
@@ -1168,7 +1168,7 @@ namespace Telerik.JustMock.Tests
 		}
 
 #if !NUNIT3
-		[TestFixtureTearDown]
+		[TearDown]
 #else
 		[OneTimeTearDown]
 #endif
