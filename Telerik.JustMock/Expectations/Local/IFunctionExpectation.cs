@@ -144,6 +144,17 @@ namespace Telerik.JustMock.Expectations.Abstraction.Local.Function
 		/// Asserts the specified C# 7.0 local function that it is called as expected.
 		/// </summary>
 		/// <param name="target">Target mock</param>
+		/// <param name="methodName">Name of the  where the local function is nestes</param>
+		/// <param name="methodParamTypes">Types of the parameters for the method where the local function is nested</param>
+		/// <param name="localFunctionName">Name of the nested local function</param>
+		/// <typeparam name="TReturn">Return type of the method</typeparam>
+		/// <param name="args">Method arguments</param>
+		void Assert<TReturn>(object target, string methodName, Type[] methodParamTypes, string localFunctionName, params object[] args);
+
+		/// <summary>
+		/// Asserts the specified C# 7.0 local function that it is called as expected.
+		/// </summary>
+		/// <param name="target">Target mock</param>
 		/// <param name="method">Metadata for the method where the local function is nestes</param>
 		/// <param name="localFunctionName">Name of the nested local function</param>
 		/// <typeparam name="TReturn">Return type of the method</typeparam>
@@ -173,11 +184,33 @@ namespace Telerik.JustMock.Expectations.Abstraction.Local.Function
 		/// </summary>
 		/// <param name="target">Target mock</param>
 		/// <param name="methodName">Name of the  where the local function is nestes</param>
+		/// <param name="methodParamTypes">Types of the parameters for the method where the local function is nested</param>
+		/// <param name="localFunctionName">Name of the nested local function</param>
+		/// <param name="args">Method arguments</param>
+		void Assert(object target, string methodName, Type[] methodParamTypes, string localFunctionName, params object[] args);
+
+		/// <summary>
+		/// Asserts the specified C# 7.0 local function that it is called as expected.
+		/// </summary>
+		/// <param name="target">Target mock</param>
+		/// <param name="methodName">Name of the  where the local function is nestes</param>
 		/// <param name="localFunctionName">Name of the nested local function</param>
 		/// <param name="occurs">Specifies the number of times a call should occur.</param>
 		/// <typeparam name="TReturn">Return type of the method</typeparam>
 		/// <param name="args">Method arguments</param>
 		void Assert<TReturn>(object target, string methodName, string localFunctionName, Occurs occurs, params object[] args);
+
+		/// <summary>
+		/// Asserts the specified C# 7.0 local function that it is called as expected.
+		/// </summary>
+		/// <param name="target">Target mock</param>
+		/// <param name="methodName">Name of the  where the local function is nestes</param>
+		/// <param name="methodParamTypes">Types of the parameters for the method where the local function is nested</param>
+		/// <param name="localFunctionName">Name of the nested local function</param>
+		/// <param name="occurs">Specifies the number of times a call should occur.</param>
+		/// <typeparam name="TReturn">Return type of the method</typeparam>
+		/// <param name="args">Method arguments</param>
+		void Assert<TReturn>(object target, string methodName, Type[] methodParamTypes, string localFunctionName, Occurs occurs, params object[] args);
 
 		/// <summary>
 		/// Asserts the specified C# 7.0 local function that it is called as expected.
@@ -209,5 +242,17 @@ namespace Telerik.JustMock.Expectations.Abstraction.Local.Function
 		/// <param name="occurs">Specifies the number of times a call should occur.</param>
 		/// <param name="args">Method arguments</param>
 		void Assert(object target, string methodName, string localFunctionName, Occurs occurs, params object[] args);
+
+
+		/// <summary>
+		/// Asserts the specified C# 7.0 local function that it is called as expected.
+		/// </summary>
+		/// <param name="target">Target mock</param>
+		/// <param name="methodName">Name of the  where the local function is nestes</param>
+		/// <param name="methodParamTypes">Types of the parameters for the method where the local function is nested</param>
+		/// <param name="localFunctionName">Name of the nested local function</param>
+		/// <param name="occurs">Specifies the number of times a call should occur.</param>
+		/// <param name="args">Method arguments</param>
+		void Assert(object target, string methodName, Type[] methodParamTypes, string localFunctionName, Occurs occurs, params object[] args);
 	}
 }
