@@ -96,7 +96,7 @@ namespace Telerik.JustMock.Core
 
 		public static MethodInfo GetMethodWithLocalFunction(Type type, string methodName, Type[] methodParamTypes)
 		{
-			MethodInfo method = type.GetMethod(methodName, methodParamTypes);
+			MethodInfo method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, methodParamTypes, null);
 			if(method == null)
 			{
 				throw new MissingMemberException(MockingUtil.BuildMissingMethodMessage(type, null, methodName));
