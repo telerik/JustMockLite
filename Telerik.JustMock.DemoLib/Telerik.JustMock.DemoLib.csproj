@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Telerik.JustMock.DemoLib</RootNamespace>
     <AssemblyName>Telerik.JustMock.DemoLib</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>
     </SccProjectName>
@@ -35,6 +35,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -107,6 +108,7 @@
     <Compile Include="Objects\Configuration.cs" />
     <Compile Include="ConfigurationService.cs" />
     <Compile Include="Objects\ILogger.cs" />
+    <Compile Include="Objects\ClassWithDynamicDataMethod.cs" />
     <Compile Include="Objects\InternalObject.cs" />
     <Compile Include="Objects\Logger.cs" />
     <Compile Include="OpenAccess\OpenAccessContext.cs" />
