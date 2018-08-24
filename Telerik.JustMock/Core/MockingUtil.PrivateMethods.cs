@@ -46,33 +46,34 @@ namespace Telerik.JustMock.Core
 			}
 			else
 			{
-				MethodInfo localMethod = null;
-				MethodInfo[] allMethods = type.GetAllMethods().ToArray();
-				int methodIndex = Array.IndexOf(allMethods, method);
-				methodIndex += 1; //Indices in the names of local methods are 1-based
+				MethodBody body = method.GetMethodBody();
+				byte[] il = body.GetILAsByteArray();
 
-				var regEx = new System.Text.RegularExpressions.Regex(@"<[a-z,A-z]>g__[a-z,A-z]|(?<MethodId>\d+)_(?<LocalId>\d+)");
-				foreach (var candidate in potentialLocalMethods)
+				MethodInfo localMethod = null;
+				for (int i = 0; i < il.Length; i++)
 				{
-					System.Text.RegularExpressions.Match match = regEx.Match(candidate.Name);
-					if (match.Success)
+					byte opCode = il[i];
+					if (opCode == 0x28) ////System.Reflection.Emit.OpCodes.Call)
 					{
-						int index = int.Parse(match.Groups["MethodId"].Value);
-						if (methodIndex == index)
+						int token = BitConverter.ToInt32(il, i + 1);
+						foreach (var m in potentialLocalMethods)
 						{
-							localMethod = candidate;
-							break;
+							if (token == m.MetadataToken && m.Name.Contains(localMemberName))
+							{
+								localMethod = m;
+								break;
+							}
 						}
 					}
+					if (localMethod != null)
+					{
+						break;
+					}
 				}
-				if (localMethod != null)
-				{
-					return localMethod;
-				}
-				else
-				{
+				if (localMethod == null)
 					throw new MissingMemberException(BuildMissingMethodMessage(type, null, localMemberName));
-				}
+
+				return localMethod;
 			}
 		}
 
@@ -96,7 +97,7 @@ namespace Telerik.JustMock.Core
 
 		public static MethodInfo GetMethodWithLocalFunction(Type type, string methodName, Type[] methodParamTypes)
 		{
-			MethodInfo method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, methodParamTypes, null);
+			MethodInfo method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance |BindingFlags.Static, null, methodParamTypes, null);
 			if(method == null)
 			{
 				throw new MissingMemberException(MockingUtil.BuildMissingMethodMessage(type, null, methodName));
