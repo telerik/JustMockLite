@@ -65,8 +65,11 @@ namespace Telerik.JustMock.Expectations.Abstraction.Local.Function
 		/// <param name="localFunctionName">Name of the nested local function</param>
 		/// <param name="args">Local function arguments</param>
 		/// <returns>Reference to setup actions calls</returns>
-		FuncExpectation<TReturn> Arrange<TReturn>(object target, MethodInfo method, string localMemberName, params object[] args);
+		FuncExpectation<TReturn> Arrange<TReturn>(object target, MethodInfo method, string localFunctionName, params object[] args);
 
+		FuncExpectation<TReturn> Arrange<T, TReturn>(string methodName, string localMemberName, params object[] args);
+
+		FuncExpectation<TReturn> Arrange<TReturn>(Type type, string methodName, string localFunctionName, params object[] args);
 
 		/// <summary>
 		/// Calls the specified C# 7.0 local function by name.

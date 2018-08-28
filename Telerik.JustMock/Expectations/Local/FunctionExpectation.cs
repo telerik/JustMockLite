@@ -63,6 +63,27 @@ namespace Telerik.JustMock.Expectations
 			});
 		}
 
+		public FuncExpectation<TReturn> Arrange<T, TReturn>(string methodName, string localFunctionName, params object[] args)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				Type type = typeof(T);
+				return Arrange<TReturn>(type, methodName, localFunctionName, args);
+			});
+		}
+
+		public FuncExpectation<TReturn> Arrange<TReturn>(Type type, string methodName, string localFunctionName, params object[] args)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				Type[] emptyParamTypes = new Type[] { };
+				MethodInfo method = MockingUtil.GetMethodWithLocalFunction(type, methodName, emptyParamTypes);
+				MethodInfo localMethod = MockingUtil.GetLocalFunction(type, method, localFunctionName);
+
+				return Mock.NonPublic.Arrange<TReturn>(type, localMethod.Name, args);
+			});
+		}
+
 		public object Call(object target, string methodName, string localFunctionName, params object[] args)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
