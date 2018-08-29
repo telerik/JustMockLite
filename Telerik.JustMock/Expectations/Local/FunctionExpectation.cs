@@ -117,6 +117,60 @@ namespace Telerik.JustMock.Expectations
 				return Mock.NonPublic.Arrange<TReturn>(type, localMethod, args);
 			});
 		}
+		
+		public ActionExpectation Arrange<T>(string methodName, string localMemberName, params object[] args)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				Type type = typeof(T);
+				return this.Arrange(type, methodName, localMemberName, args);
+			});
+		}
+
+		public ActionExpectation Arrange<T>(string methodName, Type[] methodParamTypes, string localMemberName, params object[] args)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				Type type = typeof(T);
+				return this.Arrange(type, methodName, methodParamTypes, localMemberName, args);
+			});
+		}
+
+		public ActionExpectation Arrange<T>(MethodInfo method, string localMemberName, params object[] args)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				Type type = typeof(T);
+				return this.Arrange(type, method, localMemberName, args);
+			});
+		}
+
+		public ActionExpectation Arrange(Type type, string methodName, string localFunctionName, params object[] args)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				Type[] emptyParamTypes = new Type[] { };
+				return this.Arrange(type, methodName, emptyParamTypes, localFunctionName, args);
+			});
+		}
+
+		public ActionExpectation Arrange(Type type, string methodName, Type[] methodParamTypes, string localMemberName, params object[] args)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				MethodInfo method = MockingUtil.GetMethodWithLocalFunction(type, methodName, methodParamTypes);
+				return this.Arrange(type, method, localMemberName, args);
+			});
+		}
+
+		public ActionExpectation Arrange(Type type, MethodInfo method, string localFunctionName, params object[] args)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				MethodInfo localFunction = MockingUtil.GetLocalFunction(type, method, localFunctionName);
+				return Mock.NonPublic.Arrange(type, method, localFunction, args);
+			});
+		}
 
 		public object Call(object target, string methodName, string localFunctionName, params object[] args)
 		{

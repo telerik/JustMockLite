@@ -75,6 +75,68 @@ namespace Telerik.JustMock.Expectations.Abstraction.Local.Function
 		/// <param name="localFunctionName">Name of the nested local function</param>
 		/// <param name="args">Local function arguments</param>
 		/// <returns>Reference to setup actions calls</returns>
+		ActionExpectation Arrange<T>(string methodName, string localMemberName, params object[] args);
+
+		/// <summary>
+		/// Arranges a C# 7.0 local function inside static method for mocking.
+		/// </summary>
+		/// <param name="T">The tpye with static method containing local function</param>
+		/// <param name="methodName">Name of the method where the local function is nestes</param>
+		/// <param name="methodParamTypes">Types of the parameters for the method where the local function is nested</param>
+		/// <param name="localFunctionName">Name of the nested local function</param>
+		/// <param name="args">Local function arguments</param>
+		/// <returns>Reference to setup actions calls</returns>
+		ActionExpectation Arrange<T>(string methodName, Type[] methodParamTypes, string localMemberName, params object[] args);
+
+		/// <summary>
+		/// Arranges a C# 7.0 local function inside static method for mocking.
+		/// </summary>
+		/// <param name="T">The tpye with static method containing local function</param>
+		/// <param name="method">Metadata of the method where the local function is nestes</param>
+		/// <param name="localFunctionName">Name of the nested local function</param>
+		/// <param name="args">Local function arguments</param>
+		/// <returns>Reference to setup actions calls</returns>
+		ActionExpectation Arrange<T>(MethodInfo method, string localMemberName, params object[] args);
+
+		/// <summary>
+		/// Arranges a C# 7.0 local function inside static method for mocking.
+		/// </summary>
+		/// <param name="type">The tpye with static method containing local function</param>
+		/// <param name="methodName">Name of the method where the local function is nestes</param>
+		/// <param name="localFunctionName">Name of the nested local function</param>
+		/// <param name="args">Local function arguments</param>
+		/// <returns>Reference to setup actions calls</returns>
+		ActionExpectation Arrange(Type type, string methodName, string localFunctionName, params object[] args);
+
+		/// <summary>
+		/// Arranges a C# 7.0 local function inside static method for mocking.
+		/// </summary>
+		/// <param name="type">The tpye with static method containing local function</param>
+		/// <param name="methodName">Name of the method where the local function is nestes</param>
+		/// <param name="methodParamTypes">Types of the parameters for the method where the local function is nested</param>
+		/// <param name="localFunctionName">Name of the nested local function</param>
+		/// <param name="args">Local function arguments</param>
+		/// <returns>Reference to setup actions calls</returns>
+		ActionExpectation Arrange(Type type, string methodName, Type[] methodParamTypes, string localMemberName, params object[] args);
+
+		/// <summary>
+		/// Arranges a C# 7.0 local function inside static method for mocking.
+		/// </summary>
+		/// <param name="type">The tpye with static method containing local function</param>
+		/// <param name="method">Metadata of the method where the local function is nestes</param>
+		/// <param name="localFunctionName">Name of the nested local function</param>
+		/// <param name="args">Local function arguments</param>
+		/// <returns>Reference to setup actions calls</returns>
+		ActionExpectation Arrange(Type type, MethodInfo method, string localMemberName, params object[] args);
+
+		/// <summary>
+		/// Arranges a C# 7.0 local function inside static method for mocking.
+		/// </summary>
+		/// <param name="T">The tpye with static method containing local function</param>
+		/// <param name="methodName">Name of the method where the local function is nestes</param>
+		/// <param name="localFunctionName">Name of the nested local function</param>
+		/// <param name="args">Local function arguments</param>
+		/// <returns>Reference to setup actions calls</returns>
 		FuncExpectation<TReturn> Arrange<T, TReturn>(string methodName, string localMemberName, params object[] args);
 
 		/// <summary>
