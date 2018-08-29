@@ -1,6 +1,6 @@
 ﻿/*
  JustMock Lite
- Copyright © 2010-2018 Telerik EAD
+ Copyright © 2018 Telerik EAD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -29,14 +29,13 @@ namespace Telerik.JustMock.Helpers
     {
         private const string DynamicAssemblyName = "Telerik.JustMock.DynamicTypes";
         private static Dictionary<Type, int> typeIndices = new Dictionary<Type, int>();
+        private static ModuleBuilder moduleBuilder =
+            AppDomain.CurrentDomain.DefineDynamicAssembly(
+                new AssemblyName(DynamicTypeHelper.DynamicAssemblyName), AssemblyBuilderAccess.RunAndCollect)
+                    .DefineDynamicModule(DynamicTypeHelper.DynamicAssemblyName);
 
         public static Type GetNextType<T>()
         {
-            AssemblyBuilder assemblyBuilder =
-                AppDomain.CurrentDomain.DefineDynamicAssembly(
-                    new AssemblyName(DynamicTypeHelper.DynamicAssemblyName), AssemblyBuilderAccess.RunAndCollect);
-            ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule(DynamicTypeHelper.DynamicAssemblyName);
-
             Type valueType = typeof(T);
             Type nextType = null;
             lock (DynamicTypeHelper.typeIndices)

@@ -190,12 +190,15 @@ namespace Telerik.JustMock.Core
 			return attr != null ? (int?)attr.Value : null;
 		}
 
-		public static ProfilerInterceptor.RefReturn<TReturn> CreateDynamicMethodInvoker<TReturn>(object @object, MethodInfo method, object[] args)
+		public static ProfilerInterceptor.RefReturn<TReturn> CreateDynamicMethodInvoker<TReturn>(object target, MethodInfo method, object[] args)
 		{
 			if (args.Length != method.GetParameters().Length)
 			{
-				throw new MockException("Argument count mismatch.");
+				throw new MockException(
+					String.Format("Number of the supplied arguments does not match to the expected one in the method signature:" +
+						" supplied '{0}', expected '{1}'", args.Length, method.GetParameters().Length));
 			}
+
 			ProfilerInterceptor.RefReturn<TReturn> @delegate =
 				MockingUtil.CreateDynamicMethod<ProfilerInterceptor.RefReturn<TReturn>>(
 					il =>
@@ -203,16 +206,16 @@ namespace Telerik.JustMock.Core
 						// store arguments as local variables
 						il.UnpackArgArray(OpCodes.Ldarg_1, method);
 
-						// push object reference to the stack
-						if (@object != null)
+						// push object reference to the stack in case if instance method
+						if (target != null)
 						{
 							il.Emit(OpCodes.Ldarg_0);
 						}
 
-						// push stored arguments object reference to the stack
+						// push stored arguments back to the stack
 						il.PushArgArray(method);
 
-						il.Emit((@object != null) ? OpCodes.Callvirt : OpCodes.Call, method as MethodInfo);
+						il.Emit((target != null) ? OpCodes.Callvirt : OpCodes.Call, method as MethodInfo);
 						il.Emit(OpCodes.Ret);
 					});
 
