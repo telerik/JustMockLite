@@ -81,7 +81,7 @@ namespace Telerik.JustMock.Expectations
 				MethodInfo method = MockingUtil.GetMethodWithLocalFunction(type, methodName, emptyParamTypes);
 				MethodInfo localMethod = MockingUtil.GetLocalFunction(type, method, localFunctionName);
 
-				return Mock.NonPublic.Arrange<TReturn>(type, localMethod.Name, args);
+				return Mock.NonPublic.Arrange<TReturn>(type, localMethod, args);
 			});
 		}
 
@@ -186,7 +186,7 @@ namespace Telerik.JustMock.Expectations
 				Type type = target.GetType();
 				MethodInfo localFunction = MockingUtil.GetLocalFunction(type, method, localFunctionName);
 
-				Mock.NonPublic.Assert(target, localFunction.Name, occurs, args);
+				Mock.NonPublic.Assert(target, localFunction, occurs, args);
 			});
 		}
 
