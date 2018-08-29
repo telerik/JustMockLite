@@ -36,7 +36,7 @@ namespace Telerik.JustMock.Core
 			MethodBody body = method.GetMethodBody();
 			byte[] il = body.GetILAsByteArray();
 
-			string expectedName = String.Format("<'{0}'>g__'{1}'|", method.Name, localMemberName);
+			string expectedName = String.Format("<{0}>g__{1}|", method.Name, localMemberName);
 
 			MethodInfo localMethod = null;
 			for (int i = 0; i < il.Length; i++)
