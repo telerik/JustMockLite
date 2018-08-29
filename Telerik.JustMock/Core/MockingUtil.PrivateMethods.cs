@@ -42,7 +42,7 @@ namespace Telerik.JustMock.Core
 			for (int i = 0; i < il.Length; i++)
 			{
 				byte opCode = il[i];
-				if (opCode == 0x28) ////System.Reflection.Emit.OpCodes.Call)
+				if (System.Reflection.Emit.OpCodes.Call.Value == opCode)
 				{
 					int token = BitConverter.ToInt32(il, i + 1);
 
