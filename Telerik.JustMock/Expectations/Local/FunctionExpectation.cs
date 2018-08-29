@@ -100,7 +100,8 @@ namespace Telerik.JustMock.Expectations
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
-				var resObject = this.Call(target, methodName, localFunctionName, args);
+				Type[] emptyParamTypes = new Type[] { };
+				var resObject = this.Call(target, methodName, emptyParamTypes, localFunctionName, args);
 				T res = (T)resObject;
 				return res;
 			});
