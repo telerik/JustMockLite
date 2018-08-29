@@ -25,6 +25,7 @@ namespace Telerik.JustMock.Expectations
 				return this.Arrange(target, method, localFunctionName, args);
 			});
 		}
+
 		public ActionExpectation Arrange(object target, MethodInfo method, string localFunctionName, params object[] args)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
@@ -149,35 +150,6 @@ namespace Telerik.JustMock.Expectations
 			});
 		}
 
-		public void Assert<TReturn>(object target, string methodName, string localFunctionName, params object[] args)
-		{
-			ProfilerInterceptor.GuardInternal(() =>
-			{
-				Type[] emptyParamTypes = new Type[] { };
-				this.Assert<TReturn>(target, methodName, emptyParamTypes, localFunctionName, args);
-			});
-		}
-
-		public void Assert<TReturn>(object target, string methodName, Type[] methodParamTypes, string localFunctionName, params object[] args)
-		{
-			ProfilerInterceptor.GuardInternal(() =>
-			{
-				MethodInfo method = MockingUtil.GetMethodWithLocalFunction(target, methodName, methodParamTypes);
-				this.Assert<TReturn>(target, method, localFunctionName, args);
-			});
-		}
-
-		public void Assert<TReturn>(object target, MethodInfo method, string localFunctionName, params object[] args)
-		{
-			ProfilerInterceptor.GuardInternal(() =>
-			{
-				Type type = target.GetType();
-				MethodInfo localFunction = MockingUtil.GetLocalFunction(type, method, localFunctionName);
-
-				Mock.NonPublic.Assert<TReturn>(target, localFunction.Name, args);
-			});
-		}
-
 		public void Assert(object target, MethodInfo method, string localFunctionName, params object[] args)
 		{
 			ProfilerInterceptor.GuardInternal(() =>
@@ -207,35 +179,6 @@ namespace Telerik.JustMock.Expectations
 			});
 		}
 
-		public void Assert<TReturn>(object target, string methodName, string localFunctionName, Occurs occurs, params object[] args)
-		{
-			ProfilerInterceptor.GuardInternal(() =>
-			{
-				Type[] emptyParamTypes = new Type[] { };
-				this.Assert<TReturn>(target, methodName, emptyParamTypes, localFunctionName, occurs, args);
-			});
-		}
-
-		public void Assert<TReturn>(object target, string methodName, Type[] methodParamTypes, string localFunctionName, Occurs occurs, params object[] args)
-		{
-			ProfilerInterceptor.GuardInternal(() =>
-			{
-				MethodInfo method = MockingUtil.GetMethodWithLocalFunction(target, methodName, methodParamTypes);
-				this.Assert<TReturn>(target, method, localFunctionName, occurs, args);
-			});
-		}
-
-		public void Assert<TReturn>(object target, MethodInfo method, string localFunctionName, Occurs occurs, params object[] args)
-		{
-			ProfilerInterceptor.GuardInternal(() =>
-			{
-				Type type = target.GetType();
-				MethodInfo localFunction = MockingUtil.GetLocalFunction(type, method, localFunctionName);
-
-				Mock.NonPublic.Assert<TReturn>(target, localFunction.Name, occurs, args);
-			});
-		}
-
 		public void Assert(object target, MethodInfo method, string localFunctionName, Occurs occurs, params object[] args)
 		{
 			ProfilerInterceptor.GuardInternal(() =>
@@ -255,6 +198,7 @@ namespace Telerik.JustMock.Expectations
 				this.Assert(target, methodName, emptyParamTypes, localFunctionName, occurs, args);
 			});
 		}
+
 		public void Assert(object target, string methodName, Type[] methodParamTypes, string localFunctionName, Occurs occurs, params object[] args)
 		{
 			ProfilerInterceptor.GuardInternal(() =>
