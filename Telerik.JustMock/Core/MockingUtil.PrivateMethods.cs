@@ -36,6 +36,8 @@ namespace Telerik.JustMock.Core
 			MethodBody body = method.GetMethodBody();
 			byte[] il = body.GetILAsByteArray();
 
+			string expectedName = String.Format("<'{0}'>g__'{1}'|", method.Name, localMemberName);
+
 			MethodInfo localMethod = null;
 			for (int i = 0; i < il.Length; i++)
 			{
@@ -46,21 +48,10 @@ namespace Telerik.JustMock.Core
 
 					MethodBase methodBase = type.Module.ResolveMethod(token);
 					
-					if(methodBase.DeclaringType == type)
+					if(methodBase.DeclaringType == type && methodBase.Name.StartsWith(expectedName))
 					{
-						var regEx = new System.Text.RegularExpressions.Regex(@"<(?<ContainingMethod>([a-z,A-Z,0-9]+))>g__(?<LocalFunction>([[a-z,A-Z,0-9]+))[|][0-9]+_[0-9]+");
-						System.Text.RegularExpressions.Match match = regEx.Match(methodBase.Name);
-						if (match.Success)
-						{
-							string containigMethod = match.Groups["ContainingMethod"].Value;
-							string localFunction = match.Groups["LocalFunction"].Value;
-							if (method.Name.Equals(containigMethod) && localMemberName.Equals(localFunction))
-							{
-
-								localMethod = methodBase as MethodInfo;
-								break;
-							}
-						}
+						localMethod = methodBase as MethodInfo;
+						break;
 					}
 					if (localMethod != null)
 					{
