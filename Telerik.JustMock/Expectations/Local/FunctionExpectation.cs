@@ -168,7 +168,7 @@ namespace Telerik.JustMock.Expectations
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
 				MethodInfo localFunction = MockingUtil.GetLocalFunction(type, method, localFunctionName);
-				return Mock.NonPublic.Arrange(type, method, localFunction, args);
+				return Mock.NonPublic.Arrange(type, localFunction, args);
 			});
 		}
 
