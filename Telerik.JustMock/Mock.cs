@@ -63,6 +63,9 @@ namespace Telerik.JustMock
 			}
 		}
 
+		/// <summary>
+		/// Arrange and assert expectations on language features like C# 7 local functions.
+		/// </summary>
 		public static ILocalExpectation Local
 		{
 			get
