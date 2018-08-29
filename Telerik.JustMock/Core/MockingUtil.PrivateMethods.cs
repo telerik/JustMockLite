@@ -33,34 +33,31 @@ namespace Telerik.JustMock.Core
 
 		public static MethodInfo GetLocalFunction(Type type, MethodInfo method, string localMemberName)
 		{
-			MethodInfo[] allStaticNonPublicMethods = type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Instance);
-			MethodInfo[] potentialLocalMethods = allStaticNonPublicMethods.Where(m => (m.Name.Contains(method.Name) && m.Name.Contains(localMemberName))).ToArray();
+			MethodBody body = method.GetMethodBody();
+			byte[] il = body.GetILAsByteArray();
 
-			if (potentialLocalMethods.Length == 0)
+			MethodInfo localMethod = null;
+			for (int i = 0; i < il.Length; i++)
 			{
-				throw new MissingMemberException(BuildMissingMethodMessage(type, null, localMemberName));
-			}
-			else if (potentialLocalMethods.Length == 1)
-			{
-				return potentialLocalMethods.First();
-			}
-			else
-			{
-				MethodBody body = method.GetMethodBody();
-				byte[] il = body.GetILAsByteArray();
-
-				MethodInfo localMethod = null;
-				for (int i = 0; i < il.Length; i++)
+				byte opCode = il[i];
+				if (opCode == 0x28) ////System.Reflection.Emit.OpCodes.Call)
 				{
-					byte opCode = il[i];
-					if (opCode == 0x28) ////System.Reflection.Emit.OpCodes.Call)
+					int token = BitConverter.ToInt32(il, i + 1);
+
+					MethodBase methodBase = type.Module.ResolveMethod(token);
+					
+					if(methodBase.DeclaringType == type)
 					{
-						int token = BitConverter.ToInt32(il, i + 1);
-						foreach (var m in potentialLocalMethods)
+						var regEx = new System.Text.RegularExpressions.Regex(@"<(?<ContainingMethod>([a-z,A-Z,0-9]+))>g__(?<LocalFunction>([[a-z,A-Z,0-9]+))[|][0-9]+_[0-9]+");
+						System.Text.RegularExpressions.Match match = regEx.Match(methodBase.Name);
+						if (match.Success)
 						{
-							if (token == m.MetadataToken && m.Name.Contains(localMemberName))
+							string containigMethod = match.Groups["ContainingMethod"].Value;
+							string localFunction = match.Groups["LocalFunction"].Value;
+							if (method.Name.Equals(containigMethod) && localMemberName.Equals(localFunction))
 							{
-								localMethod = m;
+
+								localMethod = methodBase as MethodInfo;
 								break;
 							}
 						}
@@ -70,11 +67,11 @@ namespace Telerik.JustMock.Core
 						break;
 					}
 				}
-				if (localMethod == null)
-					throw new MissingMemberException(BuildMissingMethodMessage(type, null, localMemberName));
-
-				return localMethod;
 			}
+			if (localMethod == null)
+				throw new MissingMemberException(BuildMissingMethodMessage(type, null, localMemberName));
+
+			return localMethod;
 		}
 
 		public static MethodInfo GetMethodWithLocalFunction(object target, string methodName)
