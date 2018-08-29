@@ -63,7 +63,7 @@ namespace Telerik.JustMock.Expectations
 				return Mock.NonPublic.Arrange<TReturn>(target, localMethod, args);
 			});
 		}
-
+		
 		public FuncExpectation<TReturn> Arrange<T, TReturn>(string methodName, string localFunctionName, params object[] args)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
@@ -72,15 +72,48 @@ namespace Telerik.JustMock.Expectations
 				return this.Arrange<TReturn>(type, methodName, localFunctionName, args);
 			});
 		}
+		
+		public FuncExpectation<TReturn> Arrange<T, TReturn>(string methodName, Type[] methodParamTypes, string localFunctionName, params object[] args)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				Type type = typeof(T);
+				return this.Arrange<TReturn>(type, methodName, methodParamTypes, localFunctionName, args);
+			});
+		}
+
+		public FuncExpectation<TReturn> Arrange<T, TReturn>(MethodInfo method, string localFunctionName, params object[] args)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				Type type = typeof(T);
+				return this.Arrange<TReturn>(type, method, localFunctionName, args);
+			});
+		}
 
 		public FuncExpectation<TReturn> Arrange<TReturn>(Type type, string methodName, string localFunctionName, params object[] args)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
 				Type[] emptyParamTypes = new Type[] { };
-				MethodInfo method = MockingUtil.GetMethodWithLocalFunction(type, methodName, emptyParamTypes);
-				MethodInfo localMethod = MockingUtil.GetLocalFunction(type, method, localFunctionName);
+				return this.Arrange<TReturn>(type, methodName, emptyParamTypes, localFunctionName, args);
+			});
+		}
 
+		public FuncExpectation<TReturn> Arrange<TReturn>(Type type, string methodName, Type[] methodParamTypes, string localFunctionName, params object[] args)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				MethodInfo method = MockingUtil.GetMethodWithLocalFunction(type, methodName, methodParamTypes);
+				return this.Arrange<TReturn>(type, method, localFunctionName, args);
+			});
+		}
+
+		public FuncExpectation<TReturn> Arrange<TReturn>(Type type, MethodInfo method, string localFunctionName, params object[] args)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				MethodInfo localMethod = MockingUtil.GetLocalFunction(type, method, localFunctionName);
 				return Mock.NonPublic.Arrange<TReturn>(type, localMethod, args);
 			});
 		}
