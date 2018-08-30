@@ -21,7 +21,10 @@ using Telerik.JustMock.Core.Behaviors;
 using Telerik.JustMock.Core.Context;
 using Telerik.JustMock.Expectations;
 using Telerik.JustMock.Expectations.Abstraction;
+
+#if !PORTABLE
 using Telerik.JustMock.Expectations.Abstraction.Local;
+#endif
 
 namespace Telerik.JustMock
 {
@@ -63,6 +66,7 @@ namespace Telerik.JustMock
 			}
 		}
 
+#if !PORTABLE
 		/// <summary>
 		/// Arrange and assert expectations on language features like C# 7 local functions.
 		/// </summary>
@@ -73,8 +77,9 @@ namespace Telerik.JustMock
 				return ProfilerInterceptor.GuardInternal(() => new LocalExpectation());
 			}
 		}
+#endif
 
-		#region Raise Event methods
+#region Raise Event methods
 
 		/// <summary>
 		/// Raises the specified event. If the event is not mocked and is declared on a C# or VB class
@@ -94,7 +99,7 @@ namespace Telerik.JustMock
 			});
 		}
 
-		#endregion
+#endregion
 
 		/// <summary>
 		/// Removes all existing arrangements within the current mocking context (e.g. current test method).
