@@ -1675,6 +1675,18 @@ namespace Telerik.JustMock.Core
 			if (mock != null)
 			{
 				behaviorsToExecute.AddRange(mock.SupplementaryBehaviors);
+
+#if !PORTABLE
+				// explicitly add recursive mocking behavior for ref returns in order to set invocation result
+				if (invocation.Method.GetReturnType().IsByRef)
+				{
+					behaviorsToExecute.AddRange(
+						mock.FallbackBehaviors.Where(
+							behavior =>
+								behavior is CallOriginalBehavior
+								|| (behavior is RecursiveMockingBehavior && ((RecursiveMockingBehavior)behavior).Type != RecursiveMockingBehaviorType.OnlyDuringAnalysis)));
+				}
+#endif
 			}
 
 			return behaviorsToExecute;
