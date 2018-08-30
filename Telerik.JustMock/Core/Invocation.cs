@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik AD
+ Copyright © 2010-2015,2018 Telerik EAD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -59,6 +59,7 @@ namespace Telerik.JustMock.Core
 		#endregion
 
 		internal bool InArrange { get; set; }
+		internal bool InAssertSet { get; set; }
 		internal bool Recording { get; set; }
 		internal bool RetainBehaviorDuringRecording { get; set; }
 		internal MocksRepository Repository { get; set; }

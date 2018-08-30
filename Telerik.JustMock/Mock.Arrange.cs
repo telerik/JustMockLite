@@ -1,6 +1,6 @@
 ﻿/*
  JustMock Lite
- Copyright © 2010-2015 Telerik AD
+ Copyright © 2010-2015,2018 Telerik EAD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -169,6 +169,26 @@ namespace Telerik.JustMock
 		public static void ArrangeLike<T>(T mock, Expression<Func<T, bool>> functionalSpecification)
 		{
 			ProfilerInterceptor.GuardInternal(() => FunctionalSpecParser.ApplyFunctionalSpec(mock, functionalSpecification, ReturnArranger.Instance));
+		}
+
+		/// <summary>
+		/// Setups the target mock call with user expectation.
+		/// </summary>
+		/// <typeparam name="T">Target type</typeparam>
+		/// <param name="action">
+		/// Target action
+		/// </param>
+		/// <returns>
+		/// Reference to <see cref="ActionExpectation"/> to setup the mock.
+		/// </returns>
+		public static ActionExpectation Arrange<T>(Action action)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				var repo = MockingContext.CurrentRepository;
+				repo.EnableInterception(typeof(T));
+				return repo.Arrange(action, () => new ActionExpectation());
+			});
 		}
 	}
 }

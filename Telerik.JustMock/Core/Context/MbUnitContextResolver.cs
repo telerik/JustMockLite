@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik AD
+ Copyright © 2010-2015 Telerik EAD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -21,10 +21,11 @@ namespace Telerik.JustMock.Core.Context
 {
 	internal class MbUnitContextResolver : HierarchicalTestFrameworkContextResolver
 	{
-		private const string MbUnitAssertionFailedName = "Gallio.Framework.Assertions.AssertionException, gallio";
+		private const string MbUnitTestFixtureAttributeName = "MbUnit.FrameworkTestFixtureAttribute, mbunit";
+		private const string GalioAssertionFailedName = "Gallio.Framework.Assertions.AssertionException, gallio";
 
 		public MbUnitContextResolver()
-			: base(MbUnitAssertionFailedName)
+			: base(GalioAssertionFailedName)
 		{
 			SetupStandardHierarchicalTestStructure(
 				new[] { "Gallio.Framework.Pattern.TestMethodPatternAttribute, gallio" },
@@ -36,7 +37,8 @@ namespace Telerik.JustMock.Core.Context
 
 		public static bool IsAvailable
 		{
-			get { return FindType(MbUnitAssertionFailedName, false) != null; }
+			get { return FindType(MbUnitTestFixtureAttributeName, false) != null
+					&& FindType(GalioAssertionFailedName, false) != null; }
 		}
 	}
 }

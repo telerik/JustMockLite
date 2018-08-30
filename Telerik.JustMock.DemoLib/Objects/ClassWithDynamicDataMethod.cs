@@ -1,6 +1,6 @@
-﻿/*
+/*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2018 Telerik EAD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -16,13 +16,19 @@
 */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace Telerik.JustMock.Core
+namespace Telerik.JustMock.DemoLib.Objects
 {
-	internal class MissingMethodException : Exception
+	public class ClassWithDynamicDataMethod
 	{
+		public bool Method1()
+		{
+			return Method2(new { V1 = "A" });
+		}
+
+		public static bool Method2(dynamic data)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

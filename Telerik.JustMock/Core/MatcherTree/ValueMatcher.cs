@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik AD
+ Copyright © 2010-2015 Telerik EAD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using Telerik.JustMock.Core.Expressions;
 
 namespace Telerik.JustMock.Core.MatcherTree
@@ -82,12 +83,45 @@ namespace Telerik.JustMock.Core.MatcherTree
 						.MakeGenericMethod(elementType);
 					return (bool) sequenceEqualsMethod.Invoke(null, new object[] { this.Value, valueMatcher.Value });
 				}
+                else if (IsAnonymousType(thisType) && IsAnonymousType(otherType))
+                {
+                    var thisTypeProperties = thisType.GetProperties();
+                    var otherTypeProperties = otherType.GetProperties();
+                    if (thisTypeProperties.Length != otherTypeProperties.Length)
+                    {
+                        return false;
+                    }
+                    for (int i = 0; i < thisTypeProperties.Length; ++i)
+                    {
+                        var thisTypeProperty = thisTypeProperties[i];
+                        var otherTypeProperty = otherTypeProperties[i];
+                        if (!thisTypeProperty.Name.Equals(otherTypeProperty.Name) || !thisTypeProperty.PropertyType.Equals(otherTypeProperty.PropertyType))
+                        {
+                            return false;
+                        }
+                        object thisTypePropertyValue = thisTypeProperty.GetGetMethod().Invoke(this.Value, null);
+                        object otherTypePropertyValue = otherTypeProperty.GetGetMethod().Invoke(valueMatcher.Value, null);
+                        if (!thisTypePropertyValue.Equals(otherTypePropertyValue))
+                        {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
 			}
 
 			return false;
 		}
 
-		private static bool IsSystemCollection(Type type)
+        public static Boolean IsAnonymousType(Type type)
+        {
+            return type.GetCustomAttributes(typeof(CompilerGeneratedAttribute), false).Count() > 0
+                 && type.FullName.Contains("AnonymousType");
+        }
+
+
+        private static bool IsSystemCollection(Type type)
 		{
 			return type.FullName.StartsWith("System.Collections.") && type.IsClass && !type.IsAbstract
 				 || type.IsArray;
