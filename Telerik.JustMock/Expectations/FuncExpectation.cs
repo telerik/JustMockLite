@@ -84,5 +84,9 @@ namespace Telerik.JustMock.Expectations
 					return this;
 				});
 		}
-	}
+
+#if !PORTABLE
+		public delegate ref TReturn RefDelegate();
+#endif
+    }
 }

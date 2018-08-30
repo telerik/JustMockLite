@@ -244,6 +244,10 @@
     <Compile Include="AutoMock\Ninject\Syntax\IResolutionRoot.cs" />
     <Compile Include="AutoMock\Ninject\Syntax\ModuleLoadExtensions.cs" />
     <Compile Include="AutoMock\Ninject\Syntax\ResolutionExtensions.cs" />
+    <Compile Include="IPrivateRefReturnAccessor.cs" />
+    <Compile Include="LocalRefHandle.cs" />
+    <Compile Include="Helpers\DynamicTypeHelper.cs" />
+    <Compile Include="LocalRef.cs" />
     <Compile Include="Core\ArrangeMethodAttribute.cs" />
     <Compile Include="Core\Behaviors\CallOriginalBehavior.cs" />
     <Compile Include="Core\Behaviors\CallOriginalObjectMethodsBehavior.cs" />
@@ -540,9 +544,13 @@
     <Compile Include="Core\TransparentProxy\ProxyInvocation.cs" />
     <Compile Include="DebugView.cs" />
     <Compile Include="Expectations\Abstraction\IExpressionContainer.cs" />
+    <Compile Include="Expectations\Abstraction\INonPublicRefReturnExpectation.cs" />
     <Compile Include="Expectations\DynaMock\ExpressionContainer.cs" />
     <Compile Include="Expectations\DynaMock\ExpressionRecorder.cs" />
+    <Compile Include="Expectations\NonPublicRefReturnExpectation.cs" />
     <Compile Include="Helpers\TaskHelper.cs" />
+    <Compile Include="Core\PrivateRefReturnAccessor.cs" />
+    <Compile Include="Core\MockingUtil.PrivateMethods.cs" />
     <Compile Include="Setup\DisableAutomaticRepositoryResetAttribute.cs">
       <SubType>Code</SubType>
     </Compile>

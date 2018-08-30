@@ -31,210 +31,6 @@ namespace Telerik.JustMock.Expectations
 {
 	internal sealed class NonPublicExpectation : INonPublicExpectation
 	{
-		private static bool ReturnTypeMatches(Type returnType, MethodInfo method)
-		{
-			return returnType == null
-				|| method.ReturnType == returnType
-				|| (method.ReturnType.IsPointer && returnType == typeof(IntPtr));
-		}
-
-		private static MethodInfo GetMethodByName(Type type, Type returnType, string memberName, ref object[] args)
-		{
-			if (type.IsProxy())
-				type = type.BaseType;
-
-			var candidateMethods = type.GetAllMethods()
-				.Where(m => m.Name == memberName)
-				.Concat(type.GetAllProperties()
-					.Where(p => p.Name == memberName)
-					.SelectMany(p => new[] { p.GetGetMethod(true), p.GetSetMethod(true) })
-					.Where(m => m != null))
-				.Select(m =>
-					{
-						if (m.IsGenericMethodDefinition
-							&& returnType != typeof(void)
-							&& m.GetGenericArguments().Length == 1
-							&& m.ReturnType.ContainsGenericParameters)
-						{
-							var generics = new Dictionary<Type, Type>();
-							if (MockingUtil.GetGenericsTypesFromActualType(m.ReturnType, returnType, generics))
-							{
-								return m.MakeGenericMethod(generics.Values.Single());
-							}
-						}
-						return m;
-					})
-				.ToArray();
-
-			MethodInfo mockedMethod = null;
-
-			if (candidateMethods.Length == 1)
-			{
-				var singleCandidate = candidateMethods[0];
-				var returnTypeMatches = ReturnTypeMatches(returnType, singleCandidate);
-				var argsIgnored = args == null || args.Length == 0;
-				if (returnTypeMatches && argsIgnored)
-				{
-					mockedMethod = singleCandidate;
-					args = mockedMethod.GetParameters()
-						.Select(p =>
-						{
-							var byref = p.ParameterType.IsByRef;
-							var paramType = byref ? p.ParameterType.GetElementType() : p.ParameterType;
-							if (paramType.IsPointer)
-								paramType = typeof(IntPtr);
-							var isAny = (Expression)typeof(ArgExpr).GetMethod("IsAny").MakeGenericMethod(paramType).Invoke(null, null);
-							if (byref)
-							{
-								isAny = ArgExpr.Ref(isAny);
-							}
-							return isAny;
-						})
-						.ToArray();
-				}
-			}
-
-			if (mockedMethod == null)
-			{
-				mockedMethod = FindMethodBySignature(candidateMethods, returnType, args);
-				if (mockedMethod == null && returnType == typeof(void))
-					mockedMethod = FindMethodBySignature(candidateMethods, null, args);
-			}
-
-			if (mockedMethod == null)
-			{
-				var mockedProperty = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
-					.FirstOrDefault(property => property.Name == memberName);
-				if (mockedProperty != null)
-				{
-					var getter = mockedProperty.GetGetMethod(true);
-					if (getter != null && getter.ArgumentsMatchSignature(args))
-						mockedMethod = getter;
-
-					if (mockedMethod == null)
-					{
-						var setter = mockedProperty.GetSetMethod(true);
-						if (setter != null && setter.ArgumentsMatchSignature(args))
-							mockedMethod = setter;
-					}
-
-					if (mockedMethod == null)
-						throw new MissingMemberException(BuildMissingMethodMessage(type, mockedProperty, memberName));
-				}
-			}
-
-			if (mockedMethod == null)
-				throw new MissingMemberException(BuildMissingMethodMessage(type, null, memberName));
-
-			if (mockedMethod.ContainsGenericParameters)
-			{
-				mockedMethod = MockingUtil.GetRealMethodInfoFromGeneric(mockedMethod, args);
-			}
-
-			if (mockedMethod.DeclaringType != mockedMethod.ReflectedType)
-			{
-				mockedMethod = GetMethodByName(mockedMethod.DeclaringType, returnType, memberName, ref args);
-			}
-
-			return mockedMethod;
-		}
-
-		private static string BuildMissingMethodMessage(Type type, PropertyInfo property, string memberName)
-		{
-			var sb = new StringBuilder();
-			sb.AppendLine(
-				property != null
-				? String.Format("Found property '{0}' on type '{1}' but the passed arguments match the signature neither of the getter nor the setter.", memberName, type)
-				: String.Format("Method '{0}' with the given signature was not found on type {1}", memberName, type));
-
-			var methods = new Dictionary<MethodInfo, string>();
-
-			if (property != null)
-			{
-				var getter = property.GetGetMethod(true);
-				if (getter != null)
-					methods.Add(getter, property.Name);
-				var setter = property.GetSetMethod(true);
-				if (setter != null)
-					methods.Add(setter, property.Name);
-			}
-
-			foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static).Where(m => m.Name == memberName))
-			{
-				methods.Add(method, method.Name);
-			}
-
-			if (methods.Count == 0)
-			{
-				sb.AppendLine("No methods or properties found with the given name.");
-			}
-			else
-			{
-				sb.AppendLine("Review the available methods in the message below and optionally paste the appropriate arrangement snippet.");
-				int i = 0;
-				foreach (var kvp in methods)
-				{
-					sb.AppendLine("----------");
-					var method = kvp.Key;
-					sb.AppendLine(String.Format("Method {0}: {1}", i + 1, method));
-					sb.AppendLine("C#: " + FormatMethodArrangementExpression(kvp.Value, method, SourceLanguage.CSharp));
-					sb.AppendLine("VB: " + FormatMethodArrangementExpression(kvp.Value, method, SourceLanguage.VisualBasic));
-					i++;
-				}
-			}
-
-			return sb.ToString();
-		}
-
-		private static string FormatMethodArrangementExpression(string memberName, MethodBase method, SourceLanguage language)
-		{
-			return String.Format("Mock.NonPublic.Arrange{0}({1}\"{2}\"{3}){4}",
-				FormatGenericArg(method.GetReturnType(), language),
-				method.IsStatic ? String.Empty : "mock, ",
-				memberName,
-				String.Join("", method.GetParameters().Select(p => ", " + FormatMethodParameterMatcher(p.ParameterType, language)).ToArray()),
-				language == SourceLanguage.CSharp ? ";" : "");
-		}
-
-		private static string FormatMethodParameterMatcher(Type paramType, SourceLanguage language)
-		{
-			if (paramType.IsByRef)
-			{
-				return String.Format("ArgExpr.Ref({0})", FormatMethodParameterMatcher(paramType.GetElementType(), language));
-			}
-			else
-			{
-				return String.Format("ArgExpr.IsAny{0}()", FormatGenericArg(paramType, language));
-			}
-		}
-
-		private static string FormatGenericArg(Type type, SourceLanguage language)
-		{
-			if (type == typeof(void))
-			{
-				return String.Empty;
-			}
-			switch (language)
-			{
-				case SourceLanguage.CSharp:
-					return String.Format("<{0}>", type.GetShortCSharpName());
-				case SourceLanguage.VisualBasic:
-					return String.Format("(Of {0})", type.GetShortVisualBasicName());
-				default:
-					throw new ArgumentOutOfRangeException("language");
-			}
-		}
-
-		private static MethodInfo FindMethodBySignature(IEnumerable<MethodInfo> candidates, Type returnType, object[] args)
-		{
-			return candidates.FirstOrDefault(method => method.ArgumentsMatchSignature(args) && ReturnTypeMatches(returnType, method));
-		}
-
-		private static string GetAssertionMessage(object[] args)
-		{
-			return null;
-		}
-
 		public ActionExpectation Arrange(object target, string memberName, params object[] args)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
@@ -244,7 +40,7 @@ namespace Telerik.JustMock.Expectations
 					if (mixin != null)
 						type = mixin.DeclaringType;
 
-					var method = GetMethodByName(type, typeof(void), memberName, ref args);
+					var method = MockingUtil.GetMethodByName(type, typeof(void), memberName, ref args);
 					return MockingContext.CurrentRepository.Arrange(target, method, args, () => new ActionExpectation());
 				});
 		}
@@ -263,7 +59,7 @@ namespace Telerik.JustMock.Expectations
 					if (mixin != null)
 						type = mixin.DeclaringType;
 
-					var method = GetMethodByName(type, typeof(TReturn), memberName, ref args);
+					var method = MockingUtil.GetMethodByName(type, typeof(TReturn), memberName, ref args);
 					return MockingContext.CurrentRepository.Arrange(target, method, args, () => new FuncExpectation<TReturn>());
 				});
 		}
@@ -282,8 +78,8 @@ namespace Telerik.JustMock.Expectations
 					if (mixin != null)
 						type = mixin.DeclaringType;
 
-					var message = GetAssertionMessage(args);
-					var method = GetMethodByName(type, typeof(TReturn), memberName, ref args);
+					var message = MockingUtil.GetAssertionMessage(args);
+					var method = MockingUtil.GetMethodByName(type, typeof(TReturn), memberName, ref args);
 					MockingContext.CurrentRepository.AssertMethodInfo(message, target, method, args, null);
 				});
 		}
@@ -292,7 +88,7 @@ namespace Telerik.JustMock.Expectations
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
-					var message = GetAssertionMessage(args);
+					var message = MockingUtil.GetAssertionMessage(args);
 					MockingContext.CurrentRepository.AssertMethodInfo(message, target, method, args, null);
 				});
 		}
@@ -306,8 +102,8 @@ namespace Telerik.JustMock.Expectations
 					if (mixin != null)
 						type = mixin.DeclaringType;
 
-					var message = GetAssertionMessage(args);
-					var method = GetMethodByName(type, typeof(void), memberName, ref args);
+					var message = MockingUtil.GetAssertionMessage(args);
+					var method = MockingUtil.GetMethodByName(type, typeof(void), memberName, ref args);
 					MockingContext.CurrentRepository.AssertMethodInfo(message, target, method, args, null);
 				});
 		}
@@ -321,8 +117,8 @@ namespace Telerik.JustMock.Expectations
 					if (mixin != null)
 						type = mixin.DeclaringType;
 
-					var message = GetAssertionMessage(args);
-					var method = GetMethodByName(type, typeof(TReturn), memberName, ref args);
+					var message = MockingUtil.GetAssertionMessage(args);
+					var method = MockingUtil.GetMethodByName(type, typeof(TReturn), memberName, ref args);
 					MockingContext.CurrentRepository.AssertMethodInfo(message, target, method, args, occurs);
 				});
 		}
@@ -331,7 +127,7 @@ namespace Telerik.JustMock.Expectations
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
-					var message = GetAssertionMessage(args);
+					var message = MockingUtil.GetAssertionMessage(args);
 					MockingContext.CurrentRepository.AssertMethodInfo(message, target, method, args, occurs);
 				});
 		}
@@ -345,8 +141,8 @@ namespace Telerik.JustMock.Expectations
 					if (mixin != null)
 						type = mixin.DeclaringType;
 
-					var message = GetAssertionMessage(args);
-					var method = GetMethodByName(type, typeof(void), memberName, ref args);
+					var message = MockingUtil.GetAssertionMessage(args);
+					var method = MockingUtil.GetMethodByName(type, typeof(void), memberName, ref args);
 					MockingContext.CurrentRepository.AssertMethodInfo(message, target, method, args, occurs);
 				});
 		}
@@ -366,7 +162,7 @@ namespace Telerik.JustMock.Expectations
 				if (mixin != null)
 					type = mixin.DeclaringType;
 
-				var method = GetMethodByName(type, typeof(void), memberName, ref args);
+				var method = MockingUtil.GetMethodByName(type, typeof(void), memberName, ref args);
 				return MockingContext.CurrentRepository.GetTimesCalledFromMethodInfo(target, method, args);
 			});
 		}
@@ -377,7 +173,7 @@ namespace Telerik.JustMock.Expectations
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 				{
-					var method = GetMethodByName(typeof(T), typeof(TReturn), memberName, ref args);
+					var method = MockingUtil.GetMethodByName(typeof(T), typeof(TReturn), memberName, ref args);
 					return MockingContext.CurrentRepository.Arrange(null, method, args, () => new FuncExpectation<TReturn>());
 				});
 		}
@@ -386,7 +182,7 @@ namespace Telerik.JustMock.Expectations
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 				{
-					var method = GetMethodByName(typeof(T), typeof(void), memberName, ref args);
+					var method = MockingUtil.GetMethodByName(typeof(T), typeof(void), memberName, ref args);
 					return MockingContext.CurrentRepository.Arrange(null, method, args, () => new ActionExpectation());
 				});
 		}
@@ -395,7 +191,7 @@ namespace Telerik.JustMock.Expectations
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 				{
-					var method = GetMethodByName(targetType, typeof(TReturn), memberName, ref args);
+					var method = MockingUtil.GetMethodByName(targetType, typeof(TReturn), memberName, ref args);
 					return MockingContext.CurrentRepository.Arrange(null, method, args, () => new FuncExpectation<TReturn>());
 				});
 		}
@@ -409,7 +205,7 @@ namespace Telerik.JustMock.Expectations
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 				{
-					var method = GetMethodByName(targetType, typeof(void), memberName, ref args);
+					var method = MockingUtil.GetMethodByName(targetType, typeof(void), memberName, ref args);
 					return MockingContext.CurrentRepository.Arrange(null, method, args, () => new ActionExpectation());
 				});
 		}
@@ -423,8 +219,8 @@ namespace Telerik.JustMock.Expectations
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
-					var message = GetAssertionMessage(args);
-					var method = GetMethodByName(typeof(T), typeof(void), memberName, ref args);
+					var message = MockingUtil.GetAssertionMessage(args);
+					var method = MockingUtil.GetMethodByName(typeof(T), typeof(void), memberName, ref args);
 					MockingContext.CurrentRepository.AssertMethodInfo(message, null, method, args, occurs);
 				});
 		}
@@ -433,7 +229,7 @@ namespace Telerik.JustMock.Expectations
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
-					var message = GetAssertionMessage(args);
+					var message = MockingUtil.GetAssertionMessage(args);
 					MockingContext.CurrentRepository.AssertMethodInfo(message, null, method, args, occurs);
 				});
 		}
@@ -442,8 +238,8 @@ namespace Telerik.JustMock.Expectations
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
-					var message = GetAssertionMessage(args);
-					var method = GetMethodByName(typeof(T), typeof(TReturn), memberName, ref args);
+					var message = MockingUtil.GetAssertionMessage(args);
+					var method = MockingUtil.GetMethodByName(typeof(T), typeof(TReturn), memberName, ref args);
 					MockingContext.CurrentRepository.AssertMethodInfo(message, null, method, args, occurs);
 				});
 		}
@@ -452,8 +248,8 @@ namespace Telerik.JustMock.Expectations
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
-					var message = GetAssertionMessage(args);
-					var method = GetMethodByName(typeof(T), typeof(void), memberName, ref args);
+					var message = MockingUtil.GetAssertionMessage(args);
+					var method = MockingUtil.GetMethodByName(typeof(T), typeof(void), memberName, ref args);
 					MockingContext.CurrentRepository.AssertMethodInfo(message, null, method, args, null);
 				});
 		}
@@ -462,7 +258,7 @@ namespace Telerik.JustMock.Expectations
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
-					var message = GetAssertionMessage(args);
+					var message = MockingUtil.GetAssertionMessage(args);
 					MockingContext.CurrentRepository.AssertMethodInfo(message, null, method, args, null);
 				});
 		}
@@ -471,8 +267,8 @@ namespace Telerik.JustMock.Expectations
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
-					var message = GetAssertionMessage(args);
-					var method = GetMethodByName(typeof(T), typeof(TReturn), memberName, ref args);
+					var message = MockingUtil.GetAssertionMessage(args);
+					var method = MockingUtil.GetMethodByName(typeof(T), typeof(TReturn), memberName, ref args);
 					MockingContext.CurrentRepository.AssertMethodInfo(message, null, method, args, null);
 				});
 		}
@@ -481,8 +277,8 @@ namespace Telerik.JustMock.Expectations
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
-					var message = GetAssertionMessage(args);
-					var method = GetMethodByName(targetType, typeof(void), memberName, ref args);
+					var message = MockingUtil.GetAssertionMessage(args);
+					var method = MockingUtil.GetMethodByName(targetType, typeof(void), memberName, ref args);
 					MockingContext.CurrentRepository.AssertMethodInfo(message, null, method, args, occurs);
 				});
 		}
@@ -491,8 +287,8 @@ namespace Telerik.JustMock.Expectations
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
-					var message = GetAssertionMessage(args);
-					var method = GetMethodByName(targetType, typeof(TReturn), memberName, ref args);
+					var message = MockingUtil.GetAssertionMessage(args);
+					var method = MockingUtil.GetMethodByName(targetType, typeof(TReturn), memberName, ref args);
 					MockingContext.CurrentRepository.AssertMethodInfo(message, null, method, args, occurs);
 				});
 		}
@@ -501,8 +297,8 @@ namespace Telerik.JustMock.Expectations
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
-					var message = GetAssertionMessage(args);
-					var method = GetMethodByName(targetType, typeof(void), memberName, ref args);
+					var message = MockingUtil.GetAssertionMessage(args);
+					var method = MockingUtil.GetMethodByName(targetType, typeof(void), memberName, ref args);
 					MockingContext.CurrentRepository.AssertMethodInfo(message, null, method, args, null);
 				});
 		}
@@ -511,8 +307,8 @@ namespace Telerik.JustMock.Expectations
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 				{
-					var message = GetAssertionMessage(args);
-					var method = GetMethodByName(targetType, typeof(TReturn), memberName, ref args);
+					var message = MockingUtil.GetAssertionMessage(args);
+					var method = MockingUtil.GetMethodByName(targetType, typeof(TReturn), memberName, ref args);
 					MockingContext.CurrentRepository.AssertMethodInfo(message, null, method, args, null);
 				});
 		}
@@ -528,7 +324,7 @@ namespace Telerik.JustMock.Expectations
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
-				var method = GetMethodByName(type, typeof(void), memberName, ref args);
+				var method = MockingUtil.GetMethodByName(type, typeof(void), memberName, ref args);
 				return MockingContext.CurrentRepository.GetTimesCalledFromMethodInfo(null, method, args);
 			});
 		}
@@ -626,5 +422,12 @@ namespace Telerik.JustMock.Expectations
 				MockingContext.CurrentRepository.Assert(message, null, ((IExpressionContainer)dynamicExpression).ToLambda(), args, occurs)
 			);
 		}
+
+#if !PORTABLE
+		public INonPublicRefReturnExpectation RefReturn
+		{
+			get { return ProfilerInterceptor.GuardInternal(() => new NonPublicRefReturnExpectation()); }
+		}
+#endif
 	}
 }

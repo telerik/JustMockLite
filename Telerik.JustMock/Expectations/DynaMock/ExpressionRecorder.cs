@@ -79,7 +79,7 @@ namespace Telerik.JustMock.Expectations.DynaMock
 		{
 			var wrapper = this.Value as ExpressionContainer;
 			var valueExpr = wrapper.Expression;
-			var property = PrivateAccessor.ResolveProperty(valueExpr.Type, memberName, ignoreCase, new object[0], !wrapper.IsStatic);
+			var property = MockingUtil.ResolveProperty(valueExpr.Type, memberName, ignoreCase, new object[0], !wrapper.IsStatic);
 			if (property == null)
 				ThrowMissingMemberException(valueExpr.Type, memberName);
 
@@ -96,7 +96,7 @@ namespace Telerik.JustMock.Expectations.DynaMock
 		private DynamicMetaObject DoBindSetMember(ExpressionContainer wrapper, Type returnType, string memberName, bool ignoreCase, DynamicMetaObject value)
 		{
 			var valueExpr = wrapper.Expression;
-			var property = PrivateAccessor.ResolveProperty(valueExpr.Type, memberName, ignoreCase, new object[0], !wrapper.IsStatic, value.Value, getter: false);
+			var property = MockingUtil.ResolveProperty(valueExpr.Type, memberName, ignoreCase, new object[0], !wrapper.IsStatic, value.Value, getter: false);
 			if (property == null)
 				ThrowMissingMemberException(valueExpr.Type, memberName);
 
@@ -109,7 +109,7 @@ namespace Telerik.JustMock.Expectations.DynaMock
 		{
 			var wrapper = this.Value as ExpressionContainer;
 			var valueExpr = wrapper.Expression;
-			var property = PrivateAccessor.ResolveProperty(valueExpr.Type, "Item", false,
+			var property = MockingUtil.ResolveProperty(valueExpr.Type, "Item", false,
 				indexes.Select(i => i.Value).ToArray(), !wrapper.IsStatic);
 			if (property == null)
 				ThrowMissingMemberException(valueExpr.Type, "Item");
@@ -122,7 +122,7 @@ namespace Telerik.JustMock.Expectations.DynaMock
 		{
 			var wrapper = this.Value as ExpressionContainer;
 			var valueExpr = wrapper.Expression;
-			var property = PrivateAccessor.ResolveProperty(valueExpr.Type, "Item", false,
+			var property = MockingUtil.ResolveProperty(valueExpr.Type, "Item", false,
 				indexes.Select(i => i.Value).ToArray(), !wrapper.IsStatic, value.Value, getter: false);
 			if (property == null)
 				ThrowMissingMemberException(valueExpr.Type, "Item");
