@@ -304,6 +304,9 @@
     <Compile Include="..\Telerik.JustMock\Core\MockingUtil.cs">
       <Link>Core\MockingUtil.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MockingUtil.PrivateMethods.cs">
+      <Link>Core\MockingUtil.PrivateMethods.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Core\MockMixin.cs">
       <Link>Core\MockMixin.cs</Link>
     </Compile>
@@ -405,6 +408,18 @@
     </Compile>
     <Compile Include="..\Telerik.JustMock\Expectations\FuncExpectation.partial.cs">
       <Link>Expectations\FuncExpectation.partial.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Local\FunctionExpectation.cs">
+      <Link>Expectations\Local\FunctionExpectation.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Local\IFunctionExpectation.cs">
+      <Link>Expectations\Local\IFunctionExpectation.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Local\ILocalExpectation.cs">
+      <Link>Expectations\Local\ILocalExpectation.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Local\LocalExpectation.cs">
+      <Link>Expectations\Local\LocalExpectation.cs</Link>
     </Compile>
     <Compile Include="..\Telerik.JustMock\Expectations\NonPublicExpectation.cs">
       <Link>Expectations\NonPublicExpectation.cs</Link>
