@@ -60,7 +60,9 @@ namespace Telerik.JustMock.Core
 				}
 			}
 			if (localMethod == null)
-				throw new MissingMemberException(BuildMissingMethodMessage(type, null, localMemberName));
+			{
+				throw new MissingMemberException(BuildMissingLocalFunctionMessage(type, method, localMemberName));
+			}
 
 			return localMethod;
 		}
@@ -91,6 +93,14 @@ namespace Telerik.JustMock.Core
 				throw new MissingMemberException(MockingUtil.BuildMissingMethodMessage(type, null, methodName));
 			}
 			return method;
+		}
+
+		public static string BuildMissingLocalFunctionMessage(Type type, MethodInfo method, string localFunctionName)
+		{
+			var sb = new StringBuilder();
+			sb.AppendLine(String.Format("C# 7 local function '{0}' with the given signature was not found inside method '{1}' on type '{2}'.", localFunctionName, method.Name, type));
+			sb.AppendLine("Note that mocking C# 7 local functions that are declared but never called is not supported.");
+			return sb.ToString();
 		}
 
 		public static string BuildMissingMethodMessage(Type type, PropertyInfo property, string memberName)
