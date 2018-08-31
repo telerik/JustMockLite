@@ -280,12 +280,14 @@ namespace Telerik.JustMock.Expectations
 				type = type.BaseType;
 			return type;
 		}
+
 		PropertyInfo GetNonPublicProperty(Type type, string propertyName)
 		{
 			var mockedProperty = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
 				.FirstOrDefault(property => property.Name == propertyName);
 			return mockedProperty;
 		}
+
 		private static string BuildMissingPropertyMessage(Type type, string propertyName)
 		{
 			return String.Format("Property '{0}' was not found on type '{1}'.", propertyName, type);

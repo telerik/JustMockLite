@@ -84,15 +84,16 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <summary>
 		/// Arranges a non-public static property setter contained by type parameter "T" for mocking.
 		/// </summary>
+		/// <typeparam name="T">Type that contains the non-public static property</typeparam>
 		/// <param name="propertyName">Property name</param>
 		/// <param name="value">Property value</param>
 		/// <returns>Reference to setup actions calls</returns>
 		ActionExpectation ArrangeSet<T>(string propertyName, object value);
 
 		/// <summary>
-		/// Arranges a non-public static property setter for mocking.
+		/// Arranges a non-public static property setter contained by "type" for mocking.
 		/// </summary>
-		/// <param name="type">Type that contains the property</param>
+		/// <param name="type">Type that contains the non-public static property</param>
 		/// <param name="propertyName">Property name</param>
 		/// <param name="value">Property value</param>
 		/// <returns>Reference to setup actions calls</returns>
