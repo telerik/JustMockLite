@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015, 2018 Telerik EAD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -72,6 +72,33 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <param name="args">Method arguments</param>
 		/// <returns>Reference to setup actions calls</returns>
 		FuncExpectation<TReturn> Arrange<TReturn>(object target, MethodInfo method, params object[] args);
+
+		/// <summary>
+		/// Arranges a non-public property setter for mocking.
+		/// </summary>
+		/// <param name="target">Target instance</param>
+		/// <param name="propertyName">Property name</param>
+		/// <param name="value">Property value</param>
+		/// <returns>Reference to setup actions calls</returns>
+		ActionExpectation ArrangeSet(object target, string propertyName, object value);
+
+		/// <summary>
+		/// Arranges a non-public static property setter contained by type parameter "T" for mocking.
+		/// </summary>
+		/// <typeparam name="T">Type that contains the non-public static property</typeparam>
+		/// <param name="propertyName">Property name</param>
+		/// <param name="value">Property value</param>
+		/// <returns>Reference to setup actions calls</returns>
+		ActionExpectation ArrangeSet<T>(string propertyName, object value);
+
+		/// <summary>
+		/// Arranges a non-public static property setter contained by "type" for mocking.
+		/// </summary>
+		/// <param name="type">Type that contains the non-public static property</param>
+		/// <param name="propertyName">Property name</param>
+		/// <param name="value">Property value</param>
+		/// <returns>Reference to setup actions calls</returns>
+		ActionExpectation ArrangeSet(Type type, string propertyName, object value);
 
 		/// <summary>
 		/// Asserts the specified member that it is called as expected.

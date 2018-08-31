@@ -70,6 +70,59 @@ namespace Telerik.JustMock.Expectations
 		{
 			return ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.Arrange(target, method, args, () => new FuncExpectation<TReturn>()));
 		}
+		
+		Type GetTypeFromInstance(object instance)
+		{
+			Type type = instance.GetType();
+			if (type.IsProxy())
+				type = type.BaseType;
+			return type;
+		}
+
+		PropertyInfo GetNonPublicProperty(Type type, string propertyName)
+		{
+			var mockedProperty = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
+				.FirstOrDefault(property => property.Name == propertyName);
+			return mockedProperty;
+		}
+
+		private static string BuildMissingPropertyMessage(Type type, string propertyName)
+		{
+			return String.Format("Property '{0}' was not found on type '{1}'.", propertyName, type);
+		}
+
+		public ActionExpectation ArrangeSet(object target, string propertyName, object value)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				Type type = GetTypeFromInstance(target);
+				if (GetNonPublicProperty(type, propertyName) == null)
+				{
+					throw new MissingMemberException(BuildMissingPropertyMessage(type, propertyName));
+				}
+				return Arrange(target, propertyName, value);
+			});
+		}
+
+		public ActionExpectation ArrangeSet<T>(string propertyName, object value)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				return ArrangeSet(typeof(T), propertyName, value);
+			});
+		}
+
+		public ActionExpectation ArrangeSet(Type type, string propertyName, object value)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				if (GetNonPublicProperty(type, propertyName) == null)
+				{
+					throw new MissingMemberException(BuildMissingPropertyMessage(type, propertyName));
+				}
+				return Arrange(type, propertyName, value);
+			});
+		}
 
 		public void Assert<TReturn>(object target, string memberName, params object[] args)
 		{
