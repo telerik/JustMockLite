@@ -293,7 +293,7 @@ namespace Telerik.JustMock.Expectations
 
 		public ActionExpectation ArrangeSet(object target, string propertyName, object value)
 		{
-			ProfilerInterceptor.GuardInternal(() =>
+			return ProfilerInterceptor.GuardInternal(() =>
 			{
 				Type type = GetTypeFromInstance(target);
 				if (GetNonPublicProperty(type, propertyName) == null)
@@ -306,14 +306,14 @@ namespace Telerik.JustMock.Expectations
 
 		public ActionExpectation ArrangeSet<T>(string propertyName, object value)
 		{
-			ProfilerInterceptor.GuardInternal(() =>
+			return ProfilerInterceptor.GuardInternal(() =>
 			{
 				return ArrangeSet(typeof(T), propertyName, value);
 			});
 		}
 		public ActionExpectation ArrangeSet(Type type, string propertyName, object value)
 		{
-			ProfilerInterceptor.GuardInternal(() =>
+			return ProfilerInterceptor.GuardInternal(() =>
 			{
 				if (GetNonPublicProperty(type, propertyName) == null)
 				{
