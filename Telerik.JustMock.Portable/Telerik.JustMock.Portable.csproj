@@ -304,6 +304,9 @@
     <Compile Include="..\Telerik.JustMock\Core\MockingUtil.cs">
       <Link>Core\MockingUtil.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MockingUtil.PrivateMethods.cs">
+      <Link>Core\MockingUtil.PrivateMethods.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Core\MockMixin.cs">
       <Link>Core\MockMixin.cs</Link>
     </Compile>
@@ -330,9 +333,6 @@
     </Compile>
     <Compile Include="..\Telerik.JustMock\Core\ThreadLocalProperty.cs">
       <Link>Core\ThreadLocalProperty.cs</Link>
-    </Compile>
-    <Compile Include="..\Telerik.JustMock\Core\MockingUtil.PrivateMethods.cs">
-      <Link>Core\MockingUtil.PrivateMethods.cs</Link>
     </Compile>
     <Compile Include="..\Telerik.JustMock\DebugView.cs">
       <Link>DebugView.cs</Link>

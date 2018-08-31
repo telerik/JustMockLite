@@ -53,6 +53,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <returns>Reference to setup actions calls</returns>
 		ActionExpectation Arrange(object target, MethodInfo method, params object[] args);
 
+
 		/// <summary>
 		/// Arranges a method for mocking.
 		/// </summary>

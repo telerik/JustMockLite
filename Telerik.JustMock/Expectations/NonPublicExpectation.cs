@@ -27,10 +27,12 @@ using Telerik.JustMock.Core.Context;
 using Telerik.JustMock.Expectations.Abstraction;
 using Telerik.JustMock.Expectations.DynaMock;
 
+
 namespace Telerik.JustMock.Expectations
 {
 	internal sealed class NonPublicExpectation : INonPublicExpectation
 	{
+
 		public ActionExpectation Arrange(object target, string memberName, params object[] args)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>

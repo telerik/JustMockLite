@@ -545,9 +545,13 @@
     <Compile Include="DebugView.cs" />
     <Compile Include="Expectations\Abstraction\IExpressionContainer.cs" />
     <Compile Include="Expectations\Abstraction\INonPublicRefReturnExpectation.cs" />
+    <Compile Include="Expectations\Local\IFunctionExpectation.cs" />
+    <Compile Include="Expectations\Local\ILocalExpectation.cs" />
     <Compile Include="Expectations\DynaMock\ExpressionContainer.cs" />
     <Compile Include="Expectations\DynaMock\ExpressionRecorder.cs" />
     <Compile Include="Expectations\NonPublicRefReturnExpectation.cs" />
+    <Compile Include="Expectations\Local\FunctionExpectation.cs" />
+    <Compile Include="Expectations\Local\LocalExpectation.cs" />
     <Compile Include="Helpers\TaskHelper.cs" />
     <Compile Include="Core\PrivateRefReturnAccessor.cs" />
     <Compile Include="Core\MockingUtil.PrivateMethods.cs" />
