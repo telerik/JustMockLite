@@ -311,6 +311,7 @@ namespace Telerik.JustMock.Expectations
 				return ArrangeSet(typeof(T), propertyName, value);
 			});
 		}
+
 		public ActionExpectation ArrangeSet(Type type, string propertyName, object value)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>

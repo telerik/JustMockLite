@@ -73,7 +73,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		FuncExpectation<TReturn> Arrange<TReturn>(object target, MethodInfo method, params object[] args);
 
 		/// <summary>
-		/// Arranges a property for mocking.
+		/// Arranges a non-public property setter for mocking.
 		/// </summary>
 		/// <param name="target">Target instance</param>
 		/// <param name="propertyName">Property name</param>
@@ -82,7 +82,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		ActionExpectation ArrangeSet(object target, string propertyName, object value);
 
 		/// <summary>
-		/// Arranges a static property contained by type parameter "T" for mocking.
+		/// Arranges a non-public static property setter contained by type parameter "T" for mocking.
 		/// </summary>
 		/// <param name="propertyName">Property name</param>
 		/// <param name="value">Property value</param>
@@ -90,7 +90,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		ActionExpectation ArrangeSet<T>(string propertyName, object value);
 
 		/// <summary>
-		/// Arranges a static property for mocking.
+		/// Arranges a non-public static property setter for mocking.
 		/// </summary>
 		/// <param name="type">Type that contains the property</param>
 		/// <param name="propertyName">Property name</param>
