@@ -272,32 +272,22 @@ namespace Telerik.JustMock.Core
 				type = type.BaseType;
 			}
 
-			MethodBody body = method.GetMethodBody();
-			byte[] il = body.GetILAsByteArray();
-
 			string expectedName = String.Format("<{0}>g__{1}|", method.Name, localMemberName);
 
+			MethodBody body = method.GetMethodBody();
+			var disasembledBody = MethodBodyDisassembler.DisassembleMethodInfo(method);
+			var callInstructions = disasembledBody.Where(instr => instr.OpCode == System.Reflection.Emit.OpCodes.Call).ToArray();
 			MethodInfo localMethod = null;
-			for (int i = 0; i < il.Length; i++)
+			foreach (var instruction in callInstructions)
 			{
-				byte opCode = il[i];
-				if (System.Reflection.Emit.OpCodes.Call.Value == opCode)
+				MethodBase methodBase = type.Module.ResolveMethod(instruction.Operand.Int);
+				if (methodBase != null && methodBase.DeclaringType == type && methodBase.Name.StartsWith(expectedName))
 				{
-					int token = BitConverter.ToInt32(il, i + 1);
-
-					MethodBase methodBase = type.Module.ResolveMethod(token);
-					
-					if(methodBase.DeclaringType == type && methodBase.Name.StartsWith(expectedName))
-					{
-						localMethod = methodBase as MethodInfo;
-						break;
-					}
-					if (localMethod != null)
-					{
-						break;
-					}
+					localMethod = methodBase as MethodInfo;
+					break;
 				}
 			}
+
 			if (localMethod == null)
 			{
 				throw new MissingMemberException(BuildMissingLocalFunctionMessage(type, method, localMemberName));
