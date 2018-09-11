@@ -105,6 +105,7 @@
     <Compile Include="FooInternalSealed.cs" />
     <Compile Include="IFooInternal.cs" />
     <Compile Include="JustMock.cs" />
+    <Compile Include="LocalFunctions.cs" />
     <Compile Include="Objects\Configuration.cs" />
     <Compile Include="ConfigurationService.cs" />
     <Compile Include="Objects\ILogger.cs" />
