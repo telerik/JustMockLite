@@ -244,6 +244,7 @@
     <Compile Include="AutoMock\Ninject\Syntax\IResolutionRoot.cs" />
     <Compile Include="AutoMock\Ninject\Syntax\ModuleLoadExtensions.cs" />
     <Compile Include="AutoMock\Ninject\Syntax\ResolutionExtensions.cs" />
+    <Compile Include="Core\MockingUtils.MethodBodyDisassembler.cs" />
     <Compile Include="IPrivateRefReturnAccessor.cs" />
     <Compile Include="LocalRefHandle.cs" />
     <Compile Include="Helpers\DynamicTypeHelper.cs" />
