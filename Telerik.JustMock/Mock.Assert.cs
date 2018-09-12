@@ -1,6 +1,6 @@
 ﻿/*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015,2018 Telerik EAD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -172,7 +172,7 @@ namespace Telerik.JustMock
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 			{
-				MockingContext.CurrentRepository.AssertAction(message, action);
+				MockingContext.CurrentRepository.AssertSetAction(message, action);
 			});
 		}
 
@@ -185,7 +185,7 @@ namespace Telerik.JustMock
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 			{
-				MockingContext.CurrentRepository.AssertAction(message, action, null, occurs);
+				MockingContext.CurrentRepository.AssertSetAction(message, action, null, occurs);
 			});
 		}
 
@@ -198,7 +198,7 @@ namespace Telerik.JustMock
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 			{
-				MockingContext.CurrentRepository.AssertAction(message, action, args, null);
+				MockingContext.CurrentRepository.AssertSetAction(message, action, args, null);
 			});
 		}
 
@@ -212,7 +212,7 @@ namespace Telerik.JustMock
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 			{
-				MockingContext.CurrentRepository.AssertAction(message, action, args, occurs);
+				MockingContext.CurrentRepository.AssertSetAction(message, action, args, occurs);
 			});
 		}
 

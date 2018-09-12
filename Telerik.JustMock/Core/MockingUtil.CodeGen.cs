@@ -132,7 +132,23 @@ namespace Telerik.JustMock.Core
 			var method = CreateDynamicMethodWithVisibilityChecks(returnType, parameterTypes, ilGen);
 			return Delegate.CreateDelegate(delegateType, method);
 #else
-			var method = new DynamicMethod("DynamicMethod_" + Guid.NewGuid().ToString("N"), returnType, parameterTypes, true);
+			// If you try to call the DynamicMethod constructor specifying a ByRef type
+			// as the return value it throws NotSupportedException with the following message:
+			// "The return Type contains some invalid type(i.e. null, ByRef)". In order to make
+			// it working we are applying the following simple workaround:
+			//   1. Pass a non-ref type to constructor and create dynamic method instance
+			//   2. Using reflection change the value of private field 'm_returnType' of the
+			//      newly created dynamic method to be ByRef type
+			Type dynamicReturnType = (returnType.IsByRef) ? returnType.GetElementType() : returnType;
+
+			var method = new DynamicMethod("DynamicMethod_" + Guid.NewGuid().ToString("N"), dynamicReturnType, parameterTypes, true);
+
+			if (returnType.IsByRef)
+			{
+				method.GetType().GetField("m_returnType", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+					.SetValue(method, returnType);
+			}
+
 			ilGen(method.GetILGenerator());
 			return method.CreateDelegate(delegateType);
 #endif
@@ -172,6 +188,38 @@ namespace Telerik.JustMock.Core
 		{
 			var attr = (DispIdAttribute)Attribute.GetCustomAttribute(member, typeof(DispIdAttribute));
 			return attr != null ? (int?)attr.Value : null;
+		}
+
+		public static ProfilerInterceptor.RefReturn<TReturn> CreateDynamicMethodInvoker<TReturn>(object target, MethodInfo method, object[] args)
+		{
+			if (args.Length != method.GetParameters().Length)
+			{
+				throw new MockException(
+					String.Format("Number of the supplied arguments does not match to the expected one in the method signature:" +
+						" supplied '{0}', expected '{1}'", args.Length, method.GetParameters().Length));
+			}
+
+			ProfilerInterceptor.RefReturn<TReturn> @delegate =
+				MockingUtil.CreateDynamicMethod<ProfilerInterceptor.RefReturn<TReturn>>(
+					il =>
+					{
+						// store arguments as local variables
+						il.UnpackArgArray(OpCodes.Ldarg_1, method);
+
+						// push object reference to the stack in case if instance method
+						if (target != null)
+						{
+							il.Emit(OpCodes.Ldarg_0);
+						}
+
+						// push stored arguments back to the stack
+						il.PushArgArray(method);
+
+						il.Emit((target != null) ? OpCodes.Callvirt : OpCodes.Call, method as MethodInfo);
+						il.Emit(OpCodes.Ret);
+					});
+
+			return @delegate;
 		}
 	}
 }

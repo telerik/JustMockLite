@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015,2108 Telerik EAD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -92,16 +92,16 @@ namespace Telerik.JustMock.Core
 
 		internal static IMockMixin GetMockMixin(object obj, Type objType)
 		{
-            IMockMixin asMixin = GetMockMixinFromAnyMock(obj);
-            if (asMixin != null)
-            {
-                return asMixin;
-            }
+			IMockMixin asMixin = GetMockMixinFromAnyMock(obj);
+			if (asMixin != null)
+			{
+				return asMixin;
+			}
 
-            if (obj != null && objType == null)
-            {
-                objType = obj.GetType();
-            }
+			if (obj != null && objType == null)
+			{
+				objType = obj.GetType();
+			}
 
 			if (obj != null)
 			{
@@ -287,7 +287,7 @@ namespace Telerik.JustMock.Core
 			while (queue.Count > 0)
 			{
 				MatcherNodeAndParent current = queue.Dequeue();
-                IMatcherTreeNode newCurrent = current.Node.Clone();
+				IMatcherTreeNode newCurrent = current.Node.Clone();
 				foreach (IMatcherTreeNode node in current.Node.Children)
 				{
 					queue.Enqueue(new MatcherNodeAndParent(node, newCurrent));
@@ -309,20 +309,20 @@ namespace Telerik.JustMock.Core
 
 			if (parentRepository != null)
 			{
-                foreach (var root in parentRepository.arrangementTreeRoots)
-                {
-                    this.arrangementTreeRoots.Add(root.Key, DeepCopy(root.Value));
-                }
+				foreach (var root in parentRepository.arrangementTreeRoots)
+				{
+					this.arrangementTreeRoots.Add(root.Key, DeepCopy(root.Value));
+				}
 
-                foreach (var root in parentRepository.invocationTreeRoots)
-                {
-                    this.invocationTreeRoots.Add(root.Key, DeepCopy(root.Value));
-                }
+				foreach (var root in parentRepository.invocationTreeRoots)
+				{
+					this.invocationTreeRoots.Add(root.Key, DeepCopy(root.Value));
+				}
 
-                foreach (var kvp in parentRepository.valueStore)
-                {
-                    this.valueStore.Add(kvp.Key, kvp.Value);
-                }
+				foreach (var kvp in parentRepository.valueStore)
+				{
+					this.valueStore.Add(kvp.Key, kvp.Value);
+				}
 
 				foreach (WeakReference mockRef in parentRepository.controlledMocks)
 				{
@@ -354,18 +354,18 @@ namespace Telerik.JustMock.Core
 		{
 			DebugView.TraceEvent(IndentLevel.Configuration, () => String.Format("Resetting mock repository related to {0}.", this.method));
 
-            foreach (var type in this.arrangedTypes)
-            {
-                ProfilerInterceptor.EnableInterception(type, false, this);
-            }
+			foreach (var type in this.arrangedTypes)
+			{
+				ProfilerInterceptor.EnableInterception(type, false, this);
+			}
 
-            this.arrangedTypes.Clear();
+			this.arrangedTypes.Clear();
 			this.staticMixinDatabase.Clear();
 
-            foreach (var method in this.globallyInterceptedMethods)
-            {
-                ProfilerInterceptor.UnregisterGlobalInterceptor(method, this);
-            }
+			foreach (var method in this.globallyInterceptedMethods)
+			{
+				ProfilerInterceptor.UnregisterGlobalInterceptor(method, this);
+			}
 			this.globallyInterceptedMethods.Clear();
 
 			lock (externalMixinDatabase)
@@ -397,6 +397,7 @@ namespace Telerik.JustMock.Core
 			}
 
 			invocation.InArrange = this.sharedContext.InArrange;
+			invocation.InAssertSet = this.sharedContext.InAssertSet;
 			invocation.Recording = this.Recorder != null;
 			invocation.RetainBehaviorDuringRecording = this.sharedContext.DispatchToMethodMocks;
 			invocation.Repository = this;
@@ -415,15 +416,23 @@ namespace Telerik.JustMock.Core
 
 			if (!methodMockProcessed)
 			{
+				// We have to be careful for the potential exception throwing in the assertion context,
+				// so skip CallOriginalBehavior processing
 				var mock = invocation.MockMixin;
 				if (mock != null)
 				{
-					foreach (var behavior in mock.FallbackBehaviors)
-						behavior.Process(invocation);
+					var fallbackBehaviorsToExecute =
+						mock.FallbackBehaviors
+							.Where(behavior => !invocation.InAssertSet || !(behavior is CallOriginalBehavior))
+							.ToList();
+					foreach (var fallbackBehavior in fallbackBehaviorsToExecute)
+					{
+						fallbackBehavior.Process(invocation);
+					}
 				}
 				else
 				{
-					invocation.CallOriginal = CallOriginalBehavior.ShouldCallOriginal(invocation);
+					invocation.CallOriginal = CallOriginalBehavior.ShouldCallOriginal(invocation) && !invocation.InAssertSet;
 				}
 			}
 
@@ -434,14 +443,14 @@ namespace Telerik.JustMock.Core
 		internal T GetValue<T>(object owner, object key, T dflt)
 		{
 			object value;
-            if (valueStore.TryGetValue(new KeyValuePair<object, object>(owner, key), out value))
-            {
-                return (T)value;
-            }
-            else
-            {
-                return dflt;
-            }
+			if (valueStore.TryGetValue(new KeyValuePair<object, object>(owner, key), out value))
+			{
+				return (T)value;
+			}
+			else
+			{
+				return dflt;
+			}
 		}
 
 		internal void StoreValue<T>(object owner, object key, T value)
@@ -456,19 +465,19 @@ namespace Telerik.JustMock.Core
 
 		internal void AddMatcherInContext(IMatcher matcher)
 		{
-            if (!this.sharedContext.InArrange || this.sharedContext.Recorder != null)
-            {
-                this.matchersInContext.Add(matcher);
-            }
+			if (!this.sharedContext.InArrange || this.sharedContext.Recorder != null)
+			{
+				this.matchersInContext.Add(matcher);
+			}
 		}
 
 		internal object Create(Type type, MockCreationSettings settings)
 		{
 			object delegateResult;
-            if (TryCreateDelegate(type, settings, out delegateResult))
-            {
-                return delegateResult;
-            }
+			if (TryCreateDelegate(type, settings, out delegateResult))
+			{
+				return delegateResult;
+			}
 
 			bool isSafeMock = settings.FallbackBehaviors.OfType<CallOriginalBehavior>().Any();
 			this.CheckIfCanMock(type, !isSafeMock);
@@ -510,7 +519,7 @@ namespace Telerik.JustMock.Core
 				}
 			}
 
-            IMockMixin mockMixin = instance as IMockMixin;
+			IMockMixin mockMixin = instance as IMockMixin;
 
 			if (instance == null)
 			{
@@ -808,6 +817,18 @@ namespace Telerik.JustMock.Core
 			}
 		}
 
+		internal void AssertSetAction(string message, Action memberAction, Args args = null, Occurs occurs = null)
+		{
+			using (MockingContext.BeginFailureAggregation(message))
+			{
+				using (this.sharedContext.StartAssertSet())
+				{
+					var callPattern = ConvertActionToCallPattern(memberAction, true);
+					AssertForCallPattern(callPattern, args, occurs);
+				}
+			}
+		}
+
 		internal void AssertMethodInfo(string message, object instance, MethodBase method, object[] arguments, Occurs occurs)
 		{
 			using (MockingContext.BeginFailureAggregation(message))
@@ -985,7 +1006,7 @@ namespace Telerik.JustMock.Core
 			callPattern.AdjustForExtensionMethod();
 		}
 
-		private CallPattern ConvertActionToCallPattern(Action memberAction)
+		private CallPattern ConvertActionToCallPattern(Action memberAction, bool dispatchToMethodMocks = false)
 		{
 			var callPattern = new CallPattern();
 
@@ -993,7 +1014,7 @@ namespace Telerik.JustMock.Core
 
 			var recorder = new DelegatingRecorder();
 			recorder.Record += invocation => lastInvocation = invocation;
-			using (this.StartRecording(recorder, false))
+			using (this.StartRecording(recorder, dispatchToMethodMocks))
 			{
 				memberAction();
 			}
@@ -1585,7 +1606,7 @@ namespace Telerik.JustMock.Core
 			ConvertInvocationToCallPattern(invocation, callPattern);
 
 			MethodInfoMatcherTreeNode funcRoot = null;
-			if (!invocation.InArrange)
+			if (!invocation.InArrange && !invocation.InAssertSet)
 			{
 				if (!invocationTreeRoots.TryGetValue(callPattern.Method, out funcRoot))
 				{
@@ -1596,7 +1617,7 @@ namespace Telerik.JustMock.Core
 
 			var methodMock = DispatchInvocationToArrangements(callPattern, invocation);
 
-			if (!invocation.InArrange)
+			if (!invocation.InArrange && !invocation.InAssertSet)
 			{
 				funcRoot.AddOrUpdateOccurence(callPattern, methodMock);
 			}
@@ -1633,16 +1654,54 @@ namespace Telerik.JustMock.Core
 
 			methodMock.IsUsed = true; //used to correctly determine inSequence arranges
 
-			foreach (var behavior in methodMock.Behaviors)
+			var behaviorsToProcess = GetBehaviorsToProcess(invocation, methodMock);
+			foreach (var behavior in behaviorsToProcess)
+			{
 				behavior.Process(invocation);
+			}
+
+			return methodMock;
+		}
+
+		private static List<IBehavior> GetBehaviorsToProcess(Invocation invocation, IMethodMock methodMock)
+		{
+			var behaviorsToExecute = new List<IBehavior>();
+
+			var behaviorTypesToSkip = GetBehaviorTypesToSkip(invocation);
+			behaviorsToExecute.AddRange(
+				methodMock.Behaviors.Where(behavior => !behaviorTypesToSkip.Contains(behavior.GetType())));
 
 			var mock = invocation.MockMixin;
 			if (mock != null)
 			{
-				foreach (var behavior in mock.SupplementaryBehaviors)
-					behavior.Process(invocation);
+				behaviorsToExecute.AddRange(mock.SupplementaryBehaviors);
+
+#if !PORTABLE
+				// explicitly add recursive mocking behavior for ref returns in order to set invocation result
+				if (invocation.Method.GetReturnType().IsByRef)
+				{
+					behaviorsToExecute.AddRange(
+						mock.FallbackBehaviors.Where(
+							behavior =>
+								behavior is CallOriginalBehavior
+								|| (behavior is RecursiveMockingBehavior && ((RecursiveMockingBehavior)behavior).Type != RecursiveMockingBehaviorType.OnlyDuringAnalysis)));
+				}
+#endif
 			}
-			return methodMock;
+
+			return behaviorsToExecute;
+		}
+
+		private static List<Type> GetBehaviorTypesToSkip(Invocation invocation)
+		{
+			var behaviorTypesToSkip = new List<Type>();
+
+			if (invocation.InAssertSet)
+			{
+				behaviorTypesToSkip.Add(typeof(InvocationOccurrenceBehavior));
+			}
+
+			return behaviorTypesToSkip;
 		}
 
 		private bool TryCreateDelegate(Type type, MockCreationSettings settings, out object delegateResult)

@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015,2018 Telerik EAD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -1064,7 +1064,60 @@ namespace Telerik.JustMock.Tests
 				DebugView.IsTraceEnabled = traceEnabled;
 			}
 		}
-	}
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+        public void ShouldAssertSetUsingRighsideLamdaMockResultOccursOnce()
+        {
+            // Arrange
+            var fooMock = Mock.Create<IFoo>();
+            var barMock = Mock.Create<Bar>();
+            Mock.Arrange(() => barMock.Echo(Arg.IsAny<int>())).Returns(2);
+
+            // Act
+            fooMock.Value = barMock.Echo(1);
+
+            // Assert
+            Mock.AssertSet(() => fooMock.Value = barMock.Echo(1), Occurs.Once());
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+        public void ShouldAssertSetUsingRighsideLamdaMockResultOccursNever()
+        {
+            // Arrange
+            var fooMock = Mock.Create<IFoo>();
+            var barMock = Mock.Create<Bar>();
+            Mock.Arrange(() => barMock.Echo(Arg.IsAny<int>())).Returns(2);
+
+            // Assert
+            Mock.AssertSet(() => fooMock.Value = barMock.Echo(1), Occurs.Never());
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+        public void ShouldAssertSetUsingRighsideLamdaUnmockedResultOccursOnce()
+        {
+            // Arrange
+            var fooMock = Mock.Create<IFoo>();
+            var bar = new Bar();
+
+            // Act
+            fooMock.Value = bar.Echo(1);
+
+            // Assert
+            Mock.AssertSet(() => fooMock.Value = bar.Echo(1), Occurs.Once());
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+        public void ShouldAssertSetUsingRighsideLamdaUnmockedResultOccursNever()
+        {
+            // Arrange
+            var fooMock = Mock.Create<IFoo>();
+            var bar = new Bar();
+
+            // Assert
+            Mock.AssertSet(() => fooMock.Value = bar.Echo(1), Occurs.Never());
+        }
+    }
+
 #if !XUNIT
 #if !PORTABLE
 #if !NUNIT
@@ -1105,7 +1158,7 @@ namespace Telerik.JustMock.Tests
 	{
 
 #if !NUNIT3
-		[TestFixtureSetUp]
+		[SetUp]
 #else
 		[OneTimeSetUp]
 #endif
@@ -1115,7 +1168,7 @@ namespace Telerik.JustMock.Tests
 		}
 
 #if !NUNIT3
-		[TestFixtureTearDown]
+		[TearDown]
 #else
 		[OneTimeTearDown]
 #endif

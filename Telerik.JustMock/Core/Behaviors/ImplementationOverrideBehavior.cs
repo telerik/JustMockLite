@@ -17,6 +17,9 @@
 
 using System;
 using System.Linq;
+#if !PORTABLE
+using System.Reflection;
+#endif
 
 namespace Telerik.JustMock.Core.Behaviors
 {
@@ -65,11 +68,49 @@ namespace Telerik.JustMock.Core.Behaviors
 			}
 		}
 
+#if !PORTABLE
+		private ref T GetOverrideRef<T>()
+		{
+			try
+			{
+				return ref ProfilerInterceptor.GuardExternal((target, args) =>
+				{
+					return ref ((Expectations.FuncExpectation<T>.RefDelegate)this.implementationOverride)();
+				}, null, null);
+			}
+			catch (InvalidCastException ex)
+			{
+				throw new MockException("The implementation callback has an incorrect signature", ex);
+			}
+		}
+#endif
+
 		public void Process(Invocation invocation)
 		{
-			var returnValue = CallOverride(invocation);
-			if (implementationOverride.Method.ReturnType != typeof(void) && !this.ignoreDelegateReturnValue)
-				invocation.ReturnValue = returnValue;
+#if !PORTABLE
+			var returnType = invocation.Method.GetReturnType();
+
+			if (returnType.IsByRef)
+			{
+				var delegateType = typeof(object).Assembly.GetType("Telerik.JustMock.RefDelegate`1").MakeGenericType(new[] { returnType.GetElementType() });
+				ConstructorInfo constructor = delegateType.GetConstructor(new[] { typeof(object), typeof(IntPtr) });
+
+				MethodInfo genericMethodInfo = this.GetType().GetMethod("GetOverrideRef", BindingFlags.NonPublic | BindingFlags.Instance);
+				MethodInfo methodInfo = genericMethodInfo.MakeGenericMethod(returnType.GetElementType());
+
+				invocation.ReturnValue = constructor.Invoke(new object[] { this, methodInfo.MethodHandle.GetFunctionPointer() });
+			}
+			else
+			{
+#endif
+				var returnValue = CallOverride(invocation);
+				if (this.implementationOverride.Method.ReturnType != typeof(void) && !this.ignoreDelegateReturnValue)
+				{
+					invocation.ReturnValue = returnValue;
+				}
+#if !PORTABLE
+			}
+#endif
 			invocation.UserProvidedImplementation = true;
 		}
 	}
