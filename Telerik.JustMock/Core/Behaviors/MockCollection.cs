@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015,2018 Telerik EAD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -22,65 +22,67 @@ using System.Linq;
 
 namespace Telerik.JustMock.Core.Behaviors
 {
-	internal static class MockCollection
-	{
-		public static object Create(Type resultCollectionType, MocksRepository repo, IMockReplicator replicator, IEnumerable collection)
-		{
-			if (resultCollectionType == typeof(string))
-				return null;
+    internal static class MockCollection
+    {
+        public static object Create(Type resultCollectionType, MocksRepository repo, IMockReplicator replicator, IEnumerable collection)
+        {
+            if (resultCollectionType == typeof(string))
+                return null;
 
-			Type sourceType = collection.GetType();
-			if (resultCollectionType.IsAssignableFrom(sourceType))
-				return collection;
+            Type sourceType = collection.GetType();
+            if (resultCollectionType.IsAssignableFrom(sourceType))
+                return collection;
 
-			var enumerableType = resultCollectionType.GetImplementationOfGenericInterface(typeof(IEnumerable<>)) ?? typeof(IEnumerable);
-			if (!enumerableType.IsAssignableFrom(resultCollectionType))
-				throw new MockException("Return value is not an enumerable type.");
+            var enumerableType = resultCollectionType.GetImplementationOfGenericInterface(typeof(IEnumerable<>)) ?? typeof(IEnumerable);
+            if (!enumerableType.IsAssignableFrom(resultCollectionType))
+                throw new MockException("Return value is not an enumerable type.");
 
-			var elementType = enumerableType.IsGenericType ? enumerableType.GetGenericArguments()[0] : typeof(object);
+            var elementType = enumerableType.IsGenericType ? enumerableType.GetGenericArguments()[0] : typeof(object);
 
-			var ilistType = typeof(IList<>).MakeGenericType(elementType);
-			var iqueryableType = typeof(IQueryable<>).MakeGenericType(elementType);
+            var ilistType = typeof(IList<>).MakeGenericType(elementType);
+            var iqueryableType = typeof(IQueryable<>).MakeGenericType(elementType);
 
-			IEnumerable list;
-			if (typeof(ICollection).IsAssignableFrom(sourceType))
-			{
-				list = collection;
-			}
-			else
-			{
-				var listType = typeof(List<>).MakeGenericType(elementType);
-				var castMethod = typeof(Enumerable).GetMethod("Cast").MakeGenericMethod(elementType);
+            IEnumerable list;
+            if (typeof(ICollection).IsAssignableFrom(sourceType))
+            {
+                list = collection;
+            }
+            else
+            {
+                var listType = typeof(List<>).MakeGenericType(elementType);
+                var castMethod = typeof(Enumerable).GetMethod("Cast").MakeGenericMethod(elementType);
 
-				var castCollection = castMethod.Invoke(null, new[] { collection });
-				list = (IEnumerable)MockingUtil.CreateInstance(listType, castCollection);
-			}
+                var castCollection = castMethod.Invoke(null, new[] { collection });
+                list = (IEnumerable)MockingUtil.CreateInstance(listType, castCollection);
+            }
 
-			var listBehavior = new DelegatedImplementationBehavior(list,
-				new[]
-				{
-					ilistType,
-					typeof(IList),
-				});
+            var listBehavior = new DelegatedImplementationBehavior(list,
+                new[]
+                {
+                    ilistType,
+                    typeof(IList),
+                });
 
-			var queryable = list.AsQueryable();
-			var queryableType = queryable.GetType();
-			var queryableBehavior = new DelegatedImplementationBehavior(queryable,
-				new[] { queryableType.GetImplementationOfGenericInterface(typeof(IQueryable<>)) });
+            var queryable = list.AsQueryable();
+            var queryableType = queryable.GetType();
+            var queryableBehavior = new DelegatedImplementationBehavior(queryable,
+                new[] { queryableType.GetImplementationOfGenericInterface(typeof(IQueryable<>)) });
 
-			if (replicator != null)
-			{
-				var mock = replicator.CreateSimilarMock(repo, resultCollectionType, null, true, null);
-				var mockMixin = MocksRepository.GetMockMixin(mock, null);
-				mockMixin.FallbackBehaviors.Insert(0, queryableBehavior);
-				mockMixin.FallbackBehaviors.Insert(0, listBehavior);
-				return mock;
-			}
-			else
-			{
-				return repo.Create(resultCollectionType, null, Behavior.Loose, MockingUtil.EmptyTypes, null,
-					null, null, new List<IBehavior> { listBehavior, queryableBehavior });
-			}
-		}
-	}
+            if (replicator != null)
+            {
+                var mock = replicator.CreateSimilarMock(repo, resultCollectionType, null, true, null);
+                IMockMixin mockMixin = MocksRepository.GetMockMixin(mock, null);
+                mockMixin.FallbackBehaviors.Insert(0, queryableBehavior);
+                mockMixin.FallbackBehaviors.Insert(0, listBehavior);
+                return mock;
+            }
+            else
+            {
+                MockCreationSettings settings = MockCreationSettings.GetSettings(constructorArgs: null, behavior: Behavior.Loose, additionalMockedInterfaces: MockingUtil.EmptyTypes, mockConstructorCall: null,
+                    additionalProxyTypeAttributes: null, supplementaryBehaviors: null, fallbackBehaviors: new List<IBehavior> { listBehavior, queryableBehavior });
+
+                return repo.Create(resultCollectionType, settings);
+            }
+        }
+    }
 }

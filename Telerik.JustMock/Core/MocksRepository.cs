@@ -21,7 +21,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -35,29 +34,10 @@ using Telerik.JustMock.Diagnostics;
 
 namespace Telerik.JustMock.Core
 {
-	internal class MockCreationSettings
-	{
-		public object[] Args;
-		public IEnumerable<object> Mixins;
-		public IEnumerable<IBehavior> SupplementaryBehaviors;
-		public IEnumerable<IBehavior> FallbackBehaviors;
-		public Type[] AdditionalMockedInterfaces;
-		public bool MockConstructorCall;
-		public bool MustCreateProxy;
-		public IEnumerable<CustomAttributeBuilder> AdditionalProxyTypeAttributes;
-		public Expression<Predicate<MethodInfo>> InterceptorFilter;
-	}
-
-	internal class ProxyTypeInfo
-	{
-		public Type ProxyType;
-		public Dictionary<Type, object> Mixins = new Dictionary<Type, object>();
-	}
-
-	/// <summary>
-	/// An implementation detail. Not intended for external usage.
-	/// </summary>
-	public sealed class MocksRepository
+    /// <summary>
+    /// An implementation detail. Not intended for external usage.
+    /// </summary>
+    public sealed class MocksRepository
 	{
 		private static readonly List<KeyValuePair<object, IMockMixin>> externalMixinDatabase = new List<KeyValuePair<object, IMockMixin>>();
 		private static readonly Dictionary<object, IMockMixin> externalReferenceMixinDatabase = new Dictionary<object, IMockMixin>(ByRefComparer<object>.Instance);
@@ -486,7 +466,7 @@ namespace Telerik.JustMock.Core
 
 			bool canCreateProxy = !type.IsSealed;
 
-			MockMixin mockMixinImpl = this.CreateMockMixin(type, settings.SupplementaryBehaviors, settings.FallbackBehaviors, settings.MockConstructorCall);
+			MockMixin mockMixinImpl = this.CreateMockMixin(type, settings);
 
 			ConstructorInfo[] ctors = type.GetConstructors();
 			bool isCoclass = ctors.Any(ctor => ctor.IsExtern());
@@ -557,7 +537,7 @@ namespace Telerik.JustMock.Core
 
 				if (!createTransparentProxy)
 				{
-					mockMixin = CreateExternalMockMixin(type, instance, settings.Mixins, settings.SupplementaryBehaviors, settings.FallbackBehaviors);
+					mockMixin = this.CreateExternalMockMixin(type, instance, settings);
 				}
 			}
 			else
@@ -582,9 +562,8 @@ namespace Telerik.JustMock.Core
 			return instance;
 		}
 
-		internal IMockMixin CreateExternalMockMixin(Type mockObjectType, object mockObject, IEnumerable<object> mixins,
-			IEnumerable<IBehavior> supplementaryBehaviors, IEnumerable<IBehavior> fallbackBehaviors)
-		{
+        internal IMockMixin CreateExternalMockMixin(Type mockObjectType, object mockObject, MockCreationSettings settings)
+        {
 			if (mockObjectType == null)
 			{
 				if (mockObject == null)
@@ -592,13 +571,13 @@ namespace Telerik.JustMock.Core
 				mockObjectType = mockObject.GetType();
 			}
 
-			EnableInterception(mockObjectType);
+			this.EnableInterception(mockObjectType);
 
 			if (mockObject == null)
 				throw new MockException(String.Format("Failed to create instance of type '{0}'", mockObjectType));
 
-			var mockMixin = CreateMockMixin(mockObjectType, supplementaryBehaviors, fallbackBehaviors, false);
-			var compoundMockMixin = mockFactory.CreateExternalMockMixin(mockMixin, mixins);
+            MockMixin mockMixin = this.CreateMockMixin(mockObjectType, settings, false);
+            IMockMixin compoundMockMixin = mockFactory.CreateExternalMockMixin(mockMixin, settings.Mixins);
 			lock (externalMixinDatabase)
 			{
 				if (mockObjectType.IsValueType())
@@ -620,7 +599,7 @@ namespace Telerik.JustMock.Core
 
 		internal ProxyTypeInfo CreateClassProxyType(Type classToProxy, MockCreationSettings settings)
 		{
-			var mockMixinImpl = CreateMockMixin(classToProxy, settings.SupplementaryBehaviors, settings.FallbackBehaviors, settings.MockConstructorCall);
+            MockMixin mockMixinImpl = this.CreateMockMixin(classToProxy, settings);
 			return mockFactory.CreateClassProxyType(classToProxy, this, settings, mockMixinImpl);
 		}
 
@@ -634,21 +613,20 @@ namespace Telerik.JustMock.Core
 				ProfilerInterceptor.CheckIfSafeToInterceptWholesale(type);
 		}
 
-		internal void InterceptStatics(Type type, IEnumerable<object> mixins, IEnumerable<IBehavior> supplementaryBehaviors,
-			IEnumerable<IBehavior> fallbackBehaviors, bool mockStaticConstructor)
-		{
+        internal void InterceptStatics(Type type, MockCreationSettings settings, bool mockStaticConstructor)
+        {
 			if (!ProfilerInterceptor.IsProfilerAttached)
 				ProfilerInterceptor.ThrowElevatedMockingException(type);
 
-			if (!fallbackBehaviors.OfType<CallOriginalBehavior>().Any())
+			if (!settings.FallbackBehaviors.OfType<CallOriginalBehavior>().Any())
 				ProfilerInterceptor.CheckIfSafeToInterceptWholesale(type);
 
 			var mockMixin = (IMockMixin)Create(typeof(ExternalMockMixin),
 				new MockCreationSettings
 				{
-					Mixins = mixins,
-					SupplementaryBehaviors = supplementaryBehaviors,
-					FallbackBehaviors = fallbackBehaviors,
+					Mixins = settings.Mixins,
+					SupplementaryBehaviors = settings.SupplementaryBehaviors,
+					FallbackBehaviors = settings.FallbackBehaviors,
 					MustCreateProxy = true,
 				});
 
@@ -656,11 +634,16 @@ namespace Telerik.JustMock.Core
 			lock (staticMixinDatabase)
 				staticMixinDatabase[type] = mockMixin;
 
-			EnableInterception(type);
+			this.EnableInterception(type);
 		}
 
-		private MockMixin CreateMockMixin(Type declaringType, IEnumerable<IBehavior> supplementaryBehaviors, IEnumerable<IBehavior> fallbackBehaviors, bool mockConstructorCall)
-		{
+        private MockMixin CreateMockMixin(Type declaringType, MockCreationSettings settings)
+        {
+            return CreateMockMixin(declaringType, settings, settings.MockConstructorCall);
+        }
+
+        private MockMixin CreateMockMixin(Type declaringType, MockCreationSettings settings, bool mockConstructorCall)
+        {
 			var mockMixin = new MockMixin
 			{
 				Repository = this,
@@ -668,9 +651,10 @@ namespace Telerik.JustMock.Core
 				IsInstanceConstructorMocked = mockConstructorCall,
 			};
 
-			foreach (var behavior in supplementaryBehaviors)
+			foreach (var behavior in settings.SupplementaryBehaviors)
 				mockMixin.SupplementaryBehaviors.Add(behavior);
-			foreach (var behavior in fallbackBehaviors)
+
+			foreach (var behavior in settings.FallbackBehaviors)
 				mockMixin.FallbackBehaviors.Add(behavior);
 
 			return mockMixin;
@@ -1258,11 +1242,13 @@ namespace Telerik.JustMock.Core
 				{
 					if (isStatic)
 					{
-						this.InterceptStatics(targetMockType, Behavior.CallOriginal, false);
-					}
+                        MockCreationSettings settings = MockCreationSettings.GetSettings(Behavior.CallOriginal);
+                        this.InterceptStatics(targetMockType, settings, false);
+                    }
 					else if (targetMockObject != null)
 					{
-						this.CreateExternalMockMixin(targetMockType, targetMockObject, Behavior.CallOriginal);
+                        MockCreationSettings settings = MockCreationSettings.GetSettings(Behavior.CallOriginal);
+                        this.CreateExternalMockMixin(targetMockType, targetMockObject, settings);
 					}
 				}
 
