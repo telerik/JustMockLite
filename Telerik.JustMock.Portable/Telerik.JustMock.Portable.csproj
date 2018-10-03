@@ -313,6 +313,12 @@
     <Compile Include="..\Telerik.JustMock\Core\MocksRepository.cs">
       <Link>Core\MocksRepository.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MockCreationSettings.cs">
+      <Link>Core\MockCreationSettings.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\ProxyTypeInfo.cs">
+      <Link>Core\ProxyTypeInfo.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Core\ProxyFailureException.cs">
       <Link>Core\ProxyFailureException.cs</Link>
     </Compile>
