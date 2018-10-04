@@ -28,7 +28,8 @@ namespace Telerik.JustMock.Setup
 		
 		public object CreateSimilarMock(MocksRepository repository, Type mockType, object[] constructorArgs, bool mockConstructorCall, Type[] additionalMockedInterfaces)
 		{
-			return repository.Create(mockType, constructorArgs, this.Behavior, additionalMockedInterfaces, mockConstructorCall);
+            MockCreationSettings settings = MockCreationSettings.GetSettings(constructorArgs, this.Behavior, additionalMockedInterfaces, mockConstructorCall);
+            return repository.Create(mockType, settings);
 		}
 	}
 }

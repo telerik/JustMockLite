@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015,2018 Telerik EAD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -98,9 +98,10 @@ namespace Telerik.JustMock.AutoMock
 					var targetType = typeof(T);
 					if (targetType.IsAbstract)
 					{
-						var repo = MockingContext.CurrentRepository;
-						var typeInfo = repo.ImplementAbstractType(targetType);
-						this.implementationType = typeInfo.ProxyType;
+                        MockCreationSettings settings = MockCreationSettings.GetSettings(Behavior.CallOriginal);
+                        ProxyTypeInfo typeInfo = MockingContext.CurrentRepository.CreateClassProxyType(targetType, settings);
+
+                        this.implementationType = typeInfo.ProxyType;
 						foreach (var mixin in typeInfo.Mixins)
 						{
 							this.Bind(mixin.Key).ToConstant(mixin.Value);
