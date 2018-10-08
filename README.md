@@ -45,10 +45,6 @@ public void TestBookService()
 }
 ```
 
-### Easy Migration to JustMock
-When you decide you need even more powerful mocking experience you can easily migrate to the paid version of JustMock. With it you can mock objects like non-virtual methods, sealed classes and static methods and classes, non-public members and types and of course **mscorlib**. Check our feature comparison between the free and commercial versions: <a href="http://docs.telerik.com/devtools/justmock/licensing/commercial-vs-free-version" target="_blank">Commercial vs Free Version</a>.
-
-
 ### Documentation
 You could learn more on how to use JustMock Lite in our <a href="http://docs.telerik.com/devtools/justmock/introduction.html" target="_blank">Documentation</a>.
 
