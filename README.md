@@ -14,7 +14,7 @@ JustMock Lite
 - Mock classes - Allows you to test public classes.
 - Mock properties - Allows you to test the property getter and setter.
 - Mock and rise events - Allows you to test events.
-- Control mock behavior - Allows you to control the default behavior of a mock wheretere be to do nothing, call the original code or throw an exception.
+- Control mock behavior - Allows you to control the default behavior of a mock whether be to do nothing, call the original code or throw an exception.
 - Assert call occurrences - Allows you to determine how many times a call has occurred.
 - Recursive mocking - Еnable you to mock members that are obtained as a result of "chained" calls on a mock.
 - Sequential mocking - Аllows you to return different values on the same or different consecutive calls to one and the same type.
