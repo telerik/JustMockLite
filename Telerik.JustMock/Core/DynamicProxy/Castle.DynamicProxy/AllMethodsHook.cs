@@ -25,7 +25,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		protected static readonly ICollection<Type> SkippedTypes = new[]
 		{
 			typeof(object),
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !NETCORE
 			typeof(MarshalByRefObject),
 			typeof(ContextBoundObject)
 #endif

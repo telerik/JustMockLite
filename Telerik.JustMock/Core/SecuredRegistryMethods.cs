@@ -36,19 +36,23 @@ namespace Telerik.JustMock.Core
 
 		static SecuredRegistryMethods()
 		{
-			if (ProfilerInterceptor.IsProfilerAttached)
+#if !NETCORE
+            if (ProfilerInterceptor.IsProfilerAttached)
 			{
 				ProfilerInterceptor.WrapCallToDelegate("SetRegistryValue", out setValue);
 				ProfilerInterceptor.WrapCallToDelegate("GetRegistryValue", out getValue);
 			}
 			else
 			{
-				getValue = (currentUser, keyName, valueName, outValue, outValueByteCount) => GetRegistryValue(currentUser, keyName, valueName, outValue);
+#endif
+                getValue = (currentUser, keyName, valueName, outValue, outValueByteCount) => GetRegistryValue(currentUser, keyName, valueName, outValue);
 				setValue = (currentUser, keyName, valueName, value) => SetRegistryValue(currentUser, keyName, valueName, value);
-			}
-		}
+#if !NETCORE
+            }
+#endif
+        }
 
-		public static string GetValue(bool currentUser, string keyName, string valueName)
+        public static string GetValue(bool currentUser, string keyName, string valueName)
 		{
 			StringBuilder outValue = new StringBuilder(256);
 			if (!getValue(currentUser, keyName, valueName, outValue, outValue.Capacity * sizeof(char)))
