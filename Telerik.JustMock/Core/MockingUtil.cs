@@ -29,6 +29,7 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Telerik.JustMock.Core.MatcherTree;
 using Telerik.JustMock.Core.Recording;
+using Telerik.JustMock.Diagnostics;
 
 namespace Telerik.JustMock.Core
 {
@@ -94,7 +95,7 @@ namespace Telerik.JustMock.Core
 
 		public static object GetDefaultValue(this Type t)
 		{
-			Debug.Assert(t != typeof(void));
+            JMDebug.Assert(t != typeof(void));
 			return
 				t.IsPointer ? IntPtr.Zero
 				: t.IsValueType && t != typeof(void) ? MockingUtil.CreateInstance(t)

@@ -17,8 +17,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 	using System;
 	using System.Diagnostics;
 	using System.Reflection;
+    using Telerik.JustMock.Diagnostics;
 
-	public abstract class AbstractInvocation : IInvocation
+    public abstract class AbstractInvocation : IInvocation
 	{
 		private readonly IInterceptor[] interceptors;
 		private readonly object[] arguments;
@@ -34,7 +35,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 			MethodInfo proxiedMethod,
 			object[] arguments)
 		{
-			Debug.Assert(proxiedMethod != null);
+            Debug.Assert(proxiedMethod != null);
 			proxyObject = proxy;
 			this.interceptors = interceptors;
 			this.proxiedMethod = proxiedMethod;
@@ -185,7 +186,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		{
 			if (method.ContainsGenericParameters)
 			{
-				Debug.Assert(genericMethodArguments != null);
+                JMDebug.Assert(genericMethodArguments != null);
 				return method.GetGenericMethodDefinition().MakeGenericMethod(genericMethodArguments);
 			}
 			return method;

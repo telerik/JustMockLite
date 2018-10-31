@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using Telerik.JustMock.Diagnostics;
 using Telerik.JustMock.Setup;
 
 namespace Telerik.JustMock.Core.Context
@@ -142,7 +143,7 @@ namespace Telerik.JustMock.Core.Context
 					}
 				}
 
-				Debug.Assert(entryOps != null);
+                JMDebug.Assert(entryOps != null);
 			}
 
 			return testMethod;

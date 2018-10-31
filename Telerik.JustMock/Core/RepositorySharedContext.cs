@@ -16,9 +16,13 @@
 */
 
 using System;
-using System.Diagnostics;
 using System.Threading;
 using Telerik.JustMock.Core.Recording;
+#if NETCORE
+using Debug = Telerik.JustMock.Diagnostics.JMDebug;
+#else
+using Debug = System.Diagnostics.Debug;
+#endif
 
 namespace Telerik.JustMock.Core
 {
@@ -121,7 +125,7 @@ namespace Telerik.JustMock.Core
 			public InArrangeContext(RepositorySharedContext context)
 				: base(context)
 			{
-				Debug.Assert(!this.Context.InArrange);
+                Debug.Assert(!this.Context.InArrange);
 				context.InArrange = true;
 			}
 
@@ -137,7 +141,7 @@ namespace Telerik.JustMock.Core
 			public InAssertSetContext(RepositorySharedContext context)
 				: base(context)
 			{
-				Debug.Assert(!this.Context.InAssertSet);
+                Debug.Assert(!this.Context.InAssertSet);
 				context.InAssertSet = true;
 			}
 
