@@ -53,11 +53,12 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: InternalsVisibleTo("Telerik.JustMock.Nunit.Tests")]
-[assembly: InternalsVisibleTo("Telerik.JustMock.Tests")]
+
 [assembly: InternalsVisibleTo(Telerik.JustMock.DemoLib.JustMock.FullyQualifiedAssemblyName)]
-[assembly: InternalsVisibleTo("Telerik.JustMock.Tests.Elevated")]
+[assembly: InternalsVisibleTo("Telerik.JustMock.MSTest.Tests")]
+[assembly: InternalsVisibleTo("Telerik.JustMock.MSTest.Tests.Elevated")]
 [assembly: InternalsVisibleTo("Telerik.JustMock.MSTest2.Tests")]
 [assembly: InternalsVisibleTo("Telerik.JustMock.MSTest2.Tests.Elevated")]
+[assembly: InternalsVisibleTo("Telerik.JustMock.Nunit.Tests")]
 [assembly: InternalsVisibleTo("Telerik.JustMock.Nunit3.Tests")]
 [assembly: InternalsVisibleTo("Telerik.JustMock.XUnit.Tests")]
