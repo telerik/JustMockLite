@@ -386,7 +386,7 @@ namespace Telerik.JustMock.Tests
 			Mock.AssertSet(() => foo.Value = 1);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("DotNetCore"), TestCategory("Assertion")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Assertion")]
 		public void ShouldBeAbleToSpecifyOccurenceForAssertSet()
 		{
 			var foo = Mock.Create<IFoo>();
@@ -433,7 +433,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Assert(() => foo.EchoOut(out expected));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("DotNetCore"), TestCategory("Assertion")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Assertion")]
 		public void ShoudThrowForUninitializedIndexedSet()
 		{
 			var foo = Mock.Create<IFooIndexed>();
@@ -455,7 +455,7 @@ namespace Telerik.JustMock.Tests
 			Mock.AssertSet(() => foo[0] = "ping");
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("DotNetCore"), TestCategory("Assertion")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Assertion")]
 		public void ShouldAssertSetWithIndexerWithMatcher()
 		{
 			var foo = Mock.Create<IFooIndexed>();
@@ -1032,7 +1032,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(1, Mock.GetTimesCalled(() => mock.Execute(null), Args.Ignore()));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("DotNetCore"), TestCategory("Assertion")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Assertion")]
 		public void ShouldGetTimesCalledOfSetter()
 		{
 			var mock = Mock.Create<IFoo>();

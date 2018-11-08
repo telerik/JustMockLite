@@ -113,7 +113,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Same(array, foo.GetArray());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("DotNetCore"), TestCategory("Behavior")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Behavior")]
 		public void ShouldReturnEmptyEnumerableOnLoose()
 		{
 			var foo = Mock.Create<IFoo>();
@@ -135,7 +135,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Same(dict, foo.GetDictionary());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("DotNetCore"), TestCategory("Behavior")]
+		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Behavior")]
 		public void ShouldReturnEmptyListOnLoose()
 		{
 			var foo = Mock.Create<IFoo>();
