@@ -53,6 +53,10 @@ using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFa
 #endif
 #endregion
 
+#if XUNIT2
+#pragma warning disable xUnit1013 
+#endif
+
 namespace Telerik.JustMock.Tests
 {
 	[TestClass]
@@ -68,6 +72,7 @@ namespace Telerik.JustMock.Tests
 			Initialize();
 		}
 #endif
+
 		[TestInitialize]
 		public void Initialize()
 		{
@@ -471,3 +476,7 @@ namespace Telerik.JustMock.Tests
 		}
 	}
 }
+
+#if XUNIT2
+#pragma warning restore xUnit1013 
+#endif

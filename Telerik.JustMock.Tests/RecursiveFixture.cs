@@ -57,6 +57,10 @@ using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFa
 [assembly: Telerik.JustMock.MockedType(typeof(Telerik.JustMock.Tests.RecursiveFixture.ValidateMember))]
 #endif
 
+#if XUNIT2
+#pragma warning disable xUnit1013 
+#endif
+
 namespace Telerik.JustMock.Tests
 {
 	[TestClass]

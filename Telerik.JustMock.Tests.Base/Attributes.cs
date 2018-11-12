@@ -10,6 +10,10 @@ using Xunit.Abstractions;
 #endif
 #endif
 
+#if XUNIT2
+#pragma warning disable xUnit1013 
+#endif
+
 namespace Telerik.JustMock.XUnit.Test.Attributes
 {
 #if XUNIT
@@ -24,16 +28,19 @@ namespace Telerik.JustMock.XUnit.Test.Attributes
     public class EmptyTestMethodAttribute : System.Attribute
     {
     }
+
     [SerializableAttribute]
     [AttributeUsageAttribute(AttributeTargets.Method, AllowMultiple = false)]
     public class EmptyTestInitializeAttribute : System.Attribute
     {
     }
+
     [SerializableAttribute]
     [AttributeUsageAttribute(AttributeTargets.Method, AllowMultiple = false)]
     public class EmptyTestCleanupAttribute : System.Attribute
     {
     }
+
     [AttributeUsageAttribute(AttributeTargets.Method, AllowMultiple = true)]
 #if !XUNIT2
     public class XUnitCategoryAttribute : Xunit.TraitAttribute
@@ -62,3 +69,7 @@ namespace Telerik.JustMock.XUnit.Test.Attributes
 #endif
 #endif
 }
+
+#if XUNIT2
+#pragma warning restore xUnit1013 
+#endif

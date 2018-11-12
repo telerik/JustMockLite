@@ -2,9 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-
-
-
 #region JustMock Test Attributes
 #if NUNIT
 using NUnit.Framework;
@@ -35,8 +32,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException;
 #endif
 #endregion
-
-
 
 namespace Telerik.JustMock.Tests
 {

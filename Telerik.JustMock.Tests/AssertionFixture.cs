@@ -23,7 +23,6 @@ using Telerik.JustMock.Core;
 using Telerik.JustMock.Diagnostics;
 
 
-
 #region JustMock Test Attributes
 #if NUNIT
 using NUnit.Framework;
