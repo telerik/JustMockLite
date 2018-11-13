@@ -76,7 +76,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(10, foo.Bar.Value);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Recursive")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Recursive")]
 		public void ShouldAssertNestedProperyCallsAsEqual()
 		{
 			var foo = Mock.Create<IFoo>();
@@ -112,14 +112,14 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(foo.Bar.Baz.Do("y"), "yit");
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Recursive")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Recursive")]
 		public void ShouldNotAutoInstantiateIfNotArranged()
 		{
 			var foo = Mock.Create<IFoo>(Behavior.Loose);
 			Assert.Equal(foo.Bar, null);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Recursive")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Recursive")]
 		public void ShouldAssertNestedPropertySet()
 		{
 			var foo = Mock.Create<IFoo>(Behavior.Strict);
@@ -212,7 +212,7 @@ namespace Telerik.JustMock.Tests
 			Assert.True(idictionaryEventRaised);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Recursive")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Recursive")]
 		public void ShouldBeAbleToEnumerateMockEnumerable()
 		{
 			var mock = Mock.Create<IDataLocator>();
@@ -221,7 +221,7 @@ namespace Telerik.JustMock.Tests
 
 		private IMatrix Matrix { get; set; }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Recursive")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Recursive")]
 		public void ShouldNotAutoArrangeIfPropertyInThis()
 		{
 			var mockedMatrix = Mock.Create<IMatrix>();
@@ -234,7 +234,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(mockedArray, this.Matrix.Raw);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Recursive")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Recursive")]
 		public void ShouldReturnNullOnLoose()
 		{
 			var foo = Mock.Create<IFoo>(Behavior.Loose);
@@ -373,7 +373,7 @@ namespace Telerik.JustMock.Tests
 			IBenefits GetBaz();
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Recursive")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Recursive")]
 		public void ShouldMockRecursivelyCustomMembersOnIEnumerable()
 		{
 			var foo = Mock.Create<IOuter>(Behavior.RecursiveLoose);

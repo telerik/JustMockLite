@@ -240,7 +240,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(5, differentMock.Echo(5));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Matchers")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
 		public void ShouldInferIgnoreInstanceFromNewExpression()
 		{
 			Mock.Arrange(() => new Foo().Echo(5)).Returns(5);
@@ -249,7 +249,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(5, differentMock.Echo(5));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Matchers")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
 		public void ShouldInferIgnoreInstanceFromNullCastToType()
 		{
 			Mock.Arrange(() => ((Foo)null).Echo(5)).Returns(5);
@@ -258,7 +258,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(5, differentMock.Echo(5));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Matchers")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
 		public void ShouldInferIgnoreInstanceFromNullTryCastToType()
 		{
 			Mock.Arrange(() => (null as Foo).Echo(5)).Returns(5);
@@ -267,7 +267,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(5, differentMock.Echo(5));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Matchers")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
 		public void ShouldInferIgnoreInstanceFromTargetPatternContainingCasts()
 		{
 			Mock.Arrange(() => (new Echoer() as IEchoer).Echo(5)).Returns(5);

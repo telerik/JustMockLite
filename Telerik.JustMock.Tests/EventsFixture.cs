@@ -220,7 +220,7 @@ namespace Telerik.JustMock.Tests
 			Assert.True(echoed2);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Events")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Events")]
 		public void ShouldRaiseEventWithStandardEventArgs()
 		{
 			var executor = Mock.Create<IExecutor<int>>();
@@ -238,7 +238,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(expected, acutal);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Events")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Events")]
 		public void ShouldRaiseEventWithCustomEventArgs()
 		{
 			var foo = Mock.Create<IFoo>();
@@ -256,7 +256,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(expected, acutal);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Events"), TestCategory("MockingContext")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Events"), TestCategory("MockingContext")]
 		public void ShouldAssertMockRaiseFromInsideAContainer()
 		{
 			var foo = Mock.Create<IFoo>();
@@ -348,7 +348,7 @@ namespace Telerik.JustMock.Tests
 		}
 #endif
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Events")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Events")]
 		public void ShouldAssertEventHandlerAddingOccurrence()
 		{
 			var doc = Mock.Create<IDocument>();
@@ -360,7 +360,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Assert(doc);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Events")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Events")]
 		public void ShouldRaiseEventWithNullEventArgsArgument()
 		{
 			var doc = Mock.Create<IDocument>();
@@ -369,7 +369,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Raise(() => doc.IsDirtyChanged += null, null);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Events")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Events")]
 		public void ShouldThrowIncompatibleSignatureExceptionWhenExpectedArgumentsDontMatch()
 		{
 			var doc = Mock.Create<IDocument>();
@@ -403,7 +403,7 @@ namespace Telerik.JustMock.Tests
 			}
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Events"), TestCategory("NonPublic")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Events"), TestCategory("NonPublic")]
 		public void ShouldRaiseEventOnMockByName()
 		{
 #if COREFX

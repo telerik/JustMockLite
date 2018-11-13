@@ -61,7 +61,7 @@ namespace Telerik.JustMock.Tests
 	[TestClass]
 	public class BehaviorFixture
 	{
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Behavior")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
 		public void ShouldReturnDefaultValueOnLoose()
 		{
 			var foo = Mock.Create<IFoo>(Behavior.Loose);
@@ -69,7 +69,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Null(foo.GetObject());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Behavior")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
 		public void ShouldReturnMockOnRecursiveLoose()
 		{
 			var foo = Mock.Create<IFoo>(Behavior.RecursiveLoose);
@@ -77,14 +77,14 @@ namespace Telerik.JustMock.Tests
 			Assert.NotNull(foo2);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Behavior")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
 		public void ShouldThrowForNoSetupOnStrict()
 		{
 			var foo = Mock.Create<IFoo>(Behavior.Strict);
 			Assert.Throws<MockException>(() => foo.GetGuid());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Behavior")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
 		public void ShouldAssertMessageForNoSetupOnString()
 		{
 			var foo = Mock.Create<IFoo>(Behavior.Strict);
@@ -95,14 +95,14 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(expected, actual);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Behavior")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
 		public void ShouldReturnDefaultGuidOnLoose()
 		{
 			var foo = Mock.Create<IFoo>();
 			Assert.Equal(default(Guid), foo.GetGuid());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Behavior")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
 		public void ShoudReturnEmptyArrayOnLoose()
 		{
 			var foo = Mock.Create<IFoo>();
@@ -113,7 +113,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Same(array, foo.GetArray());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Behavior")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
 		public void ShouldReturnEmptyEnumerableOnLoose()
 		{
 			var foo = Mock.Create<IFoo>();
@@ -123,7 +123,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Same(e, foo.GetEnumerable());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Behavior")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
 		public void SHouldReturnEmptyDictionaryOnLoose()
 		{
 			var foo = Mock.Create<IFoo>();
@@ -135,7 +135,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Same(dict, foo.GetDictionary());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Behavior")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
 		public void ShouldReturnEmptyListOnLoose()
 		{
 			var foo = Mock.Create<IFoo>();
@@ -146,7 +146,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Same(list, foo.GetList());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Behavior")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
 		public void ShouldAbleToInsertListItemOnLoose()
 		{
 			var foo = Mock.Create<IFoo>();
@@ -157,14 +157,14 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(list[0], "pong");
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Behavior")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
 		public void ShouldReturnNullStringOnLoose()
 		{
 			var foo = Mock.Create<IFoo>(Behavior.Loose);
 			Assert.Equal(foo.GetString(), null);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Behavior")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
 		public void ShouldReturnDefaultForAbstractOnLoose()
 		{
 			var foo = Mock.Create<Foo>();
@@ -179,7 +179,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Throws<StrictMockException>(() => foo.GetString());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Behavior")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
 		public void ShouldAssertSetWUnArrangedPropertyOnLoose()
 		{
 			var foo = Mock.Create<IFoo>();
@@ -207,7 +207,7 @@ namespace Telerik.JustMock.Tests
 		// BCL issue - Reflection.Emit fails for multidimensional arrays until .NET4
 		// with System.TypeLoadException : Signature of the body and declaration in a method implementation do not match.
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Behavior")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
 		public void ShouldReturnEmptyMultidimensionalArray()
 		{
 			var matrix = Mock.Create<IMatrix>();
@@ -218,7 +218,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Same(array, matrix.GetMultidimensionalArray());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Behavior")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior")]
 		public void ShouldCreateRecursiveMockInsideConstructor()
 		{
 			var mock = Mock.Create<CtorMock>(Constructor.NotMocked, Behavior.RecursiveLoose);
@@ -287,7 +287,7 @@ namespace Telerik.JustMock.Tests
 			}
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Behavior"), TestCategory("Strict")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior"), TestCategory("Strict")]
 		public void ShouldAssertStrictMock()
 		{
 			var mock = Mock.Create<IFoo>(Behavior.Strict);
@@ -303,7 +303,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal("Called unarranged member 'System.Guid GetGuid()' on strict mock of type 'Telerik.JustMock.Tests.BehaviorFixture+IFoo'", message.Trim());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Behavior"), TestCategory("Strict")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior"), TestCategory("Strict")]
 		public void ShouldAssertStrictDelegateMock()
 		{
 			var mock = Mock.Create<Action>(Behavior.Strict);
@@ -323,7 +323,7 @@ namespace Telerik.JustMock.Tests
 #endif
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Behavior"), TestCategory("Task")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior"), TestCategory("Task")]
 		public async Task ShouldAutoArrangeResultOfAsyncMethodOnRecursiveLooseMock()
 		{
 			var mock = Mock.Create<IAsyncTest>();
@@ -331,7 +331,7 @@ namespace Telerik.JustMock.Tests
 			Assert.NotNull(result);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Behavior"), TestCategory("Task")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Behavior"), TestCategory("Task")]
 		public async Task ShouldAutoArrangeResultOfAsyncMethodOnLooseMock()
 		{
 			var mock = Mock.Create<IAsyncTest>(Behavior.Loose);

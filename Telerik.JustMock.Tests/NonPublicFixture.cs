@@ -60,7 +60,7 @@ namespace Telerik.JustMock.Tests
 	[TestClass]
 	public class NonPublicFixture
 	{
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic")]
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
 		public void ShouldMockProtectedVirtualMembers()
 		{
 			var foo = Mock.Create<Foo>(Behavior.CallOriginal);
@@ -72,7 +72,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Assert(foo);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic")]
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
 		public void ShouldMockProtectedProperty()
 		{
 			var foo = Mock.Create<Foo>(Behavior.CallOriginal);
@@ -84,7 +84,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(20, ret);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic")]
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
 		public void ShouldMockOverloadUsingMatchers()
 		{
 			var foo = Mock.Create<Foo>(Behavior.CallOriginal);
@@ -100,7 +100,7 @@ namespace Telerik.JustMock.Tests
 			Assert.True(called);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic")]
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
 		public void ShouldMockOverloadUsingConcreteValues()
 		{
 			var foo = Mock.Create<Foo>(Behavior.CallOriginal);
@@ -122,14 +122,14 @@ namespace Telerik.JustMock.Tests
 			Assert.True(called2);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic")]
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
 		public void ShouldThrowArgumentExpectionForNullArguments()
 		{
 			var foo = Mock.Create<Foo>(Behavior.CallOriginal);
 			Assert.Throws<ArgumentException>(() => Mock.NonPublic.Arrange(foo, "ExecuteProtected", 0, null));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic")]
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
 		public void ShouldAssertNonPublicActions()
 		{
 			var foo = Mock.Create<Foo>(Behavior.CallOriginal);
@@ -142,7 +142,7 @@ namespace Telerik.JustMock.Tests
 			Mock.NonPublic.Assert(foo, "ExecuteProtected", 10);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic")]
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
 		public void ShouldAssertNonPublicFunctions()
 		{
 			var foo = Mock.Create<Foo>(Behavior.CallOriginal);
@@ -154,7 +154,7 @@ namespace Telerik.JustMock.Tests
 			Mock.NonPublic.Assert<int>(foo, "IntValue");
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic")]
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
 		public void ShouldThrowForAssertingCallsThatWereNotInvoked()
 		{
 			var foo = Mock.Create<Foo>(Behavior.CallOriginal);
@@ -165,14 +165,14 @@ namespace Telerik.JustMock.Tests
 			Assert.Throws<AssertionException>(() => Mock.NonPublic.Assert(foo, "ExecuteProtected", 10));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic")]
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
 		public void ShouldAssertOccrenceForNonPublicFunction()
 		{
 			var foo = Mock.Create<Foo>(Behavior.CallOriginal);
 			Mock.NonPublic.Assert<int>(foo, "IntValue", Occurs.Never());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic")]
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
 		public void ShouldAssertOccurenceForNonPublicAction()
 		{
 			var foo = Mock.Create<Foo>(Behavior.CallOriginal);
@@ -184,7 +184,7 @@ namespace Telerik.JustMock.Tests
 			Mock.NonPublic.Assert(foo, "ExecuteProtected", Occurs.Exactly(1), 10);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic")]
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
 		public void ShouldThrowMissingMethodExceptionForMethodSpecification()
 		{
 			var foo = Mock.Create<Foo>(Behavior.CallOriginal);
@@ -208,7 +208,7 @@ namespace Telerik.JustMock.Tests
 			Assert.NotNull(foo.Builder);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic")]
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
 		public void ShouldAssertNonPublicMethodFromBase()
 		{
 			var baz = Mock.Create<Baz>(Behavior.CallOriginal);
@@ -223,7 +223,7 @@ namespace Telerik.JustMock.Tests
 		}
 
 #if !PORTABLE
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic")]
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
 		public void ShouldAssertNonPublicCallWhenOccurrenceIsApplied()
 		{
 			var baz = Mock.Create<Bar>(Behavior.CallOriginal);
@@ -408,7 +408,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal("asd", input);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic")]
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
 		public void ShouldNotArrangeNonPublicUsingConstantArgumentWhereByRefIsExpected()
 		{
 			var foo = Mock.Create<RefTest>(Behavior.CallOriginal);
@@ -424,7 +424,7 @@ namespace Telerik.JustMock.Tests
 			protected static int Do(char e) { return 0; }
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic")]
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
 		public void ShouldProvideHelpfulExceptionMessageWhenNonPublicMethodIsMissing()
 		{
 			var foo = Mock.Create<WeirdSignature>();
@@ -492,7 +492,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(5, result);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic")]
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
 		public void ShouldQuickArrangeNonPublicSetter()
 		{
 			var mock = Mock.Create<NonPublicOverloads>(Behavior.CallOriginal);
@@ -504,7 +504,7 @@ namespace Telerik.JustMock.Tests
 			Assert.True(called);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic")]
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
 		public void ShouldFailToQuickArrangeNonPublicOverloadedMethods()
 		{
 			var mock = Mock.Create<NonPublicOverloads>();
@@ -528,7 +528,7 @@ namespace Telerik.JustMock.Tests
 			}
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic")]
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
 		public void ShouldArrangeNonPublicMethodReturningGenericValue()
 		{
 			var mock = Mock.Create<GenericTest>(Behavior.CallOriginal);
@@ -536,7 +536,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(123, mock.TestDo());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("NonPublic")]
+		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic")]
 		public void ShouldArrangeNonPublicMethodReturningGenericValueComplexType()
 		{
 			var mock = Mock.Create<GenericTest>(Behavior.CallOriginal);

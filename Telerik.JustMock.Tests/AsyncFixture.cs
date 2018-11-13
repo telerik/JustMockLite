@@ -48,7 +48,7 @@ namespace Telerik.JustMock.Tests
 			//no exception
 		}
 
-		[TestMethod, TestCategory("Async"), TestCategory("DotNetCore"), TestCategory("Lite")]
+		[TestMethod, TestCategory("Async"), TestCategory("Lite")]
 		public void ShouldCreateRecursiveMockInConstructorOnAnotherThread()
 		{
 			Mock.Arrange(() => Arg.IsAny<ThreadCtor>().Assign()).CallOriginal();
