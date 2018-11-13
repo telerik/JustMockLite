@@ -59,6 +59,6 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("Telerik.JustMock.MSTest.Tests.Elevated")]
 [assembly: InternalsVisibleTo("Telerik.JustMock.MSTest2.Tests")]
 [assembly: InternalsVisibleTo("Telerik.JustMock.MSTest2.Tests.Elevated")]
-[assembly: InternalsVisibleTo("Telerik.JustMock.Nunit.Tests")]
-[assembly: InternalsVisibleTo("Telerik.JustMock.Nunit3.Tests")]
+[assembly: InternalsVisibleTo("Telerik.JustMock.NUnit.Tests")]
+[assembly: InternalsVisibleTo("Telerik.JustMock.NUnit3.Tests")]
 [assembly: InternalsVisibleTo("Telerik.JustMock.XUnit.Tests")]
