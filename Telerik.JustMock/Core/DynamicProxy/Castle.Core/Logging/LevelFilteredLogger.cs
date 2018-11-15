@@ -16,23 +16,27 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 {
 	using System;
 	using System.Globalization;
+#if FEATURE_SECURITY_PERMISSIONS
 #if DOTNET40
 	using System.Security;
 #else
 	using System.Security.Permissions;
 #endif
-
-	/// <summary>
-	///	The Level Filtered Logger class.  This is a base clase which
-	///	provides a LogLevel attribute and reroutes all functions into
-	///	one Log method.
-	/// </summary>
-#if SILVERLIGHT
-	internal abstract class LevelFilteredLogger : ILogger
-#else
-	[Serializable]
-	internal abstract class LevelFilteredLogger : MarshalByRefObject, ILogger
 #endif
+
+    /// <summary>
+    /// The Level Filtered Logger class.  This is a base class which
+    /// provides a LogLevel attribute and reroutes all functions into
+    /// one Log method.
+    /// </summary>
+#if FEATURE_SERIALIZATION
+	[Serializable]
+#endif
+    internal abstract class LevelFilteredLogger :
+#if FEATURE_REMOTING
+		MarshalByRefObject,
+#endif
+		ILogger
 	{
 		private LoggerLevel level = LoggerLevel.Off;
 		private String name = "unnamed";
@@ -59,15 +63,17 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 			ChangeName(loggerName);
 		}
 
-#if !SILVERLIGHT
+#if FEATURE_REMOTING
 		/// <summary>
 		/// Keep the instance alive in a remoting scenario
 		/// </summary>
 		/// <returns></returns>
+#if FEATURE_SECURITY_PERMISSIONS
 #if DOTNET40
 		[SecurityCritical]
 #else
 		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.Infrastructure)]
+#endif
 #endif
 		public override object InitializeLifetimeService()
 		{

@@ -12,16 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Telerik.JustMock.Core.Castle.DynamicProxy
+#if FEATURE_ASSEMBLYBUILDER_SAVE
+
+namespace Telerik.JustMock.Core.InternalsVisibleCastle.DynamicProxy
 {
-#if !SILVERLIGHT
-	/// <summary>
-	///   ProxyBuilder that persists the generated type.
-	/// </summary>
-	/// <remarks>
-	///   The saved assembly contains just the last generated type.
-	/// </remarks>
-	internal class PersistentProxyBuilder : DefaultProxyBuilder
+    using Telerik.JustMock.Core.Castle.DynamicProxy;
+
+    /// <summary>
+    ///   ProxyBuilder that persists the generated type.
+    /// </summary>
+    /// <remarks>
+    ///   The saved assembly contains just the last generated type.
+    /// </remarks>
+    internal class PersistentProxyBuilder : DefaultProxyBuilder
 	{
 		/// <summary>
 		///   Initializes a new instance of the <see cref = "PersistentProxyBuilder" /> class.
@@ -43,5 +46,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 			return ModuleScope.SaveAssembly();
 		}
 	}
-#endif
 }
+
+#endif

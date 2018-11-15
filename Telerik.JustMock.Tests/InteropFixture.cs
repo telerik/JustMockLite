@@ -29,8 +29,8 @@ using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFa
 
 namespace Telerik.JustMock.Tests
 {
-	[TestClass]
-	public unsafe class InteropFixture
+    [TestClass]
+    public unsafe class InteropFixture
 	{
 		public abstract class UnsafeClass1
 		{
@@ -44,10 +44,11 @@ namespace Telerik.JustMock.Tests
 			public abstract int* Realloc(int* x);
 		}
 
-		[TestMethod]
-		public void ShouldArrangeMethodWithPointerArg()
+        // TODO: Examine the problem
+        [TestMethod]
+        public void ShouldArrangeMethodWithPointerArg()
 		{
-			var mock = Mock.Create<UnsafeClass1>();
+            var mock = Mock.Create<UnsafeClass1>();
 			int called = 0;
 
 			Mock.ArrangeSet(() => mock.Do((void*)0)).IgnoreArguments().DoInstead(() => called++);
@@ -59,7 +60,7 @@ namespace Telerik.JustMock.Tests
 		[TestMethod]
 		public void ShouldArrangeMethodWithPointerReturnType()
 		{
-			var mock = Mock.Create<UnsafeClass2>();
+            var mock = Mock.Create<UnsafeClass2>();
 			Mock.Arrange(mock, x => (IntPtr)x.Alloc()).Returns(new IntPtr(1234));
 			var result = mock.Alloc();
 			Assert.Equal(1234, new IntPtr(result).ToInt32());
@@ -81,6 +82,7 @@ namespace Telerik.JustMock.Tests
 
 		public delegate void DoDelegate(ref IntPtr arg);
 
+        // TODO examine the problem
 		[TestMethod]
 		public void ShouldPassPointersByRef()
 		{

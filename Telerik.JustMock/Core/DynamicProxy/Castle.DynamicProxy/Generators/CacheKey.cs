@@ -17,6 +17,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 	using System;
 	using System.Reflection;
 
+#if FEATURE_SERIALIZATION
+	[Serializable]
+#endif
 	internal class CacheKey
 	{
 		private readonly MemberInfo target;
@@ -46,7 +49,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 		/// <param name = "interfaces">The interfaces.</param>
 		/// <param name = "options">The options.</param>
 		public CacheKey(Type target, Type[] interfaces, ProxyGenerationOptions options)
-			: this(target, null, interfaces, options)
+			: this(target.GetTypeInfo(), null, interfaces, options)
 		{
 		}
 

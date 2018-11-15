@@ -17,11 +17,11 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 	using System;
 	using System.IO;
 
-#if SILVERLIGHT
-	internal abstract class AbstractExtendedLoggerFactory : IExtendedLoggerFactory
-#else
-	internal abstract class AbstractExtendedLoggerFactory : MarshalByRefObject, IExtendedLoggerFactory
+    internal abstract class AbstractExtendedLoggerFactory :
+#if FEATURE_REMOTING
+		MarshalByRefObject,
 #endif
+		IExtendedLoggerFactory
 	{
 		/// <summary>
 		///   Creates a new extended logger, getting the logger name from the specified type.
@@ -98,7 +98,6 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// <returns></returns>
 		protected static FileInfo GetConfigFile(string fileName)
 		{
-#if !SILVERLIGHT
 			FileInfo result;
 
 			if (Path.IsPathRooted(fileName))
@@ -107,13 +106,15 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 			}
 			else
 			{
-				result = new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
+#if FEATURE_APPDOMAIN
+				string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+#else
+				string baseDirectory = AppContext.BaseDirectory;
+#endif
+				result = new FileInfo(Path.Combine(baseDirectory, fileName));
 			}
 
 			return result;
-#else
-			return new FileInfo(fileName);
-#endif
 		}
 	}
 }

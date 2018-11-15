@@ -18,11 +18,18 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 	using System.Collections.Generic;
 	using System.Diagnostics;
 	using System.Reflection;
+	using System.Reflection.Emit;
 
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
 
 	internal static class TypeUtil
 	{
+		public static bool IsNullableType(this Type type)
+		{
+			return type.GetTypeInfo().IsGenericType &&
+			       type.GetGenericTypeDefinition() == typeof(Nullable<>);
+		}
+
 		public static FieldInfo[] GetAllFields(this Type type)
 		{
 			if (type == null)
@@ -30,7 +37,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 				throw new ArgumentNullException("type");
 			}
 
-			if (type.IsClass == false)
+			if (type.GetTypeInfo().IsClass == false)
 			{
 				throw new ArgumentException(string.Format("Type {0} is not a class type. This method supports only classes", type));
 			}
@@ -42,7 +49,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 				Debug.Assert(currentType != null);
 				var currentFields = currentType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
 				fields.AddRange(currentFields);
-				currentType = currentType.BaseType;
+				currentType = currentType.GetTypeInfo().BaseType;
 			}
 
 			return fields.ToArray();
@@ -69,7 +76,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 					continue;
 				}
 
-				if (type.IsInterface)
+				if (type.GetTypeInfo().IsInterface)
 				{
 					if (interfaces.Add(type) == false)
 					{
@@ -95,12 +102,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 
 		public static Type GetClosedParameterType(this AbstractTypeEmitter type, Type parameter)
 		{
-			if (parameter.IsGenericTypeDefinition)
+			if (parameter.GetTypeInfo().IsGenericTypeDefinition)
 			{
 				return parameter.GetGenericTypeDefinition().MakeGenericType(type.GetGenericArgumentsFor(parameter));
 			}
 
-			if (parameter.IsGenericType)
+			if (parameter.GetTypeInfo().IsGenericType)
 			{
 				var arguments = parameter.GetGenericArguments();
 				if (CloseGenericParametersIfAny(type, arguments))
@@ -109,12 +116,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 				}
 			}
 
-			if (parameter.IsGenericParameter)
+			if (parameter.GetTypeInfo().IsGenericParameter)
 			{
 				return type.GetGenericArgument(parameter.Name);
 			}
 
-			if (parameter.IsArray)
+			if (parameter.GetTypeInfo().IsArray)
 			{
 				var elementType = GetClosedParameterType(type, parameter.GetElementType());
 				int rank = parameter.GetArrayRank();
@@ -123,7 +130,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 					: elementType.MakeArrayType(rank);
 			}
 
-			if (parameter.IsByRef)
+			if (parameter.GetTypeInfo().IsByRef)
 			{
 				var elementType = GetClosedParameterType(type, parameter.GetElementType());
 				return elementType.MakeByRefType();
@@ -139,6 +146,16 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 				return null;
 			}
 			return target.GetType();
+		}
+
+		public static Type[] AsTypeArray(this GenericTypeParameterBuilder[] typeInfos)
+		{
+			Type[] types = new Type[typeInfos.Length];
+			for (int i = 0; i < types.Length; i++)
+			{
+				types[i] = typeInfos[i].AsType();
+			}
+			return types;
 		}
 
 		public static bool IsFinalizer(this MethodInfo methodInfo)
@@ -158,11 +175,19 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 
 		public static void SetStaticField(this Type type, string fieldName, BindingFlags additionalFlags, object value)
 		{
-			var flags = additionalFlags | BindingFlags.Static | BindingFlags.SetField;
+			var flags = additionalFlags | BindingFlags.Static;
+
+			FieldInfo field = type.GetField(fieldName, flags);
+			if (field == null)
+			{
+				throw new ProxyGenerationException(string.Format(
+					"Could not find field named '{0}' on type {1}. This is likely a bug in DynamicProxy. Please report it.",
+					fieldName, type));
+			}
 
 			try
 			{
-				type.InvokeMember(fieldName, flags, null, null, new[] { value });
+				field.SetValue(null, value);
 			}
 			catch (MissingFieldException e)
 			{
@@ -172,6 +197,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 						fieldName,
 						type), e);
 			}
+#if FEATURE_TARGETEXCEPTION
 			catch (TargetException e)
 			{
 				throw new ProxyGenerationException(
@@ -180,6 +206,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 						fieldName,
 						type), e);
 			}
+#endif
 			catch (TargetInvocationException e) // yes, this is not documented in MSDN. Yay for documentation
 			{
 				if ((e.InnerException is TypeInitializationException) == false)

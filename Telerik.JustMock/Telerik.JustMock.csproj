@@ -27,7 +27,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\..\Binaries\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NO_ASSEMBLY_SCANNING;NO_EXCEPTION_SERIALIZATION</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NO_ASSEMBLY_SCANNING;NO_EXCEPTION_SERIALIZATION;FEATURE_SERIALIZATION;FEATURE_LEGACY_REFLECTION_API;FEATURE_ASSEMBLYBUILDER_SAVE;FEATURE_APPDOMAIN;FEATURE_REMOTING</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -60,7 +60,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugFree|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\..\..\Binaries\DebugFree\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;LITE_EDITION;NO_ASSEMBLY_SCANNING;NO_EXCEPTION_SERIALIZATION</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;LITE_EDITION;NO_ASSEMBLY_SCANNING;NO_EXCEPTION_SERIALIZATION;FEATURE_SERIALIZATION;FEATURE_APPDOMAIN;FEATURE_ASSEMBLYBUILDER_SAVE;FEATURE_BINDINGLIST;FEATURE_DICTIONARYADAPTER_XML;FEATURE_EMIT_CUSTOMMODIFIERS;FEATURE_EVENTLOG;FEATURE_GAC;FEATURE_GET_REFERENCED_ASSEMBLIES;FEATURE_IDATAERRORINFO;FEATURE_ISUPPORTINITIALIZE;FEATURE_LISTSORT;FEATURE_REMOTING;FEATURE_SECURITY_PERMISSIONS;FEATURE_SERIALIZATION;FEATURE_SMTP;FEATURE_SYSTEM_CONFIGURATION;FEATURE_TARGETEXCEPTION;FEATURE_TEST_COM;FEATURE_TEST_SERILOGINTEGRATION;FEATURE_TEST_PEVERIFY;FEATURE_LEGACY_REFLECTION_API;DOTNET40</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -244,6 +244,22 @@
     <Compile Include="AutoMock\Ninject\Syntax\IResolutionRoot.cs" />
     <Compile Include="AutoMock\Ninject\Syntax\ModuleLoadExtensions.cs" />
     <Compile Include="AutoMock\Ninject\Syntax\ResolutionExtensions.cs" />
+    <Compile Include="Core\DynamicProxy\Castle.Compatibility\CustomAttributeExtensions.cs" />
+    <Compile Include="Core\DynamicProxy\Castle.Compatibility\IntrospectionExtensions.cs" />
+    <Compile Include="Core\DynamicProxy\Castle.Compatibility\NetCoreReflectionExtensions.cs" />
+    <Compile Include="Core\DynamicProxy\Castle.Compatibility\RuntimeReflectionExtensions.cs" />
+    <Compile Include="Core\DynamicProxy\Castle.Compatibility\TypeBuilderExtensions.cs" />
+    <Compile Include="Core\DynamicProxy\Castle.Core\Internal\InternalsVisible.cs" />
+    <Compile Include="Core\DynamicProxy\Castle.Core\Internal\TypeExtensions.cs" />
+    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Contributors\FieldReferenceComparer.cs" />
+    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\CustomAttributeInfo.cs" />
+    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\ExceptionMessageBuilder.cs" />
+    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Generators\MetaTypeElementUtil.cs" />
+    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\IProxyGenerator.cs" />
+    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Serialization\ProxyObjectReference.cs" />
+    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Serialization\ProxyTypeConstants.cs" />
+    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Tokens\FormatterServicesMethods.cs" />
+    <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Tokens\SerializationInfoMethods.cs" />
     <Compile Include="Core\MockCreationSettings.cs" />
     <Compile Include="Core\MockingUtils.MethodBodyDisassembler.cs" />
     <Compile Include="Core\ProxyTypeInfo.cs" />
@@ -686,9 +702,9 @@
       <LastGenOutput>Func.cs</LastGenOutput>
     </None>
     <Compile Include="Mock.Create.cs" />
-    <None Include="../Solution Items/snkey_lite.snk">
+    <EmbeddedResource Include="../Solution Items/snkey_lite.snk">
       <Link>snkey_lite.snk</Link>
-    </None>
+    </EmbeddedResource>
     <None Include="TextBuilder.include" />
   </ItemGroup>
   <ItemGroup>

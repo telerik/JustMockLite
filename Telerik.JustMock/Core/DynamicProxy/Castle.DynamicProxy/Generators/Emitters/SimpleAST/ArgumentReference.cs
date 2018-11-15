@@ -16,35 +16,35 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 {
 	using System;
 	using System.Diagnostics;
-	using System.Reflection;
-	using System.Reflection.Emit;
+    using System.Reflection;
+    using System.Reflection.Emit;
 
 	[DebuggerDisplay("argument {Type}")]
 	internal class ArgumentReference : TypeReference
 	{
 		public ArgumentReference(Type argumentType)
-			: this(argumentType, DBNull.Value)
-		{ }
+            : this(argumentType, DBNull.Value)
+        { }
 
-	    public ArgumentReference(Type argumentType, object defaultValue)
-			: base(argumentType)
-		{
+        public ArgumentReference(Type argumentType, object defaultValue)
+            : base(argumentType)
+        {
             this.DefaultValue = defaultValue;
             ParameterAttributes = ParameterAttributes.None;
             Position = -1;
-		}
+        }
 
-	    public ArgumentReference(Type argumentType, int position, ParameterAttributes parameterAttributes)
+        public ArgumentReference(Type argumentType, int position, ParameterAttributes parameterAttributes)
 			: base(argumentType)
 		{
-			Position = position;
+            Position = position;
 		}
 
         internal object DefaultValue { get; private set; }
         internal int Position { get; set; }
         internal ParameterAttributes ParameterAttributes { get; set; }
 
-		public override void LoadAddressOfReference(ILGenerator gen)
+        public override void LoadAddressOfReference(ILGenerator gen)
 		{
 			throw new NotSupportedException();
 		}
@@ -53,7 +53,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 		{
 			if (Position == -1)
 			{
-				throw new ProxyGenerationException("ArgumentReference unitialized");
+				throw new ProxyGenerationException("ArgumentReference uninitialized");
 			}
 			switch (Position)
 			{
@@ -70,7 +70,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 					gen.Emit(OpCodes.Ldarg_3);
 					break;
 				default:
-                    gen.Emit(OpCodes.Ldarg, Position);
+					gen.Emit(OpCodes.Ldarg_S, Position);
 					break;
 			}
 		}
@@ -79,7 +79,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 		{
 			if (Position == -1)
 			{
-				throw new ProxyGenerationException("ArgumentReference unitialized");
+				throw new ProxyGenerationException("ArgumentReference uninitialized");
 			}
 			gen.Emit(OpCodes.Starg, Position);
 		}

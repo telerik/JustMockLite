@@ -1,4 +1,4 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2016 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Telerik.JustMock
+namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 {
 	using System;
 	using System.Collections.Generic;
-    using System.Linq;
-    using System.Runtime.InteropServices;
-    using System.Security.Permissions;
-    using Telerik.JustMock.Core;
+	using System.Linq;
+	using System.Reflection;
 
     /// <summary>
     /// A list of attributes that must not be replicated when building a proxy. JustMock
@@ -30,35 +28,38 @@ namespace Telerik.JustMock
     /// <example>
     /// <see cref="AttributesToAvoidReplicating"/>.Add(typeof(ServiceContractAttribute));
     /// </example>
-	public static class AttributesToAvoidReplicating
+
+    public static class AttributesToAvoidReplicating
 	{
-		private static readonly List<Type> attributes = new List<Type>();
+		private static readonly object lockObject = new object();
+
+		private static readonly IList<Type> attributes;
 
 		static AttributesToAvoidReplicating()
 		{
-			Add<ComImportAttribute>();
-#if !SILVERLIGHT
-			Add<SecurityPermissionAttribute>();
+			attributes = new List<Type>()
+			{
+				typeof(System.Runtime.InteropServices.ComImportAttribute),
+				typeof(System.Runtime.InteropServices.MarshalAsAttribute),
+#if !DOTNET35
+				typeof(System.Runtime.InteropServices.TypeIdentifierAttribute),
 #endif
-#if DOTNET40
-			Add<TypeIdentifierAttribute>();
+#if FEATURE_SECURITY_PERMISSIONS
+				typeof(System.Security.Permissions.SecurityAttribute),
 #endif
+			};
 		}
 
-        /// <summary>
-        /// Add an attribute type that must not be replicated when building a proxy.
-        /// </summary>
-        /// <param name="attribute"></param>
 		public static void Add(Type attribute)
 		{
             ProfilerInterceptor.GuardInternal(() =>
+            {
+                if (attributes.Contains(attribute) == false)
                 {
-                    if (attributes.Contains(attribute) == false)
-                    {
-                        attributes.Add(attribute);
-                    }
-                });
-		}
+                    attributes.Add(attribute);
+                }
+            });
+        }
 
         /// <summary>
         /// Add an attribute type that must not be replicated when building a proxy.
@@ -67,11 +68,16 @@ namespace Telerik.JustMock
         public static void Add<T>()
 		{
             ProfilerInterceptor.GuardInternal(() => Add(typeof(T)));
-		}
+        }
 
-		internal static bool Contains(Type type)
+        internal static bool Contains(Type type)
 		{
             return attributes.Any(attr => attr.IsAssignableFrom(type));
+        }
+
+		internal static bool ShouldAvoid(Type attribute)
+		{
+			return attributes.Any(attr => attr.GetTypeInfo().IsAssignableFrom(attribute.GetTypeInfo()));
 		}
 	}
 }

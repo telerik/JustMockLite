@@ -16,11 +16,13 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 {
 	using System;
 
-	/// <summary>
-	/// NullLogFactory used when logging is turned off.
-	/// </summary>
+    /// <summary>
+    /// NullLogFactory used when logging is turned off.
+    /// </summary>
+#if FEATURE_SERIALIZATION
 	[Serializable]
-	internal class NullLogFactory : AbstractLoggerFactory
+#endif
+    internal class NullLogFactory : AbstractLoggerFactory
 	{
 		/// <summary>
 		///   Creates an instance of ILogger with the specified name.

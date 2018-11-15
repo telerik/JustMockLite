@@ -20,10 +20,10 @@ namespace Telerik.JustMock.Core.Castle.Core
 	using System.Linq;
 	using System.Reflection;
 
-	/// <summary>
-	/// Readonly implementation of <see cref="IDictionary"/> which uses an anonymous object as its source. Uses names of properties as keys, and property values as... well - values. Keys are not case sensitive.
-	/// </summary>
-	internal sealed class ReflectionBasedDictionaryAdapter : IDictionary
+    /// <summary>
+    /// Readonly implementation of <see cref="IDictionary"/> which uses an anonymous object as its source. Uses names of properties as keys, and property values as... well - values. Keys are not case sensitive.
+    /// </summary>
+    internal sealed class ReflectionBasedDictionaryAdapter : IDictionary
 	{
 		private readonly Dictionary<string, object> properties =
 			new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
@@ -245,22 +245,7 @@ namespace Telerik.JustMock.Core.Castle.Core
 
 		private static object GetPropertyValue(object target, PropertyInfo property)
 		{
-			try
-			{
-				return property.GetValue(target, null);
-			}
-			catch (MethodAccessException
-#if SILVERLIGHT
-				e)
-			{
-				string message = "Could not read properties of anonymous object due to restrictive behavior of Silverlight. Make your assembly internal types visible to Castle.Core by adding the following attribute: [assembly: InternalsVisibleTo(InternalsVisible.ToCastleCore)]";
-				throw new InvalidOperationException(message,e);
-#else
-				)
-			{
-				throw;
-#endif
-			}
+			return property.GetValue(target, null);
 		}
 
 		private static IEnumerable<PropertyInfo> GetReadableProperties(Type targetType)

@@ -57,13 +57,13 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			return new FieldReference(InvocationMethods.Target);
 		}
 
-		protected override void ImplementInvokeMethodOnTarget(AbstractTypeEmitter invocation, MethodInfo method,
+		protected override void ImplementInvokeMethodOnTarget(AbstractTypeEmitter invocation, ParameterInfo[] parameters,
 		                                                      MethodEmitter invokeMethodOnTarget, Reference targetField)
 		{
 			invokeMethodOnTarget.CodeBuilder.AddStatement(
 				new ExpressionStatement(
 					new MethodInvocationExpression(SelfReference.Self, InvocationMethods.EnsureValidTarget)));
-			base.ImplementInvokeMethodOnTarget(invocation, method, invokeMethodOnTarget, targetField);
+			base.ImplementInvokeMethodOnTarget(invocation, parameters, invokeMethodOnTarget, targetField);
 		}
 	}
 }

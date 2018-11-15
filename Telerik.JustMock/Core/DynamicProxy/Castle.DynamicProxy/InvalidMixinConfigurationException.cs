@@ -15,9 +15,13 @@
 namespace Telerik.JustMock.Core.Castle.DynamicProxy
 {
 	using System;
+#if FEATURE_SERIALIZATION
 	using System.Runtime.Serialization;
+#endif
 
+#if FEATURE_SERIALIZATION
 	[Serializable]
+#endif
 	internal class InvalidMixinConfigurationException : Exception
 	{
 		public InvalidMixinConfigurationException(string message)
@@ -29,7 +33,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		{
 		}
 
-#if !SILVERLIGHT
+#if FEATURE_SERIALIZATION
 		protected InvalidMixinConfigurationException(SerializationInfo info, StreamingContext context) : base(info, context)
 		{
 		}

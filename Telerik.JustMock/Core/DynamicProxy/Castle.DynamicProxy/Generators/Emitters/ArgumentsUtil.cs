@@ -15,8 +15,9 @@
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 {
 	using System;
-	using System.Linq;
-	using System.Reflection;
+	using System.ComponentModel;
+    using System.Linq;
+    using System.Reflection;
 	using System.Reflection.Emit;
 
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
@@ -65,7 +66,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 
 			for (var i = 0; i < args.Length; ++i)
 			{
-				arguments[i] = new ReferenceExpression(new ArgumentReference(args[i].ParameterType, i + 1, args[i].Attributes));
+                arguments[i] = new ReferenceExpression(new ArgumentReference(args[i].ParameterType, i + 1, args[i].Attributes));
 			}
 
 			return arguments;
@@ -115,11 +116,13 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 			}
 		}
 
+		[Obsolete]
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		public static bool IsAnyByRef(ParameterInfo[] parameters)
 		{
 			for (var i = 0; i < parameters.Length; i++)
 			{
-				if (parameters[i].ParameterType.IsByRef)
+				if (parameters[i].ParameterType.GetTypeInfo().IsByRef)
 				{
 					return true;
 				}
@@ -127,16 +130,16 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 			return false;
 		}
 
-		public static MethodInfo PointerFromIntPtr()
-		{
-			return typeof(IntPtr).GetMethods(BindingFlags.Public | BindingFlags.Static)
-					.First(m => m.Name == "op_Explicit" && m.ReturnType.IsPointer);
-		}
+        public static MethodInfo PointerFromIntPtr()
+        {
+            return typeof(IntPtr).GetMethods(BindingFlags.Public | BindingFlags.Static)
+                    .First(m => m.Name == "op_Explicit" && m.ReturnType.IsPointer);
+        }
 
-		public static MethodInfo IntPtrFromPointer()
-		{
-			return typeof(IntPtr).GetMethods(BindingFlags.Public | BindingFlags.Static)
-					.First(m => m.Name == "op_Explicit" && m.GetParameters()[0].ParameterType.IsPointer);
-		}
-	}
+        public static MethodInfo IntPtrFromPointer()
+        {
+            return typeof(IntPtr).GetMethods(BindingFlags.Public | BindingFlags.Static)
+                    .First(m => m.Name == "op_Explicit" && m.GetParameters()[0].ParameterType.IsPointer);
+        }
+    }
 }

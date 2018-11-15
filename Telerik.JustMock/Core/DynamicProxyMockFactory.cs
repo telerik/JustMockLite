@@ -50,8 +50,8 @@ namespace Telerik.JustMock.Core
 
 		public bool IsAccessible(Type type)
 		{
-			return generator.ProxyBuilder.ModuleScope.Internals.IsAccessible(type);
-		}
+            return ProxyUtil.IsAccessibleType(type);
+        }
 
 		public object Create(Type type, MocksRepository repository, IMockMixin mockMixinImpl, MockCreationSettings settings, bool createTransparentProxy)
 		{
@@ -64,7 +64,8 @@ namespace Telerik.JustMock.Core
 			{
 				foreach (var attr in settings.AdditionalProxyTypeAttributes)
 				{
-					options.AdditionalAttributes.Add(attr);
+                    // TODO DP
+					//options.AdditionalAttributes.Add(attr);
 				}
 			}
 
@@ -209,7 +210,8 @@ namespace Telerik.JustMock.Core
 			{
 				foreach (var attr in settings.AdditionalProxyTypeAttributes)
 				{
-					options.AdditionalAttributes.Add(attr);
+                    // TODO DP
+					//options.AdditionalAttributes.Add(attr);
 				}
 			}
 

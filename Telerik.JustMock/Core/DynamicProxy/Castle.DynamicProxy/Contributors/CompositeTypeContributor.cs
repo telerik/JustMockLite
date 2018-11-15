@@ -17,6 +17,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 	using System;
 	using System.Collections.Generic;
 	using System.Diagnostics;
+	using System.Reflection;
 
 	using Telerik.JustMock.Core.Castle.Core.Logging;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
@@ -26,20 +27,18 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 	internal abstract class CompositeTypeContributor : ITypeContributor
 	{
 		protected readonly INamingScope namingScope;
-        protected readonly ModuleScope scope;
-        protected readonly ICollection<Type> interfaces = new HashSet<Type>();
+
+		protected readonly ICollection<Type> interfaces = new HashSet<Type>();
 		
 		private ILogger logger = NullLogger.Instance;
 		private readonly ICollection<MetaProperty> properties = new TypeElementCollection<MetaProperty>();
 		private readonly ICollection<MetaEvent> events = new TypeElementCollection<MetaEvent>();
 		private readonly ICollection<MetaMethod> methods = new TypeElementCollection<MetaMethod>();
 
-
-        protected CompositeTypeContributor(INamingScope namingScope, ModuleScope scope)
-        {
-            this.scope = scope;
-            this.namingScope = namingScope;
-        }
+		protected CompositeTypeContributor(INamingScope namingScope)
+		{
+			this.namingScope = namingScope;
+		}
 
 		public ILogger Logger
 		{
@@ -100,7 +99,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 		public void AddInterfaceToProxy(Type @interface)
 		{
 			Debug.Assert(@interface != null, "@interface == null", "Shouldn't be adding empty interfaces...");
-			Debug.Assert(@interface.IsInterface, "@interface.IsInterface", "Should be adding interfaces only...");
+			Debug.Assert(@interface.GetTypeInfo().IsInterface, "@interface.IsInterface", "Should be adding interfaces only...");
 			Debug.Assert(!interfaces.Contains(@interface), "!interfaces.ContainsKey(@interface)",
 			             "Shouldn't be adding same interface twice...");
 
@@ -144,7 +143,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 				var proxyMethod = generator.Generate(@class, options, namingScope);
 				foreach (var attribute in method.Method.GetNonInheritableAttributes())
 				{
-					proxyMethod.DefineCustomAttribute(attribute);
+					proxyMethod.DefineCustomAttribute(attribute.Builder);
 				}
 			}
 		}
