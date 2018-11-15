@@ -365,6 +365,11 @@ namespace Telerik.JustMock.Tests
 		[TestMethod, TestCategory("Lite"), TestCategory("Misc")]
 		public void ShouldAssertStreamMocking()
 		{
+
+#if NETCORE
+			Telerik.JustMock.Setup.AllowedMockableTypes.Add<System.IO.Stream>();
+#endif
+
 			var stream = Mock.Create<Stream>();
 
 			Mock.Arrange(() => stream.Seek(0, SeekOrigin.Begin)).Returns(0L);
