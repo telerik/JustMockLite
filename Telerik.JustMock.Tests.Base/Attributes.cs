@@ -67,6 +67,17 @@ namespace Telerik.JustMock.XUnit.Test.Attributes
         }
     }
 #endif
+
+    public static class SkipReason
+    {
+#if XUNIT2
+        // It seems that xUnit2 requires not empty string in order to skip the test, see
+        // https://stackoverflow.com/questions/14840172/skipping-a-whole-test-class-in-xunit-net
+        public const string Value = " ";
+#else
+        public const string Value = "";
+#endif
+    }
 #endif
 }
 
