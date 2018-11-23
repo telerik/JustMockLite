@@ -440,7 +440,7 @@ namespace Telerik.JustMock.Tests
 			Mock.ArrangeSet(() => foo[0] = "ping");
 
 			Assert.Throws<AssertionException>(() => Mock.AssertSet(() => foo[0] = "ping"));
-        }
+		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
 		public void ShouldAssertIndexerSet()
@@ -1048,7 +1048,14 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(1, Mock.GetTimesSetCalled(() => mock.Value = 0, Args.Ignore()));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+#if XUNIT
+		[Fact(Skip = SkipReason.Value)]
+#elif NUNIT
+		[TestMethod, Ignore("")]
+#else
+		[TestMethod, Ignore]
+#endif
+		[TestCategory("Lite"), TestCategory("Assertion")]
 		public void ShouldGetDebugViewTraceInMockException()
 		{
 			var traceEnabled = DebugView.IsTraceEnabled;
@@ -1068,58 +1075,58 @@ namespace Telerik.JustMock.Tests
 			}
 		}
 
-        [TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
-        public void ShouldAssertSetUsingRighsideLamdaMockResultOccursOnce()
-        {
-            // Arrange
-            var fooMock = Mock.Create<IFoo>();
-            var barMock = Mock.Create<Bar>();
-            Mock.Arrange(() => barMock.Echo(Arg.IsAny<int>())).Returns(2);
+		[TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+		public void ShouldAssertSetUsingRighsideLamdaMockResultOccursOnce()
+		{
+			// Arrange
+			var fooMock = Mock.Create<IFoo>();
+			var barMock = Mock.Create<Bar>();
+			Mock.Arrange(() => barMock.Echo(Arg.IsAny<int>())).Returns(2);
 
-            // Act
-            fooMock.Value = barMock.Echo(1);
+			// Act
+			fooMock.Value = barMock.Echo(1);
 
-            // Assert
-            Mock.AssertSet(() => fooMock.Value = barMock.Echo(1), Occurs.Once());
-        }
+			// Assert
+			Mock.AssertSet(() => fooMock.Value = barMock.Echo(1), Occurs.Once());
+		}
 
-        [TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
-        public void ShouldAssertSetUsingRighsideLamdaMockResultOccursNever()
-        {
-            // Arrange
-            var fooMock = Mock.Create<IFoo>();
-            var barMock = Mock.Create<Bar>();
-            Mock.Arrange(() => barMock.Echo(Arg.IsAny<int>())).Returns(2);
+		[TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+		public void ShouldAssertSetUsingRighsideLamdaMockResultOccursNever()
+		{
+			// Arrange
+			var fooMock = Mock.Create<IFoo>();
+			var barMock = Mock.Create<Bar>();
+			Mock.Arrange(() => barMock.Echo(Arg.IsAny<int>())).Returns(2);
 
-            // Assert
-            Mock.AssertSet(() => fooMock.Value = barMock.Echo(1), Occurs.Never());
-        }
+			// Assert
+			Mock.AssertSet(() => fooMock.Value = barMock.Echo(1), Occurs.Never());
+		}
 
-        [TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
-        public void ShouldAssertSetUsingRighsideLamdaUnmockedResultOccursOnce()
-        {
-            // Arrange
-            var fooMock = Mock.Create<IFoo>();
-            var bar = new Bar();
+		[TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+		public void ShouldAssertSetUsingRighsideLamdaUnmockedResultOccursOnce()
+		{
+			// Arrange
+			var fooMock = Mock.Create<IFoo>();
+			var bar = new Bar();
 
-            // Act
-            fooMock.Value = bar.Echo(1);
+			// Act
+			fooMock.Value = bar.Echo(1);
 
-            // Assert
-            Mock.AssertSet(() => fooMock.Value = bar.Echo(1), Occurs.Once());
-        }
+			// Assert
+			Mock.AssertSet(() => fooMock.Value = bar.Echo(1), Occurs.Once());
+		}
 
-        [TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
-        public void ShouldAssertSetUsingRighsideLamdaUnmockedResultOccursNever()
-        {
-            // Arrange
-            var fooMock = Mock.Create<IFoo>();
-            var bar = new Bar();
+		[TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+		public void ShouldAssertSetUsingRighsideLamdaUnmockedResultOccursNever()
+		{
+			// Arrange
+			var fooMock = Mock.Create<IFoo>();
+			var bar = new Bar();
 
-            // Assert
-            Mock.AssertSet(() => fooMock.Value = bar.Echo(1), Occurs.Never());
-        }
-    }
+			// Assert
+			Mock.AssertSet(() => fooMock.Value = bar.Echo(1), Occurs.Never());
+		}
+	}
 
 #if !XUNIT
 #if !PORTABLE
