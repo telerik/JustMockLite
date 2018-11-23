@@ -158,7 +158,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Assert(foo);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Sequence")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Sequence")]
 		public void Should_Arrange_Calls_In_Sequence()
 		{
 			var foo = Mock.Create<IFoo2>();
@@ -173,7 +173,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(7, foo.Add(2, 5));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Sequence")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Sequence")]
 		public void Should_Arrange_Calls_In_Sequence_Fluently()
 		{
 			var foo = Mock.Create<IFoo2>();

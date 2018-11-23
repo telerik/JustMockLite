@@ -71,14 +71,14 @@ namespace Telerik.JustMock.Tests
 	[TestClass]
 	public class MockFixture
 	{
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldMockInterface()
 		{
 			var iCloneable = Mock.Create<ICloneable>();
 			Assert.NotNull(iCloneable);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldMockInterfaceContainingProperty()
 		{
 			var bar = Mock.Create<IBar>();
@@ -221,7 +221,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(foo.Echo(10), expected);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldThrowIfArgumentsPassedForInterface()
 		{
 			Assert.Throws<Exception>(() => Mock.Create<IFoo>(25, true));
@@ -273,7 +273,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(Assert.Throws<Exception>(() => log.Info("x")).Message, "x");
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void MockObjectShouldBeAssignableToMockedInterface()
 		{
 			var iFoo = Mock.Create<IFoo>();
@@ -320,7 +320,7 @@ namespace Telerik.JustMock.Tests
 		}
 
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldAssertEqualityRefereces()
 		{
 			var iFoo1 = Mock.Create<IFoo>();
@@ -330,7 +330,7 @@ namespace Telerik.JustMock.Tests
 			Assert.False(iFoo1.Equals(iFoo2));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void TwoMockedObjectsShouldHavdDifferentHashCode()
 		{
 			var iFoo1 = Mock.Create<IFoo>();
@@ -338,14 +338,14 @@ namespace Telerik.JustMock.Tests
 			Assert.NotEqual(iFoo1.GetHashCode(), iFoo2.GetHashCode());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ToStringShouldNotbeNullOrEmpty()
 		{
 			var foo = Mock.Create<IFoo>();
 			Assert.False(String.IsNullOrEmpty(foo.ToString()));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldMockClassWithNonDefaultConstructor()
 		{
 			var nonDefaultClass = Mock.Create<ClassWithNonDefaultConstructor>("ping", 1);
@@ -359,21 +359,21 @@ namespace Telerik.JustMock.Tests
 			Assert.NotNull(nonDefaultClass);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldMockClassWithNoDefaultConstructorWithNull()
 		{
 			var nonDefaultClass = Mock.Create<ClassWithNonDefaultConstructor>(null, 1);
 			Assert.NotNull(nonDefaultClass);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShoulsMockClassWithMultipleNonDefaultConstructor()
 		{
 			var nonDefaultClass = Mock.Create<ClassWithNonDefaultConstructor>(null, 1, true);
 			Assert.NotNull(nonDefaultClass);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldAssertGuidNonDefaultCtorWithDefaultIfNotSpecified()
 		{
 			var nonDefaultGuidClass = Mock.Create<ClassNonDefaultGuidConstructor>();
@@ -390,14 +390,14 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(foo.GetGuid(), default(Guid));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldAssertImplementedInterface()
 		{
 			var implemented = Mock.Create<IFooImplemted>();
 			Assert.NotNull(implemented);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldAssertBaseForImplemetedInterface()
 		{
 			var implemented = Mock.Create<IFooImplemted>();
@@ -440,7 +440,7 @@ namespace Telerik.JustMock.Tests
 			Assert.True(foo.Equals(new object()));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldCallUnderlyingEquals()
 		{
 			var foo1 = Mock.Create<FooOverridesEquals>("foo");
@@ -448,7 +448,7 @@ namespace Telerik.JustMock.Tests
 			Assert.True(foo1.Equals(foo2));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldNotCallBaseByDefault()
 		{
 			var foo = Mock.Create<FooBase>();
@@ -512,14 +512,14 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(actual, 10);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldNotInvokeOriginalCallWhenInitiatedFromCtor()
 		{
 			var foo = Mock.Create<FooAbstractCall>(false);
 			Assert.NotNull(foo);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldNotInvokeOriginalActionWhenInitiatedFromCtor()
 		{
 			var foo = Mock.Create<FooAbstractAction>();
@@ -633,7 +633,7 @@ namespace Telerik.JustMock.Tests
 		}
 
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldAssertOutputGenericArgument()
 		{
 			var fooGen = Mock.Create<FooGeneric>();
@@ -737,7 +737,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(2, ret);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldCreateMockFromRealObject()
 		{
 			var realItem = Mock.Create(() => new RealItem());
@@ -745,7 +745,7 @@ namespace Telerik.JustMock.Tests
 		}
 
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldCreateMockFromRealObjectForNonDefaultConstructor()
 		{
 			var realItem = Mock.Create(() => new RealItem(10));
@@ -759,7 +759,7 @@ namespace Telerik.JustMock.Tests
 			Assert.NotNull(realItem);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldCreateMockFromRealCtorWithParams()
 		{
 			// the following line should not throw any argument exception.
@@ -770,7 +770,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(2, realItem.Args.Length);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldAssertMixins()
 		{
 			var realItem = Mock.Create<RealItem>(x =>
@@ -797,7 +797,7 @@ namespace Telerik.JustMock.Tests
 			iDispose.Dispose();
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldImplementDependentInterfacesWhenTopIsSpecified()
 		{
 			var realItem = Mock.Create<RealItem>(x =>
@@ -823,7 +823,7 @@ namespace Telerik.JustMock.Tests
 			Assert.True(isCloned);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldCallOriginalMethodForCallsOriginal()
 		{
 			var foo = Mock.Create<FooBase>(Behavior.CallOriginal);
@@ -912,7 +912,7 @@ namespace Telerik.JustMock.Tests
 			Assert.True(foo.FindOne(criteria));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldThrowNotImplementedExceptionForBaseInovocationOnAbstract()
 		{
 			var node = Mock.Create<ExpressionNode>(Behavior.CallOriginal);
@@ -967,7 +967,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(10, result);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldCreateMockFromInterfaceWithSimilarGenericOverloads()
 		{
 			var session = Mock.Create<ISession>();
@@ -1088,14 +1088,14 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(2, outArg);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldCheckMethodOverloadsWhenResolvingInterfaceInheritance()
 		{
 			var project = Mock.Create<IProject>();
 			Assert.NotNull(project);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void PropertySetShouldThrowExceptionWhenNameHasSet_Literal()
 		{
 			var b_object = Mock.Create<B>();
@@ -1129,7 +1129,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Assert(() => foo.CallMeOnce(Arg.IsAny<bool>(), badGuid), Occurs.Never());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldEqualityCheckForMockFromAnInterfaceThatHasEquals()
 		{
 			IRule mockRule1 = Mock.Create<IRule>();
@@ -1143,7 +1143,7 @@ namespace Telerik.JustMock.Tests
 			Assert.True(ruleList.Contains(mockRule1));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldAssertMethodWithKeyValuePairTypeArgument()
 		{
 			var presenter = Mock.Create<InteractiveKioskPresenter>(Behavior.CallOriginal);
@@ -1154,7 +1154,7 @@ namespace Telerik.JustMock.Tests
 			presenter.ShowControl(new KeyValuePair<IKioskPart, IKioskWellInfo>(key, val));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldAssertMethodWithStructTypeArgument()
 		{
 			var presenter = Mock.Create<InteractiveKioskPresenter>(Behavior.CallOriginal);
@@ -1206,7 +1206,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Assert(() => foo.Baz["TestName"], Occurs.Once());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldNotSkipBaseInterfaceWhenSomeMembersAreSame()
 		{
 			var loanString = Mock.Create<ILoanStringField>();
@@ -1240,7 +1240,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(value2, result[1]);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldNotInitRescursiveMockingWithProfilerForProperyThatReturnsMock()
 		{
 			WorkerHelper helper = new WorkerHelper();
@@ -1294,13 +1294,13 @@ namespace Telerik.JustMock.Tests
 			Mock.Assert(foo);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldAssertCallOriginalForAbstractClass()
 		{
 			Assert.NotNull(Mock.Create<TestTreeItem>(Behavior.CallOriginal));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldCallBaseWhenCallOriginalSpecifiedForMock()
 		{
 			var item = Mock.Create<TestTreeItem>(Behavior.CallOriginal);
@@ -1338,7 +1338,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Assert(() => ((ISupportInitialize)mock).Initialize());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldArrangeBaseMethodInManyImplementations()
 		{
 			var fe = Mock.Create<FrameworkElement>();
@@ -1366,7 +1366,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Assert(() => (control as ISupportInitialize).Initialize(), Occurs.Once());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldArrangeBaseMethodInManyImplementationsForProperty()
 		{
 			var fe = Mock.Create<FrameworkElement>();
@@ -1394,7 +1394,7 @@ namespace Telerik.JustMock.Tests
 			Mock.Assert(() => (control as ISupportInitialize).Property, Occurs.Once());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldArrangeInheritableMemberOfExplicitlySpecifiedType()
 		{
 			var ident = Mock.Create<IIdentifiable>();
@@ -1739,7 +1739,7 @@ namespace Telerik.JustMock.Tests
 			ICriteria CreateCriteria(System.Type persistentClass, string alias);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldNotTryToWeaveMethodInSilverlightRuntime()
 		{
 			var foo = Mock.Create<FooSilver>();
@@ -2110,7 +2110,7 @@ namespace Telerik.JustMock.Tests
 
 		#endregion
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldInterpretNullAsDefaultInitializedValueTypeInCtorCall()
 		{
 			var mock = Mock.Create<ValueTypeInCtor>(null, null);
@@ -2147,7 +2147,7 @@ namespace Telerik.JustMock.Tests
 			string Identity { [DispId(1)] get; [DispId(1)] set; }
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldCoalesceDifferentMembersWithSameDispIdInVersionedInterfaces()
 		{
 			var mock = Mock.Create<IVersioned2>();
@@ -2188,7 +2188,7 @@ namespace Telerik.JustMock.Tests
 		}
 
 #if !DOTNET35 && !SILVERLIGHT && !WINDOWS_PHONE
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Regression")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Regression")]
 		public void ShouldInterceptDynamicProxyMethodsFromMultipleThreads()
 		{
 			var generator = Mock.Create<IGuidGenerator>();
@@ -2213,7 +2213,7 @@ namespace Telerik.JustMock.Tests
 			}
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldThrowMeaningfulExceptionWhenConstructorArgumentsAreIncorrect()
 		{
 			var ex = Assert.Throws<Exception>(() => Mock.Create<ClassWithCtor>(5));
@@ -2281,7 +2281,7 @@ namespace Telerik.JustMock.Tests
 			}
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldCallConstructorWithDefaultArguments()
 		{
 			var mock = Mock.Create<CtorWithDefaults>(Behavior.CallOriginal);
@@ -2321,7 +2321,7 @@ namespace Telerik.JustMock.Tests
 			}
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldCallStaticConstructorWhenCreatingMock()
 		{
 			var mock = Mock.Create<StaticCtor>();
@@ -2380,7 +2380,7 @@ namespace Telerik.JustMock.Tests
 			public string Name { get; set; }
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
 		public void ShouldTreatInterfaceAndImplementationMemberIdentically()
 		{
 			var mock = Mock.Create<EntityBase>();

@@ -21,10 +21,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Telerik.JustMock.XUnit.Test
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Telerik.JustMock.Tests.Base", "Telerik.JustMock.Tests.Base\Telerik.JustMock.Tests.Base.shproj", "{EB616AFE-5BAC-4B9F-A46E-7EFC592249D0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Telerik.JustMock.MSTest.SimpleTests", "Telerik.JustMock.MSTest.SimpleTests\Telerik.JustMock.MSTest.SimpleTests.csproj", "{BFBACD60-E544-4B35-92CC-E60E521A5093}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Telerik.JustMock.SimpleTests", "Telerik.JustMock.SimpleTests\Telerik.JustMock.SimpleTests.shproj", "{6DE82214-291D-4DE6-A667-B8E68DDAD910}"
-EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Telerik.JustMock.Tests.Base\Telerik.JustMock.Tests.Base.projitems*{12629109-a1aa-4abb-852a-087dd15205f3}*SharedItemsImports = 4
@@ -33,7 +29,6 @@ Global
 		Telerik.JustMock.Tests\Telerik.JustMock.Tests.projitems*{1b34a434-aa3f-412a-b843-f6c082a92bda}*SharedItemsImports = 4
 		Telerik.JustMock.Tests.Base\Telerik.JustMock.Tests.Base.projitems*{3aedda3d-9525-4d05-bbda-9613ac30b0d1}*SharedItemsImports = 4
 		Telerik.JustMock.Tests\Telerik.JustMock.Tests.projitems*{3aedda3d-9525-4d05-bbda-9613ac30b0d1}*SharedItemsImports = 4
-		Telerik.JustMock.SimpleTests\Telerik.JustMock.SimpleTests.projitems*{6de82214-291d-4de6-a667-b8e68ddad910}*SharedItemsImports = 13
 		Telerik.JustMock.Tests\Telerik.JustMock.Tests.projitems*{6f2aea8b-7295-4446-9686-663993ae0b18}*SharedItemsImports = 13
 		Telerik.JustMock.Tests.Base\Telerik.JustMock.Tests.Base.projitems*{83f0c270-db35-4b80-beda-5aed79c0fb2d}*SharedItemsImports = 4
 		Telerik.JustMock.Tests\Telerik.JustMock.Tests.projitems*{83f0c270-db35-4b80-beda-5aed79c0fb2d}*SharedItemsImports = 4
@@ -117,16 +112,6 @@ Global
 		{3AEDDA3D-9525-4D05-BBDA-9613AC30B0D1}.ReleaseFree|Any CPU.Build.0 = ReleaseFree|Any CPU
 		{3AEDDA3D-9525-4D05-BBDA-9613AC30B0D1}.ReleaseTrial|Any CPU.ActiveCfg = ReleaseFree|Any CPU
 		{3AEDDA3D-9525-4D05-BBDA-9613AC30B0D1}.ReleaseTrial|Any CPU.Build.0 = ReleaseFree|Any CPU
-		{BFBACD60-E544-4B35-92CC-E60E521A5093}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BFBACD60-E544-4B35-92CC-E60E521A5093}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BFBACD60-E544-4B35-92CC-E60E521A5093}.DebugFree|Any CPU.ActiveCfg = DebugFree|Any CPU
-		{BFBACD60-E544-4B35-92CC-E60E521A5093}.DebugFree|Any CPU.Build.0 = DebugFree|Any CPU
-		{BFBACD60-E544-4B35-92CC-E60E521A5093}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BFBACD60-E544-4B35-92CC-E60E521A5093}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BFBACD60-E544-4B35-92CC-E60E521A5093}.ReleaseFree|Any CPU.ActiveCfg = ReleaseFree|Any CPU
-		{BFBACD60-E544-4B35-92CC-E60E521A5093}.ReleaseFree|Any CPU.Build.0 = ReleaseFree|Any CPU
-		{BFBACD60-E544-4B35-92CC-E60E521A5093}.ReleaseTrial|Any CPU.ActiveCfg = ReleaseFree|Any CPU
-		{BFBACD60-E544-4B35-92CC-E60E521A5093}.ReleaseTrial|Any CPU.Build.0 = ReleaseFree|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

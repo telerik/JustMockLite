@@ -54,7 +54,7 @@ namespace Telerik.JustMock.Core.Context
 
 		protected virtual Expression<Func<string, Exception, Exception>> CreateExceptionFactory()
 		{
-            Type assertionException = FindType(this.assertFailedExceptionTypeName);
+			Type assertionException = FindType(this.assertFailedExceptionTypeName);
 			return this.CreateExceptionFactory(assertionException);
 		}
 
@@ -67,23 +67,43 @@ namespace Telerik.JustMock.Core.Context
 			return (Expression<Func<string, Exception, Exception>>)Expression.Lambda(typeof(Func<string, Exception, Exception>), newException, messageParam, innerExceptionParam);
 		}
 
-		protected static Type FindType(string assemblyAndTypeName, bool throwOnNotFound = true)
-        {
-            string[] parts = assemblyAndTypeName.Split(',').Select(s => s.Trim()).ToArray();
-            string assemblyName = parts[1];
+		protected static Type FindType(string assemblyAndTypeName, bool throwOnNotFound = true, bool forceAssemblyLoad = false)
+		{
+			string[] parts = assemblyAndTypeName.Split(',').Select(s => s.Trim()).ToArray();
+			string assemblyName = parts[1];
 
-            Assembly assembly = GetAssembly(assemblyName);
-            Type foundType = assembly != null ? assembly.GetType(parts[0]) : null;
-            if (foundType == null && throwOnNotFound)
-                throw new InvalidOperationException(String.Format("Test framework type '{0}' not found", assemblyAndTypeName));
+			Assembly assembly = GetAssembly(assemblyName, throwOnNotFound, forceAssemblyLoad);
+			Type foundType = assembly != null ? assembly.GetType(parts[0]) : null;
+			if (foundType == null && throwOnNotFound)
+			{
+				throw new InvalidOperationException(String.Format("Test framework type '{0}' not found", assemblyAndTypeName));
+			}
 
-            return foundType;
-        }
+			return foundType;
+		}
 
-        protected static Assembly GetAssembly(string assemblyName)
-        {
-            return AppDomain.CurrentDomain.GetAssemblies()
-                .FirstOrDefault(a => String.Equals(a.GetAssemblyName(), assemblyName, StringComparison.OrdinalIgnoreCase));
-        }
-    }
+		protected static Assembly GetAssembly(string assemblyName, bool throwOnLoad = false, bool forceLoad = false)
+		{
+			AppDomain appDomain = AppDomain.CurrentDomain;
+
+			Assembly assembly = appDomain.GetAssemblies()
+				.FirstOrDefault(a => String.Equals(a.GetAssemblyName(), assemblyName, StringComparison.OrdinalIgnoreCase));
+			if (assembly == null && forceLoad)
+			{
+				try
+				{
+					assembly = appDomain.Load(new AssemblyName(assemblyName));
+				}
+				catch (Exception /*e*/)
+				{
+					if (throwOnLoad)
+					{
+						throw;
+					}
+				}
+			}
+
+			return assembly;
+		}
+	}
 }

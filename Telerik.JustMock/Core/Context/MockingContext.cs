@@ -139,10 +139,6 @@ namespace Telerik.JustMock.Core.Context
 			if (XamarinIosNUnitContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new XamarinIosNUnitContextResolver());
 #else
-			if (MSTestMockingContextResolver.IsAvailable)
-				registeredContextResolvers.Add(new MSTestMockingContextResolver());
-			if (MSTestV2MockingContextResolver.IsAvailable)
-				registeredContextResolvers.Add(new MSTestV2MockingContextResolver());
 			if (XUnit1xMockingContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new XUnit1xMockingContextResolver());
 			if (XUnit2xMockingContextResolver.IsAvailable)
@@ -157,6 +153,10 @@ namespace Telerik.JustMock.Core.Context
 				registeredContextResolvers.Add(new MSpecContextResolver());
 			if (MbUnitContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new MbUnitContextResolver());
+			if (MSTestMockingContextResolver.IsAvailable)
+				registeredContextResolvers.Add(new MSTestMockingContextResolver());
+			if (MSTestV2MockingContextResolver.IsAvailable)
+				registeredContextResolvers.Add(new MSTestV2MockingContextResolver());
 #endif
 
 			foreach (var resolver in registeredContextResolvers)

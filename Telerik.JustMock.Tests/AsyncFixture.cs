@@ -2,9 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-
-
-
 #region JustMock Test Attributes
 #if NUNIT
 using NUnit.Framework;
@@ -36,8 +33,6 @@ using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFa
 #endif
 #endregion
 
-
-
 namespace Telerik.JustMock.Tests
 {
 	[TestClass]
@@ -53,7 +48,7 @@ namespace Telerik.JustMock.Tests
 			//no exception
 		}
 
-		[TestMethod, TestCategory("Async"), TestCategory("DotNetCore"), TestCategory("Lite")]
+		[TestMethod, TestCategory("Async"), TestCategory("Lite")]
 		public void ShouldCreateRecursiveMockInConstructorOnAnotherThread()
 		{
 			Mock.Arrange(() => Arg.IsAny<ThreadCtor>().Assign()).CallOriginal();

@@ -108,7 +108,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Throws<AssertionException>(() => Mock.Assert(foo));
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("InOrder")]
+		[TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
 		public void ShouldAsserInOrderExecutionForPropertySet()
 		{
 			var foo = Mock.Create<IFoo>();
@@ -182,7 +182,7 @@ namespace Telerik.JustMock.Tests
 			void CommitChanges();
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("InOrder")]
+		[TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
 		public void ShouldCreateInOrderArrangementOnNonMock()
 		{
 			Mock.Arrange(() => Arg.IsAny<List<string>>().Add("a")).InOrder();
