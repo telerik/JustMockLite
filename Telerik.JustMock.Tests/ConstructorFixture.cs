@@ -53,7 +53,7 @@ namespace Telerik.JustMock.Tests
 	[TestClass]
 	public class ConstructorFixture
 	{
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Constructor")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Constructor")]
 		public void ShouldCallBaseCtorWhenNotMocked()
 		{
 			Assert.Throws<ArgumentException>(() =>
@@ -120,7 +120,7 @@ namespace Telerik.JustMock.Tests
 			public abstract int Id { get; set; }
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Constructor")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Constructor")]
 		public void ShouldCallConstructorRequiringPrimitiveArgumentConversions()
 		{
 			Mock.Create<CtorLongArg>(Behavior.CallOriginal, 0);
@@ -141,7 +141,7 @@ namespace Telerik.JustMock.Tests
 			}
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Constructor")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Constructor")]
 		public void ShouldUseAutoselectedConstructorMockingBehaviorWithFluentConfig()
 		{
 			var proxy = Mock.Create<Base>(fluentConfig =>
@@ -152,7 +152,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(0, proxy.i);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Constructor")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Constructor")]
 		public void ShouldSpecifyConstructorArgumentsWithFluentConfig()
 		{
 			var proxy = Mock.Create<Base>(fluentConfig =>
@@ -173,7 +173,7 @@ namespace Telerik.JustMock.Tests
 			}
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Constructor")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Constructor")]
 		public void ShouldCallDefaultConstructorWhenExplicitlyGivenNoArguments()
 		{
 			var mock = Mock.Create<CallsCtor>(new object[0]);

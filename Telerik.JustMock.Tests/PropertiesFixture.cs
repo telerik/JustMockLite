@@ -89,7 +89,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(indexedFoo[1], "pong");
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Properties")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
 		public void ShouldAssertPropertySet()
 		{
 			var foo = Mock.Create<IFoo>(Behavior.Strict);
@@ -101,7 +101,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Throws<MockException>(() => foo.Value = 2);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Properties")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
 		public void SHouldAssertPropertySetUsingMatcher()
 		{
 			var foo = Mock.Create<IFoo>(Behavior.Strict);
@@ -114,7 +114,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Throws<MockException>(() => foo.Value = 3);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Properties")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
 		public void ShouldAssertIndexedSet()
 		{
 			var foo = Mock.Create<IIndexedFoo>(Behavior.Strict);
@@ -126,7 +126,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Throws<MockException>(() => foo[0] = "fxx");
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Properties")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
 		public void SHouldAssertIndexedSetWithMatcher()
 		{
 			var foo = Mock.Create<IIndexedFoo>(Behavior.Strict);
@@ -138,7 +138,7 @@ namespace Telerik.JustMock.Tests
 			foo[1] = "pong";
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Properties")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
 		public void ShouldAssertThrowOnProperty()
 		{
 			var foo = Mock.Create<IFoo>(Behavior.Strict);
@@ -157,7 +157,7 @@ namespace Telerik.JustMock.Tests
 			foo.Call(1, 2);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Properties")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
 		public void ShouldAssertDoInsteadOnProperySet()
 		{
 			bool expected = false;
@@ -169,7 +169,7 @@ namespace Telerik.JustMock.Tests
 			Assert.True(expected);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Properties")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
 		public void ShouldAssertCallOriginalForPropertySet()
 		{
 			var foo = Mock.Create<FooAbstract>(Behavior.Strict);
@@ -177,7 +177,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Throws<NotImplementedException>(() => { foo.Value = 1; });
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Properties")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
 		public void ShouldThrowExpectionForASpecificSet()
 		{
 			var foo = Mock.Create<Foo>();
@@ -189,7 +189,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Throws<ArgumentException>(() => { foo.MyProperty = 10; });
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Properties")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
 		public void ShouldAutomaticallyArrangeGetSetWhenNoneSpecifiedForStub()
 		{
 			var foo = Mock.Create<IFoo>();
@@ -199,7 +199,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal("Spike", foo.Name);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Properties")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
 		public void ShouldBeAbleToSetPropertiesMultipleTimes()
 		{
 			var foo = Mock.Create<IFoo>();
@@ -210,7 +210,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal("Dudes", foo.Name);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Properties")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
 		public void ShouldDoGetOrSetForIndexedProperty()
 		{
 			var indexed = Mock.Create<IIndexedFoo>();
@@ -220,7 +220,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal("hello", indexed[1]);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Properties")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
 		public void ShoudlAssertSetOnlyProperty()
 		{
 			var foo = Mock.Create<IFoo>();
@@ -230,7 +230,7 @@ namespace Telerik.JustMock.Tests
 			Mock.AssertSet(() => foo.Track = true);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Properties")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
 		public void ShouldAutoSetGetWhenAlreadyInvokedButNotArranged()
 		{
 			var project = Mock.Create<IProject>();
@@ -241,7 +241,7 @@ namespace Telerik.JustMock.Tests
 			Assert.NotNull(project.Parent);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Properties")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
 		public void ShouldSetStringPropertyToNull()
 		{
 			var mock = Mock.Create<IAutomockedProperties>();

@@ -17,7 +17,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -31,6 +30,11 @@ using Telerik.JustMock.Core.MatcherTree;
 using Telerik.JustMock.Core.Recording;
 using Telerik.JustMock.Core.TransparentProxy;
 using Telerik.JustMock.Diagnostics;
+#if NETCORE
+using Debug = Telerik.JustMock.Diagnostics.JMDebug;
+#else
+using Debug = System.Diagnostics.Debug;
+#endif
 
 namespace Telerik.JustMock.Core
 {
@@ -1233,9 +1237,9 @@ namespace Telerik.JustMock.Core
 
 			if (callPattern.InstanceMatcher == null)
 			{
-				// TODO: implicit creation of mock mixins shouldn't explicitly refer to behaviors, but
-				// should get them from some configuration made outside the Core.
-				Debug.Assert(targetMockObject != null || targetMockType != null);
+                // TODO: implicit creation of mock mixins shouldn't explicitly refer to behaviors, but
+                // should get them from some configuration made outside the Core.
+                Debug.Assert(targetMockObject != null || targetMockType != null);
 				UnwrapDelegateTarget(ref targetMockObject);
 				var mixin = GetMockMixin(targetMockObject, targetMockType);
 				if (mixin == null)
@@ -1261,8 +1265,8 @@ namespace Telerik.JustMock.Core
 				callPattern.InstanceMatcher = new ReferenceMatcher(targetValue);
 			}
 
-			// now we have the method part of the call pattern
-			Debug.Assert(method != null);
+            // now we have the method part of the call pattern
+            Debug.Assert(method != null);
 			callPattern.SetMethod(method, checkCompatibility: true);
 
 			//Finally, construct the arguments part of the call pattern.

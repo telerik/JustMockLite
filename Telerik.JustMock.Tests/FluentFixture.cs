@@ -51,12 +51,16 @@ using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFa
 
 using Telerik.JustMock.Helpers;
 
+#if XUNIT2
+#pragma warning disable xUnit1013 
+#endif
+
 namespace Telerik.JustMock.Tests
 {
 	[TestClass]
 	public class FluentFixture
 	{
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Fluent")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Fluent")]
 		public void ShouldArrangeAssertMockUsingFluentInterface()
 		{
 			//Arrange
@@ -75,7 +79,7 @@ namespace Telerik.JustMock.Tests
 			fileReader.Assert();
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Fluent")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Fluent")]
 		public void ShouldAssertActionWhenChained()
 		{
 			IFileReader fileReader = Mock.Create<IFileReader>();
@@ -89,7 +93,7 @@ namespace Telerik.JustMock.Tests
 			Assert.True(mocked);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Fluent")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Fluent")]
 		public void ShouldAssertPropertyGetWhenChained()
 		{
 			IFileReader fileReader = Mock.Create<IFileReader>();
@@ -101,7 +105,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(fileReader.Path, expected);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Fluent")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Fluent")]
 		public void ShouldAssertPropertySetWhenChained()
 		{
 			IFileReader fileReader = Mock.Create<IFileReader>(Behavior.Strict);
@@ -115,7 +119,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Throws<MockException>(() => fileReader.Path = "abc");
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Fluent")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Fluent")]
 		public void ShouldBeAbleToAssertSpecificActionForASetup()
 		{
 			IFileReader fileReader = Mock.Create<IFileReader>();
@@ -127,7 +131,7 @@ namespace Telerik.JustMock.Tests
 			fileReader.Assert(x => x.Delete());
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Fluent")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Fluent")]
 		public void ShouldBeAbleToAssertSpecificFuntionForASetup()
 		{
 			IFileReader fileReader = Mock.Create<IFileReader>();
@@ -141,7 +145,7 @@ namespace Telerik.JustMock.Tests
 			fileReader.Assert(x => x.Path);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Fluent")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Fluent")]
 		public void ShouldBeAbleToDoAssertAllForASetup()
 		{
 			IFileReader fileReader = Mock.Create<IFileReader>();
@@ -155,7 +159,7 @@ namespace Telerik.JustMock.Tests
 			fileReader.AssertAll();
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Fluent")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Fluent")]
 		public void ShouldCallMethodForDefaultEventWhenRaised()
 		{
 			var foo = Mock.Create<IFileReader>();
@@ -167,7 +171,7 @@ namespace Telerik.JustMock.Tests
 			Assert.True(raised);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Fluent")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Fluent")]
 		public void ShouldInvokeMethodForACustomEventWhenRaised()
 		{
 			var foo = Mock.Create<IFileReader>();
@@ -269,7 +273,7 @@ namespace Telerik.JustMock.Tests
 		}
 
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Fluent"), TestCategory("Occurrence")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Fluent"), TestCategory("Occurrence")]
 		public void ShouldFluentAssertOccurrenceExpectationSetInArrange()
 		{
 			const int someValue = 4;
@@ -391,7 +395,7 @@ namespace Telerik.JustMock.Tests
 			Guid? GetGuid(string id);
 		}
 
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Fluent")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Fluent")]
 		public void ShouldFailToChainReturnsCallToActionExpectationFromNonPublicInterface()
 		{
 			var mock = Mock.Create<IGuidResolver>();
@@ -430,3 +434,7 @@ namespace Telerik.JustMock.Tests
 		}
 	}
 }
+
+#if XUNIT2
+#pragma warning restore xUnit1013 
+#endif

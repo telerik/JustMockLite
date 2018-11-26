@@ -85,7 +85,7 @@ namespace Telerik.JustMock.Core.Context
 
 		protected override Type GetExceptionType()
 		{
-			var exceptionType = FindType(this.assertFailedExceptionTypeName, throwOnNotFound: false);
+			var exceptionType = FindType(this.assertFailedExceptionTypeName, false);
 			if (exceptionType != null)
 			{
 				exceptionType = exceptionType.BaseType;
@@ -101,7 +101,7 @@ namespace Telerik.JustMock.Core.Context
 
 		public static bool IsAvailable
 		{
-			get { return FindType("Xunit.FactAttribute, xunit.core", false) != null; }
+			get { return FindType(XunitAssertionExceptionName, false, true) != null; }
 		}
 
 		public XUnit2xMockingContextResolver()
@@ -115,7 +115,7 @@ namespace Telerik.JustMock.Core.Context
 
 		protected override Type GetExceptionType()
 		{
-			return FindType(this.assertFailedExceptionTypeName, throwOnNotFound: false);
+			return FindType(this.assertFailedExceptionTypeName, false, true);
 		}
 	}
 }

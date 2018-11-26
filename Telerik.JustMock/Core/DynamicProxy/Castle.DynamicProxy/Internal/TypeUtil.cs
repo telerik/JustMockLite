@@ -16,10 +16,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 {
 	using System;
 	using System.Collections.Generic;
-	using System.Diagnostics;
 	using System.Reflection;
+#if NETCORE
+    using Debug = Telerik.JustMock.Diagnostics.JMDebug;
+#else
+using Debug = System.Diagnostics.Debug;
+#endif
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
 
 	internal static class TypeUtil
 	{
@@ -39,7 +43,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 			var currentType = type;
 			while (currentType != typeof(object))
 			{
-				Debug.Assert(currentType != null);
+                Debug.Assert(currentType != null);
 				var currentFields = currentType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
 				fields.AddRange(currentFields);
 				currentType = currentType.BaseType;

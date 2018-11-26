@@ -16,10 +16,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 {
 	using System;
 	using System.Collections.Generic;
-	using System.Diagnostics;
 	using System.Reflection;
+#if NETCORE
+    using Debug = Telerik.JustMock.Diagnostics.JMDebug;
+#else
+using Debug = System.Diagnostics.Debug;
+#endif
 
-	using Telerik.JustMock.Core.Castle.Core.Internal;
+    using Telerik.JustMock.Core.Castle.Core.Internal;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
 
 	internal static class InvocationHelper
@@ -90,7 +94,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 			{
 				var mapping = type.GetInterfaceMap(declaringType);
 				var index = Array.IndexOf(mapping.InterfaceMethods, proxiedMethod);
-				Debug.Assert(index != -1);
+                Debug.Assert(index != -1);
 				methodOnTarget = mapping.TargetMethods[index];
 			}
 			else

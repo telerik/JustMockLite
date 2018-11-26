@@ -513,7 +513,7 @@ namespace Telerik.JustMock
 
 		private static bool CheckReflectionPermission()
 		{
-#if (COREFX || NETCORE)
+#if (COREFX)
 			return false;
 #else
             try

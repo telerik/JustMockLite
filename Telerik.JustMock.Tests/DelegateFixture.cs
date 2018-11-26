@@ -57,7 +57,7 @@ namespace Telerik.JustMock.Tests
 	public class DelegateFixture
 	{
 #if !PORTABLE
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock"), TestCategory("Delegate")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("Delegate")]
 		public void ShouldCreateMockDelegate()
 		{
 			var mock = Mock.Create<Action<int, string>>();
@@ -146,7 +146,7 @@ namespace Telerik.JustMock.Tests
 		}
 
 #if !PORTABLE
-		[TestMethod, TestCategory("Lite"), TestCategory("DotNetCore"), TestCategory("Mock"), TestCategory("Delegate")]
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("Delegate")]
 		public void ShouldThrowWhenMockingAbstractDelegate()
 		{
 			Assert.Throws<MockException>(() => Mock.Create<Delegate>());

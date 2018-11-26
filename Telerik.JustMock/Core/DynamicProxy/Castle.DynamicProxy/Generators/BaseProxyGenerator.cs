@@ -34,12 +34,17 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 #if SILVERLIGHT
 	using Telerik.JustMock.Core.Castle.DynamicProxy.SilverlightExtensions;
 #endif
+#if NETCORE
+    using Debug = Telerik.JustMock.Diagnostics.JMDebug;
+#else
+using Debug = System.Diagnostics.Debug;
+#endif
 
-	/// <summary>
-	///   Base class that exposes the common functionalities
-	///   to proxy generation.
-	/// </summary>
-	internal abstract class BaseProxyGenerator
+    /// <summary>
+    ///   Base class that exposes the common functionalities
+    ///   to proxy generation.
+    /// </summary>
+    internal abstract class BaseProxyGenerator
 	{
 		protected readonly Type targetType;
 		private readonly ModuleScope scope;
