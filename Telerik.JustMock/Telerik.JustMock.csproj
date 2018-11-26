@@ -260,6 +260,7 @@
     <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Serialization\ProxyTypeConstants.cs" />
     <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Tokens\FormatterServicesMethods.cs" />
     <Compile Include="Core\DynamicProxy\Castle.DynamicProxy\Tokens\SerializationInfoMethods.cs" />
+    <Compile Include="Core\DynamicProxy\JustMockInternalsVisible.cs" />
     <Compile Include="Core\MockCreationSettings.cs" />
     <Compile Include="Core\MockingUtils.MethodBodyDisassembler.cs" />
     <Compile Include="Core\ProxyTypeInfo.cs" />

@@ -398,7 +398,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
                     assemblyName.KeyPair = new StrongNameKeyPair(keyPairStream);
                 }
 #else
-				assemblyName.SetPublicKey(InternalsVisible.DynamicProxyGenAssembly2PublicKey);
+				assemblyName.SetPublicKey(JustMockInternalsVisible.JustMockGenAssemblyPublicKey);
 #endif
             }
 
