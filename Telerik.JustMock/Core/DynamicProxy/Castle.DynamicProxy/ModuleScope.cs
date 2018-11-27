@@ -185,7 +185,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
         /// <returns></returns>
         public static byte[] GetKeyPair()
         {
-            string snkeyName = DEFAULT_ASSEMBLY_NAME + ".snkey_lite.snk";
+            string snkeyName = DEFAULT_ASSEMBLY_NAME + ".Core.DynamicProxy.DynamicProxy.snk";
 
             var assembly = typeof(ModuleScope).GetTypeInfo().Assembly;
 

@@ -682,6 +682,7 @@
       <LastGenOutput>Args.Matching.cs</LastGenOutput>
     </None>
     <None Include="Core\DynamicProxy\Castle.DynamicProxy\DynProxy.snk" />
+    <EmbeddedResource Include="Core\DynamicProxy\DynamicProxy.snk" />
     <None Include="Expectations\Abstraction\IReturns.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>IReturns.cs</LastGenOutput>
