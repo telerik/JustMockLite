@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
+namespace Telerik.JustMock
 {
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Reflection;
+    using Telerik.JustMock.Core;
 
     /// <summary>
     /// A list of attributes that must not be replicated when building a proxy. JustMock
