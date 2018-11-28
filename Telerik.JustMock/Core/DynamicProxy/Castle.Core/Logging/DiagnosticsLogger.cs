@@ -16,7 +16,6 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Logging
 {
-#if (!SILVERLIGHT && !NETCORE)
 	using System;
 	using System.Diagnostics;
 	using System.Globalization;

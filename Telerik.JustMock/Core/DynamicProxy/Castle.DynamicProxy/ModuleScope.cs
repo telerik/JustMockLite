@@ -23,6 +23,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 
     using Telerik.JustMock.Core.Castle.Core.Internal;
     using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
+    using Telerik.JustMock.Core.DynamicProxy;
 #if FEATURE_SERIALIZATION
     using Telerik.JustMock.Core.Castle.DynamicProxy.Serialization;
 #endif
