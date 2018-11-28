@@ -21,7 +21,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 
 	internal class ClassEmitter : AbstractTypeEmitter
 	{
-		private const TypeAttributes DefaultAttributes =
+		internal const TypeAttributes DefaultAttributes =
 			TypeAttributes.Public | TypeAttributes.Class | TypeAttributes.Serializable;
 
 		private readonly ModuleScope moduleScope;
@@ -66,10 +66,15 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 			get { return moduleScope; }
 		}
 
+		internal bool InStrongNamedModule
+		{
+			get { return StrongNameUtil.IsAssemblySigned(TypeBuilder.Assembly); }
+		}
+
 		protected virtual IEnumerable<Type> InitializeGenericArgumentsFromBases(ref Type baseType,
 		                                                                        IEnumerable<Type> interfaces)
 		{
-			if (baseType != null && baseType.IsGenericTypeDefinition)
+			if (baseType != null && baseType.GetTypeInfo().IsGenericTypeDefinition)
 			{
 				throw new NotSupportedException("ClassEmitter does not support open generic base types. Type: " + baseType.FullName);
 			}
@@ -81,7 +86,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 
 			foreach (var inter in interfaces)
 			{
-				if (inter.IsGenericTypeDefinition)
+				if (inter.GetTypeInfo().IsGenericTypeDefinition)
 				{
 					throw new NotSupportedException("ClassEmitter does not support open generic interfaces. Type: " + inter.FullName);
 				}

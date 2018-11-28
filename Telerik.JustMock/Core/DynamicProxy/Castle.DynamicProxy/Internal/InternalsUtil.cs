@@ -15,71 +15,34 @@
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 {
 	using System;
-	using System.Collections.Generic;
-	using System.Linq;
+	using System.ComponentModel;
 	using System.Reflection;
-	using System.Runtime.CompilerServices;
-	using Telerik.JustMock.Core.Castle.Core.Internal;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
 
-    internal static class InternalsUtilExtensions
-    {
-        /// <summary>
-        ///   Determines whether the specified method is internal.
-        /// </summary>
-        /// <param name = "method">The method.</param>
-        /// <returns>
-        ///   <c>true</c> if the specified method is internal; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool IsInternal(this MethodBase method)
-        {
-            return method.IsAssembly || (method.IsFamilyAndAssembly
-                                         && !method.IsFamilyOrAssembly);
-        }
-    }
-
-	internal class InternalsUtil
+	internal static class InternalsUtil
 	{
-		private readonly IDictionary<Assembly, bool> internalsToDynProxy = new Dictionary<Assembly, bool>();
-		private readonly Lock internalsToDynProxyLock = Lock.Create();
-        private readonly ModuleScope moduleScope;
-
-        public InternalsUtil(ModuleScope moduleScope)
-        {
-            this.moduleScope = moduleScope;
-        }
+		/// <summary>
+		///   Determines whether the specified method is internal.
+		/// </summary>
+		/// <param name = "method">The method.</param>
+		/// <returns>
+		///   <c>true</c> if the specified method is internal; otherwise, <c>false</c>.
+		/// </returns>
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[Obsolete]
+		public static bool IsInternal(this MethodBase method)
+		{
+			return ProxyUtil.IsInternal(method);
+		}
 
 		/// <summary>
 		///   Determines whether this assembly has internals visible to dynamic proxy.
 		/// </summary>
 		/// <param name = "asm">The assembly to inspect.</param>
-		public bool IsInternalToDynamicProxy(Assembly asm)
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[Obsolete]
+		public static bool IsInternalToDynamicProxy(this Assembly asm)
 		{
-			using (var locker = internalsToDynProxyLock.ForReadingUpgradeable())
-			{
-				if (internalsToDynProxy.ContainsKey(asm))
-				{
-					return internalsToDynProxy[asm];
-				}
-
-				locker.Upgrade();
-
-				if (internalsToDynProxy.ContainsKey(asm))
-				{
-					return internalsToDynProxy[asm];
-				}
-
-                var internalsVisibleTo = asm.GetAttributes<InternalsVisibleToAttribute>();
-                var found = internalsVisibleTo.Any(attr => {
-                            var parts = attr.AssemblyName.Split(',');
-                            return parts.Length > 0
-                                && (parts[0] == this.moduleScope.StrongAssemblyName
-                                    || parts[0] == this.moduleScope.WeakAssemblyName);
-                        });
-
-				internalsToDynProxy.Add(asm, found);
-				return found;
-			}
+			return ProxyUtil.AreInternalsVisibleToDynamicProxy(asm);
 		}
 
 		/// <summary>
@@ -87,39 +50,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 		/// </summary>
 		/// <param name = "method"></param>
 		/// <returns></returns>
-		public bool IsAccessible(MethodBase method)
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[Obsolete("Use " + nameof(ProxyUtil) + "." + nameof(ProxyUtil.IsAccessible) + " instead, " +
+		          "which performs a more accurate accessibility check.")]
+		public static bool IsAccessible(this MethodBase method)
 		{
-			// Accessibility supported by the full framework and CoreCLR
-			if (method.IsPublic || method.IsFamily || method.IsFamilyOrAssembly)
-			{
-				return true;
-			}
-
-			if (method.IsFamilyAndAssembly)
-			{
-				return true;
-			}
-
-			if (IsInternalToDynamicProxy(method.DeclaringType.Assembly) && method.IsAssembly)
-			{
-				return true;
-			}
-			return false;
-		}
-
-		public bool IsAccessible(Type type)
-		{
-			if (!type.IsNested)
-			{
-				return type.IsPublic || this.IsInternalToDynamicProxy(type.Assembly);
-			}
-			else
-			{
-				return IsAccessible(type.DeclaringType)
-					&& (type.IsNestedPublic
-						|| this.IsInternalToDynamicProxy(type.Assembly)
-							&& (type.IsNestedAssembly || type.IsNestedFamORAssem));
-			}
+			return ProxyUtil.IsAccessibleMethod(method);
 		}
 	}
 }

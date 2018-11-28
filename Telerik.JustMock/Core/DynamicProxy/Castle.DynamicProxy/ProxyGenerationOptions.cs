@@ -17,17 +17,31 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 	using System;
 	using System.Collections.Generic;
 	using System.Reflection.Emit;
-	using Telerik.JustMock.Core.Castle.Core.Internal;
-    using InternalCollectionExtensions = Telerik.JustMock.Core.Castle.Core.Internal.CollectionExtensions;
+#if FEATURE_SERIALIZATION
+	using System.Runtime.Serialization;
+#endif
+	using Castle.Core.Internal;
+#if DOTNET40
+	using System.Security;
+#endif
 
-    internal class ProxyGenerationOptions
+#if FEATURE_SERIALIZATION
+	[Serializable]
+#endif
+	internal class ProxyGenerationOptions
+#if FEATURE_SERIALIZATION
+		: ISerializable
+#endif
 	{
 		public static readonly ProxyGenerationOptions Default = new ProxyGenerationOptions();
 
 		private List<object> mixins;
 		internal readonly IList<Attribute> attributesToAddToGeneratedTypes = new List<Attribute>();
-		private readonly IList<CustomAttributeBuilder> additionalAttributes = new List<CustomAttributeBuilder>();
+		private readonly IList<CustomAttributeInfo> additionalAttributes = new List<CustomAttributeInfo>();
 
+#if FEATURE_SERIALIZATION
+		[NonSerialized]
+#endif
 		private MixinData mixinData; // this is calculated dynamically on proxy type creation
 
 		/// <summary>
@@ -48,6 +62,16 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		{
 		}
 
+#if FEATURE_SERIALIZATION
+		private ProxyGenerationOptions(SerializationInfo info, StreamingContext context)
+		{
+			Hook = (IProxyGenerationHook)info.GetValue("hook", typeof(IProxyGenerationHook));
+			Selector = (IInterceptorSelector)info.GetValue("selector", typeof(IInterceptorSelector));
+			mixins = (List<object>)info.GetValue("mixins", typeof(List<object>));
+			BaseTypeForInterfaceProxy = Type.GetType(info.GetString("baseTypeForInterfaceProxy.AssemblyQualifiedName"));
+		}
+#endif
+
 		public void Initialize()
 		{
 			if (mixinData == null)
@@ -64,21 +88,26 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 			}
 		}
 
+#if FEATURE_SERIALIZATION
+#if FEATURE_SECURITY_PERMISSIONS && DOTNET40
+		[SecurityCritical]
+#endif
+		public void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			info.AddValue("hook", Hook);
+			info.AddValue("selector", Selector);
+			info.AddValue("mixins", mixins);
+			info.AddValue("baseTypeForInterfaceProxy.AssemblyQualifiedName", BaseTypeForInterfaceProxy.AssemblyQualifiedName);
+		}
+#endif
+
 		public IProxyGenerationHook Hook { get; set; }
 
 		public IInterceptorSelector Selector { get; set; }
 
 		public Type BaseTypeForInterfaceProxy { get; set; }
 
-		[Obsolete(
-			"This property is obsolete and will be removed in future versions. Use AdditionalAttributes property instead. " +
-			"You can use AttributeUtil class to simplify creating CustomAttributeBuilder instances for common cases.")]
-		public IList<Attribute> AttributesToAddToGeneratedTypes
-		{
-			get { return attributesToAddToGeneratedTypes; }
-		}
-
-		public IList<CustomAttributeBuilder> AdditionalAttributes
+		public IList<CustomAttributeInfo> AdditionalAttributes
 		{
 			get { return additionalAttributes; }
 		}
@@ -159,7 +188,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 			{
 				return false;
 			}
-			if (!InternalCollectionExtensions.AreEquivalent(AdditionalAttributes, proxyGenerationOptions.AdditionalAttributes))
+			if (!CollectionExtensions.AreEquivalent(AdditionalAttributes, proxyGenerationOptions.AdditionalAttributes))
 			{
 				return false;
 			}
@@ -172,10 +201,10 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 			Initialize();
 
 			var result = Hook != null ? Hook.GetType().GetHashCode() : 0;
-			result = 29 * result + (Selector != null ? 1 : 0);
-			result = 29 * result + MixinData.GetHashCode();
-			result = 29 * result + (BaseTypeForInterfaceProxy != null ? BaseTypeForInterfaceProxy.GetHashCode() : 0);
-			result = 29 * result + InternalCollectionExtensions.GetContentsHashCode(AdditionalAttributes);
+			result = 29*result + (Selector != null ? 1 : 0);
+			result = 29*result + MixinData.GetHashCode();
+			result = 29*result + (BaseTypeForInterfaceProxy != null ? BaseTypeForInterfaceProxy.GetHashCode() : 0);
+			result = 29*result + CollectionExtensions.GetContentsHashCode(AdditionalAttributes);
 			return result;
 		}
 	}

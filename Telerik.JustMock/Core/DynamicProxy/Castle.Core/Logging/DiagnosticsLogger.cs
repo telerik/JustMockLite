@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#if FEATURE_EVENTLOG
+
 namespace Telerik.JustMock.Core.Castle.Core.Logging
 {
 #if (!SILVERLIGHT && !NETCORE)
@@ -20,12 +22,16 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 	using System.Globalization;
 
 	/// <summary>
-	///   The Logger using standart Diagnostics namespace.
+	///   The Logger using standard Diagnostics namespace.
 	/// </summary>
+#if FEATURE_SERIALIZATION
 	[Serializable]
+#endif
 	internal class DiagnosticsLogger : LevelFilteredLogger, IDisposable
 	{
+#if FEATURE_SERIALIZATION
 		[NonSerialized]
+#endif
 		private EventLog eventLog;
 
 		/// <summary>
@@ -140,5 +146,6 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 			}
 		}
 	}
-#endif
 }
+
+#endif

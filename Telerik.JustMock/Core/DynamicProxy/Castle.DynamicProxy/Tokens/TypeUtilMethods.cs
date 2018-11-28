@@ -20,9 +20,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Tokens
 
 	internal static class TypeUtilMethods
 	{
-#if !SILVERLIGHT
 		public static readonly MethodInfo Sort = typeof(TypeUtil).GetMethod("Sort", BindingFlags.Public | BindingFlags.Static);
-#endif
 		public static readonly MethodInfo GetTypeOrNull = typeof(TypeUtil).GetMethod("GetTypeOrNull", BindingFlags.Public | BindingFlags.Static);
 	}
 }

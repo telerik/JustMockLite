@@ -12,12 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#if FEATURE_EVENTLOG
+
 namespace Telerik.JustMock.Core.Castle.Core.Logging
 {
-#if (!SILVERLIGHT && !NETCORE)
-    using System;
+	using System;
 
+#if FEATURE_SERIALIZATION
 	[Serializable]
+#endif
 	internal class DiagnosticsLoggerFactory : AbstractLoggerFactory
 	{
 		private const string DefaultLogName = "CastleDefaultLogger";
@@ -34,6 +37,6 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 			return logger;
 		}
 	}
+}
 
 #endif
-}

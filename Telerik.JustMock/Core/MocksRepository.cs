@@ -24,6 +24,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using Telerik.JustMock.Core.Behaviors;
+using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
 using Telerik.JustMock.Core.Context;
 using Telerik.JustMock.Core.Expressions;
 using Telerik.JustMock.Core.MatcherTree;

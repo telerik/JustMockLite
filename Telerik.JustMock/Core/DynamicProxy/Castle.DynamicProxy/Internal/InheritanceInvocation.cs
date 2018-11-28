@@ -15,15 +15,13 @@
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 {
 	using System;
-    using System.Diagnostics;
-    using System.Reflection;
+	using System.Reflection;
 
 	public abstract class InheritanceInvocation : AbstractInvocation
 	{
 		private readonly Type targetType;
 
-        [DebuggerHidden]
-        protected InheritanceInvocation(
+		protected InheritanceInvocation(
 			Type targetType,
 			object proxy,
 			IInterceptor[] interceptors,

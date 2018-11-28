@@ -1,4 +1,4 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2016 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,33 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq.Expressions;
-using System.Linq;
-
 namespace Telerik.JustMock.Core.Castle.DynamicProxy
 {
 	using System;
 	using System.Collections.Generic;
 	using System.Diagnostics;
 	using System.Reflection;
-#if !SILVERLIGHT
 	using System.Runtime.InteropServices;
-#if !NETCORE
+#if FEATURE_REMOTING
 	using System.Runtime.Remoting;
 #endif
+#if FEATURE_SECURITY_PERMISSIONS
 	using System.Security;
 	using System.Security.Permissions;
-	using Telerik.JustMock.Core.Castle.Core.Internal;
 #endif
 	using System.Text;
 
-	using Telerik.JustMock.Core.Castle.Core.Logging;
-	using Telerik.JustMock.Core;
+	using Castle.Core.Internal;
+	using Castle.Core.Logging;
+	using Castle.DynamicProxy.Generators;
 
 	/// <summary>
 	///   Provides proxy objects for classes and interfaces.
 	/// </summary>
-	internal class ProxyGenerator
+	[CLSCompliant(true)]
+	internal class ProxyGenerator : IProxyGenerator
 	{
 		private ILogger logger = NullLogger.Instance;
 		private readonly IProxyBuilder proxyBuilder;
@@ -51,15 +49,15 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		{
 			proxyBuilder = builder;
 
-#if (!SILVERLIGHT && !NETCORE)
+#if FEATURE_SECURITY_PERMISSIONS
 			if (HasSecurityPermission())
+#endif
 			{
 				Logger = new TraceLogger("Castle.DynamicProxy", LoggerLevel.Warn);
 			}
-#endif
 		}
 
-#if (!SILVERLIGHT && !NETCORE)
+#if FEATURE_SECURITY_PERMISSIONS
 		private bool HasSecurityPermission()
 		{
 			const SecurityPermissionFlag flag = SecurityPermissionFlag.ControlEvidence | SecurityPermissionFlag.ControlPolicy;
@@ -103,10 +101,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		{
 			get { return proxyBuilder; }
 		}
-
-#if MONO
-#pragma warning disable 1584, 1580, 1574 // Mono chokes on cref with generic arguments
-#endif
 
 		/// <summary>
 		///   Creates proxy object intercepting calls to members of interface <typeparamref name = "TInterface" /> on <paramref
@@ -168,15 +162,11 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public TInterface CreateInterfaceProxyWithTarget<TInterface>(TInterface target, ProxyGenerationOptions options,
-																	 params IInterceptor[] interceptors)
+		                                                             params IInterceptor[] interceptors)
 			where TInterface : class
 		{
 			return (TInterface)CreateInterfaceProxyWithTarget(typeof(TInterface), target, options, interceptors);
 		}
-
-#if MONO
-#pragma warning restore 1584, 1580, 1574
-#endif
 
 		/// <summary>
 		///   Creates proxy object intercepting calls to members of interface <paramref name = "interfaceToProxy" /> on <paramref
@@ -239,7 +229,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public object CreateInterfaceProxyWithTarget(Type interfaceToProxy, object target, ProxyGenerationOptions options,
-													 params IInterceptor[] interceptors)
+		                                             params IInterceptor[] interceptors)
 		{
 			return CreateInterfaceProxyWithTarget(interfaceToProxy, null, target, options, interceptors);
 		}
@@ -275,10 +265,10 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public object CreateInterfaceProxyWithTarget(Type interfaceToProxy, Type[] additionalInterfacesToProxy, object target,
-													 params IInterceptor[] interceptors)
+		                                             params IInterceptor[] interceptors)
 		{
 			return CreateInterfaceProxyWithTarget(interfaceToProxy, additionalInterfacesToProxy, target,
-												  ProxyGenerationOptions.Default, interceptors);
+			                                      ProxyGenerationOptions.Default, interceptors);
 		}
 
 		/// <summary>
@@ -313,9 +303,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public virtual object CreateInterfaceProxyWithTarget(Type interfaceToProxy, Type[] additionalInterfacesToProxy,
-															 object target,
-															 ProxyGenerationOptions options,
-															 params IInterceptor[] interceptors)
+		                                                     object target,
+		                                                     ProxyGenerationOptions options,
+		                                                     params IInterceptor[] interceptors)
 		{
 			if (interfaceToProxy == null)
 			{
@@ -330,7 +320,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 				throw new ArgumentNullException("interceptors");
 			}
 
-			if (!interfaceToProxy.IsInterface)
+			if (!interfaceToProxy.GetTypeInfo().IsInterface)
 			{
 				throw new ArgumentException("Specified type is not an interface", "interfaceToProxy");
 			}
@@ -345,14 +335,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 			CheckNotGenericTypeDefinitions(additionalInterfacesToProxy, "additionalInterfacesToProxy");
 
 			var generatedType = CreateInterfaceProxyTypeWithTarget(interfaceToProxy, additionalInterfacesToProxy, targetType,
-																   options);
+			                                                       options);
 
 			var arguments = GetConstructorArguments(target, interceptors, options);
 			return Activator.CreateInstance(generatedType, arguments.ToArray());
 		}
 
 		protected List<object> GetConstructorArguments(object target, IInterceptor[] interceptors,
-													   ProxyGenerationOptions options)
+		                                               ProxyGenerationOptions options)
 		{
 			// create constructor arguments (initialized with mixin implementations, interceptors and target type constructor arguments)
 			var arguments = new List<object>(options.MixinData.Mixins) { interceptors, target };
@@ -391,7 +381,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public object CreateInterfaceProxyWithTargetInterface(Type interfaceToProxy, object target,
-															  params IInterceptor[] interceptors)
+		                                                      params IInterceptor[] interceptors)
 		{
 			return CreateInterfaceProxyWithTargetInterface(interfaceToProxy, target, ProxyGenerationOptions.Default, interceptors);
 		}
@@ -420,13 +410,13 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public TInterface CreateInterfaceProxyWithTargetInterface<TInterface>(TInterface target,
-																			  params IInterceptor[] interceptors)
+		                                                                      params IInterceptor[] interceptors)
 			where TInterface : class
 		{
 			return (TInterface)CreateInterfaceProxyWithTargetInterface(typeof(TInterface),
-																	   target,
-																	   ProxyGenerationOptions.Default,
-																	   interceptors);
+			                                                           target,
+			                                                           ProxyGenerationOptions.Default,
+			                                                           interceptors);
 		}
 
 		/// <summary>
@@ -454,14 +444,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public TInterface CreateInterfaceProxyWithTargetInterface<TInterface>(TInterface target,
-																			  ProxyGenerationOptions options,
-																			  params IInterceptor[] interceptors)
+		                                                                      ProxyGenerationOptions options,
+		                                                                      params IInterceptor[] interceptors)
 			where TInterface : class
 		{
 			return (TInterface)CreateInterfaceProxyWithTargetInterface(typeof(TInterface),
-																	   target,
-																	   options,
-																	   interceptors);
+			                                                           target,
+			                                                           options,
+			                                                           interceptors);
 		}
 
 		/// <summary>
@@ -495,10 +485,10 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public object CreateInterfaceProxyWithTargetInterface(Type interfaceToProxy, Type[] additionalInterfacesToProxy,
-															  object target, params IInterceptor[] interceptors)
+		                                                      object target, params IInterceptor[] interceptors)
 		{
 			return CreateInterfaceProxyWithTargetInterface(interfaceToProxy, additionalInterfacesToProxy, target,
-														   ProxyGenerationOptions.Default, interceptors);
+			                                               ProxyGenerationOptions.Default, interceptors);
 		}
 
 		/// <summary>
@@ -530,8 +520,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public object CreateInterfaceProxyWithTargetInterface(Type interfaceToProxy, object target,
-															  ProxyGenerationOptions options,
-															  params IInterceptor[] interceptors)
+		                                                      ProxyGenerationOptions options,
+		                                                      params IInterceptor[] interceptors)
 		{
 			return CreateInterfaceProxyWithTargetInterface(interfaceToProxy, null, target, options, interceptors);
 		}
@@ -560,16 +550,15 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   This method uses <see cref = "IProxyBuilder" /> implementation to generate a proxy type.
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
-#if DOTNET40
+#if FEATURE_SECURITY_PERMISSIONS && DOTNET40
 		[SecuritySafeCritical]
 #endif
 		public virtual object CreateInterfaceProxyWithTargetInterface(Type interfaceToProxy,
-																	  Type[] additionalInterfacesToProxy,
-																	  object target, ProxyGenerationOptions options,
-																	  params IInterceptor[] interceptors)
+		                                                              Type[] additionalInterfacesToProxy,
+		                                                              object target, ProxyGenerationOptions options,
+		                                                              params IInterceptor[] interceptors)
 		{
 			//TODO: add <example> to xml comments to show how to use IChangeProxyTarget
-
 
 			if (interfaceToProxy == null)
 			{
@@ -585,13 +574,13 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 				throw new ArgumentNullException("interceptors");
 			}
 
-			if (!interfaceToProxy.IsInterface)
+			if (!interfaceToProxy.GetTypeInfo().IsInterface)
 			{
 				throw new ArgumentException("Specified type is not an interface", "interfaceToProxy");
 			}
 
 			var isRemotingProxy = false;
-#if (!SILVERLIGHT && !NETCORE)
+#if FEATURE_REMOTING
 			if (target != null)
 			{
 				isRemotingProxy = RemotingServices.IsTransparentProxy(target);
@@ -604,9 +593,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 						var iUnknown = Marshal.GetIUnknownForObject(target); // Increment the reference count
 						var interfacePointer = IntPtr.Zero;
 						var result = Marshal.QueryInterface(iUnknown, ref interfaceId, out interfacePointer); // Increment the reference count
-						var isInterfacePointerNull = interfacePointer == IntPtr.Zero;		        
+						var isInterfacePointerNull = interfacePointer == IntPtr.Zero;
 						Marshal.Release(iUnknown); // Decrement the reference count
-						Marshal.Release(interfacePointer); // Decrement the reference count
+						if (!isInterfacePointerNull)
+						{
+							Marshal.Release(interfacePointer); // Decrement the reference count
+						}
 
 						if (result == 0 && isInterfacePointerNull)
 						{
@@ -616,14 +608,13 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 					}
 				}
 			}
-			
 #endif
 
 			CheckNotGenericTypeDefinition(interfaceToProxy, "interfaceToProxy");
 			CheckNotGenericTypeDefinitions(additionalInterfacesToProxy, "additionalInterfacesToProxy");
 
 			var generatedType = CreateInterfaceProxyTypeWithTargetInterface(interfaceToProxy, additionalInterfacesToProxy,
-																			options);
+			                                                                options);
 			var arguments = GetConstructorArguments(target, interceptors, options);
 			if (isRemotingProxy)
 			{
@@ -656,7 +647,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   This method uses <see cref = "IProxyBuilder" /> implementation to generate a proxy type.
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
-		public TInterface CreateInterfaceProxyWithoutTarget<TInterface>(IInterceptor interceptor) where TInterface : class
+		public TInterface CreateInterfaceProxyWithoutTarget<TInterface>(IInterceptor interceptor)
+			where TInterface : class
 		{
 			return (TInterface)CreateInterfaceProxyWithoutTarget(typeof(TInterface), interceptor);
 		}
@@ -709,7 +701,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public TInterface CreateInterfaceProxyWithoutTarget<TInterface>(ProxyGenerationOptions options,
-																		params IInterceptor[] interceptors)
+		                                                                params IInterceptor[] interceptors)
 			where TInterface : class
 		{
 			return (TInterface)CreateInterfaceProxyWithoutTarget(typeof(TInterface), Type.EmptyTypes, options, interceptors);
@@ -739,7 +731,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		public object CreateInterfaceProxyWithoutTarget(Type interfaceToProxy, IInterceptor interceptor)
 		{
 			return CreateInterfaceProxyWithoutTarget(interfaceToProxy, Type.EmptyTypes, ProxyGenerationOptions.Default,
-													 interceptor);
+			                                         interceptor);
 		}
 
 		/// <summary>
@@ -766,7 +758,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		public object CreateInterfaceProxyWithoutTarget(Type interfaceToProxy, params IInterceptor[] interceptors)
 		{
 			return CreateInterfaceProxyWithoutTarget(interfaceToProxy, Type.EmptyTypes, ProxyGenerationOptions.Default,
-													 interceptors);
+			                                         interceptors);
 		}
 
 		/// <summary>
@@ -794,10 +786,10 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public object CreateInterfaceProxyWithoutTarget(Type interfaceToProxy, Type[] additionalInterfacesToProxy,
-														params IInterceptor[] interceptors)
+		                                                params IInterceptor[] interceptors)
 		{
 			return CreateInterfaceProxyWithoutTarget(interfaceToProxy, additionalInterfacesToProxy,
-													 ProxyGenerationOptions.Default, interceptors);
+			                                         ProxyGenerationOptions.Default, interceptors);
 		}
 
 		/// <summary>
@@ -821,7 +813,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public object CreateInterfaceProxyWithoutTarget(Type interfaceToProxy, ProxyGenerationOptions options,
-														params IInterceptor[] interceptors)
+		                                                params IInterceptor[] interceptors)
 		{
 			return CreateInterfaceProxyWithoutTarget(interfaceToProxy, Type.EmptyTypes, options, interceptors);
 		}
@@ -852,8 +844,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public virtual object CreateInterfaceProxyWithoutTarget(Type interfaceToProxy, Type[] additionalInterfacesToProxy,
-																ProxyGenerationOptions options,
-																params IInterceptor[] interceptors)
+		                                                        ProxyGenerationOptions options,
+		                                                        params IInterceptor[] interceptors)
 		{
 			if (interfaceToProxy == null)
 			{
@@ -864,7 +856,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 				throw new ArgumentNullException("interceptors");
 			}
 
-			if (!interfaceToProxy.IsInterface)
+			if (!interfaceToProxy.GetTypeInfo().IsInterface)
 			{
 				throw new ArgumentException("Specified type is not an interface", "interfaceToProxy");
 			}
@@ -899,11 +891,11 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 			where TClass : class
 		{
 			return (TClass)CreateClassProxyWithTarget(typeof(TClass),
-													  Type.EmptyTypes,
-													  target,
-													  ProxyGenerationOptions.Default,
-													  new object[0],
-													  interceptors);
+			                                          Type.EmptyTypes,
+			                                          target,
+			                                          ProxyGenerationOptions.Default,
+			                                          new object[0],
+			                                          interceptors);
 		}
 
 		/// <summary>
@@ -926,14 +918,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public TClass CreateClassProxyWithTarget<TClass>(TClass target, ProxyGenerationOptions options,
-														 params IInterceptor[] interceptors) where TClass : class
+		                                                 params IInterceptor[] interceptors) where TClass : class
 		{
 			return (TClass)CreateClassProxyWithTarget(typeof(TClass),
-													  Type.EmptyTypes,
-													  target,
-													  options,
-													  new object[0],
-													  interceptors);
+			                                          Type.EmptyTypes,
+			                                          target,
+			                                          options,
+			                                          new object[0],
+			                                          interceptors);
 		}
 
 		/// <summary>
@@ -959,14 +951,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public object CreateClassProxyWithTarget(Type classToProxy, Type[] additionalInterfacesToProxy, object target,
-												 params IInterceptor[] interceptors)
+		                                         params IInterceptor[] interceptors)
 		{
 			return CreateClassProxyWithTarget(classToProxy,
-											  additionalInterfacesToProxy,
-											  target,
-											  ProxyGenerationOptions.Default,
-											  new object[0],
-											  interceptors);
+			                                  additionalInterfacesToProxy,
+			                                  target,
+			                                  ProxyGenerationOptions.Default,
+			                                  new object[0],
+			                                  interceptors);
 		}
 
 		/// <summary>
@@ -993,14 +985,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public object CreateClassProxyWithTarget(Type classToProxy, object target, ProxyGenerationOptions options,
-												 object[] constructorArguments, params IInterceptor[] interceptors)
+		                                         object[] constructorArguments, params IInterceptor[] interceptors)
 		{
 			return CreateClassProxyWithTarget(classToProxy,
-											  Type.EmptyTypes,
-											  target,
-											  options,
-											  constructorArguments,
-											  interceptors);
+			                                  Type.EmptyTypes,
+			                                  target,
+			                                  options,
+			                                  constructorArguments,
+			                                  interceptors);
 		}
 
 		/// <summary>
@@ -1026,14 +1018,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public object CreateClassProxyWithTarget(Type classToProxy, object target, object[] constructorArguments,
-												 params IInterceptor[] interceptors)
+		                                         params IInterceptor[] interceptors)
 		{
 			return CreateClassProxyWithTarget(classToProxy,
-											  Type.EmptyTypes,
-											  target,
-											  ProxyGenerationOptions.Default,
-											  constructorArguments,
-											  interceptors);
+			                                  Type.EmptyTypes,
+			                                  target,
+			                                  ProxyGenerationOptions.Default,
+			                                  constructorArguments,
+			                                  interceptors);
 		}
 
 		/// <summary>
@@ -1060,11 +1052,11 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		public object CreateClassProxyWithTarget(Type classToProxy, object target, params IInterceptor[] interceptors)
 		{
 			return CreateClassProxyWithTarget(classToProxy,
-											  Type.EmptyTypes,
-											  target,
-											  ProxyGenerationOptions.Default,
-											  new object[0],
-											  interceptors);
+			                                  Type.EmptyTypes,
+			                                  target,
+			                                  ProxyGenerationOptions.Default,
+			                                  new object[0],
+			                                  interceptors);
 		}
 
 		/// <summary>
@@ -1090,14 +1082,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public object CreateClassProxyWithTarget(Type classToProxy, object target, ProxyGenerationOptions options,
-												 params IInterceptor[] interceptors)
+		                                         params IInterceptor[] interceptors)
 		{
 			return CreateClassProxyWithTarget(classToProxy,
-											  Type.EmptyTypes,
-											  target,
-											  options,
-											  new object[0],
-											  interceptors);
+			                                  Type.EmptyTypes,
+			                                  target,
+			                                  options,
+			                                  new object[0],
+			                                  interceptors);
 		}
 
 		/// <summary>
@@ -1125,14 +1117,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public object CreateClassProxyWithTarget(Type classToProxy, Type[] additionalInterfacesToProxy, object target,
-												 ProxyGenerationOptions options, params IInterceptor[] interceptors)
+		                                         ProxyGenerationOptions options, params IInterceptor[] interceptors)
 		{
 			return CreateClassProxyWithTarget(classToProxy,
-											  additionalInterfacesToProxy,
-											  target,
-											  options,
-											  new object[0],
-											  interceptors);
+			                                  additionalInterfacesToProxy,
+			                                  target,
+			                                  options,
+			                                  new object[0],
+			                                  interceptors);
 		}
 
 		/// <summary>
@@ -1162,8 +1154,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public virtual object CreateClassProxyWithTarget(Type classToProxy, Type[] additionalInterfacesToProxy, object target,
-														 ProxyGenerationOptions options, object[] constructorArguments,
-														 params IInterceptor[] interceptors)
+		                                                 ProxyGenerationOptions options, object[] constructorArguments,
+		                                                 params IInterceptor[] interceptors)
 		{
 			if (classToProxy == null)
 			{
@@ -1173,7 +1165,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 			{
 				throw new ArgumentNullException("options");
 			}
-			if (!classToProxy.IsClass)
+			if (!classToProxy.GetTypeInfo().IsClass)
 			{
 				throw new ArgumentException("'classToProxy' must be a class", "classToProxy");
 			}
@@ -1260,7 +1252,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public object CreateClassProxy(Type classToProxy, Type[] additionalInterfacesToProxy,
-									   params IInterceptor[] interceptors)
+		                               params IInterceptor[] interceptors)
 		{
 			return CreateClassProxy(classToProxy, additionalInterfacesToProxy, ProxyGenerationOptions.Default, interceptors);
 		}
@@ -1288,7 +1280,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public object CreateClassProxy(Type classToProxy, ProxyGenerationOptions options, object[] constructorArguments,
-									   params IInterceptor[] interceptors)
+		                               params IInterceptor[] interceptors)
 		{
 			return CreateClassProxy(classToProxy, null, options, constructorArguments, interceptors);
 		}
@@ -1342,7 +1334,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		public object CreateClassProxy(Type classToProxy, params IInterceptor[] interceptors)
 		{
 			return CreateClassProxy(classToProxy, null, ProxyGenerationOptions.Default,
-									null, interceptors);
+			                        null, interceptors);
 		}
 
 		/// <summary>
@@ -1395,7 +1387,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public object CreateClassProxy(Type classToProxy, Type[] additionalInterfacesToProxy, ProxyGenerationOptions options,
-									   params IInterceptor[] interceptors)
+		                               params IInterceptor[] interceptors)
 		{
 			return CreateClassProxy(classToProxy, additionalInterfacesToProxy, options, null, interceptors);
 		}
@@ -1426,8 +1418,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
 		public virtual object CreateClassProxy(Type classToProxy, Type[] additionalInterfacesToProxy,
-											   ProxyGenerationOptions options,
-											   object[] constructorArguments, params IInterceptor[] interceptors)
+		                                       ProxyGenerationOptions options,
+		                                       object[] constructorArguments, params IInterceptor[] interceptors)
 		{
 			if (classToProxy == null)
 			{
@@ -1437,7 +1429,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 			{
 				throw new ArgumentNullException("options");
 			}
-			if (!classToProxy.IsClass)
+			if (!classToProxy.GetTypeInfo().IsClass)
 			{
 				throw new ArgumentException("'classToProxy' must be a class", "classToProxy");
 			}
@@ -1457,12 +1449,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		}
 
 		protected object CreateClassProxyInstance(Type proxyType, List<object> proxyArguments, Type classToProxy,
-												  object[] constructorArguments)
+		                                          object[] constructorArguments)
 		{
 			try
 			{
-				return proxyType.CreateObject(proxyArguments.ToArray());
-			}
+                return proxyType.CreateObject(proxyArguments.ToArray());
+            }
 			catch (MissingMethodException)
 			{
 				var message = new StringBuilder();
@@ -1488,9 +1480,10 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 
 		protected void CheckNotGenericTypeDefinition(Type type, string argumentName)
 		{
-			if (type != null && type.IsGenericTypeDefinition)
+			if (type != null && type.GetTypeInfo().IsGenericTypeDefinition)
 			{
-				throw new ArgumentException("You can't specify a generic type definition.", argumentName);
+				throw new GeneratorException(string.Format("Can not create proxy for type {0} because it is an open generic type.",
+														   type.GetBestName()));
 			}
 		}
 
@@ -1507,7 +1500,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		}
 
 		protected List<object> BuildArgumentListForClassProxyWithTarget(object target, ProxyGenerationOptions options,
-																		IInterceptor[] interceptors)
+		                                                                IInterceptor[] interceptors)
 		{
 			var arguments = new List<object>();
 			arguments.Add(target);
@@ -1539,7 +1532,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		/// <param name = "options">The options for proxy generation process.</param>
 		/// <returns><see cref = "Type" /> of proxy.</returns>
 		protected Type CreateClassProxyType(Type classToProxy, Type[] additionalInterfacesToProxy,
-											ProxyGenerationOptions options)
+		                                    ProxyGenerationOptions options)
 		{
 			// create proxy
 			return ProxyBuilder.CreateClassProxyType(classToProxy, additionalInterfacesToProxy, options);
@@ -1556,12 +1549,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		/// <param name = "options">The options for proxy generation process.</param>
 		/// <returns><see cref = "Type" /> of proxy.</returns>
 		protected Type CreateInterfaceProxyTypeWithTarget(Type interfaceToProxy, Type[] additionalInterfacesToProxy,
-														  Type targetType,
-														  ProxyGenerationOptions options)
+		                                                  Type targetType,
+		                                                  ProxyGenerationOptions options)
 		{
 			// create proxy
 			return ProxyBuilder.CreateInterfaceProxyTypeWithTarget(interfaceToProxy, additionalInterfacesToProxy, targetType,
-																   options);
+			                                                       options);
 		}
 
 		/// <summary>
@@ -1574,11 +1567,11 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		/// <param name = "options">The options for proxy generation process.</param>
 		/// <returns><see cref = "Type" /> of proxy.</returns>
 		protected Type CreateInterfaceProxyTypeWithTargetInterface(Type interfaceToProxy, Type[] additionalInterfacesToProxy,
-																   ProxyGenerationOptions options)
+		                                                           ProxyGenerationOptions options)
 		{
 			// create proxy
 			return ProxyBuilder.CreateInterfaceProxyTypeWithTargetInterface(interfaceToProxy, additionalInterfacesToProxy,
-																			options);
+			                                                                options);
 		}
 
 		/// <summary>
@@ -1590,14 +1583,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		/// <param name = "options">The options for proxy generation process.</param>
 		/// <returns><see cref = "Type" /> of proxy.</returns>
 		protected Type CreateInterfaceProxyTypeWithoutTarget(Type interfaceToProxy, Type[] additionalInterfacesToProxy,
-															 ProxyGenerationOptions options)
+		                                                     ProxyGenerationOptions options)
 		{
 			// create proxy
 			return ProxyBuilder.CreateInterfaceProxyTypeWithoutTarget(interfaceToProxy, additionalInterfacesToProxy, options);
 		}
 
 		protected Type CreateClassProxyTypeWithTarget(Type classToProxy, Type[] additionalInterfacesToProxy,
-													  ProxyGenerationOptions options)
+		                                              ProxyGenerationOptions options)
 		{
 			// create proxy
 			return ProxyBuilder.CreateClassProxyTypeWithTarget(classToProxy, additionalInterfacesToProxy, options);

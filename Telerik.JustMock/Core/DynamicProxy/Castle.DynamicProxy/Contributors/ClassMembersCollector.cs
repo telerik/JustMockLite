@@ -20,16 +20,16 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
 
-	internal class ClassMembersCollector : MembersCollector
+    internal class ClassMembersCollector : MembersCollector
 	{
-		public ClassMembersCollector(Type targetType, ModuleScope scope)
-			: base(targetType, scope)
+		public ClassMembersCollector(Type targetType)
+			: base(targetType)
 		{
 		}
 
 		protected override MetaMethod GetMethodToGenerate(MethodInfo method, IProxyGenerationHook hook, bool isStandalone)
 		{
-			if (scope.Internals.IsAccessible(method) == false)
+			if (ProxyUtil.IsAccessibleMethod(method) == false)
 			{
 				return null;
 			}
@@ -41,7 +41,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 				return null;
 			}
 
-			return new MetaMethod(method, scope, method, isStandalone, accepted, !method.IsAbstract);
+			return new MetaMethod(method, method, isStandalone, accepted, !method.IsAbstract);
 		}
 	}
 }

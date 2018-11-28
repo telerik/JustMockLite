@@ -15,14 +15,12 @@
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 {
 	using System;
-    using System.Diagnostics;
-    using System.Reflection;
+	using System.Reflection;
 
 	public abstract class CompositionInvocation : AbstractInvocation
 	{
 		protected object target;
 
-        [DebuggerHidden]
 		protected CompositionInvocation(
 			object target,
 			object proxy,

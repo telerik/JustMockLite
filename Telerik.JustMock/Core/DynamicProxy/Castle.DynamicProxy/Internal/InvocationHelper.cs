@@ -28,8 +28,8 @@ using Debug = System.Diagnostics.Debug;
 
 	internal static class InvocationHelper
 	{
-		private static readonly Dictionary<KeyValuePair<MethodInfo, Type>, MethodInfo> cache =
-			new Dictionary<KeyValuePair<MethodInfo, Type>, MethodInfo>();
+		private static readonly Dictionary<CacheKey, MethodInfo> cache =
+			new Dictionary<CacheKey, MethodInfo>();
 
 		private static readonly Lock @lock = Lock.Create();
 
@@ -51,7 +51,16 @@ using Debug = System.Diagnostics.Debug;
 			}
 
 			Debug.Assert(proxiedMethod.DeclaringType.IsAssignableFrom(type),
-			             "proxiedMethod.DeclaringType.IsAssignableFrom(type)");
+						 "proxiedMethod.DeclaringType.IsAssignableFrom(type)");
+			using (var locker = @lock.ForReading())
+			{
+				var methodOnTarget = GetFromCache(proxiedMethod, type);
+				if (methodOnTarget != null)
+				{
+					return methodOnTarget;
+				}
+			}
+
 			using (var locker = @lock.ForReadingUpgradeable())
 			{
 				var methodOnTarget = GetFromCache(proxiedMethod, type);
@@ -59,22 +68,20 @@ using Debug = System.Diagnostics.Debug;
 				{
 					return methodOnTarget;
 				}
-				locker.Upgrade();
 
-				methodOnTarget = GetFromCache(proxiedMethod, type);
-				if (methodOnTarget != null)
+				// Upgrade the lock to a write lock. 
+				using (locker.Upgrade())
 				{
-					return methodOnTarget;
+					methodOnTarget = ObtainMethod(proxiedMethod, type);
+					PutToCache(proxiedMethod, type, methodOnTarget);
 				}
-				methodOnTarget = ObtainMethod(proxiedMethod, type);
-				PutToCache(proxiedMethod, type, methodOnTarget);
 				return methodOnTarget;
 			}
 		}
 
 		private static MethodInfo GetFromCache(MethodInfo methodInfo, Type type)
 		{
-			var key = new KeyValuePair<MethodInfo, Type>(methodInfo, type);
+			var key = new CacheKey(methodInfo, type);
 			MethodInfo method;
 			cache.TryGetValue(key, out method);
 			return method;
@@ -90,9 +97,9 @@ using Debug = System.Diagnostics.Debug;
 			}
 			var declaringType = proxiedMethod.DeclaringType;
 			MethodInfo methodOnTarget = null;
-			if (declaringType.IsInterface)
+			if (declaringType.GetTypeInfo().IsInterface)
 			{
-				var mapping = type.GetInterfaceMap(declaringType);
+				var mapping = type.GetTypeInfo().GetRuntimeInterfaceMap(declaringType);
 				var index = Array.IndexOf(mapping.InterfaceMethods, proxiedMethod);
                 Debug.Assert(index != -1);
 				methodOnTarget = mapping.TargetMethods[index];
@@ -114,7 +121,7 @@ using Debug = System.Diagnostics.Debug;
 			{
 				throw new ArgumentException(
 					string.Format("Could not find method overriding {0} on type {1}. This is most likely a bug. Please report it.",
-					              proxiedMethod, type));
+								  proxiedMethod, type));
 			}
 
 			if (genericArguments == null)
@@ -126,8 +133,40 @@ using Debug = System.Diagnostics.Debug;
 
 		private static void PutToCache(MethodInfo methodInfo, Type type, MethodInfo value)
 		{
-			var key = new KeyValuePair<MethodInfo, Type>(methodInfo, type);
+			var key = new CacheKey(methodInfo, type);
 			cache.Add(key, value);
+		}
+
+		private struct CacheKey : IEquatable<CacheKey>
+		{
+			public CacheKey(MethodInfo method, Type type)
+			{
+				Method = method;
+				Type = type;
+			}
+			public MethodInfo Method { get; }
+
+			public Type Type { get; }
+
+			public bool Equals(CacheKey other)
+			{
+				return object.ReferenceEquals(Method, other.Method) && object.ReferenceEquals(Type, other.Type);
+			}
+
+			public override bool Equals(object obj)
+			{
+				if (ReferenceEquals(null, obj))
+					return false;
+				return obj is CacheKey @struct && Equals(@struct);
+			}
+
+			public override int GetHashCode()
+			{
+				unchecked
+				{
+					return ((Method != null ? Method.GetHashCode() : 0) * 397) ^ (Type != null ? Type.GetHashCode() : 0);
+				}
+			}
 		}
 	}
 }

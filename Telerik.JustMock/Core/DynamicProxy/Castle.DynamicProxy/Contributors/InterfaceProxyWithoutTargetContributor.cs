@@ -26,8 +26,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 		private readonly GetTargetExpressionDelegate getTargetExpression;
 		protected bool canChangeTarget = false;
 
-        public InterfaceProxyWithoutTargetContributor(INamingScope namingScope, ModuleScope scope, GetTargetExpressionDelegate getTarget)
-			: base(namingScope, scope)
+		public InterfaceProxyWithoutTargetContributor(INamingScope namingScope, GetTargetExpressionDelegate getTarget)
+			: base(namingScope)
 		{
 			getTargetExpression = getTarget;
 		}
@@ -37,7 +37,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 			Debug.Assert(hook != null, "hook != null");
 			foreach (var @interface in interfaces)
 			{
-				var item = new InterfaceMembersCollector(@interface, scope);
+				var item = new InterfaceMembersCollector(@interface);
 				item.CollectMembersToProxy(hook);
 				yield return item;
 			}

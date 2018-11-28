@@ -18,40 +18,29 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 	using System.Reflection;
 	using System.Reflection.Emit;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Tokens;
+	using Castle.DynamicProxy.Tokens;
 
 	internal class MethodTokenExpression : Expression
 	{
 		private readonly MethodInfo method;
-#if !MONO
 		private readonly Type declaringType;
-#endif
 
 		public MethodTokenExpression(MethodInfo method)
 		{
 			this.method = method;
-#if !MONO
 			declaringType = method.DeclaringType;
-#endif
 		}
 
 		public override void Emit(IMemberEmitter member, ILGenerator gen)
 		{
 			gen.Emit(OpCodes.Ldtoken, method);
-#if !MONO
 			if (declaringType == null)
 			{
 				throw new GeneratorException("declaringType can't be null for this situation");
 			}
 			gen.Emit(OpCodes.Ldtoken, declaringType);
-#endif
 
-			var minfo = MethodBaseMethods.GetMethodFromHandle1;
-
-#if !MONO
-			minfo = MethodBaseMethods.GetMethodFromHandle2;
-#endif
-
+			var minfo = MethodBaseMethods.GetMethodFromHandle;
 			gen.Emit(OpCodes.Call, minfo);
 			gen.Emit(OpCodes.Castclass, typeof(MethodInfo));
 		}

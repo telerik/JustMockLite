@@ -16,11 +16,13 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 {
 	using System;
 	using System.Diagnostics;
+	using System.Linq;
 	using System.Reflection;
 
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Tokens;
 
 	internal class InvocationWithGenericDelegateContributor : IInvocationCreationContributor
@@ -31,7 +33,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 
 		public InvocationWithGenericDelegateContributor(Type delegateType, MetaMethod method, Reference targetReference)
 		{
-			Debug.Assert(delegateType.IsGenericType, "delegateType.IsGenericType");
+			Debug.Assert(delegateType.GetTypeInfo().IsGenericType, "delegateType.IsGenericType");
 			this.delegateType = delegateType;
 			this.method = method;
 			this.targetReference = targetReference;
@@ -62,9 +64,10 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 
 		private Reference GetDelegate(AbstractTypeEmitter invocation, MethodEmitter invokeMethodOnTarget)
 		{
-			var closedDelegateType = delegateType.MakeGenericType(invocation.GenericTypeParams);
+			var genericTypeParameters = invocation.GenericTypeParams.AsTypeArray();
+			var closedDelegateType = delegateType.MakeGenericType(genericTypeParameters);
 			var localReference = invokeMethodOnTarget.CodeBuilder.DeclareLocal(closedDelegateType);
-			var closedMethodOnTarget = method.MethodOnTarget.MakeGenericMethod(invocation.GenericTypeParams);
+			var closedMethodOnTarget = method.MethodOnTarget.MakeGenericMethod(genericTypeParameters);
 			var localTarget = new ReferenceExpression(targetReference);
 			invokeMethodOnTarget.CodeBuilder.AddStatement(
 				SetDelegate(localReference, localTarget, closedDelegateType, closedMethodOnTarget));

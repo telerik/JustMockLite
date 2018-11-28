@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#if FEATURE_SERIALIZATION
 
-#if !SILVERLIGHT
-
-namespace Telerik.JustMock.Core.Castle.DynamicProxy
+namespace Telerik.JustMock.Core.Castle.DynamicProxy.Serialization
 {
 	using System;
 	using System.Collections.Generic;
@@ -30,6 +29,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 	///   Applied to the assemblies saved by <see cref="ModuleScope" /> in order to persist the cache data included in the persisted assembly.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false)]
+	[CLSCompliant(false)]
 	internal class CacheMappingsAttribute : Attribute
 	{
 		private static readonly ConstructorInfo constructor =

@@ -19,10 +19,10 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 
-	internal delegate MethodEmitter OverrideMethodDelegate(
+    internal delegate MethodEmitter OverrideMethodDelegate(
 		string name, MethodAttributes attributes, MethodInfo methodToOverride);
 
-	internal delegate Expression GetTargetExpressionDelegate(ClassEmitter @class, MethodInfo method);
+    internal delegate Expression GetTargetExpressionDelegate(ClassEmitter @class, MethodInfo method);
 
-	internal delegate Reference GetTargetReferenceDelegate(ClassEmitter @class, MethodInfo method);
+    internal delegate Reference GetTargetReferenceDelegate(ClassEmitter @class, MethodInfo method);
 }

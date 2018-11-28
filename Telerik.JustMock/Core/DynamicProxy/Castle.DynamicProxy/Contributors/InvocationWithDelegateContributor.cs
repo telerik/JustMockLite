@@ -33,7 +33,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 		public InvocationWithDelegateContributor(Type delegateType, Type targetType, MetaMethod method,
 		                                         INamingScope namingScope)
 		{
-			Debug.Assert(delegateType.IsGenericType == false, "delegateType.IsGenericType == false");
+			Debug.Assert(delegateType.GetTypeInfo().IsGenericType == false, "delegateType.IsGenericType == false");
 			this.delegateType = delegateType;
 			this.targetType = targetType;
 			this.method = method;

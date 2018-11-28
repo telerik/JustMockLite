@@ -14,31 +14,30 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Logging
 {
-#if !SILVERLIGHT
 	using System;
 	using System.Diagnostics;
 	using System.Collections.Generic;
-#if DOTNET40
+#if FEATURE_SECURITY_PERMISSIONS && DOTNET40
 	using System.Security;
 #endif
 
-	/// <summary>
-	///   The TraceLogger sends all logging to the System.Diagnostics.TraceSource
-	///   built into the .net framework.
-	/// </summary>
-	/// <remarks>
-	///   Logging can be configured in the system.diagnostics configuration 
-	///   section. 
-	/// 
-	///   If logger doesn't find a source name with a full match it will
-	///   use source names which match the namespace partially. For example you can
-	///   configure from all castle components by adding a source name with the
-	///   name "Castle". 
-	/// 
-	///   If no portion of the namespace matches the source named "Default" will
-	///   be used.
-	/// </remarks>
-	internal class TraceLogger : LevelFilteredLogger
+    /// <summary>
+    ///   The TraceLogger sends all logging to the System.Diagnostics.TraceSource
+    ///   built into the .net framework.
+    /// </summary>
+    /// <remarks>
+    ///   Logging can be configured in the system.diagnostics configuration 
+    ///   section. 
+    /// 
+    ///   If logger doesn't find a source name with a full match it will
+    ///   use source names which match the namespace partially. For example you can
+    ///   configure from all castle components by adding a source name with the
+    ///   name "Castle". 
+    /// 
+    ///   If no portion of the namespace matches the source named "Default" will
+    ///   be used.
+    /// </remarks>
+    internal class TraceLogger : LevelFilteredLogger
 	{
 		private static readonly Dictionary<string, TraceSource> cache = new Dictionary<string, TraceSource>();
 
@@ -48,7 +47,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// Build a new trace logger based on the named TraceSource
 		/// </summary>
 		/// <param name="name">The name used to locate the best TraceSource. In most cases comes from the using type's fullname.</param>
-#if DOTNET40
+#if FEATURE_SECURITY_PERMISSIONS && DOTNET40
 		[SecuritySafeCritical]
 #endif
 		public TraceLogger(string name)
@@ -64,7 +63,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// <param name="name">The name used to locate the best TraceSource. In most cases comes from the using type's fullname.</param>
 		/// <param name="level">The default logging level at which this source should write messages. In almost all cases this
 		/// default value will be overridden in the config file. </param>
-#if DOTNET40
+#if FEATURE_SECURITY_PERMISSIONS && DOTNET40
 		[SecuritySafeCritical]
 #endif
 		public TraceLogger(string name, LoggerLevel level)
@@ -80,7 +79,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// </summary>
 		/// <param name="loggerName">The Subname of this logger.</param>
 		/// <returns>The New ILogger instance.</returns> 
-#if DOTNET40
+#if FEATURE_SECURITY_PERMISSIONS && DOTNET40
 		[SecuritySafeCritical]
 #endif
 		public override ILogger CreateChildLogger(string loggerName)
@@ -88,7 +87,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 			return InternalCreateChildLogger(loggerName);
 		}
 
-#if DOTNET40
+#if FEATURE_SECURITY_PERMISSIONS && DOTNET40
 		[SecurityCritical]
 #endif
 		private ILogger InternalCreateChildLogger(string loggerName)
@@ -108,7 +107,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 			}
 		}
 
-#if DOTNET40
+#if FEATURE_SECURITY_PERMISSIONS && DOTNET40
 		[SecurityCritical]
 #endif
 		private void Initialize()
@@ -116,7 +115,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 			lock (cache)
 			{
 				// because TraceSource is meant to be used as a static member, and because
-				// building up the configuraion inheritance is non-trivial, the instances
+				// building up the configuration inheritance is non-trivial, the instances
 				// themselves are cached for so multiple TraceLogger instances will reuse
 				// the named TraceSources which have been created
 
@@ -173,7 +172,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 			return null;
 		}
 
-#if DOTNET40
+#if FEATURE_SECURITY_PERMISSIONS && DOTNET40
 		[SecuritySafeCritical]
 #endif
 		private static bool IsSourceConfigured(TraceSource source)
@@ -243,6 +242,4 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 			return TraceEventType.Verbose;
 		}
 	}
-
-#endif
 }
