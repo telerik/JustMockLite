@@ -70,7 +70,7 @@ namespace Telerik.JustMock.Core
 			}
 
 			var interceptor = repository.Interceptor;
-#if (SILVERLIGHT || NETCORE)
+#if (SILVERLIGHT)
 			options.Hook = new ProxyGenerationHook(false, settings.InterceptorFilter);
 #else
 			options.Hook = new ProxyGenerationHook(settings.MockConstructorCall, settings.InterceptorFilter);

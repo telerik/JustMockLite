@@ -86,7 +86,11 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Core\DynamicProxy\DynamicProxy.snk" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="..\CommonAssemblyInfo.cs" Link="Properties\CommonAssemblyInfo.cs" />
+    <EmbeddedResource Include="Core\DynamicProxy\DynamicProxy.snk" />
     <Compile Update="Args.Matching.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
