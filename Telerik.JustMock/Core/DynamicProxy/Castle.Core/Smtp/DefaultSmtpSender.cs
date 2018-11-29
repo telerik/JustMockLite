@@ -16,7 +16,7 @@
 
 #pragma warning disable 618 // Mono marked SmtpClient obsolete
 
-namespace Castle.Core.Smtp
+namespace Telerik.JustMock.Core.Castle.Core.Smtp
 {
 	using System;
 	using System.Collections.Generic;
@@ -32,7 +32,7 @@ namespace Castle.Core.Smtp
 	/// <summary>
 	/// Default <see cref="IEmailSender"/> implementation.
 	/// </summary>
-	public class DefaultSmtpSender : IEmailSender
+	internal class DefaultSmtpSender : IEmailSender
 	{
 		private bool asyncSend;
 		private readonly string hostname;

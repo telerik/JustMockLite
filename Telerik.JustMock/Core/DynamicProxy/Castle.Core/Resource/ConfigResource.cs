@@ -14,7 +14,7 @@
 
 #if FEATURE_SYSTEM_CONFIGURATION
 
-namespace Castle.Core.Resource
+namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
 	using System;
 	using System.Configuration;
@@ -23,7 +23,7 @@ namespace Castle.Core.Resource
 	using System.Text;
 	using System.Xml;
 
-	public class ConfigResource : AbstractResource
+	internal class ConfigResource : AbstractResource
 	{
 		private readonly XmlNode configSectionNode;
 		private readonly string sectionName;

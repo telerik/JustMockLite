@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.Core.Resource
+namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
 	using System;
 	using System.Globalization;
 	using System.IO;
 	using System.Reflection;
 
-	public class AssemblyResource : AbstractStreamResource
+    internal class AssemblyResource : AbstractStreamResource
 	{
 		private string assemblyName;
 		private string resourcePath;

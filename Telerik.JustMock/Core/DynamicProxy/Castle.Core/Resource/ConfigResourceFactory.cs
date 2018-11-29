@@ -14,11 +14,11 @@
 
 #if FEATURE_SYSTEM_CONFIGURATION
 
-namespace Castle.Core.Resource
+namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
 	using System;
 
-	public class ConfigResourceFactory : IResourceFactory
+	internal class ConfigResourceFactory : IResourceFactory
 	{
 		public ConfigResourceFactory()
 		{

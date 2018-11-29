@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.Core.Resource
+namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
 	using System;
 	using System.Globalization;
@@ -22,7 +22,7 @@ namespace Castle.Core.Resource
 	/// Enable access to files on network shares
 	/// </summary>
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Unc")]
-	public class UncResource : AbstractStreamResource
+    internal class UncResource : AbstractStreamResource
 	{
 		private string basePath;
 		private string filePath;

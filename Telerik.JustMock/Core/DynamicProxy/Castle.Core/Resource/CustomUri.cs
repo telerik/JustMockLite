@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.Core.Resource
+namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
 	using System;
 	using System.Text;
@@ -20,7 +20,7 @@ namespace Castle.Core.Resource
 #if FEATURE_SERIALIZATION
 	[Serializable]
 #endif
-	public sealed class CustomUri
+    internal sealed class CustomUri
 	{
 		public static readonly String SchemeDelimiter = "://";
 		public static readonly String UriSchemeFile = "file";

@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.Core.Resource
+namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
 	using System;
 
-	/// <summary>
-	/// 
-	/// </summary>
-	public class FileResourceFactory : IResourceFactory
+    /// <summary>
+    /// 
+    /// </summary>
+    internal class FileResourceFactory : IResourceFactory
 	{
 		public FileResourceFactory()
 		{

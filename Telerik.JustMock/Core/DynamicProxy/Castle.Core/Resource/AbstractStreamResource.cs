@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.Core.Resource
+namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
 	using System.IO;
 	using System.Text;
 
-	public delegate Stream StreamFactory();
+    internal delegate Stream StreamFactory();
 
-	/// <summary>
-	/// 
-	/// </summary>
-	public abstract class AbstractStreamResource : AbstractResource
+    /// <summary>
+    /// 
+    /// </summary>
+    internal abstract class AbstractStreamResource : AbstractResource
 	{
 		/// <summary>
 		/// This returns a new stream instance each time it is called.

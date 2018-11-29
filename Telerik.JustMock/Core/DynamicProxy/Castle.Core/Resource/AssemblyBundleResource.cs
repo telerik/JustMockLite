@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.Core.Resource
+namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
 	using System;
 	using System.Globalization;
@@ -20,8 +20,8 @@ namespace Castle.Core.Resource
 	using System.Reflection;
 	using System.Resources;
 	using System.Text;
-	
-	public class AssemblyBundleResource : AbstractResource
+
+    internal class AssemblyBundleResource : AbstractResource
 	{
 		private readonly CustomUri resource;
 

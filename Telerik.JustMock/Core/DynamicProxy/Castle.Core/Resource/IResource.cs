@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.Core.Resource
+namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
 	using System;
 	using System.IO;
 	using System.Text;
 
-	/// <summary>
-	/// Represents a 'streamable' resource. Can
-	/// be a file, a resource in an assembly.
-	/// </summary>
-	public interface IResource : IDisposable
+    /// <summary>
+    /// Represents a 'streamable' resource. Can
+    /// be a file, a resource in an assembly.
+    /// </summary>
+    internal interface IResource : IDisposable
 	{
 		/// <summary>
 		/// 

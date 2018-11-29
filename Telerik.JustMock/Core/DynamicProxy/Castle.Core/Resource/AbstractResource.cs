@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.Core.Resource
+namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
 	using System;
 	using System.IO;
 	using System.Text;
 
-	public abstract class AbstractResource : IResource
+    internal abstract class AbstractResource : IResource
 	{
 #if FEATURE_APPDOMAIN
 		protected static readonly string DefaultBasePath = AppDomain.CurrentDomain.BaseDirectory;

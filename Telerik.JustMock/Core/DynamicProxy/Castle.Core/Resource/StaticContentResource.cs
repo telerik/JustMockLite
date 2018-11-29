@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.Core.Resource
+namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
 	using System;
 	using System.IO;
 	using System.Text;
 
-	/// <summary>
-	/// Adapts a static string content as an <see cref="IResource"/>
-	/// </summary>
-	public class StaticContentResource : AbstractResource
+    /// <summary>
+    /// Adapts a static string content as an <see cref="IResource"/>
+    /// </summary>
+    internal class StaticContentResource : AbstractResource
 	{
 		private readonly string contents;
 

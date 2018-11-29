@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.Core.Resource
+namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
 	using System;
 #if FEATURE_SERIALIZATION
@@ -22,7 +22,7 @@ namespace Castle.Core.Resource
 #if FEATURE_SERIALIZATION
 	[Serializable]
 #endif
-	public class ResourceException : Exception
+    internal class ResourceException : Exception
 	{
 		public ResourceException()
 		{

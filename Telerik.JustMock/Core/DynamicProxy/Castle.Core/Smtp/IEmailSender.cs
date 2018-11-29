@@ -14,7 +14,7 @@
 
 #if FEATURE_SMTP
 
-namespace Castle.Core.Smtp
+namespace Telerik.JustMock.Core.Castle.Core.Smtp
 {
 	using System.Collections.Generic;
 	using System.Net.Mail;
@@ -22,7 +22,7 @@ namespace Castle.Core.Smtp
 	/// <summary>
 	/// Email sender abstraction.
 	/// </summary>
-	public interface IEmailSender
+	internal interface IEmailSender
 	{
 		/// <summary>
 		/// Sends a mail message.

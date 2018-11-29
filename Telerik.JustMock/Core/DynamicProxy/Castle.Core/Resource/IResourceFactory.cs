@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.Core.Resource
+namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
 	using System;
 
-	/// <summary>
-	/// Depicts the contract for resource factories.
-	/// </summary>
-	public interface IResourceFactory
+    /// <summary>
+    /// Depicts the contract for resource factories.
+    /// </summary>
+    internal interface IResourceFactory
 	{
 		/// <summary>
 		/// Used to check whether the resource factory
