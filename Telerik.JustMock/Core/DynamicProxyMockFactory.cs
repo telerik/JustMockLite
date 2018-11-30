@@ -62,10 +62,9 @@ namespace Telerik.JustMock.Core
 
 			if (settings.AdditionalProxyTypeAttributes != null)
 			{
-				foreach (var attr in settings.AdditionalProxyTypeAttributes)
+				foreach (var attributeBuilder in settings.AdditionalProxyTypeAttributes)
 				{
-                    // TODO DP
-					//options.AdditionalAttributes.Add(attr);
+					options.AdditionalAttributes.Add(new CustomAttributeInfo(attributeBuilder));
 				}
 			}
 
@@ -208,10 +207,9 @@ namespace Telerik.JustMock.Core
 
 			if (settings.AdditionalProxyTypeAttributes != null)
 			{
-				foreach (var attr in settings.AdditionalProxyTypeAttributes)
+				foreach (var attributeBuilder in settings.AdditionalProxyTypeAttributes)
 				{
-                    // TODO DP
-					//options.AdditionalAttributes.Add(attr);
+					options.AdditionalAttributes.Add(new CustomAttributeInfo(attributeBuilder));
 				}
 			}
 

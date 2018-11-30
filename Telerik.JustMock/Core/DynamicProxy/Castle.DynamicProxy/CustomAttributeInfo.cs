@@ -43,6 +43,11 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		private readonly IDictionary<string, object> properties;
 		private readonly IDictionary<string, object> fields;
 
+        public CustomAttributeInfo(CustomAttributeBuilder builder)
+        {
+            this.builder = builder;
+        }
+
 		public CustomAttributeInfo(
 			ConstructorInfo constructor,
 			object[] constructorArgs,

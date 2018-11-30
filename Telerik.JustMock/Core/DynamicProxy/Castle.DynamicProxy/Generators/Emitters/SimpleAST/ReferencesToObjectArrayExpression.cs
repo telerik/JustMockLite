@@ -50,11 +50,11 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 				{
 					throw new NotSupportedException();
 				}
-                //if (reference.Type.IsPointer)
-                //{
-                //    gen.Emit(OpCodes.Call, ArgumentsUtil.IntPtrFromPointer());
-                //    gen.Emit(OpCodes.Box, typeof(IntPtr));
-                //}
+                if (reference.Type.IsPointer)
+                {
+                    gen.Emit(OpCodes.Call, ArgumentsUtil.IntPtrFromPointer());
+                    gen.Emit(OpCodes.Box, typeof(IntPtr));
+                }
                 if (reference.Type.GetTypeInfo().IsValueType)
 				{
 					gen.Emit(OpCodes.Box, reference.Type);

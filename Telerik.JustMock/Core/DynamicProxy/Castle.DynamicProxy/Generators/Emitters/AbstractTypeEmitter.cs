@@ -90,17 +90,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 
 		public void AddCustomAttributes(ProxyGenerationOptions proxyGenerationOptions)
 		{
-            // TODO: Examine
-            foreach (Attribute attr in proxyGenerationOptions.attributesToAddToGeneratedTypes)
-            {
-                throw new ArgumentException("TODO: Examine this problem");
-                //var customAttributeBuilder = AttributeUtil.CreateBuilder(attr);
-                //if (customAttributeBuilder != null)
-                //{
-                //    typebuilder.SetCustomAttribute(customAttributeBuilder);
-                //}
-            }
-
             foreach (var attribute in proxyGenerationOptions.AdditionalAttributes)
 			{
 				typebuilder.SetCustomAttribute(attribute.Builder);
