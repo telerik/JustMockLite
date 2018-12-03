@@ -95,15 +95,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			CompleteInitCacheMethod(cctor.CodeBuilder);
 
             // Crosses fingers and build type
-            Type proxyType = null;
-            //try
-            //{
-                proxyType = emitter.BuildType();
-            //}
-            //catch(Exception ex)
-            //{
-                
-            //}
+            Type proxyType = emitter.BuildType();
 
 			InitializeStaticFields(proxyType);
 			return proxyType;

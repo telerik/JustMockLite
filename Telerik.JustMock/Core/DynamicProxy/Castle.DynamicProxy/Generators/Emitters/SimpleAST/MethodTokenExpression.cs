@@ -17,10 +17,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 	using System;
 	using System.Reflection;
 	using System.Reflection.Emit;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Tokens;
 
-	using Castle.DynamicProxy.Tokens;
-
-	internal class MethodTokenExpression : Expression
+    internal class MethodTokenExpression : Expression
 	{
 		private readonly MethodInfo method;
 		private readonly Type declaringType;

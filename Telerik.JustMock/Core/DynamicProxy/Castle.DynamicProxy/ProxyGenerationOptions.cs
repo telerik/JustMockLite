@@ -20,7 +20,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 #if FEATURE_SERIALIZATION
 	using System.Runtime.Serialization;
 #endif
-	using Castle.Core.Internal;
     using CollectionExtensions = Telerik.JustMock.Core.Castle.Core.Internal.CollectionExtensions;
 #if DOTNET40
 	using System.Security;

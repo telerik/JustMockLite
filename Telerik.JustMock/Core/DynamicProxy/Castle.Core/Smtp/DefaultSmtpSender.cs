@@ -27,7 +27,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Smtp
 	using System.Security;
 #endif
 	using System.Security.Permissions;
-	using Castle.Core.Internal;
+	using Telerik.JustMock.Core.Castle.Core.Internal;
 
 	/// <summary>
 	/// Default <see cref="IEmailSender"/> implementation.
