@@ -28,8 +28,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		private readonly MethodInfo proxiedMethod;
 		protected readonly object proxyObject;
 
-        [DebuggerHidden]
-        protected AbstractInvocation(
+		protected AbstractInvocation(
 			object proxy,
 			IInterceptor[] interceptors,
 			MethodInfo proxiedMethod,
@@ -99,7 +98,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 			return arguments[index];
 		}
 
-        [DebuggerHidden]
 		public void Proceed()
 		{
 			if (interceptors == null)
@@ -162,7 +160,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 
 			string methodKindIs;
 			string methodKindDescription;
-			if (Method.DeclaringType.IsClass && Method.IsAbstract)
+			if (Method.DeclaringType.GetTypeInfo().IsClass && Method.IsAbstract)
 			{
 				methodKindIs = "is abstract";
 				methodKindDescription = "an abstract method";

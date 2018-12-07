@@ -48,7 +48,7 @@ namespace Telerik.JustMock.Tests
 			public abstract int* Realloc(int* x);
 		}
 
-		[TestMethod,]
+		[TestMethod, TestCategory("Interop")]
 		public void ShouldArrangeMethodWithPointerArg()
 		{
 			var mock = Mock.Create<UnsafeClass1>();
@@ -60,7 +60,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(2, called);
 		}
 
-		[TestMethod,]
+		[TestMethod, TestCategory("Interop")]
 		public void ShouldArrangeMethodWithPointerReturnType()
 		{
 			var mock = Mock.Create<UnsafeClass2>();
@@ -69,7 +69,7 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(1234, new IntPtr(result).ToInt32());
 		}
 
-		[TestMethod,]
+		[TestMethod, TestCategory("Interop")]
 		public void ShouldPassPointersToAndFromReturns()
 		{
 			var mock = Mock.Create<UnsafeClass2>();
@@ -85,7 +85,7 @@ namespace Telerik.JustMock.Tests
 
 		public delegate void DoDelegate(ref IntPtr arg);
 
-		[TestMethod]
+		[TestMethod, TestCategory("Interop")]
 		public void ShouldPassPointersByRef()
 		{
 			var mock = Mock.Create<UnsafeClassRef>();
@@ -106,7 +106,7 @@ namespace Telerik.JustMock.Tests
 			}
 		}
 
-		[TestMethod,]
+		[TestMethod, TestCategory("Interop")]
 		public void ShouldCallOriginalImplementationWithPointers()
 		{
 			var mock = Mock.Create<UnsafeClass3>();

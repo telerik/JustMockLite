@@ -50,8 +50,8 @@ namespace Telerik.JustMock.Core
 
 		public bool IsAccessible(Type type)
 		{
-			return generator.ProxyBuilder.ModuleScope.Internals.IsAccessible(type);
-		}
+            return ProxyUtil.IsAccessibleType(type);
+        }
 
 		public object Create(Type type, MocksRepository repository, IMockMixin mockMixinImpl, MockCreationSettings settings, bool createTransparentProxy)
 		{
@@ -62,14 +62,14 @@ namespace Telerik.JustMock.Core
 
 			if (settings.AdditionalProxyTypeAttributes != null)
 			{
-				foreach (var attr in settings.AdditionalProxyTypeAttributes)
+				foreach (var attributeBuilder in settings.AdditionalProxyTypeAttributes)
 				{
-					options.AdditionalAttributes.Add(attr);
+					options.AdditionalAttributes.Add(new CustomAttributeInfo(attributeBuilder));
 				}
 			}
 
 			var interceptor = repository.Interceptor;
-#if (SILVERLIGHT || NETCORE)
+#if (SILVERLIGHT)
 			options.Hook = new ProxyGenerationHook(false, settings.InterceptorFilter);
 #else
 			options.Hook = new ProxyGenerationHook(settings.MockConstructorCall, settings.InterceptorFilter);
@@ -207,9 +207,9 @@ namespace Telerik.JustMock.Core
 
 			if (settings.AdditionalProxyTypeAttributes != null)
 			{
-				foreach (var attr in settings.AdditionalProxyTypeAttributes)
+				foreach (var attributeBuilder in settings.AdditionalProxyTypeAttributes)
 				{
-					options.AdditionalAttributes.Add(attr);
+					options.AdditionalAttributes.Add(new CustomAttributeInfo(attributeBuilder));
 				}
 			}
 

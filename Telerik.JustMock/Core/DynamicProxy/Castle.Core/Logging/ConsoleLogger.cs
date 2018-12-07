@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,13 +17,15 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 	using System;
 	using System.Globalization;
 
-	/// <summary>
-	///	The Logger sending everything to the standard output streams.
-	/// This is mainly for the cases when you have a utility that
-	/// does not have a logger to supply.
-	/// </summary>
+    /// <summary>
+    /// The Logger sending everything to the standard output streams.
+    /// This is mainly for the cases when you have a utility that
+    /// does not have a logger to supply.
+    /// </summary>
+#if FEATURE_SERIALIZATION
 	[Serializable]
-	internal class ConsoleLogger : LevelFilteredLogger
+#endif
+    internal class ConsoleLogger : LevelFilteredLogger
 	{
 		/// <summary>
 		///   Creates a new ConsoleLogger with the <c>Level</c>

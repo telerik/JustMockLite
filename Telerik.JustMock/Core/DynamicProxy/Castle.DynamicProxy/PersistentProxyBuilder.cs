@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Telerik.JustMock.Core.Castle.DynamicProxy
+#if FEATURE_ASSEMBLYBUILDER_SAVE
+
+namespace Telerik.JustMock.Core.InternalsVisibleCastle.DynamicProxy
 {
-#if (!SILVERLIGHT && !NETCORE)
+    using Telerik.JustMock.Core.Castle.DynamicProxy;
+
     /// <summary>
     ///   ProxyBuilder that persists the generated type.
     /// </summary>
@@ -43,5 +46,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 			return ModuleScope.SaveAssembly();
 		}
 	}
-#endif
 }
+
+#endif

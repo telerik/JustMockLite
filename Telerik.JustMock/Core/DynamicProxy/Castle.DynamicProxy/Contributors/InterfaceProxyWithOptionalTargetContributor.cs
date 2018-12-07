@@ -21,9 +21,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 	{
 		private readonly GetTargetReferenceDelegate getTargetReference;
 
-        public InterfaceProxyWithOptionalTargetContributor(INamingScope namingScope, ModuleScope scope, GetTargetExpressionDelegate getTarget,
+		public InterfaceProxyWithOptionalTargetContributor(INamingScope namingScope, GetTargetExpressionDelegate getTarget,
 		                                                   GetTargetReferenceDelegate getTargetReference)
-			: base(namingScope, scope, getTarget)
+			: base(namingScope, getTarget)
 		{
 			this.getTargetReference = getTargetReference;
 			canChangeTarget = true;

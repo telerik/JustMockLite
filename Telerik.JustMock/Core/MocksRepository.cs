@@ -30,6 +30,10 @@ using Telerik.JustMock.Core.MatcherTree;
 using Telerik.JustMock.Core.Recording;
 using Telerik.JustMock.Core.TransparentProxy;
 using Telerik.JustMock.Diagnostics;
+#if !PORTABLE
+using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
+#endif
+
 #if NETCORE
 using Debug = Telerik.JustMock.Diagnostics.JMDebug;
 #else

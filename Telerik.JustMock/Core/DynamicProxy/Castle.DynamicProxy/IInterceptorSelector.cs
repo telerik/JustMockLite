@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,12 +21,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 	///   Provides an extension point that allows proxies to choose specific interceptors on
 	///   a per method basis.
 	/// </summary>
-	internal interface IInterceptorSelector
+	public interface IInterceptorSelector
 	{
 		/// <summary>
 		///   Selects the interceptors that should intercept calls to the given <paramref name = "method" />.
 		/// </summary>
-		/// <param name = "type">The type declaring the method to intercept.</param>
+		/// <param name = "type">The type of the target object.</param>
 		/// <param name = "method">The method that will be intercepted.</param>
 		/// <param name = "interceptors">All interceptors registered with the proxy.</param>
 		/// <returns>An array of interceptors to invoke upon calling the <paramref name = "method" />.</returns>

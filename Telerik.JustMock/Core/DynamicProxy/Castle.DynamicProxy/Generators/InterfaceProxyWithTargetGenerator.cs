@@ -18,16 +18,20 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Reflection;
-#if !SILVERLIGHT
+#if FEATURE_SERIALIZATION
 	using System.Xml.Serialization;
+
 #endif
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+    using Telerik.JustMock.Core.Castle.DynamicProxy;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
+	using Telerik.JustMock.Core.Castle.DynamicProxy.Serialization;
 
-	internal class InterfaceProxyWithTargetGenerator : BaseProxyGenerator
+    internal class InterfaceProxyWithTargetGenerator : BaseProxyGenerator
 	{
 		protected FieldReference targetField;
 
@@ -42,6 +46,11 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			get { return false; }
 		}
 
+		protected virtual string GeneratorType
+		{
+			get { return ProxyTypeConstants.InterfaceWithTarget; }
+		}
+
 		public Type GenerateCode(Type proxyTargetType, Type[] interfaces, ProxyGenerationOptions options)
 		{
 			// make sure ProxyGenerationOptions is initialized
@@ -53,7 +62,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			ProxyGenerationOptions = options;
 
 			interfaces = TypeUtil.GetAllInterfaces(interfaces);
-			var cacheKey = new CacheKey(proxyTargetType, targetType, interfaces, options);
+			var cacheKey = new CacheKey(proxyTargetType.GetTypeInfo(), targetType, interfaces, options);
 
 			return ObtainProxyType(cacheKey, (n, s) => GenerateType(n, proxyTargetType, interfaces, s));
 		}
@@ -63,7 +72,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 		                                                           ICollection<Type> additionalInterfaces,
 		                                                           INamingScope namingScope)
 		{
-			var contributor = new InterfaceProxyTargetContributor(proxyTargetType, AllowChangeTarget, namingScope, Scope)
+			var contributor = new InterfaceProxyTargetContributor(proxyTargetType, AllowChangeTarget, namingScope)
 			{ Logger = Logger };
 			var proxiedInterfaces = targetType.GetAllInterfaces();
 			foreach (var @interface in proxiedInterfaces)
@@ -84,7 +93,15 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			}
 			return contributor;
 		}
-		
+
+#if FEATURE_SERIALIZATION
+		protected override void CreateTypeAttributes(ClassEmitter emitter)
+		{
+			base.CreateTypeAttributes(emitter);
+			emitter.DefineCustomAttribute<SerializableAttribute>();
+		}
+#endif
+
 		protected virtual Type GenerateType(string typeName, Type proxyTargetType, Type[] interfaces, INamingScope namingScope)
 		{
 			IEnumerable<ITypeContributor> contributors;
@@ -142,7 +159,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 		protected virtual InterfaceProxyWithoutTargetContributor GetContributorForAdditionalInterfaces(
 			INamingScope namingScope)
 		{
-			return new InterfaceProxyWithoutTargetContributor(namingScope, Scope, (c, m) => NullExpression.Instance) { Logger = Logger };
+			return new InterfaceProxyWithoutTargetContributor(namingScope, (c, m) => NullExpression.Instance) { Logger = Logger };
 		}
 
 		protected virtual IEnumerable<Type> GetTypeImplementerMapping(Type[] interfaces, Type proxyTargetType,
@@ -150,7 +167,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 		                                                              INamingScope namingScope)
 		{
 			IDictionary<Type, ITypeContributor> typeImplementerMapping = new Dictionary<Type, ITypeContributor>();
-			var mixins = new MixinContributor(namingScope, Scope, AllowChangeTarget) { Logger = Logger };
+			var mixins = new MixinContributor(namingScope, AllowChangeTarget) { Logger = Logger };
 			// Order of interface precedence:
 			// 1. first target
 			var targetInterfaces = proxyTargetType.GetAllInterfaces();
@@ -203,7 +220,10 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			}
 
 			// 4. plus special interfaces
-			var instance = new InterfaceProxyInstanceContributor(targetType, interfaces);
+			var instance = new InterfaceProxyInstanceContributor(targetType, GeneratorType, interfaces);
+#if FEATURE_SERIALIZATION
+			AddMappingForISerializable(typeImplementerMapping, instance);
+#endif
 			try
 			{
 				AddMappingNoCheck(typeof(IProxyTargetAccessor), instance, typeImplementerMapping);
@@ -241,7 +261,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 		{
 			base.CreateFields(emitter);
 			targetField = emitter.CreateField("__target", proxyTargetType);
-#if !SILVERLIGHT
+#if FEATURE_SERIALIZATION
 			emitter.DefineCustomAttributeFor<XmlIgnoreAttribute>(targetField);
 #endif
 		}
@@ -254,12 +274,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 					"Base type for proxy is null reference. Please set it to System.Object or some other valid type.");
 			}
 
-			if (!type.IsClass)
+			if (!type.GetTypeInfo().IsClass)
 			{
 				ThrowInvalidBaseType(type, "it is not a class type");
 			}
 
-			if (type.IsSealed)
+			if (type.GetTypeInfo().IsSealed)
 			{
 				ThrowInvalidBaseType(type, "it is sealed");
 			}

@@ -17,6 +17,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 	using System;
 	using System.Collections.Generic;
 	using System.Diagnostics;
+	using System.Reflection;
 
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
@@ -26,8 +27,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 		private readonly bool canChangeTarget;
 		private readonly Type proxyTargetType;
 
-        public InterfaceProxyTargetContributor(Type proxyTargetType, bool canChangeTarget, INamingScope namingScope, ModuleScope scope)
-			: base(namingScope, scope)
+		public InterfaceProxyTargetContributor(Type proxyTargetType, bool canChangeTarget, INamingScope namingScope)
+			: base(namingScope)
 		{
 			this.proxyTargetType = proxyTargetType;
 			this.canChangeTarget = canChangeTarget;
@@ -48,7 +49,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 
 		protected virtual MembersCollector GetCollectorForInterface(Type @interface)
 		{
-			return new InterfaceMembersOnClassCollector(@interface, scope, false, proxyTargetType.GetInterfaceMap(@interface));
+			return new InterfaceMembersOnClassCollector(@interface, false,
+				proxyTargetType.GetTypeInfo().GetRuntimeInterfaceMap(@interface));
 		}
 
 		protected override MethodGenerator GetMethodGenerator(MetaMethod method, ClassEmitter @class,

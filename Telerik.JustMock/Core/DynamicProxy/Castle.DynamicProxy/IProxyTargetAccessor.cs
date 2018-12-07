@@ -1,4 +1,4 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2016 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,6 +14,10 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy
 {
+	/// <summary>
+	///   Exposes access to the target object and interceptors of proxy objects.
+	///   This is a DynamicProxy infrastructure interface and should not be implemented yourself.
+	/// </summary>
 	public interface IProxyTargetAccessor
 	{
 		/// <summary>
@@ -21,6 +25,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		/// </summary>
 		/// <returns></returns>
 		object DynProxyGetTarget();
+
+		/// <summary>
+		///   Set the proxy target.
+		/// </summary>
+		/// <param name="target">New proxy target.</param>
+		void DynProxySetTarget(object target);
 
 		/// <summary>
 		///   Gets the interceptors for the proxy

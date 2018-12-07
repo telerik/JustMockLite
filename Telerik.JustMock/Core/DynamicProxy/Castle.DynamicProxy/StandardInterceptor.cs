@@ -16,7 +16,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 {
 	using System;
 
-	internal class StandardInterceptor : IInterceptor
+#if FEATURE_SERIALIZATION
+	[Serializable]
+#endif
+	internal class StandardInterceptor :
+#if FEATURE_REMOTING
+		MarshalByRefObject,
+#endif
+		IInterceptor
 	{
 		public void Intercept(IInvocation invocation)
 		{

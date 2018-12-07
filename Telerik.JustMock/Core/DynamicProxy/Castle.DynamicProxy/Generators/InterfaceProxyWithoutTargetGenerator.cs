@@ -16,11 +16,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 {
 	using System;
 	using System.Collections.Generic;
-
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
+    using Telerik.JustMock.Core.Castle.Core.Logging;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
+	using Telerik.JustMock.Core.Castle.DynamicProxy.Serialization;
 
 	internal class InterfaceProxyWithoutTargetGenerator : InterfaceProxyWithTargetGenerator
 	{
@@ -28,12 +29,17 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 		{
 		}
 
+		protected override string GeneratorType
+		{
+			get { return ProxyTypeConstants.InterfaceWithoutTarget; }
+		}
+
 		protected override ITypeContributor AddMappingForTargetType(
 			IDictionary<Type, ITypeContributor> interfaceTypeImplementerMapping, Type proxyTargetType,
 			ICollection<Type> targetInterfaces, ICollection<Type> additionalInterfaces, INamingScope namingScope)
 		{
-			var contributor = new InterfaceProxyWithoutTargetContributor(namingScope, Scope, (c, m) => NullExpression.Instance)
-			{ Logger = Logger };
+			var contributor = new InterfaceProxyWithoutTargetContributor(namingScope, (c, m) => NullExpression.Instance)
+			{ Logger = this.Logger };
 			foreach (var @interface in targetType.GetAllInterfaces())
 			{
 				contributor.AddInterfaceToProxy(@interface);

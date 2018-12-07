@@ -17,60 +17,58 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 	using System;
 	using System.Collections.Generic;
 	using System.Diagnostics;
+	using System.Linq;
 	using System.Reflection;
-	using System.Reflection.Emit;
-
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
+    using System.Reflection.Emit;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
 
 	internal static class AttributeUtil
 	{
-		private static readonly IDictionary<Type, IAttributeDisassembler> disassemblers =
-			new Dictionary<Type, IAttributeDisassembler>();
-
-		private static IAttributeDisassembler fallbackDisassembler = new AttributeDisassembler();
-
-		public static IAttributeDisassembler FallbackDisassembler
-		{
-			get { return fallbackDisassembler; }
-			set { fallbackDisassembler = value; }
-		}
-
-		/// <summary>
-		///   Registers custom disassembler to handle disassembly of specified type of attributes.
-		/// </summary>
-		/// <typeparam name = "TAttribute">Type of attributes to handle</typeparam>
-		/// <param name = "disassembler">Disassembler converting existing instances of Attributes to CustomAttributeBuilders</param>
-		/// <remarks>
-		///   When disassembling an attribute Dynamic Proxy will first check if an custom disassembler has been registered to handle attributes of that type, 
-		///   and if none is found, it'll use the <see cref = "FallbackDisassembler" />.
-		/// </remarks>
-		public static void AddDisassembler<TAttribute>(IAttributeDisassembler disassembler) where TAttribute : Attribute
-		{
-			if (disassembler == null)
-			{
-				throw new ArgumentNullException("disassembler");
-			}
-
-			disassemblers[typeof(TAttribute)] = disassembler;
-		}
-
-#if !SILVERLIGHT
-		public static CustomAttributeBuilder CreateBuilder(CustomAttributeData attribute)
+		public static CustomAttributeInfo CreateInfo(CustomAttributeData attribute)
 		{
 			Debug.Assert(attribute != null, "attribute != null");
+
+			// .NET Core does not provide CustomAttributeData.Constructor, so we'll implement it
+			// by finding a constructor ourselves
+			Type[] constructorArgTypes;
+			object[] constructorArgs;
+			GetArguments(attribute.ConstructorArguments, out constructorArgTypes, out constructorArgs);
+#if FEATURE_LEGACY_REFLECTION_API
+			var constructor = attribute.Constructor;
+#else
+			var constructor = attribute.AttributeType.GetConstructor(constructorArgTypes);
+#endif
 
 			PropertyInfo[] properties;
 			object[] propertyValues;
 			FieldInfo[] fields;
 			object[] fieldValues;
-			GetSettersAndFields(attribute.NamedArguments, out properties, out propertyValues, out fields, out fieldValues);
-			var constructorArgs = GetArguments(attribute.ConstructorArguments);
-			return new CustomAttributeBuilder(attribute.Constructor,
-			                                  constructorArgs,
-			                                  properties,
-			                                  propertyValues,
-			                                  fields,
-			                                  fieldValues);
+			GetSettersAndFields(
+#if FEATURE_LEGACY_REFLECTION_API
+				null,
+#else
+				attribute.AttributeType,
+#endif
+				attribute.NamedArguments, out properties, out propertyValues, out fields, out fieldValues);
+
+			return new CustomAttributeInfo(constructor,
+			                               constructorArgs,
+			                               properties,
+			                               propertyValues,
+			                               fields,
+			                               fieldValues);
+		}
+
+		private static void GetArguments(IList<CustomAttributeTypedArgument> constructorArguments,
+			out Type[] constructorArgTypes, out object[] constructorArgs)
+		{
+			constructorArgTypes = new Type[constructorArguments.Count];
+			constructorArgs = new object[constructorArguments.Count];
+			for (var i = 0; i < constructorArguments.Count; i++)
+			{
+				constructorArgTypes[i] = constructorArguments[i].ArgumentType;
+				constructorArgs[i] = ReadAttributeValue(constructorArguments[i]);
+			}
 		}
 
 		private static object[] GetArguments(IList<CustomAttributeTypedArgument> constructorArguments)
@@ -87,20 +85,20 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 		private static object ReadAttributeValue(CustomAttributeTypedArgument argument)
 		{
 			var value = argument.Value;
-			if (argument.ArgumentType.IsArray == false)
+			if (argument.ArgumentType.GetTypeInfo().IsArray == false)
 			{
 				return value;
 			}
 			//special case for handling arrays in attributes
 			var arguments = GetArguments((IList<CustomAttributeTypedArgument>)value);
-			var array = Array.CreateInstance(argument.ArgumentType.GetElementType() ?? typeof(object), arguments.Length);
+			var array = new object[arguments.Length];
 			arguments.CopyTo(array, 0);
 			return array;
 		}
 
-		private static void GetSettersAndFields(IEnumerable<CustomAttributeNamedArgument> namedArguments,
-		                                        out PropertyInfo[] properties, out object[] propertyValues,
-		                                        out FieldInfo[] fields, out object[] fieldValues)
+		private static void GetSettersAndFields(Type attributeType, IEnumerable<CustomAttributeNamedArgument> namedArguments,
+			out PropertyInfo[] properties, out object[] propertyValues,
+			out FieldInfo[] fields, out object[] fieldValues)
 		{
 			var propertyList = new List<PropertyInfo>();
 			var propertyValuesList = new List<object>();
@@ -108,21 +106,29 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 			var fieldValuesList = new List<object>();
 			foreach (var argument in namedArguments)
 			{
-				switch (argument.MemberInfo.MemberType)
+#if FEATURE_LEGACY_REFLECTION_API
+				if (argument.MemberInfo.MemberType == MemberTypes.Field)
 				{
-					case MemberTypes.Property:
-						propertyList.Add(argument.MemberInfo as PropertyInfo);
-						propertyValuesList.Add(ReadAttributeValue(argument.TypedValue));
-						break;
-					case MemberTypes.Field:
-						fieldList.Add(argument.MemberInfo as FieldInfo);
-						fieldValuesList.Add(ReadAttributeValue(argument.TypedValue));
-						break;
-					default:
-						// NOTE: can this ever happen?
-						throw new ArgumentException(string.Format("Unexpected member type {0} in custom attribute.",
-						                                          argument.MemberInfo.MemberType));
+					fieldList.Add(argument.MemberInfo as FieldInfo);
+					fieldValuesList.Add(ReadAttributeValue(argument.TypedValue));
 				}
+				else
+				{
+					propertyList.Add(argument.MemberInfo as PropertyInfo);
+					propertyValuesList.Add(ReadAttributeValue(argument.TypedValue));
+				}
+#else
+				if (argument.IsField)
+				{
+					fieldList.Add(attributeType.GetField(argument.MemberName));
+					fieldValuesList.Add(ReadAttributeValue(argument.TypedValue));
+				}
+				else
+				{
+					propertyList.Add(attributeType.GetProperty(argument.MemberName));
+					propertyValuesList.Add(ReadAttributeValue(argument.TypedValue));
+				}
+#endif
 			}
 
 			properties = propertyList.ToArray();
@@ -130,89 +136,85 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 			fields = fieldList.ToArray();
 			fieldValues = fieldValuesList.ToArray();
 		}
-#else
-		// CustomAttributeData is internal in Silverlight
-#endif
 
-		public static IEnumerable<CustomAttributeBuilder> GetNonInheritableAttributes(this MemberInfo member)
+		public static IEnumerable<CustomAttributeInfo> GetNonInheritableAttributes(this MemberInfo member)
 		{
 			Debug.Assert(member != null, "member != null");
-			var attributes =
-#if SILVERLIGHT
-				member.GetCustomAttributes(false);
+#if FEATURE_LEGACY_REFLECTION_API
+			var attributes = CustomAttributeData.GetCustomAttributes(member);
 #else
-				CustomAttributeData.GetCustomAttributes(member);
+			var attributes = member.CustomAttributes;
 #endif
 
 			foreach (var attribute in attributes)
 			{
-				var attributeType =
-#if SILVERLIGHT
-				attribute.GetType();
+#if FEATURE_LEGACY_REFLECTION_API
+				var attributeType = attribute.Constructor.DeclaringType;
 #else
-					attribute.Constructor.DeclaringType;
+				var attributeType = attribute.AttributeType;
 #endif
-				if (ShouldSkipAttributeReplication(attributeType))
+				if (ShouldSkipAttributeReplication(attributeType, ignoreInheritance: false))
 				{
 					continue;
 				}
 
-				CustomAttributeBuilder builder;
+				CustomAttributeInfo info;
 				try
 				{
-					builder = CreateBuilder(attribute
-#if SILVERLIGHT
-					as Attribute
-#endif
-						);
+					info = CreateInfo(attribute);
 				}
 				catch (ArgumentException e)
 				{
 					var message =
 						string.Format(
-							"Due to limitations in CLR, DynamicProxy was unable to successfully replicate non-inheritable attribute {0} on {1}{2}. To avoid this error you can chose not to replicate this attribute type by calling '{3}.Add(typeof({0}))'.",
-							attributeType.FullName, (member.ReflectedType == null) ? "" : member.ReflectedType.FullName,
-							(member is Type) ? "" : ("." + member.Name), typeof(AttributesToAvoidReplicating).FullName);
+							"Due to limitations in CLR, DynamicProxy was unable to successfully replicate non-inheritable attribute {0} on {1}{2}. " +
+							"To avoid this error you can chose not to replicate this attribute type by calling '{3}.Add(typeof({0}))'.",
+							attributeType.FullName,
+							member.DeclaringType.FullName,
+#if FEATURE_LEGACY_REFLECTION_API
+							(member is Type) ? "" : ("." + member.Name),
+#else
+							(member is TypeInfo) ? "" : ("." + member.Name),
+#endif
+							typeof(AttributesToAvoidReplicating).FullName);
 					throw new ProxyGenerationException(message, e);
 				}
-				if (builder != null)
+				if (info != null)
 				{
-					yield return builder;
+					yield return info;
 				}
 			}
 		}
 
-		public static IEnumerable<CustomAttributeBuilder> GetNonInheritableAttributes(this ParameterInfo parameter)
+		public static IEnumerable<CustomAttributeInfo> GetNonInheritableAttributes(this ParameterInfo parameter)
 		{
 			Debug.Assert(parameter != null, "parameter != null");
-			var attributes =
-#if SILVERLIGHT
-				parameter.GetCustomAttributes(false);
+
+#if FEATURE_LEGACY_REFLECTION_API
+			var attributes = CustomAttributeData.GetCustomAttributes(parameter);
 #else
-				CustomAttributeData.GetCustomAttributes(parameter);
+			var attributes = parameter.CustomAttributes;
 #endif
+
+			var ignoreInheritance = parameter.Member is ConstructorInfo;
 
 			foreach (var attribute in attributes)
 			{
-				var attributeType =
-#if SILVERLIGHT
-				attribute.GetType();
+#if FEATURE_LEGACY_REFLECTION_API
+				var attributeType = attribute.Constructor.DeclaringType;
 #else
-					attribute.Constructor.DeclaringType;
+				var attributeType = attribute.AttributeType;
 #endif
-				if (ShouldSkipAttributeReplication(attributeType))
+
+				if (ShouldSkipAttributeReplication(attributeType, ignoreInheritance))
 				{
 					continue;
 				}
 
-				var builder = CreateBuilder(attribute
-#if SILVERLIGHT
-					as Attribute
-#endif
-					);
-				if (builder != null)
+				var info = CreateInfo(attribute);
+				if (info != null)
 				{
-					yield return builder;
+					yield return info;
 				}
 			}
 		}
@@ -222,57 +224,50 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 		///   but there are some special cases where the attributes means
 		///   something to the CLR, where they should be skipped.
 		/// </summary>
-		private static bool ShouldSkipAttributeReplication(Type attribute)
+		private static bool ShouldSkipAttributeReplication(Type attribute, bool ignoreInheritance)
 		{
-			if (attribute.IsPublic == false)
+			if (attribute.GetTypeInfo().IsPublic == false)
 			{
 				return true;
 			}
 
-			if (SpecialCaseAttributThatShouldNotBeReplicated(attribute))
+			if (AttributesToAvoidReplicating.ShouldAvoid(attribute))
 			{
 				return true;
 			}
 
-			var attrs = attribute.GetCustomAttributes(typeof(AttributeUsageAttribute), true);
-
-			if (attrs.Length != 0)
+			// Later, there might be more special cases requiring attribute replication,
+			// which might justify creating a `SpecialCaseAttributeThatShouldBeReplicated`
+			// method and an `AttributesToAlwaysReplicate` class. For the moment, `Param-
+			// ArrayAttribute` is the only special case, so keep it simple for now:
+			if (attribute == typeof(ParamArrayAttribute))
 			{
-				var usage = (AttributeUsageAttribute)attrs[0];
-
-				return usage.Inherited;
+				return false;
 			}
 
-			return true;
+			if (!ignoreInheritance)
+			{
+				var attrs = attribute.GetTypeInfo().GetCustomAttributes<AttributeUsageAttribute>(true).ToArray();
+				if (attrs.Length != 0)
+				{
+					return attrs[0].Inherited;
+				}
+
+				return true;
+			}
+
+			return false;
 		}
 
-		private static bool SpecialCaseAttributThatShouldNotBeReplicated(Type attribute)
-		{
-            return AttributesToAvoidReplicating.Contains(attribute)
-                || (!CheckDynamicallyInvokable(attribute));
-		}
-
-        private static bool CheckDynamicallyInvokable(MemberInfo member)
-        {
-            if (!MockingUtil.IsMetro())
-                return true;
-
-            var dynInvoke = member.Module.GetType("__DynamicallyInvokableAttribute", false, false);
-            if (dynInvoke == null)
-                return true;
-
-            return Attribute.IsDefined(member, dynInvoke);
-        }
-
-		public static CustomAttributeBuilder CreateBuilder<TAttribute>() where TAttribute : Attribute, new()
+		public static CustomAttributeInfo CreateInfo<TAttribute>() where TAttribute : Attribute, new()
 		{
 			var constructor = typeof(TAttribute).GetConstructor(Type.EmptyTypes);
 			Debug.Assert(constructor != null, "constructor != null");
 
-			return new CustomAttributeBuilder(constructor, new object[0]);
+			return new CustomAttributeInfo(constructor, new object[0]);
 		}
 
-		public static CustomAttributeBuilder CreateBuilder(Type attribute, object[] constructorArguments)
+		public static CustomAttributeInfo CreateInfo(Type attribute, object[] constructorArguments)
 		{
 			Debug.Assert(attribute != null, "attribute != null");
 			Debug.Assert(typeof(Attribute).IsAssignableFrom(attribute), "typeof(Attribute).IsAssignableFrom(attribute)");
@@ -281,20 +276,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 			var constructor = attribute.GetConstructor(GetTypes(constructorArguments));
 			Debug.Assert(constructor != null, "constructor != null");
 
-			return new CustomAttributeBuilder(constructor, constructorArguments);
-		}
-
-		// NOTE: Use other overloads if possible. This method is here to support Silverlight and legacy scenarios.
-		internal static CustomAttributeBuilder CreateBuilder(Attribute attribute)
-		{
-			var type = attribute.GetType();
-
-			IAttributeDisassembler disassembler;
-			if (disassemblers.TryGetValue(type, out disassembler))
-			{
-				return disassembler.Disassemble(attribute);
-			}
-			return FallbackDisassembler.Disassemble(attribute);
+			return new CustomAttributeInfo(constructor, constructorArguments);
 		}
 
 		private static Type[] GetTypes(object[] objects)
@@ -306,5 +288,13 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 			}
 			return types;
 		}
-	}
+
+        public static CustomAttributeBuilder CreateBuilder<TAttribute>() where TAttribute : Attribute, new()
+        {
+            var constructor = typeof(TAttribute).GetConstructor(Type.EmptyTypes);
+            Debug.Assert(constructor != null, "constructor != null");
+
+            return new CustomAttributeBuilder(constructor, new object[0]);
+        }
+    }
 }

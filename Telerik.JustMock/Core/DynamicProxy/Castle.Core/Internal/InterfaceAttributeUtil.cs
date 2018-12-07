@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,6 +18,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Internal
 	using System.Collections.Generic;
 	using System.Diagnostics;
 	using System.Linq;
+	using System.Reflection;
 
 	internal sealed class InterfaceAttributeUtil
 	{
@@ -44,10 +45,10 @@ namespace Telerik.JustMock.Core.Castle.Core.Internal
 
 		public static object[] GetAttributes(Type type, bool inherit)
 		{
-			if (type.IsInterface == false)
+			if (type.GetTypeInfo().IsInterface == false)
 				throw new ArgumentOutOfRangeException("type");
 
-			var attributes = type.GetCustomAttributes(false);
+			var attributes = type.GetTypeInfo().GetCustomAttributes(false).ToArray();
 			var baseTypes  = type.GetInterfaces();
 
 			if (baseTypes.Length == 0 || !inherit)
@@ -90,7 +91,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Internal
 		private object[] GetAttributes(object[] attributes)
 		{
 			for (index = types.Length - 1; index > 0; index--)
-				ProcessType(CurrentType.GetCustomAttributes(false));
+				ProcessType(CurrentType.GetTypeInfo().GetCustomAttributes(false).ToArray());
 
 			ProcessType(attributes);
 

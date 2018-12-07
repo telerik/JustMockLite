@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,7 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Internal
 {
-	internal abstract class Lock
+    internal abstract class Lock
 	{
 		public abstract IUpgradeableLockHolder ForReadingUpgradeable();
 		public abstract ILockHolder ForReading();
@@ -31,10 +31,10 @@ namespace Telerik.JustMock.Core.Castle.Core.Internal
 		public static Lock Create()
 		{
 #if COREFX
-			return new MonitorLock();
+            return new MonitorLock();
 #else
 			return new SlimReadWriteLock();
 #endif
-		}
-	}
+        }
+    }
 }

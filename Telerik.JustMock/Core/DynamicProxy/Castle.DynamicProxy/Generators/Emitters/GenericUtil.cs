@@ -49,13 +49,13 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 
 		public static Type ExtractCorrectType(Type paramType, Dictionary<string, GenericTypeParameterBuilder> name2GenericType)
 		{
-			if (paramType.IsArray)
+			if (paramType.GetTypeInfo().IsArray)
 			{
 				var rank = paramType.GetArrayRank();
 
 				var underlyingType = paramType.GetElementType();
 
-				if (underlyingType.IsGenericParameter)
+				if (underlyingType.GetTypeInfo().IsGenericParameter)
 				{
 					GenericTypeParameterBuilder genericType;
 					if (name2GenericType.TryGetValue(underlyingType.Name, out genericType) == false)
@@ -76,12 +76,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 				return underlyingType.MakeArrayType(rank);
 			}
 
-			if (paramType.IsGenericParameter)
+			if (paramType.GetTypeInfo().IsGenericParameter)
 			{
 				GenericTypeParameterBuilder value;
 				if (name2GenericType.TryGetValue(paramType.Name, out value))
 				{
-					return value;
+					return value.AsType();
 				}
 			}
 
@@ -124,7 +124,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 			Type constraint, MethodInfo methodToCopyGenericsFrom, Type[] originalGenericParameters,
 			GenericTypeParameterBuilder[] newGenericParameters)
 		{
-			if (constraint.IsGenericType)
+			if (constraint.GetTypeInfo().IsGenericType)
 			{
 				var genericArgumentsOfConstraint = constraint.GetGenericArguments();
 
@@ -136,21 +136,21 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 				}
 				return constraint.GetGenericTypeDefinition().MakeGenericType(genericArgumentsOfConstraint);
 			}
-			else if (constraint.IsGenericParameter)
+			else if (constraint.GetTypeInfo().IsGenericParameter)
 			{
 				// Determine the source of the parameter
-				if (constraint.DeclaringMethod != null)
+				if (constraint.GetTypeInfo().DeclaringMethod != null)
 				{
 					// constraint comes from the method
 					var index = Array.IndexOf(originalGenericParameters, constraint);
 					Trace.Assert(index != -1,
 					             "When a generic method parameter has a constraint on another method parameter, both parameters must be declared on the same method.");
-					return newGenericParameters[index];
+					return newGenericParameters[index].AsType();
 				}
 				else // parameter from surrounding type
 				{
-					Trace.Assert(constraint.DeclaringType.IsGenericTypeDefinition);
-					Trace.Assert(methodToCopyGenericsFrom.DeclaringType.IsGenericType
+					Trace.Assert(constraint.DeclaringType.GetTypeInfo().IsGenericTypeDefinition);
+					Trace.Assert(methodToCopyGenericsFrom.DeclaringType.GetTypeInfo().IsGenericType
 					             && constraint.DeclaringType == methodToCopyGenericsFrom.DeclaringType.GetGenericTypeDefinition(),
 					             "When a generic method parameter has a constraint on a generic type parameter, the generic type must be the declaring typer of the method.");
 
@@ -170,14 +170,16 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 		                                               Type[] originalGenericArguments,
 		                                               Type[] constraints)
 		{
+			// HACK: the mono runtime has a strange bug where assigning to the constraints
+			//       parameter and returning it throws, so we'll create a new array.
+			//       System.ArrayTypeMismatchException : Source array type cannot be assigned to destination array type.
+			Type[] adjustedConstraints = new Type[constraints.Length];
 			for (var i = 0; i < constraints.Length; i++)
 			{
-				constraints[i] = AdjustConstraintToNewGenericParameters(constraints[i],
-				                                                        methodToCopyGenericsFrom,
-				                                                        originalGenericArguments,
-				                                                        newGenericParameters);
+				adjustedConstraints[i] = AdjustConstraintToNewGenericParameters(constraints[i],
+					methodToCopyGenericsFrom, originalGenericArguments, newGenericParameters);
 			}
-			return constraints;
+			return adjustedConstraints;
 		}
 
 		private static GenericTypeParameterBuilder[] CopyGenericArguments(
@@ -198,16 +200,16 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 			{
 				try
 				{
-					var attributes = originalGenericArguments[i].GenericParameterAttributes;
+					var attributes = originalGenericArguments[i].GetTypeInfo().GenericParameterAttributes;
 					newGenericParameters[i].SetGenericParameterAttributes(attributes);
-					var constraints = AdjustGenericConstraints(methodToCopyGenericsFrom, newGenericParameters, originalGenericArguments, originalGenericArguments[i].GetGenericParameterConstraints());
+					var constraints = AdjustGenericConstraints(methodToCopyGenericsFrom, newGenericParameters, originalGenericArguments, originalGenericArguments[i].GetTypeInfo().GetGenericParameterConstraints());
 
 					newGenericParameters[i].SetInterfaceConstraints(constraints);
 					CopyNonInheritableAttributes(newGenericParameters[i], originalGenericArguments[i]);
 				}
 				catch (NotSupportedException)
 				{
-					// Doesnt matter
+					// Doesn't matter
 
 					newGenericParameters[i].SetGenericParameterAttributes(GenericParameterAttributes.None);
 				}
@@ -221,9 +223,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 		private static void CopyNonInheritableAttributes(GenericTypeParameterBuilder newGenericParameter,
 		                                                 Type originalGenericArgument)
 		{
-			foreach (var attribute in originalGenericArgument.GetNonInheritableAttributes())
+			foreach (var attribute in originalGenericArgument.GetTypeInfo().GetNonInheritableAttributes())
 			{
-				newGenericParameter.SetCustomAttribute(attribute);
+				newGenericParameter.SetCustomAttribute(attribute.Builder);
 			}
 		}
 
