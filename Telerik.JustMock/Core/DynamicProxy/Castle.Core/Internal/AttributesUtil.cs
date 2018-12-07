@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,37 +15,60 @@
 namespace Telerik.JustMock.Core.Castle.Core.Internal
 {
 	using System;
+	using System.Collections.Generic;
 	using System.ComponentModel;
 	using System.Linq;
 	using System.Reflection;
 
-	/// <summary>
-	///   Helper class for retrieving attributes.
-	/// </summary>
-	internal static class AttributesUtil
+    /// <summary>
+    ///   Helper class for retrieving attributes.
+    /// </summary>
+    internal static class AttributesUtil
 	{
 		/// <summary>
-		///   Gets the attribute.
+		/// Gets the attribute.
 		/// </summary>
-		/// <param name = "member">The member.</param>
+		/// <param name="type">The type.</param>
+		/// <returns>The type attribute.</returns>
+		public static T GetAttribute<T>(this Type type) where T : Attribute
+		{
+			return GetAttributes<T>(type).FirstOrDefault();
+		}
+
+		/// <summary>
+		/// Gets the attributes. Does not consider inherited attributes!
+		/// </summary>
+		/// <param name="type">The type.</param>
+		/// <returns>The type attributes.</returns>
+		public static IEnumerable<T> GetAttributes<T>(this Type type) where T : Attribute
+		{
+			foreach (T a in type.GetTypeInfo().GetCustomAttributes(typeof(T), false))
+			{
+				yield return a;
+			}
+		}
+
+		/// <summary>
+		/// Gets the attribute.
+		/// </summary>
+		/// <param name="member">The member.</param>
 		/// <returns>The member attribute.</returns>
-		public static T GetAttribute<T>(this ICustomAttributeProvider member) where T : class
+		public static T GetAttribute<T>(this MemberInfo member) where T : Attribute
 		{
 			return GetAttributes<T>(member).FirstOrDefault();
 		}
 
 		/// <summary>
-		///   Gets the attributes. Does not consider inherited attributes!
+		/// Gets the attributes. Does not consider inherited attributes!
 		/// </summary>
-		/// <param name = "member">The member.</param>
+		/// <param name="member">The member.</param>
 		/// <returns>The member attributes.</returns>
-		public static T[] GetAttributes<T>(this ICustomAttributeProvider member) where T : class
+		public static IEnumerable<T> GetAttributes<T>(this MemberInfo member) where T : Attribute
 		{
-			if (typeof(T) != typeof(object))
+			foreach (T a in member.GetCustomAttributes(typeof(T), false))
 			{
-				return (T[])member.GetCustomAttributes(typeof(T), false);
+				yield return a;
 			}
-			return (T[])member.GetCustomAttributes(false);
 		}
 
 		/// <summary>
@@ -53,7 +76,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Internal
 		/// </summary>
 		/// <param name = "type">The type.</param>
 		/// <returns>The type attribute.</returns>
-		public static T GetTypeAttribute<T>(this Type type) where T : class
+		public static T GetTypeAttribute<T>(this Type type) where T : Attribute
 		{
 			var attribute = GetAttribute<T>(type);
 
@@ -77,9 +100,9 @@ namespace Telerik.JustMock.Core.Castle.Core.Internal
 		/// </summary>
 		/// <param name = "type">The type.</param>
 		/// <returns>The type attributes.</returns>
-		public static T[] GetTypeAttributes<T>(Type type) where T : class
+		public static T[] GetTypeAttributes<T>(Type type) where T : Attribute
 		{
-			var attributes = GetAttributes<T>(type);
+			var attributes = GetAttributes<T>(type).ToArray();
 
 			if (attributes.Length == 0)
 			{
@@ -96,26 +119,18 @@ namespace Telerik.JustMock.Core.Castle.Core.Internal
 			return attributes;
 		}
 
-		public static object[] GetInterfaceAttributes(Type type)
-		{
-			return InterfaceAttributeUtil.GetAttributes(type, true);
-		}
-
 		public static AttributeUsageAttribute GetAttributeUsage(this Type attributeType)
 		{
-			var attributes = attributeType.GetCustomAttributes(typeof(AttributeUsageAttribute), true);
-			return attributes.Length != 0
-				? (AttributeUsageAttribute) attributes[0]
-				: DefaultAttributeUsage;
+			var attributes = attributeType.GetTypeInfo().GetCustomAttributes<AttributeUsageAttribute>(true).ToArray();
+			return attributes.Length != 0 ? attributes[0] : DefaultAttributeUsage;
 		}
 
-		private static readonly AttributeUsageAttribute
-			DefaultAttributeUsage = new AttributeUsageAttribute(AttributeTargets.All);
+		private static readonly AttributeUsageAttribute DefaultAttributeUsage = new AttributeUsageAttribute(AttributeTargets.All);
 
 		/// <summary>
-		///   Gets the type converter.
+		/// Gets the type converter.
 		/// </summary>
-		/// <param name = "member">The member.</param>
+		/// <param name="member">The member.</param>
 		/// <returns></returns>
 		public static Type GetTypeConverter(MemberInfo member)
 		{
@@ -128,15 +143,5 @@ namespace Telerik.JustMock.Core.Castle.Core.Internal
 
 			return null;
 		}
-
-		/// <summary>
-		///   Gets the attribute.
-		/// </summary>
-		/// <param name = "member">The member.</param>
-		/// <returns>The member attribute.</returns>
-		public static bool HasAttribute<T>(this ICustomAttributeProvider member) where T : class
-		{
-			return GetAttributes<T>(member).FirstOrDefault() != null;
-		}
-	}
+    }
 }

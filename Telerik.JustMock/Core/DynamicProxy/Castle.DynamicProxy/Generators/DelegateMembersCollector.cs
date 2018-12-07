@@ -21,7 +21,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 
 	internal class DelegateMembersCollector : MembersCollector
 	{
-		public DelegateMembersCollector(Type type, ModuleScope scope) : base(type, scope)
+		public DelegateMembersCollector(Type type) : base(type)
 		{
 		}
 
@@ -34,7 +34,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 				return null;
 			}
 
-			return new MetaMethod(method, scope, method, isStandalone, true, !method.IsAbstract);
+			return new MetaMethod(method, method, isStandalone, true, !method.IsAbstract);
 		}
 	}
 }

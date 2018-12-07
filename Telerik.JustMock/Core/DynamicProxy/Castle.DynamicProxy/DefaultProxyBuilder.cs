@@ -1,4 +1,4 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2014 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
+	using System.Reflection;
 
+	using Telerik.JustMock.Core.Castle.Core.Internal;
 	using Telerik.JustMock.Core.Castle.Core.Logging;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
-
 
 	/// <summary>
 	///   Default implementation of <see cref = "IProxyBuilder" /> interface producing in-memory proxy assemblies.
@@ -110,17 +111,23 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 
 		private void AssertValidType(Type target)
 		{
-			if (target.IsGenericTypeDefinition)
+			AssertValidTypeForTarget(target, target);
+		}
+
+		private void AssertValidTypeForTarget(Type type, Type target)
+		{
+			if (type.GetTypeInfo().IsGenericTypeDefinition)
 			{
-				throw new GeneratorException("Type " + target.FullName + " is a generic type definition. " +
-				                             "Can not create proxy for open generic types.");
+				throw new GeneratorException(string.Format("Can not create proxy for type {0} because type {1} is an open generic type.",
+															target.GetBestName(), type.GetBestName()));
 			}
-			if (IsPublic(target) == false && IsAccessible(target) == false)
+			if (ProxyUtil.IsAccessibleType(type) == false)
 			{
-				throw new GeneratorException("Type " + target.FullName + " is not visible to DynamicProxy. " +
-				                             "Can not create proxy for types that are not accessible. " +
-				                             "Make the type public, or internal and mark your assembly with " +
-				                             "[assembly: InternalsVisibleTo(InternalsVisible.ToDynamicProxyGenAssembly2)] attribute.");
+				throw new GeneratorException(ExceptionMessageBuilder.CreateMessageForInaccessibleType(type, target));
+			}
+			foreach (var typeArgument in type.GetGenericArguments())
+			{
+				AssertValidTypeForTarget(typeArgument, target);
 			}
 		}
 
@@ -133,25 +140,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 					AssertValidType(t);
 				}
 			}
-		}
-
-		private bool IsAccessible(Type target)
-		{
-            return IsInternal(target) && this.scope.Internals.IsInternalToDynamicProxy(target.Assembly);
-		}
-
-		private bool IsPublic(Type target)
-		{
-			return target.IsPublic || target.IsNestedPublic;
-		}
-
-		private static bool IsInternal(Type target)
-		{
-			var isTargetNested = target.IsNested;
-			var isNestedAndInternal = isTargetNested && (target.IsNestedAssembly || target.IsNestedFamORAssem);
-			var isInternalNotNested = target.IsVisible == false && isTargetNested == false;
-
-			return isInternalNotNested || isNestedAndInternal;
 		}
 	}
 }

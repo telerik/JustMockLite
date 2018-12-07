@@ -25,14 +25,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Tokens;
 
-	internal class ClassProxyWithTargetTargetContributor : CompositeTypeContributor
+    internal class ClassProxyWithTargetTargetContributor : CompositeTypeContributor
 	{
 		private readonly IList<MethodInfo> methodsToSkip;
 		private readonly Type targetType;
 
 		public ClassProxyWithTargetTargetContributor(Type targetType, IList<MethodInfo> methodsToSkip,
-		                                             INamingScope namingScope, ModuleScope scope)
-			: base(namingScope, scope)
+		                                             INamingScope namingScope)
+			: base(namingScope)
 		{
 			this.targetType = targetType;
 			this.methodsToSkip = methodsToSkip;
@@ -42,15 +42,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 		{
 			Debug.Assert(hook != null, "hook != null");
 
-			var targetItem = new WrappedClassMembersCollector(targetType, scope) { Logger = Logger };
+			var targetItem = new WrappedClassMembersCollector(targetType) { Logger = Logger };
 			targetItem.CollectMembersToProxy(hook);
 			yield return targetItem;
 
 			foreach (var @interface in interfaces)
 			{
-				var item = new InterfaceMembersOnClassCollector(@interface, scope,
-				                                                true,
-				                                                targetType.GetInterfaceMap(@interface)) { Logger = Logger };
+				var item = new InterfaceMembersOnClassCollector(@interface, true,
+					targetType.GetTypeInfo().GetRuntimeInterfaceMap(@interface)) { Logger = Logger };
 				item.CollectMembersToProxy(hook);
 				yield return item;
 			}
@@ -107,7 +106,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 
 		private IInvocationCreationContributor GetContributor(Type @delegate, MetaMethod method)
 		{
-			if (@delegate.IsGenericType == false)
+			if (@delegate.GetTypeInfo().IsGenericType == false)
 			{
 				return new InvocationWithDelegateContributor(@delegate, targetType, method, namingScope);
 			}
@@ -120,7 +119,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 		{
 			var scope = @class.ModuleScope;
 			var key = new CacheKey(
-				typeof(Delegate),
+				typeof(Delegate).GetTypeInfo(),
 				targetType,
 				new[] { method.MethodOnTarget.ReturnType }
 					.Concat(ArgumentsUtil.GetTypes(method.MethodOnTarget.GetParameters())).

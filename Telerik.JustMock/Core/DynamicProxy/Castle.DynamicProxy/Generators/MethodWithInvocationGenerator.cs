@@ -18,7 +18,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 	using System.Diagnostics;
 	using System.Reflection;
 	using System.Reflection.Emit;
-#if !SILVERLIGHT
+#if FEATURE_SERIALIZATION
 	using System.Xml.Serialization;
 #endif
 
@@ -26,22 +26,33 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Tokens;
 
 	internal class MethodWithInvocationGenerator : MethodGenerator
 	{
 		private readonly IInvocationCreationContributor contributor;
 		private readonly GetTargetExpressionDelegate getTargetExpression;
+		private readonly GetTargetExpressionDelegate getTargetTypeExpression;
 		private readonly Reference interceptors;
 		private readonly Type invocation;
 
 		public MethodWithInvocationGenerator(MetaMethod method, Reference interceptors, Type invocation,
 		                                     GetTargetExpressionDelegate getTargetExpression,
 		                                     OverrideMethodDelegate createMethod, IInvocationCreationContributor contributor)
+			: this(method, interceptors, invocation, getTargetExpression, null, createMethod, contributor)
+		{
+		}
+
+		public MethodWithInvocationGenerator(MetaMethod method, Reference interceptors, Type invocation,
+		                                     GetTargetExpressionDelegate getTargetExpression,
+		                                     GetTargetExpressionDelegate getTargetTypeExpression,
+		                                     OverrideMethodDelegate createMethod, IInvocationCreationContributor contributor)
 			: base(method, createMethod)
 		{
 			this.invocation = invocation;
 			this.getTargetExpression = getTargetExpression;
+			this.getTargetTypeExpression = getTargetTypeExpression;
 			this.interceptors = interceptors;
 			this.contributor = contributor;
 		}
@@ -52,7 +63,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 				namingScope.GetUniqueName(string.Format("interceptors_{0}", method.Name)),
 				typeof(IInterceptor[]),
 				false);
-#if !SILVERLIGHT
+#if FEATURE_SERIALIZATION
 			@class.DefineCustomAttributeFor<XmlIgnoreAttribute>(methodInterceptors);
 #endif
 			return methodInterceptors;
@@ -62,7 +73,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 		{
 			var invocationType = invocation;
 
-			Trace.Assert(MethodToOverride.IsGenericMethod == invocationType.IsGenericTypeDefinition);
+			Trace.Assert(MethodToOverride.IsGenericMethod == invocationType.GetTypeInfo().IsGenericTypeDefinition);
 			var genericArguments = Type.EmptyTypes;
 
 			var constructor = invocation.GetConstructors()[0];
@@ -125,8 +136,19 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 
 			if (MethodToOverride.ReturnType != typeof(void))
 			{
-				// Emit code to return with cast from ReturnValue
 				var getRetVal = new MethodInvocationExpression(invocationLocal, InvocationMethods.GetReturnValue);
+
+				// Emit code to ensure a value type return type is not null, otherwise the cast will cause a null-deref
+				if (emitter.ReturnType.GetTypeInfo().IsValueType && !emitter.ReturnType.IsNullableType())
+				{
+					LocalReference returnValue = emitter.CodeBuilder.DeclareLocal(typeof(object));
+					emitter.CodeBuilder.AddStatement(new AssignStatement(returnValue, getRetVal));
+
+					emitter.CodeBuilder.AddExpression(new IfNullExpression(returnValue, new ThrowStatement(typeof(InvalidOperationException),
+						"Interceptors failed to set a return value, or swallowed the exception thrown by the target")));
+				}
+
+				// Emit code to return with cast from ReturnValue
 				emitter.CodeBuilder.AddStatement(new ReturnStatement(new ConvertExpression(emitter.ReturnType, getRetVal)));
 			}
 			else
@@ -145,14 +167,21 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 				return null;
 			}
 
-
 			var methodInterceptorsField = BuildMethodInterceptorsField(@class, MethodToOverride, namingScope);
+
+			Expression targetTypeExpression;
+			if (getTargetTypeExpression != null)
+			{
+				targetTypeExpression = getTargetTypeExpression(@class, MethodToOverride);
+			}
+			else
+			{
+				targetTypeExpression = new MethodInvocationExpression(null, TypeUtilMethods.GetTypeOrNull, getTargetExpression(@class, MethodToOverride));
+			}
 
 			var emptyInterceptors = new NewArrayExpression(0, typeof(IInterceptor));
 			var selectInterceptors = new MethodInvocationExpression(selector, InterceptorSelectorMethods.SelectInterceptors,
-			                                                        new MethodInvocationExpression(null,
-				                                                        TypeUtilMethods.GetTypeOrNull,
-				                                                        getTargetExpression(@class, MethodToOverride)),
+			                                                        targetTypeExpression,
 			                                                        proxiedMethodTokenExpression, interceptors.ToExpression())
 			{ VirtualCall = true };
 
@@ -166,7 +195,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 
 		private void EmitLoadGenricMethodArguments(MethodEmitter methodEmitter, MethodInfo method, Reference invocationLocal)
 		{
-			var genericParameters = method.GetGenericArguments().FindAll(t => t.IsGenericParameter);
+			var genericParameters = method.GetGenericArguments().FindAll(t => t.GetTypeInfo().IsGenericParameter);
 			var genericParamsArrayLocal = methodEmitter.CodeBuilder.DeclareLocal(typeof(Type[]));
 			methodEmitter.CodeBuilder.AddStatement(
 				new AssignStatement(genericParamsArrayLocal, new NewArrayExpression(genericParameters.Length, typeof(Type))));
@@ -209,7 +238,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 		{
 			for (int i = 0; i < arguments.Length; i++ )
 			{
-				if (arguments[i].Type.IsByRef)
+				if (arguments[i].Type.GetTypeInfo().IsByRef)
 				{
 					return true;
 				}

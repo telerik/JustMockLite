@@ -90,18 +90,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 
 		public void AddCustomAttributes(ProxyGenerationOptions proxyGenerationOptions)
 		{
-			foreach (var attr in proxyGenerationOptions.attributesToAddToGeneratedTypes)
+            foreach (var attribute in proxyGenerationOptions.AdditionalAttributes)
 			{
-				var customAttributeBuilder = AttributeUtil.CreateBuilder(attr);
-				if (customAttributeBuilder != null)
-				{
-					typebuilder.SetCustomAttribute(customAttributeBuilder);
-				}
-			}
-
-			foreach (var attribute in proxyGenerationOptions.AdditionalAttributes)
-			{
-				typebuilder.SetCustomAttribute(attribute);
+				typebuilder.SetCustomAttribute(attribute.Builder);
 			}
 		}
 
@@ -166,7 +157,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 
 		public FieldReference CreateField(string name, Type fieldType, bool serializable)
 		{
-			var atts = FieldAttributes.Public;
+			var atts = FieldAttributes.Private;
 
 			if (!serializable)
 			{
@@ -217,7 +208,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 
 		public FieldReference CreateStaticField(string name, Type fieldType)
 		{
-			return CreateStaticField(name, fieldType, FieldAttributes.Public);
+			return CreateStaticField(name, fieldType, FieldAttributes.Private);
 		}
 
 		public FieldReference CreateStaticField(string name, Type fieldType, FieldAttributes atts)
@@ -241,26 +232,26 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 
 		public void DefineCustomAttribute<TAttribute>(object[] constructorArguments) where TAttribute : Attribute
 		{
-			var customAttributeBuilder = AttributeUtil.CreateBuilder(typeof(TAttribute), constructorArguments);
-			typebuilder.SetCustomAttribute(customAttributeBuilder);
+			var customAttributeInfo = AttributeUtil.CreateInfo(typeof(TAttribute), constructorArguments);
+			typebuilder.SetCustomAttribute(customAttributeInfo.Builder);
 		}
 
 		public void DefineCustomAttribute<TAttribute>() where TAttribute : Attribute, new()
 		{
-			var customAttributeBuilder = AttributeUtil.CreateBuilder<TAttribute>();
-			typebuilder.SetCustomAttribute(customAttributeBuilder);
+			var customAttributeInfo = AttributeUtil.CreateInfo<TAttribute>();
+			typebuilder.SetCustomAttribute(customAttributeInfo.Builder);
 		}
 
 		public void DefineCustomAttributeFor<TAttribute>(FieldReference field) where TAttribute : Attribute, new()
 		{
-			var customAttributeBuilder = AttributeUtil.CreateBuilder<TAttribute>();
+			var customAttributeInfo = AttributeUtil.CreateInfo<TAttribute>();
 			var fieldbuilder = field.Fieldbuilder;
 			if (fieldbuilder == null)
 			{
 				throw new ArgumentException(
 					"Invalid field reference.This reference does not point to field on type being generated", "field");
 			}
-			fieldbuilder.SetCustomAttribute(customAttributeBuilder);
+			fieldbuilder.SetCustomAttribute(customAttributeInfo.Builder);
 		}
 
 		public IEnumerable<FieldReference> GetAllFields()
@@ -283,7 +274,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 		public Type GetGenericArgument(String genericArgumentName)
 		{
 			if (name2GenericType.ContainsKey(genericArgumentName))
-				return name2GenericType[genericArgumentName];
+				return name2GenericType[genericArgumentName].AsType();
 
 			return null;
 		}
@@ -294,9 +285,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 
 			foreach (var genType in genericType.GetGenericArguments())
 			{
-				if (genType.IsGenericParameter)
+				if (genType.GetTypeInfo().IsGenericParameter)
 				{
-					types.Add(name2GenericType[genType.Name]);
+					types.Add(name2GenericType[genType.Name].AsType());
 				}
 				else
 				{
@@ -312,7 +303,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 			var types = new List<Type>();
 			foreach (var genType in genericMethod.GetGenericArguments())
 			{
-				types.Add(name2GenericType[genType.Name]);
+				types.Add(name2GenericType[genType.Name].AsType());
 			}
 
 			return types.ToArray();
@@ -325,40 +316,40 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 
 		protected Type CreateType(TypeBuilder type)
 		{
-            try
-            {
-                return type.CreateType();
-            }
-            catch (BadImageFormatException ex)
-            {
-                if (Debugger.IsAttached == false)
-                {
-                    throw;
-                }
+			try
+			{
+#if FEATURE_LEGACY_REFLECTION_API
+				return type.CreateType();
+#else
+				return type.CreateTypeInfo().AsType();
+#endif
+			}
+			catch (BadImageFormatException ex)
+			{
+				if (Debugger.IsAttached == false)
+				{
+					throw;
+				}
 
-                if (ex.Message.Contains(@"HRESULT: 0x8007000B") == false)
-                {
-                    throw;
-                }
+				if (ex.Message.Contains(@"HRESULT: 0x8007000B") == false)
+				{
+					throw;
+				}
 
-                if (type.IsGenericTypeDefinition == false)
-                {
-                    throw;
-                }
+				if (type.IsGenericTypeDefinition == false)
+				{
+					throw;
+				}
 
-                var message =
-                    "This is a DynamicProxy2 error: It looks like you enoutered a bug in Visual Studio debugger, " +
-                    "which causes this exception when proxying types with generic methods having constraints on their generic arguments." +
-                    "This code will work just fine without the debugger attached. " +
-                    "If you wish to use debugger you may have to switch to Visual Studio 2010 where this bug was fixed.";
-                var exception = new ProxyGenerationException(message);
-                exception.Data.Add("ProxyType", type.ToString());
-                throw exception;
-            }
-            catch (NotSupportedException ex)
-            {
-                throw new MockException("Failed to create proxy type", ex);
-            }
+				var message =
+					"This is a DynamicProxy2 error: It looks like you encountered a bug in Visual Studio debugger, " +
+					"which causes this exception when proxying types with generic methods having constraints on their generic arguments." +
+					"This code will work just fine without the debugger attached. " +
+					"If you wish to use debugger you may have to switch to Visual Studio 2010 where this bug was fixed.";
+				var exception = new ProxyGenerationException(message);
+				exception.Data.Add("ProxyType", type.ToString());
+				throw exception;
+			}
 		}
 
 		protected virtual void EnsureBuildersAreInAValidState()

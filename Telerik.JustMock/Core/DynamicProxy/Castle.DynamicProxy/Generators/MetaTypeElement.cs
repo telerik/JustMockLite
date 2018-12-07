@@ -15,27 +15,21 @@
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 {
 	using System;
+	using System.Reflection;
 
 	internal abstract class MetaTypeElement
 	{
 		protected readonly Type sourceType;
-        private readonly ModuleScope scope;
 
-        protected MetaTypeElement(Type sourceType, ModuleScope scope)
-        {
-            this.scope = scope;
-            this.sourceType = sourceType;
-        }
+		protected MetaTypeElement(Type sourceType)
+		{
+			this.sourceType = sourceType;
+		}
 
 		internal bool CanBeImplementedExplicitly
 		{
-			get { return sourceType != null && sourceType.IsInterface; }
+			get { return sourceType != null && sourceType.GetTypeInfo().IsInterface; }
 		}
-
-        protected ModuleScope Scope
-        {
-            get { return this.scope; }
-        }
 
 		internal abstract void SwitchToExplicitImplementation();
 	}

@@ -29,10 +29,17 @@ namespace Telerik.JustMock.Helpers
     {
         private const string DynamicAssemblyName = "Telerik.JustMock.DynamicTypes";
         private static Dictionary<Type, int> typeIndices = new Dictionary<Type, int>();
+
         private static ModuleBuilder moduleBuilder =
+#if !NETCORE
             AppDomain.CurrentDomain.DefineDynamicAssembly(
                 new AssemblyName(DynamicTypeHelper.DynamicAssemblyName), AssemblyBuilderAccess.RunAndCollect)
                     .DefineDynamicModule(DynamicTypeHelper.DynamicAssemblyName);
+#else
+            AssemblyBuilder.DefineDynamicAssembly(
+                new AssemblyName(DynamicTypeHelper.DynamicAssemblyName), AssemblyBuilderAccess.RunAndCollect)
+                    .DefineDynamicModule(DynamicTypeHelper.DynamicAssemblyName);
+#endif
 
         public static Type GetNextType<T>()
         {

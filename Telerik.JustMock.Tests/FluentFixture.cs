@@ -35,7 +35,11 @@ using TestClass = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestClassAttribute
 using TestMethod = Xunit.FactAttribute;
 using TestInitialize = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestInitializeAttribute;
 using TestCleanup = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestCleanupAttribute;
+#if XUNIT2
+using AssertionException = Xunit.Sdk.XunitException;
+#else
 using AssertionException = Xunit.Sdk.AssertException;
+#endif
 #elif VSTEST_PORTABLE
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
@@ -46,6 +50,10 @@ using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFa
 #endregion
 
 using Telerik.JustMock.Helpers;
+
+#if XUNIT2
+#pragma warning disable xUnit1013 
+#endif
 
 namespace Telerik.JustMock.Tests
 {
@@ -426,3 +434,7 @@ namespace Telerik.JustMock.Tests
 		}
 	}
 }
+
+#if XUNIT2
+#pragma warning restore xUnit1013 
+#endif

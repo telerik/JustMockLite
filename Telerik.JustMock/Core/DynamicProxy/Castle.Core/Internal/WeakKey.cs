@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,25 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !MONO
 namespace Telerik.JustMock.Core.Castle.Core.Internal
 {
 	using System;
 
-	internal sealed class WeakKey
+	internal sealed class WeakKey : WeakReference
 	{
-        private readonly WeakReference weakRef;
-        private readonly int hashCode;
+		private readonly int hashCode;
 
 		public WeakKey(object target, int hashCode)
+			: base(target)
 		{
-            this.weakRef = new WeakReference(target);
 			this.hashCode = hashCode;
 		}
 
-		public object Target
+		public override object Target
 		{
-			get { return weakRef.Target; }
+			get { return base.Target; }
+			set { throw new NotSupportedException("Dictionary keys are read-only."); }
 		}
 
 		public override int GetHashCode()
@@ -44,4 +43,3 @@ namespace Telerik.JustMock.Core.Castle.Core.Internal
 		}
 	}
 }
-#endif

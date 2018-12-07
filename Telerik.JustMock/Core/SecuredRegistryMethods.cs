@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015,2018 Telerik EAD
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -36,19 +36,23 @@ namespace Telerik.JustMock.Core
 
 		static SecuredRegistryMethods()
 		{
-			if (ProfilerInterceptor.IsProfilerAttached)
+#if !NETCORE
+            if (ProfilerInterceptor.IsProfilerAttached)
 			{
 				ProfilerInterceptor.WrapCallToDelegate("SetRegistryValue", out setValue);
 				ProfilerInterceptor.WrapCallToDelegate("GetRegistryValue", out getValue);
 			}
 			else
 			{
-				getValue = (currentUser, keyName, valueName, outValue, outValueByteCount) => GetRegistryValue(currentUser, keyName, valueName, outValue);
+#endif
+                getValue = (currentUser, keyName, valueName, outValue, outValueByteCount) => GetRegistryValue(currentUser, keyName, valueName, outValue);
 				setValue = (currentUser, keyName, valueName, value) => SetRegistryValue(currentUser, keyName, valueName, value);
-			}
-		}
+#if !NETCORE
+            }
+#endif
+        }
 
-		public static string GetValue(bool currentUser, string keyName, string valueName)
+        public static string GetValue(bool currentUser, string keyName, string valueName)
 		{
 			StringBuilder outValue = new StringBuilder(256);
 			if (!getValue(currentUser, keyName, valueName, outValue, outValue.Capacity * sizeof(char)))
@@ -63,7 +67,7 @@ namespace Telerik.JustMock.Core
 
 		private static bool GetRegistryValue(bool currentUser, string keyName, string valueName, StringBuilder outValue)
 		{
-#if !SILVERLIGHT
+#if (!SILVERLIGHT && !NETCORE)
 			using (RegistryKey registryKey = currentUser ? Registry.CurrentUser : Registry.LocalMachine)
 			{
 				using (var key = registryKey.OpenSubKey(keyName))
@@ -83,7 +87,7 @@ namespace Telerik.JustMock.Core
 
 		private static bool SetRegistryValue(bool currentUser, string keyName, string valueName, string value)
 		{
-#if !SILVERLIGHT
+#if (!SILVERLIGHT && !NETCORE)
 			using (RegistryKey registryKey = currentUser ? Registry.CurrentUser : Registry.LocalMachine)
 			{
 				using (var key = registryKey.OpenSubKey(keyName, true))

@@ -38,6 +38,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   Gets the object on which the invocation is performed. This is different from proxy object
 		///   because most of the time this will be the proxy target object.
 		/// </summary>
+		/// <seealso cref = "IChangeProxyTarget" />
 		/// <value>The invocation target.</value>
 		object InvocationTarget { get; }
 

@@ -20,8 +20,10 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 	using System.Reflection;
 
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
+	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
+	using Telerik.JustMock.Core.Castle.DynamicProxy.Serialization;
 
 	internal class ClassProxyGenerator : BaseProxyGenerator
 	{
@@ -70,9 +72,10 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 				contributor.Generate(emitter, ProxyGenerationOptions);
 
 				// TODO: redo it
-				if (contributor is MixinContributor)
+				var mixinContributor = contributor as MixinContributor;
+				if (mixinContributor != null)
 				{
-					constructorArguments.AddRange((contributor as MixinContributor).Fields);
+					constructorArguments.AddRange(mixinContributor.Fields);
 				}
 			}
 
@@ -91,21 +94,21 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			// Complete type initializer code body
 			CompleteInitCacheMethod(cctor.CodeBuilder);
 
-			// Crosses fingers and build type
+            // Crosses fingers and build type
+            Type proxyType = emitter.BuildType();
 
-			var proxyType = emitter.BuildType();
 			InitializeStaticFields(proxyType);
 			return proxyType;
 		}
 
 		protected virtual IEnumerable<Type> GetTypeImplementerMapping(Type[] interfaces,
-		                                                              out IEnumerable<ITypeContributor> contributors,
-		                                                              INamingScope namingScope)
+																	  out IEnumerable<ITypeContributor> contributors,
+																	  INamingScope namingScope)
 		{
 			var methodsToSkip = new List<MethodInfo>();
-			var proxyInstance = new ClassProxyInstanceContributor(targetType, methodsToSkip, interfaces);
+			var proxyInstance = new ClassProxyInstanceContributor(targetType, methodsToSkip, interfaces, ProxyTypeConstants.Class);
 			// TODO: the trick with methodsToSkip is not very nice...
-			var proxyTarget = new ClassProxyTargetContributor(targetType, methodsToSkip, namingScope, Scope) { Logger = Logger };
+			var proxyTarget = new ClassProxyTargetContributor(targetType, methodsToSkip, namingScope) { Logger = Logger };
 			IDictionary<Type, ITypeContributor> typeImplementerMapping = new Dictionary<Type, ITypeContributor>();
 
 			// Order of interface precedence:
@@ -115,7 +118,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			var targetInterfaces = targetType.GetAllInterfaces();
 			var additionalInterfaces = TypeUtil.GetAllInterfaces(interfaces);
 			// 2. then mixins
-			var mixins = new MixinContributor(namingScope, Scope, false) { Logger = Logger };
+			var mixins = new MixinContributor(namingScope, false) { Logger = Logger };
 			if (ProxyGenerationOptions.HasMixins)
 			{
 				foreach (var mixinInterface in ProxyGenerationOptions.MixinData.MixinInterfaces)
@@ -141,8 +144,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 					}
 				}
 			}
-			var additionalInterfacesContributor = new InterfaceProxyWithoutTargetContributor(namingScope, Scope,
-			                                                                                 (c, m) => NullExpression.Instance)
+			var additionalInterfacesContributor = new InterfaceProxyWithoutTargetContributor(namingScope,
+																							 (c, m) => NullExpression.Instance)
 			{ Logger = Logger };
 			// 3. then additional interfaces
 			foreach (var @interface in additionalInterfaces)
@@ -164,6 +167,13 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 					AddMapping(@interface, additionalInterfacesContributor, typeImplementerMapping);
 				}
 			}
+			// 4. plus special interfaces
+#if FEATURE_SERIALIZATION
+			if (targetType.IsSerializable)
+			{
+				AddMappingForISerializable(typeImplementerMapping, proxyInstance);
+			}
+#endif
 			try
 			{
 				AddMappingNoCheck(typeof(IProxyTargetAccessor), proxyInstance, typeImplementerMapping);

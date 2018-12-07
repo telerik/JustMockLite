@@ -25,8 +25,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 	{
 		private readonly Type targetType;
 
-        public DelegateProxyTargetContributor(Type targetType, INamingScope namingScope, ModuleScope scope)
-            : base(namingScope, scope)
+		public DelegateProxyTargetContributor(Type targetType, INamingScope namingScope) : base(namingScope)
 		{
 			this.targetType = targetType;
 		}
@@ -34,7 +33,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 		protected override IEnumerable<MembersCollector> CollectElementsToProxyInternal(IProxyGenerationHook hook)
 		{
 			Debug.Assert(hook != null, "hook != null");
-			var targetItem = new DelegateMembersCollector(targetType, scope) { Logger = Logger };
+			var targetItem = new DelegateMembersCollector(targetType) { Logger = Logger };
 			targetItem.CollectMembersToProxy(hook);
 			yield return targetItem;
 		}

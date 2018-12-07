@@ -18,8 +18,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 	using System.Diagnostics;
 	using System.Reflection;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
-
 	[DebuggerDisplay("{Method}")]
 	internal class MetaMethod : MetaTypeElement, IEquatable<MetaMethod>
 	{
@@ -31,8 +29,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 
 		private string name;
 
-		public MetaMethod(MethodInfo method, ModuleScope scope, MethodInfo methodOnTarget, bool standalone, bool proxyable, bool hasTarget)
-			: base(method.DeclaringType, scope)
+		public MetaMethod(MethodInfo method, MethodInfo methodOnTarget, bool standalone, bool proxyable, bool hasTarget)
+			: base(method.DeclaringType)
 		{
 			Method = method;
 			name = method.Name;
@@ -101,7 +99,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 				Attributes |= MethodAttributes.SpecialName;
 			}
 
-			name = string.Format("{0}.{1}", Method.DeclaringType.Name, Method.Name);
+			name = MetaTypeElementUtil.CreateNameForExplicitImplementation(sourceType, Method.Name);
 		}
 
 		private MethodAttributes ObtainAttributes()
@@ -109,7 +107,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			var methodInfo = Method;
 			var attributes = MethodAttributes.Virtual;
 
-			if (methodInfo.IsFinal || Method.DeclaringType.IsInterface)
+			if (methodInfo.IsFinal || Method.DeclaringType.GetTypeInfo().IsInterface)
 			{
 				attributes |= MethodAttributes.NewSlot;
 			}
@@ -123,8 +121,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			{
 				attributes |= MethodAttributes.HideBySig;
 			}
-            if (methodInfo.IsInternal() &&
-			    Scope.Internals.IsInternalToDynamicProxy(methodInfo.DeclaringType.Assembly))
+			if (ProxyUtil.IsInternal(methodInfo) &&
+			    ProxyUtil.AreInternalsVisibleToDynamicProxy(methodInfo.DeclaringType.GetTypeInfo().Assembly))
 			{
 				attributes |= MethodAttributes.Assembly;
 			}

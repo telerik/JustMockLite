@@ -243,10 +243,12 @@ namespace Telerik.JustMock.Core
 			for (int i = 0; i < ctorParameters.Length; ++i)
 			{
 				var paramType = ctorParameters[i].ParameterType;
-				if (paramType.IsValueType && args[i] == null)
-					args[i] = paramType.GetDefaultValue();
-				else if (args[i] != null && !paramType.IsAssignableFrom(args[i].GetType()))
-					args[i] = Convert.ChangeType(args[i], paramType, System.Globalization.CultureInfo.CurrentCulture);
+                if (paramType.IsValueType && args[i] == null)
+                    args[i] = paramType.GetDefaultValue();
+                else if (args[i] != null && !paramType.IsAssignableFrom(args[i].GetType()))
+                {
+                        args[i] = Convert.ChangeType(args[i], paramType, System.Globalization.CultureInfo.CurrentCulture);
+                }
 			}
 
 #if !PORTABLE

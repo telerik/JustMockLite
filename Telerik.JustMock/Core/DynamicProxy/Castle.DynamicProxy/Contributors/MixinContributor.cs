@@ -17,6 +17,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 	using System;
 	using System.Collections.Generic;
 	using System.Diagnostics;
+	using System.Reflection;
 
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
@@ -26,11 +27,11 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 	{
 		private readonly bool canChangeTarget;
 		private readonly IList<Type> empty = new List<Type>();
-		private readonly IDictionary<Type, FieldReference> fields = new Dictionary<Type, FieldReference>();
+		private readonly IDictionary<Type, FieldReference> fields = new SortedDictionary<Type, FieldReference>(new FieldReferenceComparer());
 		private readonly GetTargetExpressionDelegate getTargetExpression;
 
-        public MixinContributor(INamingScope namingScope, ModuleScope scope, bool canChangeTarget)
-			: base(namingScope, scope)
+		public MixinContributor(INamingScope namingScope, bool canChangeTarget)
+			: base(namingScope)
 		{
 			this.canChangeTarget = canChangeTarget;
 			getTargetExpression = BuildGetTargetExpression();
@@ -44,7 +45,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 		public void AddEmptyInterface(Type @interface)
 		{
 			Debug.Assert(@interface != null, "@interface == null", "Shouldn't be adding empty interfaces...");
-			Debug.Assert(@interface.IsInterface, "@interface.IsInterface", "Should be adding interfaces only...");
+			Debug.Assert(@interface.GetTypeInfo().IsInterface, "@interface.IsInterface", "Should be adding interfaces only...");
 			Debug.Assert(!interfaces.Contains(@interface), "!interfaces.Contains(@interface)",
 			             "Shouldn't be adding same interface twice...");
 			Debug.Assert(!empty.Contains(@interface), "!empty.Contains(@interface)",
@@ -71,7 +72,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 		{
 			foreach (var @interface in interfaces)
 			{
-				var item = new InterfaceMembersCollector(@interface, scope);
+				var item = new InterfaceMembersCollector(@interface);
 				item.CollectMembersToProxy(hook);
 				yield return item;
 			}
