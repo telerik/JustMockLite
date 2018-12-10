@@ -13,7 +13,7 @@
     <AssemblyName>JustMock.NonElevatedExamples</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</ProjectTypeGuids>
     <ReferencePath>$(DevEnvDir)PublicAssemblies\</ReferencePath>
     <SccProjectName>SAK</SccProjectName>
@@ -61,7 +61,7 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Telerik.JustMock, Version=2013.3.1021.0, Culture=neutral, PublicKeyToken=721b6c5bc0326b3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\..\..\..\..\Program Files (x86)\Telerik\JustMock\Libraries\Telerik.JustMock.dll</HintPath>
+      <HintPath>..\..\..\..\..\Binaries\$(Configuration)\net45\Telerik.JustMock.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
