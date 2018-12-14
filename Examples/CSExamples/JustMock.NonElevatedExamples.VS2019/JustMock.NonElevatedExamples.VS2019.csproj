@@ -4,12 +4,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3F2E15F1-5A5D-483F-9986-85A8985B7B67}</ProjectGuid>
+    <ProjectGuid>{89288D39-5ADC-4D58-8598-F784770E9290}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>JustMock.NonElevatedExamples.VS2017</RootNamespace>
-    <AssemblyName>JustMock.NonElevatedExamples.VS2017</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <RootNamespace>JustMock.NonElevatedExamples.VS2019</RootNamespace>
+    <AssemblyName>JustMock.NonElevatedExamples.VS2019</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">15.0</VisualStudioVersion>
