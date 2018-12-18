@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\JustMockLite\Build\common.props"></Import>
+  <Import Project="..\..\JustMockLite\Build\Config.targets"></Import>
   
   <PropertyGroup>
     <TargetFramework>net451</TargetFramework>
