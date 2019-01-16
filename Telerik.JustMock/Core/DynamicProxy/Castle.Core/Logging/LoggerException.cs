@@ -15,10 +15,14 @@
 namespace Telerik.JustMock.Core.Castle.Core.Logging
 {
 	using System;
+#if FEATURE_SERIALIZATION
 	using System.Runtime.Serialization;
+#endif
 
+#if FEATURE_SERIALIZATION
 	[Serializable]
-	internal class LoggerException : Exception
+#endif
+    internal class LoggerException : Exception
 	{
 		public LoggerException()
 		{
@@ -32,7 +36,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		{
 		}
 
-#if !SILVERLIGHT
+#if FEATURE_SERIALIZATION
 		protected LoggerException(SerializationInfo info, StreamingContext context) : base(info, context)
 		{
 		}

@@ -33,7 +33,10 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 
 		public override void Emit(IMemberEmitter member, ILGenerator gen)
 		{
-			statements.ForEach(s => s.Emit(member, gen));
+			foreach (Statement s in statements)
+			{
+				s.Emit(member, gen);
+			}
 		}
 	}
 }

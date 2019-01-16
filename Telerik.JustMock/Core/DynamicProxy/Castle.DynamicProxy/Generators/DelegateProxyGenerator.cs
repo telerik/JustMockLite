@@ -17,13 +17,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 	using System;
 	using System.Collections.Generic;
 	using System.Reflection;
-#if !SILVERLIGHT
+#if FEATURE_SERIALIZATION
 	using System.Xml.Serialization;
 #endif
 
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+	using Telerik.JustMock.Core.Castle.DynamicProxy.Serialization;
 
 	internal class DelegateProxyGenerator : BaseProxyGenerator
 	{
@@ -43,14 +44,22 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 		                                                              INamingScope namingScope)
 		{
 			var methodsToSkip = new List<MethodInfo>();
-			var proxyInstance = new ClassProxyInstanceContributor(targetType, methodsToSkip, Type.EmptyTypes);
-			var proxyTarget = new DelegateProxyTargetContributor(targetType, namingScope, Scope) { Logger = Logger };
+			var proxyInstance = new ClassProxyInstanceContributor(targetType, methodsToSkip, Type.EmptyTypes,
+			                                                      ProxyTypeConstants.ClassWithTarget);
+			var proxyTarget = new DelegateProxyTargetContributor(targetType, namingScope) { Logger = Logger };
 			IDictionary<Type, ITypeContributor> typeImplementerMapping = new Dictionary<Type, ITypeContributor>();
 
 			// Order of interface precedence:
 			// 1. first target, target is not an interface so we do nothing
 			// 2. then mixins - we support none so we do nothing
 			// 3. then additional interfaces - we support none so we do nothing
+			// 4. plus special interfaces
+#if FEATURE_SERIALIZATION
+			if (targetType.IsSerializable)
+			{
+				AddMappingForISerializable(typeImplementerMapping, proxyInstance);
+			}
+#endif
 			AddMappingNoCheck(typeof(IProxyTargetAccessor), proxyInstance, typeImplementerMapping);
 
 			contributors = new List<ITypeContributor>
@@ -64,7 +73,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 		private FieldReference CreateTargetField(ClassEmitter emitter)
 		{
 			var targetField = emitter.CreateField("__target", targetType);
-#if !SILVERLIGHT
+#if FEATURE_SERIALIZATION
 			emitter.DefineCustomAttributeFor<XmlIgnoreAttribute>(targetField);
 #endif
 			return targetField;

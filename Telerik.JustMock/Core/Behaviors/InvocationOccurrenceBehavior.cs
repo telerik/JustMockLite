@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -16,10 +16,14 @@
 */
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using Telerik.JustMock.Core.Context;
 using Telerik.JustMock.Diagnostics;
+#if NETCORE
+using Debug = Telerik.JustMock.Diagnostics.JMDebug;
+#else
+using Debug = System.Diagnostics.Debug;
+#endif
 
 namespace Telerik.JustMock.Core.Behaviors
 {
@@ -104,7 +108,7 @@ namespace Telerik.JustMock.Core.Behaviors
 
 		private static string MakeRangeString(int? lowerBound, int? upperBound)
 		{
-			Debug.Assert(lowerBound != null || upperBound != null);
+            Debug.Assert(lowerBound != null || upperBound != null);
 			return upperBound == 0 ? "Expected no calls"
 				: lowerBound != null && lowerBound == upperBound ? String.Format("Expected exactly {0} call{1}", lowerBound, lowerBound != 1 ? "s" : "")
 				: lowerBound != null && upperBound != null ? String.Format("Expected between {0} and {1} calls", lowerBound, upperBound)

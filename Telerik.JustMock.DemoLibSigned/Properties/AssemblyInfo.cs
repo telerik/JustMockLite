@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2014 Telerik EAD
+ Copyright © 2010-2014 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 */
 
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
@@ -27,8 +28,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("Telerik.JustMock.DemoLibSigned")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: AssemblyCompany("Telerik EAD")]
-[assembly: AssemblyCopyright("Copyright © 2010-2014 Telerik EAD")]
+[assembly: AssemblyCompany("Progress Software Corporation")]
+[assembly: AssemblyCopyright("Copyright © 2010-2014 Progress Software Corporation")]
 
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]

@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -173,7 +173,7 @@ namespace Telerik.JustMock.Core
 				throw new MockException("Telerik.CodeWeaver.Profiler.dll is old.\nRegister the updated version.");
 
 			string profilerVersion = (string)getProfilerVersion.Invoke(null, null);
-			Debug.Assert(null != profilerVersion);
+            JMDebug.Assert(null != profilerVersion);
 			var codeWeaverAssemblyVersion = new Version(profilerVersion);
 			int comparison = justMockAssemblyVersion.CompareTo(codeWeaverAssemblyVersion);
 
@@ -629,7 +629,7 @@ namespace Telerik.JustMock.Core
 
 		internal static void SkipMethodInterceptionOnce(MethodBase method)
 		{
-			Debug.Assert(skipMethodInterceptionOnce == null || skipMethodInterceptionOnce == method);
+            JMDebug.Assert(skipMethodInterceptionOnce == null || skipMethodInterceptionOnce == method);
 			skipMethodInterceptionOnce = method;
 		}
 	}

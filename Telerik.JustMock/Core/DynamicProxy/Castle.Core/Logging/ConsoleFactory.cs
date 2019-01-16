@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,12 +16,14 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 {
 	using System;
 
-#if SILVERLIGHT
-	internal class ConsoleFactory : ILoggerFactory
-#else
+#if FEATURE_SERIALIZATION
 	[Serializable]
-	internal class ConsoleFactory : MarshalByRefObject, ILoggerFactory
 #endif
+    internal class ConsoleFactory :
+#if FEATURE_REMOTING
+		MarshalByRefObject,
+#endif
+		ILoggerFactory
 	{
 		private LoggerLevel? level;
 

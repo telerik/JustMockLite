@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015,2018 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -28,7 +28,8 @@ namespace Telerik.JustMock.Core.Behaviors
 			var mockMixin = invocation.MockMixin;
 			if (mockMixin == null)
 			{
-				mockMixin = invocation.Repository.CreateExternalMockMixin(null, invocation.Instance, Behavior.CallOriginal);
+                MockCreationSettings settings = MockCreationSettings.GetSettings(Behavior.CallOriginal);
+                mockMixin = invocation.Repository.CreateExternalMockMixin(null, invocation.Instance, settings);
 				mockMixin.IsInstanceConstructorMocked = true;
 			}
 

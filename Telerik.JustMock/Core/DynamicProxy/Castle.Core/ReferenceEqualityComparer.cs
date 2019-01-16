@@ -19,8 +19,10 @@ namespace Telerik.JustMock.Core.Castle.Core
 	using System.Collections.Generic;
 	using System.Runtime.CompilerServices;
 
+#if FEATURE_SERIALIZATION
 	[Serializable]
-	internal class ReferenceEqualityComparer<T> : IEqualityComparer, IEqualityComparer<T>
+#endif
+    internal class ReferenceEqualityComparer<T> : IEqualityComparer, IEqualityComparer<T>
 	{
 		private static readonly ReferenceEqualityComparer<T> instance = new ReferenceEqualityComparer<T>();
 

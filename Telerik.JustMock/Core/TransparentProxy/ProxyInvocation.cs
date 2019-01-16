@@ -1,6 +1,6 @@
 ﻿/*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015,2018 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -18,12 +18,15 @@
 using System;
 using System.Linq;
 using System.Reflection;
+#if !NETCORE
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Messaging;
+#endif
 using Telerik.JustMock.Core.Castle.DynamicProxy;
 
 namespace Telerik.JustMock.Core.TransparentProxy
 {
+#if !NETCORE
 	internal sealed class ProxyInvocation : IInvocation
 	{
 		private readonly IMethodCallMessage message;
@@ -119,4 +122,5 @@ namespace Telerik.JustMock.Core.TransparentProxy
 			get { throw new NotSupportedException(); }
 		}
 	}
+#endif
 }

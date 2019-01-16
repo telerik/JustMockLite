@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using Telerik.JustMock.Diagnostics;
 using Telerik.JustMock.Setup;
 
 namespace Telerik.JustMock.Core.Context
@@ -142,7 +143,7 @@ namespace Telerik.JustMock.Core.Context
 					}
 				}
 
-				Debug.Assert(entryOps != null);
+                JMDebug.Assert(entryOps != null);
 			}
 
 			return testMethod;

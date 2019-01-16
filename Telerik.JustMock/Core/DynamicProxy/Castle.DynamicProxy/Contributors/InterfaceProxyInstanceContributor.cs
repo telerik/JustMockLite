@@ -17,18 +17,41 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 	using System;
 
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.CodeBuilders;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+	using Telerik.JustMock.Core.Castle.DynamicProxy.Tokens;
 
 	internal class InterfaceProxyInstanceContributor : ProxyInstanceContributor
 	{
-		protected override Expression GetTargetReferenceExpression(ClassEmitter emitter)
+		protected override Reference GetTargetReference(ClassEmitter emitter)
 		{
-			return emitter.GetField("__target").ToExpression();
+			return emitter.GetField("__target");
 		}
 
-		public InterfaceProxyInstanceContributor(Type targetType, Type[] interfaces)
-			: base(targetType, interfaces)
+		public InterfaceProxyInstanceContributor(Type targetType, string proxyGeneratorId, Type[] interfaces)
+			: base(targetType, interfaces, proxyGeneratorId)
 		{
 		}
+
+#if FEATURE_SERIALIZATION
+		protected override void CustomizeGetObjectData(AbstractCodeBuilder codebuilder, ArgumentReference serializationInfo,
+		                                               ArgumentReference streamingContext, ClassEmitter emitter)
+		{
+			var targetField = emitter.GetField("__target");
+
+			codebuilder.AddStatement(new ExpressionStatement(
+			                         	new MethodInvocationExpression(serializationInfo, SerializationInfoMethods.AddValue_Object,
+			                         	                               new ConstReference("__targetFieldType").ToExpression(),
+			                         	                               new ConstReference(
+			                         	                               	targetField.Reference.FieldType.AssemblyQualifiedName).
+			                         	                               	ToExpression())));
+
+			codebuilder.AddStatement(new ExpressionStatement(
+			                         	new MethodInvocationExpression(serializationInfo, SerializationInfoMethods.AddValue_Object,
+			                         	                               new ConstReference("__theInterface").ToExpression(),
+			                         	                               new ConstReference(targetType.AssemblyQualifiedName).
+			                         	                               	ToExpression())));
+		}
+#endif
 	}
 }

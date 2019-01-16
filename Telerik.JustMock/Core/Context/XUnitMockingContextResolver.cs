@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -41,9 +41,11 @@ namespace Telerik.JustMock.Core.Context
 			return exceptionType != null ? this.CreateExceptionFactory(this.exceptionType) : null;
 		}
 
+		protected abstract Type GetExceptionType();
+
 		private void CreateExceptionType()
 		{
-			var baseType = FindType(this.assertFailedExceptionTypeName, throwOnNotFound: false);
+			var baseType = GetExceptionType();
 			if (baseType == null)
 				return;
 			var typeBuilder = MockingUtil.ModuleBuilder.DefineType(
@@ -65,7 +67,7 @@ namespace Telerik.JustMock.Core.Context
 
 	internal class XUnit1xMockingContextResolver : XUnitMockingContextResolver
 	{
-		private const string XunitAssertionExceptionName = "Xunit.Sdk.AssertException, xunit";
+		private const string XunitAssertionExceptionName = "Xunit.Sdk.AssertActualExpectedException, xunit";
 
 		public static bool IsAvailable
 		{
@@ -80,6 +82,17 @@ namespace Telerik.JustMock.Core.Context
 				null, null, null,
 				FixtureConstuctorSemantics.InstanceConstructorCalledOncePerTest);
 		}
+
+		protected override Type GetExceptionType()
+		{
+			var exceptionType = FindType(this.assertFailedExceptionTypeName, false);
+			if (exceptionType != null)
+			{
+				exceptionType = exceptionType.BaseType;
+			}
+
+			return exceptionType;
+		}
 	}
 
 	internal class XUnit2xMockingContextResolver : XUnitMockingContextResolver
@@ -88,7 +101,7 @@ namespace Telerik.JustMock.Core.Context
 
 		public static bool IsAvailable
 		{
-			get { return FindType("Xunit.FactAttribute, xunit.core", false) != null; }
+			get { return FindType(XunitAssertionExceptionName, false, true) != null; }
 		}
 
 		public XUnit2xMockingContextResolver()
@@ -98,6 +111,11 @@ namespace Telerik.JustMock.Core.Context
 				new[] { "Xunit.FactAttribute, xunit.core", "Xunit.TheoryAttribute, xunit.core" },
 				null, null, null,
 				FixtureConstuctorSemantics.InstanceConstructorCalledOncePerTest);
+		}
+
+		protected override Type GetExceptionType()
+		{
+			return FindType(this.assertFailedExceptionTypeName, false, true);
 		}
 	}
 }

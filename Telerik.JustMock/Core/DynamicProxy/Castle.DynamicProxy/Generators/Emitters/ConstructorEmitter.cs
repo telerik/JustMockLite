@@ -41,8 +41,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 			var args = ArgumentsUtil.InitializeAndConvert(arguments);
 
 			builder = maintype.TypeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, args);
-			// if we don't copy the parameter attributes, the default binder will fail
-			// when trying to resolve constructors from the passed argument values.
+            // if we don't copy the parameter attributes, the default binder will fail
+            // when trying to resolve constructors from the passed argument values.
             for (int i = 0; i < args.Length; ++i)
             {
                 var arg = arguments[i];
@@ -50,7 +50,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
                 if (arg.DefaultValue != DBNull.Value)
                     paramBuilder.SetConstant(arg.DefaultValue);
             }
-		}
+        }
 
 		public virtual ConstructorCodeBuilder CodeBuilder
 		{
@@ -84,7 +84,11 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 		{
 			get
 			{
+#if FEATURE_LEGACY_REFLECTION_API
 				var attributes = builder.GetMethodImplementationFlags();
+#else
+				var attributes = builder.MethodImplementationFlags;
+#endif
 				return (attributes & MethodImplAttributes.Runtime) != 0;
 			}
 		}

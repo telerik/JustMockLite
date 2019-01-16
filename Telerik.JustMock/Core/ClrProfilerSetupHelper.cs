@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015,2018 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -72,6 +72,7 @@ namespace Telerik.JustMock.Core
 			{ new Guid("{D1087F67-BEE8-4F53-B27A-4E01F64F3DA8}"), "JustMock 2010" },
 		};
 
+#if !NETCORE
 		private const string NETFrameworkKey = @"SOFTWARE\Microsoft\.NETFramework";
 		private const string NETFrameworkWoW64Key = @"SOFTWARE\Wow6432Node\Microsoft\.NETFramework";
 
@@ -79,14 +80,23 @@ namespace Telerik.JustMock.Core
 		private const string NetFxCurrentUserKeyNameX32 = @"HKEY_CURRENT_USER\" + NETFrameworkWoW64Key;
 		private const string SystemEnvironmentKeyName = @"HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment";
 		private const string UserEnvironmentKeyName = @"HKEY_CURRENT_USER\Environment";
+#endif
 
+#if NETCORE
+		private const string CorGeneralProfilerKey = "CORECLR_PROFILER";
+		private const string CorGeneralEnableProfilingKey = "CORECLR_ENABLE_PROFILING";
+		private const string CorGeneralProfilerPathKey = "CORECLR_PROFILER_PATH";
+#else
 		private const string CorGeneralProfilerKey = "COR_PROFILER";
 		private const string CorGeneralEnableProfilingKey = "COR_ENABLE_PROFILING";
 		private const string CorGeneralProfilerPathKey = "COR_PROFILER_PATH";
+#endif
 
-		private const string ProcessEnvironmentLocationDescription = "process environment";
+#if !NETCORE
 		private const string CurrentUserLocationDescription = "current user registry setting";
 		private const string CurrentUser32LocationDescription = "current user 32-bit registry setting";
+#endif
+		private const string ProcessEnvironmentLocationDescription = "process environment";
 		private const string SystemEnvironmentLocationDescription = "global system environment";
 		private const string UserEnvironmentLocationDescription = "global user environment";
 
@@ -94,15 +104,18 @@ namespace Telerik.JustMock.Core
 		{
 			var locationsBuilder = new StringBuilder("\n");
 
+#if !NETCORE
 			CheckRegistryLocation(NetFxCurrentUserKeyName, CurrentUserLocationDescription, locationsBuilder);
 			CheckRegistryLocation(NetFxCurrentUserKeyNameX32, CurrentUser32LocationDescription, locationsBuilder);
 			CheckRegistryLocation(SystemEnvironmentKeyName, SystemEnvironmentLocationDescription, locationsBuilder);
 			CheckRegistryLocation(UserEnvironmentKeyName, UserEnvironmentLocationDescription, locationsBuilder);
+#endif
 			CheckProcessEnvironment(locationsBuilder);
 
 			return locationsBuilder.ToString().TrimEnd();
 		}
 
+#if !NETCORE
 		private static void CheckRegistryLocation(string keyName, string locationDescription, StringBuilder locationsBuilder)
 		{
 			try
@@ -122,6 +135,7 @@ namespace Telerik.JustMock.Core
 				AddError(locationDescription, locationsBuilder);
 			}
 		}
+#endif
 
 		private static void CheckProcessEnvironment(StringBuilder locationsBuilder)
 		{

@@ -1,6 +1,6 @@
 ﻿/*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015,2018 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -54,7 +54,8 @@ namespace Telerik.JustMock
 			try
 			{
 				var args = expression.GetArgumentsFromConstructorExpression();
-				return (T)MockingContext.CurrentRepository.Create(typeof(T), args, behavior, null, false);
+                MockCreationSettings settings = MockCreationSettings.GetSettings(args, behavior, null, false);
+                return (T)MockingContext.CurrentRepository.Create(typeof(T), settings);
 			}
 			catch (InvalidCastException e)
 			{
@@ -89,7 +90,8 @@ namespace Telerik.JustMock
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
-				return (T)MockingContext.CurrentRepository.Create(typeof(T), args, behavior, null, null);
+                MockCreationSettings settings = MockCreationSettings.GetSettings(args, behavior, null, null);
+                return (T)MockingContext.CurrentRepository.Create(typeof(T), settings);
 			});
 		}
 
@@ -103,7 +105,8 @@ namespace Telerik.JustMock
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
-				return (T)MockingContext.CurrentRepository.Create(typeof(T), null, behavior, null, null);
+                MockCreationSettings settings = MockCreationSettings.GetSettings(behavior);
+                return (T)MockingContext.CurrentRepository.Create(typeof(T), settings);
 			});
 		}
 
@@ -116,7 +119,8 @@ namespace Telerik.JustMock
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
-				return (T)MockingContext.CurrentRepository.Create(typeof(T), null, null, null, null);
+                MockCreationSettings settings = MockCreationSettings.GetSettings();
+                return (T)MockingContext.CurrentRepository.Create(typeof(T), settings);
 			});
 		}
 
@@ -130,7 +134,8 @@ namespace Telerik.JustMock
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
-				return MockingContext.CurrentRepository.Create(target, args, null, null, null);
+                MockCreationSettings settings = MockCreationSettings.GetSettings(args, null, null, null);
+                return MockingContext.CurrentRepository.Create(target, settings);
 			});
 		}
 
@@ -143,7 +148,8 @@ namespace Telerik.JustMock
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
-				return MockingContext.CurrentRepository.Create(target, null, null, null, null);
+                MockCreationSettings settings = MockCreationSettings.GetSettings();
+                return MockingContext.CurrentRepository.Create(target, settings);
 			});
 		}
 
@@ -159,7 +165,8 @@ namespace Telerik.JustMock
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
-				return (T)MockingContext.CurrentRepository.Create(typeof(T), null, null, null, constructor == Constructor.Mocked);
+                MockCreationSettings settings = MockCreationSettings.GetSettings(null, null, null, constructor == Constructor.Mocked);
+                return (T)MockingContext.CurrentRepository.Create(typeof(T), settings);
 			});
 		}
 
@@ -176,7 +183,8 @@ namespace Telerik.JustMock
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
-				return (T)MockingContext.CurrentRepository.Create(typeof(T), null, behavior, null, constructor == Constructor.Mocked);
+                MockCreationSettings settings = MockCreationSettings.GetSettings(null, behavior, null, constructor == Constructor.Mocked);
+                return (T)MockingContext.CurrentRepository.Create(typeof(T), settings);
 			});
 		}
 
@@ -193,7 +201,8 @@ namespace Telerik.JustMock
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
-				return MockingContext.CurrentRepository.Create(type, null, behavior, null, constructor == Constructor.Mocked);
+                MockCreationSettings settings = MockCreationSettings.GetSettings(null, behavior, null, constructor == Constructor.Mocked);
+                return MockingContext.CurrentRepository.Create(type, settings);
 			});
 		}
 
@@ -224,7 +233,8 @@ namespace Telerik.JustMock
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
-				return MockingContext.CurrentRepository.Create(type, args, behavior, null, null);
+                MockCreationSettings settings = MockCreationSettings.GetSettings(args, behavior, null, null);
+                return MockingContext.CurrentRepository.Create(type, settings);
 			});
 		}
 
@@ -238,7 +248,8 @@ namespace Telerik.JustMock
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
-				return MockingContext.CurrentRepository.Create(type, null, behavior, null, null);
+                MockCreationSettings settings = MockCreationSettings.GetSettings(behavior);
+                return MockingContext.CurrentRepository.Create(type, settings);
 			});
 		}
 
@@ -252,7 +263,8 @@ namespace Telerik.JustMock
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
-				return (T)MockingContext.CurrentRepository.Create(typeof(T), args, null, null, null);
+                MockCreationSettings settings = MockCreationSettings.GetSettings(args, null, null, null);
+                return (T)MockingContext.CurrentRepository.Create(typeof(T), settings);
 			});
 		}
 
@@ -285,7 +297,8 @@ namespace Telerik.JustMock
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
-				return MockingContext.CurrentRepository.Create(MockingUtil.GetTypeFrom(fullName), null, null, null, null);
+                MockCreationSettings settings = MockCreationSettings.GetSettings();
+                return MockingContext.CurrentRepository.Create(MockingUtil.GetTypeFrom(fullName), settings);
 			});
 		}
 
@@ -299,7 +312,8 @@ namespace Telerik.JustMock
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
-				return MockingContext.CurrentRepository.Create(MockingUtil.GetTypeFrom(fullName), null, behavior, null, null);
+                MockCreationSettings settings = MockCreationSettings.GetSettings(behavior);
+                return MockingContext.CurrentRepository.Create(MockingUtil.GetTypeFrom(fullName), settings);
 			});
 		}
 

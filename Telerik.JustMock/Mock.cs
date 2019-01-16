@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -113,7 +113,7 @@ namespace Telerik.JustMock
 #if !LITE_EDITION
 		/// <summary>
 		/// Explicitly enables the interception of the given type by the profiler. Interception is usually enabled
-		/// implicitly by calls to <see cref="Create"/> or <see cref="Arrange"/>. This method is rarely needed in cases
+		/// implicitly by calls to <see cref="Mock.Create(Type)"/> or <see cref="Mock.Arrange"/>. This method is rarely needed in cases
 		/// where you're trying to arrange setters or raise events on a partial mock.
 		/// </summary>
 		/// <typeparam name="TTypeToIntercept">The type to intercept</typeparam>
@@ -124,7 +124,7 @@ namespace Telerik.JustMock
 
 		/// <summary>
 		/// Explicitly enables the interception of the given type by the profiler. Interception is usually enabled
-		/// implicitly by calls to <see cref="Create"/> or <see cref="Arrange"/>. This method is rarely needed in cases
+		/// implicitly by calls to <see cref="Mock.Create(Type)"/> or <see cref="Mock.Arrange"/>. This method is rarely needed in cases
 		/// where you're trying to arrange setters or raise events on a partial mock.
 		/// </summary>
 		/// <param name="typeToIntercept">The type to intercept</param>

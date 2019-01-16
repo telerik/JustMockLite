@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2014 Telerik EAD
+ Copyright © 2010-2014 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("Telerik.JustMock.DemoLib")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: AssemblyCompany("Telerik EAD")]
-[assembly: AssemblyCopyright("Copyright © 2010-2014 Telerik EAD")]
+[assembly: AssemblyCompany("Progress Software Corporation")]
+[assembly: AssemblyCopyright("Copyright © 2010-2014 Progress Software Corporation")]
 
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
@@ -53,11 +53,12 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: InternalsVisibleTo("Telerik.JustMock.Nunit.Tests")]
-[assembly: InternalsVisibleTo("Telerik.JustMock.Tests")]
+
 [assembly: InternalsVisibleTo(Telerik.JustMock.DemoLib.JustMock.FullyQualifiedAssemblyName)]
-[assembly: InternalsVisibleTo("Telerik.JustMock.Tests.Elevated")]
+[assembly: InternalsVisibleTo("Telerik.JustMock.MSTest.Tests")]
+[assembly: InternalsVisibleTo("Telerik.JustMock.MSTest.Tests.Elevated")]
 [assembly: InternalsVisibleTo("Telerik.JustMock.MSTest2.Tests")]
 [assembly: InternalsVisibleTo("Telerik.JustMock.MSTest2.Tests.Elevated")]
-[assembly: InternalsVisibleTo("Telerik.JustMock.Nunit3.Tests")]
+[assembly: InternalsVisibleTo("Telerik.JustMock.NUnit.Tests")]
+[assembly: InternalsVisibleTo("Telerik.JustMock.NUnit3.Tests")]
 [assembly: InternalsVisibleTo("Telerik.JustMock.XUnit.Tests")]

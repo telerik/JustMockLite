@@ -18,6 +18,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 	using System.Reflection;
 	using System.Reflection.Emit;
 
+	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
+
 	internal class BindDelegateExpression : Expression
 	{
 		private readonly ConstructorInfo delegateCtor;
@@ -29,11 +31,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 		{
 			delegateCtor = @delegate.GetConstructors()[0];
 			this.methodToBindTo = methodToBindTo;
-			if (@delegate.IsGenericTypeDefinition)
+			if (@delegate.GetTypeInfo().IsGenericTypeDefinition)
 			{
-				var closedDelegate = @delegate.MakeGenericType(genericTypeParams);
+				var genericTypeParameters = genericTypeParams.AsTypeArray();
+				var closedDelegate = @delegate.MakeGenericType(genericTypeParameters);
 				delegateCtor = TypeBuilder.GetConstructor(closedDelegate, delegateCtor);
-				this.methodToBindTo = methodToBindTo.MakeGenericMethod(genericTypeParams);
+				this.methodToBindTo = methodToBindTo.MakeGenericMethod(genericTypeParameters);
 			}
 			this.owner = owner;
 		}

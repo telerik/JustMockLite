@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015,2018 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -49,8 +49,10 @@ namespace Telerik.JustMock.Setup
 
 		public override object CreateMock(Type mockType, MocksRepository repository)
 		{
-			return repository.Create(mockType, this.arguments, this.behavior, this.implementedInterfaces.ToArray(),
-				this.mockConstructor, this.additionalProxyTypeAttributes, null, null, null, this.interceptorFilter);
+            MockCreationSettings settings = MockCreationSettings.GetSettings(this.arguments, this.behavior, this.implementedInterfaces.ToArray(),
+                this.mockConstructor, this.additionalProxyTypeAttributes, null, null, null, this.interceptorFilter);
+
+            return repository.Create(mockType, settings);
 		}
 	}
 
@@ -89,8 +91,10 @@ namespace Telerik.JustMock.Setup
 
 		public virtual object CreateMock(Type mockType, MocksRepository repository)
 		{
-			return repository.Create(mockType, this.arguments, this.behavior, null, this.mockConstructor,
-				this.additionalProxyTypeAttributes, null, null, null, this.interceptorFilter);
+            MockCreationSettings settings = MockCreationSettings.GetSettings(this.arguments, this.behavior, null, this.mockConstructor,
+                this.additionalProxyTypeAttributes, null, null, null, this.interceptorFilter);
+
+            return repository.Create(mockType, settings);
 		}
 
 		public IFluentConfig SetInterceptorFilter(Expression<Predicate<MethodInfo>> filter)

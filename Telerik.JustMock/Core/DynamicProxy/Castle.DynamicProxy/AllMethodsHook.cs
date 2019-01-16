@@ -18,14 +18,17 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 	using System.Collections.Generic;
 	using System.Reflection;
 
+#if FEATURE_SERIALIZATION
+	[Serializable]
+#endif
 	internal class AllMethodsHook : IProxyGenerationHook, IConstructorGenerationHook
-	{
+    {
         public static readonly AllMethodsHook Instance = new AllMethodsHook();
 
-		protected static readonly ICollection<Type> SkippedTypes = new[]
+        protected static readonly ICollection<Type> SkippedTypes = new[]
 		{
 			typeof(object),
-#if !SILVERLIGHT
+#if FEATURE_REMOTING
 			typeof(MarshalByRefObject),
 			typeof(ContextBoundObject)
 #endif
@@ -54,16 +57,17 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 			return GetType().GetHashCode();
 		}
 
-	    public ProxyConstructorImplementation DefaultConstructorImplementation
-	    {
-	        get { return ProxyConstructorImplementation.SkipConstructor; }
-	    }
+        public ProxyConstructorImplementation DefaultConstructorImplementation
+        {
+            get { return ProxyConstructorImplementation.SkipConstructor; }
+        }
 
-	    public ProxyConstructorImplementation GetConstructorImplementation(ConstructorInfo constructorInfo, ConstructorImplementationAnalysis analysis)
-	    {
-	        return analysis.IsBaseVisible
-	                   ? ProxyConstructorImplementation.CallBase
-	                   : ProxyConstructorImplementation.SkipConstructor;
-	    }
-	}
+	    
+        public ProxyConstructorImplementation GetConstructorImplementation(ConstructorInfo constructorInfo, ConstructorImplementationAnalysis analysis)
+        {
+            return analysis.IsBaseVisible
+                       ? ProxyConstructorImplementation.CallBase
+                       : ProxyConstructorImplementation.SkipConstructor;
+        }
+    }
 }

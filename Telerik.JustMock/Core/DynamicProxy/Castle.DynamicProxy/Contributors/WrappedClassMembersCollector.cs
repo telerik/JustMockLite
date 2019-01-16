@@ -24,7 +24,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 
 	internal class WrappedClassMembersCollector : ClassMembersCollector
 	{
-		public WrappedClassMembersCollector(Type type, ModuleScope scope) : base(type, scope)
+		public WrappedClassMembersCollector(Type type) : base(type)
 		{
 		}
 
@@ -37,14 +37,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 
 		protected override MetaMethod GetMethodToGenerate(MethodInfo method, IProxyGenerationHook hook, bool isStandalone)
 		{
-#if SILVERLIGHT
-			if(method.IsFamily)
-			{
-				// we can't proxy protected methods like this on Silverlight
-				return null;
-			}
-#endif
-			if (scope.Internals.IsAccessible(method) == false)
+			if (ProxyUtil.IsAccessibleMethod(method) == false)
 			{
 				return null;
 			}
@@ -56,13 +49,13 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 				return null;
 			}
 
-			return new MetaMethod(method, scope, method, isStandalone, accepted, hasTarget: true);
+			return new MetaMethod(method, method, isStandalone, accepted, hasTarget: true);
 		}
 
 		protected bool IsGeneratedByTheCompiler(FieldInfo field)
 		{
 			// for example fields backing autoproperties
-			return Attribute.IsDefined(field, typeof(CompilerGeneratedAttribute));
+			return field.IsDefined(typeof(CompilerGeneratedAttribute));
 		}
 
 		protected virtual bool IsOKToBeOnProxy(FieldInfo field)

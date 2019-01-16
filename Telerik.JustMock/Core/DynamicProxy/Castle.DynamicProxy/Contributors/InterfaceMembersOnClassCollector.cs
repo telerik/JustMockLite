@@ -18,14 +18,13 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 	using System.Reflection;
 
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
 
 	internal class InterfaceMembersOnClassCollector : MembersCollector
 	{
 		private readonly InterfaceMapping map;
 		private readonly bool onlyProxyVirtual;
 
-		public InterfaceMembersOnClassCollector(Type type, ModuleScope scope, bool onlyProxyVirtual, InterfaceMapping map) : base(type, scope)
+		public InterfaceMembersOnClassCollector(Type type, bool onlyProxyVirtual, InterfaceMapping map) : base(type)
 		{
 			this.onlyProxyVirtual = onlyProxyVirtual;
 			this.map = map;
@@ -33,7 +32,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 
 		protected override MetaMethod GetMethodToGenerate(MethodInfo method, IProxyGenerationHook hook, bool isStandalone)
 		{
-			if (scope.Internals.IsAccessible(method) == false)
+			if (ProxyUtil.IsAccessibleMethod(method) == false)
 			{
 				return null;
 			}
@@ -46,7 +45,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 			var methodOnTarget = GetMethodOnTarget(method);
 
 			var proxyable = AcceptMethod(method, onlyProxyVirtual, hook);
-			return new MetaMethod(method, scope, methodOnTarget, isStandalone, proxyable, methodOnTarget.IsPrivate == false);
+			return new MetaMethod(method, methodOnTarget, isStandalone, proxyable, methodOnTarget.IsPrivate == false);
 		}
 
 		private MethodInfo GetMethodOnTarget(MethodInfo method)

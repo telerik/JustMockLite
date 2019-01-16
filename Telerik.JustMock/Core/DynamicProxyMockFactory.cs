@@ -1,6 +1,6 @@
 ﻿/*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015,2018 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ namespace Telerik.JustMock.Core
 #endif
 		}
 
-#if DEBUG && !SILVERLIGHT
+#if (DEBUG && !SILVERLIGHT && !NETCORE)
 		internal static void SaveAssembly()
 		{
 			generator.ProxyBuilder.ModuleScope.SaveAssembly();
@@ -50,8 +50,8 @@ namespace Telerik.JustMock.Core
 
 		public bool IsAccessible(Type type)
 		{
-			return generator.ProxyBuilder.ModuleScope.Internals.IsAccessible(type);
-		}
+            return ProxyUtil.IsAccessibleType(type);
+        }
 
 		public object Create(Type type, MocksRepository repository, IMockMixin mockMixinImpl, MockCreationSettings settings, bool createTransparentProxy)
 		{
@@ -62,14 +62,14 @@ namespace Telerik.JustMock.Core
 
 			if (settings.AdditionalProxyTypeAttributes != null)
 			{
-				foreach (var attr in settings.AdditionalProxyTypeAttributes)
+				foreach (var attributeBuilder in settings.AdditionalProxyTypeAttributes)
 				{
-					options.AdditionalAttributes.Add(attr);
+					options.AdditionalAttributes.Add(new CustomAttributeInfo(attributeBuilder));
 				}
 			}
 
 			var interceptor = repository.Interceptor;
-#if SILVERLIGHT
+#if (SILVERLIGHT)
 			options.Hook = new ProxyGenerationHook(false, settings.InterceptorFilter);
 #else
 			options.Hook = new ProxyGenerationHook(settings.MockConstructorCall, settings.InterceptorFilter);
@@ -99,7 +99,7 @@ namespace Telerik.JustMock.Core
 			{
 				try
 				{
-#if SILVERLIGHT
+#if (SILVERLIGHT || NETCORE)
 					if (settings.Args == null || settings.Args.Length == 0)
 					{
 						ConstructorInfo[] constructors = type.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
@@ -207,9 +207,9 @@ namespace Telerik.JustMock.Core
 
 			if (settings.AdditionalProxyTypeAttributes != null)
 			{
-				foreach (var attr in settings.AdditionalProxyTypeAttributes)
+				foreach (var attributeBuilder in settings.AdditionalProxyTypeAttributes)
 				{
-					options.AdditionalAttributes.Add(attr);
+					options.AdditionalAttributes.Add(new CustomAttributeInfo(attributeBuilder));
 				}
 			}
 
@@ -264,7 +264,7 @@ namespace Telerik.JustMock.Core
 			{
 				get
 				{
-#if SILVERLIGHT
+#if (SILVERLIGHT || NETCORE)
 					return ProxyConstructorImplementation.SkipConstructor;
 #else
 					return myMockConstructors ? ProxyConstructorImplementation.DoNotCallBase : ProxyConstructorImplementation.SkipConstructor;

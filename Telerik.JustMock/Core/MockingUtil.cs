@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -243,10 +243,12 @@ namespace Telerik.JustMock.Core
 			for (int i = 0; i < ctorParameters.Length; ++i)
 			{
 				var paramType = ctorParameters[i].ParameterType;
-				if (paramType.IsValueType && args[i] == null)
-					args[i] = paramType.GetDefaultValue();
-				else if (args[i] != null && !paramType.IsAssignableFrom(args[i].GetType()))
-					args[i] = Convert.ChangeType(args[i], paramType, System.Globalization.CultureInfo.CurrentCulture);
+                if (paramType.IsValueType && args[i] == null)
+                    args[i] = paramType.GetDefaultValue();
+                else if (args[i] != null && !paramType.IsAssignableFrom(args[i].GetType()))
+                {
+                        args[i] = Convert.ChangeType(args[i], paramType, System.Globalization.CultureInfo.CurrentCulture);
+                }
 			}
 
 #if !PORTABLE

@@ -1,6 +1,6 @@
 ﻿/*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015,2018 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -40,8 +40,9 @@ namespace Telerik.JustMock
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 			{
-				MockingContext.CurrentRepository.InterceptStatics(typeof(T), null, false);
-			});
+                MockCreationSettings settings = MockCreationSettings.GetSettings();
+                MockingContext.CurrentRepository.InterceptStatics(typeof(T), settings, false);
+            });
 		}
 
 		/// <summary>
@@ -61,8 +62,9 @@ namespace Telerik.JustMock
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 			{
-				MockingContext.CurrentRepository.InterceptStatics(typeof(T), behavior, false);
-			});
+                MockCreationSettings settings = MockCreationSettings.GetSettings(behavior);
+                MockingContext.CurrentRepository.InterceptStatics(typeof(T), settings, false);
+            });
 		}
 
 		/// <summary>
@@ -74,8 +76,9 @@ namespace Telerik.JustMock
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 			{
-				MockingContext.CurrentRepository.InterceptStatics(staticType, null, staticConstructor == StaticConstructor.Mocked);
-			});
+                MockCreationSettings settings = MockCreationSettings.GetSettings();
+                MockingContext.CurrentRepository.InterceptStatics(staticType, settings, staticConstructor == StaticConstructor.Mocked);
+            });
 		}
 
 		/// <summary>
@@ -86,34 +89,37 @@ namespace Telerik.JustMock
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 			{
-				MockingContext.CurrentRepository.InterceptStatics(staticType, null, false);
-			});
+                MockCreationSettings settings = MockCreationSettings.GetSettings();
+                MockingContext.CurrentRepository.InterceptStatics(staticType, settings, false);
+            });
 		}
 
-		/// <summary>
-		/// Setups the target for mocking all static calls.
-		/// </summary>
-		/// <param name="targetType">Target type</param>
-		/// <param name="behavior">Specifies behavior of the mock. Default is <see cref="Behavior.RecursiveLoose"/></param>
-		public static void SetupStatic(Type targetType, Behavior behavior)
+        /// <summary>
+        /// Setups the target for mocking all static calls.
+        /// </summary>
+        /// <param name="staticType">Static type</param>
+        /// <param name="behavior">Specifies behavior of the mock. Default is <see cref="Behavior.RecursiveLoose"/></param>
+        public static void SetupStatic(Type staticType, Behavior behavior)
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 			{
-				MockingContext.CurrentRepository.InterceptStatics(targetType, behavior, false);
+                MockCreationSettings settings = MockCreationSettings.GetSettings(behavior);
+                MockingContext.CurrentRepository.InterceptStatics(staticType, settings, false);
 			});
 		}
 
-		/// <summary>
-		/// Setups the target for mocking all static calls.
-		/// </summary>
-		/// <param name="targetType">Target type</param>
-		/// <param name="behavior">Specifies behavior of the mock. Default is <see cref="Behavior.RecursiveLoose"/></param>
-		/// <param name="staticConstructor">Defines the behavior of the static constructor</param>
-		public static void SetupStatic(Type targetType, Behavior behavior, StaticConstructor staticConstructor)
+        /// <summary>
+        /// Setups the target for mocking all static calls.
+        /// </summary>
+        /// <param name="staticType">Static type</param>
+        /// <param name="behavior">Specifies behavior of the mock. Default is <see cref="Behavior.RecursiveLoose"/></param>
+        /// <param name="staticConstructor">Defines the behavior of the static constructor</param>
+        public static void SetupStatic(Type staticType, Behavior behavior, StaticConstructor staticConstructor)
 		{
 			ProfilerInterceptor.GuardInternal(() =>
 			{
-				MockingContext.CurrentRepository.InterceptStatics(targetType, behavior, staticConstructor == StaticConstructor.Mocked);
+                MockCreationSettings settings = MockCreationSettings.GetSettings(behavior);
+                MockingContext.CurrentRepository.InterceptStatics(staticType, settings, staticConstructor == StaticConstructor.Mocked);
 			});
 		}
 #endif

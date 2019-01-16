@@ -21,14 +21,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 	internal class InterfaceProxyWithTargetInterfaceTargetContributor : InterfaceProxyTargetContributor
 	{
 		public InterfaceProxyWithTargetInterfaceTargetContributor(Type proxyTargetType, bool allowChangeTarget,
-                                                                  INamingScope namingScope, ModuleScope scope)
-			: base(proxyTargetType, allowChangeTarget, namingScope, scope)
+		                                                          INamingScope namingScope)
+			: base(proxyTargetType, allowChangeTarget, namingScope)
 		{
 		}
 
 		protected override MembersCollector GetCollectorForInterface(Type @interface)
 		{
-			return new InterfaceMembersCollector(@interface, scope);
+			return new InterfaceMembersCollector(@interface);
 		}
 	}
 }

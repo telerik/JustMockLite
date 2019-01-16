@@ -33,8 +33,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 		private string name;
 
 		public MetaProperty(string name, Type propertyType, Type declaringType, MetaMethod getter, MetaMethod setter,
-		                    IEnumerable<CustomAttributeBuilder> customAttributes, Type[] arguments, ModuleScope scope)
-			: base(declaringType, scope)
+		                    IEnumerable<CustomAttributeBuilder> customAttributes, Type[] arguments)
+			: base(declaringType)
 		{
 			this.name = name;
 			type = propertyType;
@@ -184,7 +184,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 
 		internal override void SwitchToExplicitImplementation()
 		{
-			name = string.Format("{0}.{1}", sourceType.Name, name);
+			name = MetaTypeElementUtil.CreateNameForExplicitImplementation(sourceType, name);
 			if (setter != null)
 			{
 				setter.SwitchToExplicitImplementation();

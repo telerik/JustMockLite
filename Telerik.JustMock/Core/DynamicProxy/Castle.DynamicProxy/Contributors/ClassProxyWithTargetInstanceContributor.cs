@@ -23,14 +23,15 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 
 	class ClassProxyWithTargetInstanceContributor : ClassProxyInstanceContributor
 	{
-		public ClassProxyWithTargetInstanceContributor(Type targetType, IList<MethodInfo> methodsToSkip, Type[] interfaces)
-			: base(targetType, methodsToSkip, interfaces)
+		public ClassProxyWithTargetInstanceContributor(Type targetType, IList<MethodInfo> methodsToSkip,
+		                                               Type[] interfaces, string typeId)
+			: base(targetType, methodsToSkip, interfaces, typeId)
 		{
 		}
 
-		protected override Expression GetTargetReferenceExpression(ClassEmitter emitter)
+		protected override Reference GetTargetReference(ClassEmitter emitter)
 		{
-			return emitter.GetField("__target").ToExpression();
+			return emitter.GetField("__target");
 		}
 	}
 }

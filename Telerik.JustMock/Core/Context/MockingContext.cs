@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -139,10 +139,6 @@ namespace Telerik.JustMock.Core.Context
 			if (XamarinIosNUnitContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new XamarinIosNUnitContextResolver());
 #else
-			if (MSTestMockingContextResolver.IsAvailable)
-				registeredContextResolvers.Add(new MSTestMockingContextResolver());
-			if (MSTestV2MockingContextResolver.IsAvailable)
-				registeredContextResolvers.Add(new MSTestV2MockingContextResolver());
 			if (XUnit1xMockingContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new XUnit1xMockingContextResolver());
 			if (XUnit2xMockingContextResolver.IsAvailable)
@@ -157,6 +153,10 @@ namespace Telerik.JustMock.Core.Context
 				registeredContextResolvers.Add(new MSpecContextResolver());
 			if (MbUnitContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new MbUnitContextResolver());
+			if (MSTestMockingContextResolver.IsAvailable)
+				registeredContextResolvers.Add(new MSTestMockingContextResolver());
+			if (MSTestV2MockingContextResolver.IsAvailable)
+				registeredContextResolvers.Add(new MSTestV2MockingContextResolver());
 #endif
 
 			foreach (var resolver in registeredContextResolvers)
