@@ -1,9 +1,9 @@
 JustMock Lite
 ===
 
-[![Version](https://img.shields.io/badge/release-R3%202018-blue.svg)](https://www.nuget.org/packages/JustMock/)
-[![Version](https://img.shields.io/badge/nuget-2018.3.912.1-blue.svg)](https://www.nuget.org/packages/JustMock/)
-[![Version](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/telerik/JustMockLite/blob/master/LICENSE/)
+[![release](https://img.shields.io/badge/release-R1%202019-blue.svg)](https://www.nuget.org/packages/JustMock/)
+[![nuget](https://img.shields.io/nuget/v/JustMock.svg?label=nuget)](https://www.nuget.org/packages/JustMock/)
+[![license](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/telerik/JustMockLite/blob/master/LICENSE/)
 
 **JustMock Lite by Telerik** is for developers who practice unit testing and want to deliver exceptional software. JustMock Lite is the superior free mocking framework that makes unit testing simpler for SOLID testable projects. It is also an open source product that is easy to use, feature rich, with great power and flexibility, making it the superior choice. JustMock Lite cuts your development time and helps you create better unit tests. It enables you to perform fast and controlled tests that are independent of external dependencies like databases, web services or proprietary code. For more information, refer to our <a href="http://www.telerik.com/justmock/free-mocking" target="_blank">JustMock Lite website</a>.
 
