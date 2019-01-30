@@ -45,11 +45,15 @@ public void TestBookService()
 }
 ```
 
+### Supported Frameworks
+- .Net Framework 4.5+ and later.
+- .Net Core 2.0 and later.
+
 ### Documentation
-You could learn more on how to use JustMock Lite in our <a href="http://docs.telerik.com/devtools/justmock/introduction.html" target="_blank">Documentation</a>.
+JustMock Lite comes with extensive <a href="http://docs.telerik.com/devtools/justmock/introduction.html" target="_blank">Documentation</a> and examples that will help you quickly get started with the framework.
 
 ### Feedback
-You can suggest and vote for feature requests and bug reports in our <a href="https://feedback.telerik.com/Project/105" target="_blank">Feedback Portal</a>.
+JustMock Lite is constantly improved through customer interaction and feedback. If you want to suggest a new feature, bug report or vote for a popular one, please visit our <a href="https://feedback.telerik.com/Project/105" target="_blank">Feedback Portal</a>.
 
 
 ### Happy mocking!
