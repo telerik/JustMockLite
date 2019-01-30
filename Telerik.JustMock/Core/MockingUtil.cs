@@ -899,8 +899,15 @@ namespace Telerik.JustMock.Core
 			return null;
 		}
 
+        internal static MethodInfo UnwrapDelegateTarget(ref object obj)
+        {
+            var delg = obj as Delegate;
+            obj = delg != null ? delg.Target : obj;
+            return delg != null ? delg.Method : null;
+        }
+
 #if !COREFX
-		[DllImport("user32.dll")]
+        [DllImport("user32.dll")]
 		private static extern bool IsImmersiveProcess(IntPtr hProcess);
 		private static bool? isMetro;
 		public static bool IsMetro()
