@@ -54,6 +54,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)RecursiveFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ReturnsFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SequenceFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SerializableFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WaitEventFixture.cs" />
   </ItemGroup>
   <ItemGroup>
