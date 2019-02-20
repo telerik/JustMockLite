@@ -142,6 +142,9 @@
     <Compile Include="..\Telerik.JustMock\Core\CallPattern.cs">
       <Link>Core\CallPattern.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\CallPatternCreator.cs">
+      <Link>Core\CallPatternCreator.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Core\ClrProfilerSetupHelper.cs">
       <Link>Core\ClrProfilerSetupHelper.cs</Link>
     </Compile>
