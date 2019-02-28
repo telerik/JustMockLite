@@ -6,7 +6,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-	 http://www.apache.org/licenses/LICENSE-2.0
+     http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,7 +25,6 @@ using System.Text;
 using System.Threading;
 using Telerik.JustMock.Core.Behaviors;
 using Telerik.JustMock.Core.Context;
-using Telerik.JustMock.Core.Expressions;
 using Telerik.JustMock.Core.MatcherTree;
 using Telerik.JustMock.Core.Recording;
 using Telerik.JustMock.Core.TransparentProxy;
@@ -81,19 +80,19 @@ namespace Telerik.JustMock.Core
                 typeof(UIntPtr),
                 typeof(void),
 #if !PORTABLE
-				typeof(AppDomain),
+                typeof(AppDomain),
                 typeof(TypedReference),
                 typeof(RuntimeArgumentHandle),
                 Type.GetType("System.ContextBoundObject"),
                 Type.GetType("System.ArgIterator"),
 #endif
 #if !SILVERLIGHT
-				Type.GetType("System.__ComObject"),
+                Type.GetType("System.__ComObject"),
 #endif
 #if SILVERLIGHT
-				typeof(WeakReference),
+                typeof(WeakReference),
 #endif
-			};
+            };
 
 
         internal IRecorder Recorder
@@ -124,7 +123,7 @@ namespace Telerik.JustMock.Core
 
         internal DynamicProxyInterceptor Interceptor { get; private set; }
 
-        internal List<IMatcher> MatchersInContext { get; private set; } = new List<IMatcher>();
+        internal List<IMatcher> MatchersInContext { get; private set; }
 
         static MocksRepository()
         {
@@ -143,7 +142,7 @@ namespace Telerik.JustMock.Core
 #if !PORTABLE
             mockFactory = new DynamicProxyMockFactory();
 #else
-			mockFactory = new StaticProxy.StaticProxyMockFactory();
+            mockFactory = new StaticProxy.StaticProxyMockFactory();
 #endif
 
             ProfilerInterceptor.Initialize();
@@ -155,6 +154,7 @@ namespace Telerik.JustMock.Core
             this.Method = method;
             this.creatingThread = Thread.CurrentThread;
             this.Interceptor = new DynamicProxyInterceptor(this);
+            this.MatchersInContext = new List<IMatcher>();
             if (parentRepository != null)
             {
                 this.parentRepository = parentRepository;
