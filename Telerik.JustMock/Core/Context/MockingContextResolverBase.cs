@@ -26,16 +26,18 @@ namespace Telerik.JustMock.Core.Context
 {
 	internal abstract class MockingContextResolverBase : IMockingContextResolver
 	{
-		protected readonly string assertFailedExceptionTypeName;
+        protected string AssertFailedExceptionTypeName { get; private set; }
 
-		public abstract MocksRepository ResolveRepository(UnresolvedContextBehavior unresolvedContextBehavior);
+        public MockingContextResolverBase(string assertFailedExceptionTypeName)
+        {
+            this.AssertFailedExceptionTypeName = assertFailedExceptionTypeName;
+        }
+
+        public abstract MocksRepository ResolveRepository(UnresolvedContextBehavior unresolvedContextBehavior);
 
 		public abstract bool RetireRepository();
 
-		public MockingContextResolverBase(string assertFailedExceptionTypeName)
-		{
-			this.assertFailedExceptionTypeName = assertFailedExceptionTypeName;
-		}
+        public abstract MethodBase GetTestMethod();
 
 		public Action<string, Exception> GetFailMethod()
 		{
@@ -54,7 +56,7 @@ namespace Telerik.JustMock.Core.Context
 
 		protected virtual Expression<Func<string, Exception, Exception>> CreateExceptionFactory()
 		{
-			Type assertionException = FindType(this.assertFailedExceptionTypeName);
+			Type assertionException = FindType(this.AssertFailedExceptionTypeName);
 			return this.CreateExceptionFactory(assertionException);
 		}
 

@@ -36,15 +36,15 @@ namespace Telerik.JustMock.Core.Context
 
 		public override MocksRepository ResolveRepository(UnresolvedContextBehavior unresolvedContextBehavior)
 		{
-			var stackTrace = new StackTrace();
-			var frames = stackTrace.EnumerateFrames().ToList();
-			var testMethod = FindExistingTestMethod(frames);
-			if (testMethod != null)
+            var testMethod = this.GetTestMethod();
+            if (testMethod != null)
 				return repositories[testMethod.DeclaringType];
 			if (unresolvedContextBehavior == UnresolvedContextBehavior.DoNotCreateNew)
 				return null;
 
-			var caller = frames.FirstOrDefault(method => method.Module.Assembly != typeof(MocksRepository).Assembly);
+            var stackTrace = new StackTrace();
+            var frames = stackTrace.EnumerateFrames().ToList();
+            var caller = frames.FirstOrDefault(method => method.Module.Assembly != typeof(MocksRepository).Assembly);
 			var mspecTestClass = caller.DeclaringType;
 
 			MocksRepository parentRepo;
@@ -72,7 +72,16 @@ namespace Telerik.JustMock.Core.Context
 			return true;
 		}
 
-		public static bool IsAvailable
+        public override MethodBase GetTestMethod()
+        {
+            var stackTrace = new StackTrace();
+            var frames = stackTrace.EnumerateFrames().ToList();
+            var testMethod = this.FindExistingTestMethod(frames);
+
+            return testMethod;
+        }
+
+        public static bool IsAvailable
 		{
 			get { return FindType(MSpecAssertionFailedName, false) != null; }
 		}
@@ -85,5 +94,5 @@ namespace Telerik.JustMock.Core.Context
 
 			return q.FirstOrDefault();
 		}
-	}
+    }
 }

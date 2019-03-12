@@ -16,6 +16,7 @@
 */
 
 using System;
+using System.Reflection;
 
 namespace Telerik.JustMock.Core.Context
 {
@@ -26,5 +27,7 @@ namespace Telerik.JustMock.Core.Context
 		bool RetireRepository();
 
 		Action<string, Exception> GetFailMethod();
+
+        MethodBase GetTestMethod();
 	}
 }

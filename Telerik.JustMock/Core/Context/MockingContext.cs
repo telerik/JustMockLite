@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Telerik.JustMock.Diagnostics;
 #if !PORTABLE
@@ -78,6 +79,20 @@ namespace Telerik.JustMock.Core.Context
 			DynamicTypeHelper.Reset();
 #endif
 		}
+
+        public static MethodBase GetTestMethod()
+        {
+            foreach (IMockingContextResolver resolver in registeredContextResolvers)
+            {
+                var testMethod = resolver.GetTestMethod();
+                if (testMethod != null)
+                {
+                    return testMethod;
+                }
+            }
+
+            return null;
+        }
 
 		public static void Fail(string message, params object[] args)
 		{

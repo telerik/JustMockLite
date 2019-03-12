@@ -1091,6 +1091,8 @@ namespace Telerik.JustMock.Core
 
             CheckMethodInterceptorAvailable(methodMock.CallPattern.InstanceMatcher, method);
 
+            CallContextWrapper.SetAsyncStaticMockingData(methodMock.CallPattern);
+
             Type declaringType = method.DeclaringType;
 
             // If we're arranging a call to a mock object, overwrite its repository.

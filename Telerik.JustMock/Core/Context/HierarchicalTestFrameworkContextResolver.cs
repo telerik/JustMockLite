@@ -101,26 +101,33 @@ namespace Telerik.JustMock.Core.Context
 			return true;
 		}
 
-		protected virtual void OnMocksRepositoryCreated(MocksRepository repo)
+        public override MethodBase GetTestMethod()
+        {
+            var stackTrace = new StackTrace();
+            var q = from method in stackTrace.EnumerateFrames()
+                    where repoOperations.Any(repo => repo.MatchesMethod(method))
+                    select method;
+
+            var allTestMethods = q.Distinct().ToArray();
+            if (allTestMethods.Length > 1)
+            {
+                string message = "Calling one test method from another could result in unexpected behavior and must be avoided. Extract common mocking logic to a non-test method. At:\n" + stackTrace;
+                DebugView.DebugTrace(message);
+            }
+
+            MethodBase testMethod = allTestMethods.FirstOrDefault();
+
+            return testMethod;
+        }
+
+        protected virtual void OnMocksRepositoryCreated(MocksRepository repo)
 		{
 		}
 
 		private MethodBase FindTestMethod(out int repoIdx, out RepositoryOperationsBase entryOps)
 		{
-			var stackTrace = new StackTrace();
-			var q = from method in stackTrace.EnumerateFrames()
-					where repoOperations.Any(repo => repo.MatchesMethod(method))
-					select method;
-
-			var allTestMethods = q.Distinct().ToArray();
-			if (allTestMethods.Length > 1)
-			{
-				var message = "Calling one test method from another could result in unexpected behavior and must be avoided. Extract common mocking logic to a non-test method. At:\n" + stackTrace;
-				DebugView.DebugTrace(message);
-			}
-			var testMethod = allTestMethods.FirstOrDefault();
-
-			if (testMethod != null)
+            MethodBase testMethod = this.GetTestMethod();
+            if (testMethod != null)
 			{
 				var disableAttr = Attribute.GetCustomAttribute(testMethod, typeof(DisableAutomaticRepositoryResetAttribute)) as DisableAutomaticRepositoryResetAttribute;
 				if (disableAttr != null
@@ -128,6 +135,10 @@ namespace Telerik.JustMock.Core.Context
 					&& !disableAttr.AllowMocking)
 					throw new MockException("Using the mocking API in a test method decorated with DisableAutomaticRepositoryResetAttribute is unsafe. Read the documentation of the DisableAutomaticRepositoryResetAttribute class for further information and possible solutions.");
 			}
+            else
+            {
+                testMethod = CallContextWrapper.GetData();
+            }
 
 			repoIdx = 0;
 			entryOps = null;

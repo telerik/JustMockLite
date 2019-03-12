@@ -85,7 +85,7 @@ namespace Telerik.JustMock.Core.Context
 
 		protected override Type GetExceptionType()
 		{
-			var exceptionType = FindType(this.assertFailedExceptionTypeName, false);
+			var exceptionType = FindType(this.AssertFailedExceptionTypeName, false);
 			if (exceptionType != null)
 			{
 				exceptionType = exceptionType.BaseType;
@@ -115,7 +115,7 @@ namespace Telerik.JustMock.Core.Context
 
 		protected override Type GetExceptionType()
 		{
-			return FindType(this.assertFailedExceptionTypeName, false, true);
+			return FindType(this.AssertFailedExceptionTypeName, false, true);
 		}
 	}
 }
