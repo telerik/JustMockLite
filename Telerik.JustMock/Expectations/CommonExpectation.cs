@@ -408,7 +408,13 @@ namespace Telerik.JustMock.Expectations
 		/// <summary>
 		/// Determines wheter prerequisite is met
 		/// </summary>
-		public bool IsMet { get { return ((IMethodMock)this).IsUsed; } }
+		public bool IsMet
+		{
+			get
+			{
+				return ProfilerInterceptor.GuardInternal(() => ((IMethodMock)this).IsUsed);
+			}
+		}
 
 		/// <summary>
 		/// Specifies a call should occur only after all of the given prerequisites have been called.
