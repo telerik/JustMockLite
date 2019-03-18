@@ -49,9 +49,14 @@ namespace Telerik.JustMock.Core.Behaviors
         {
             get
             {
-                bool isMet = true;
-                Array.ForEach(this.prerequisites, prerequisite => isMet = isMet && prerequisite.IsMet);
-                return isMet;
+                foreach (var prerequisite in this.prerequisites)
+                {
+                    if (!prerequisite.IsMet)
+                    {
+                        return false;
+                    }
+                }
+                return true;
             }
         }
 
