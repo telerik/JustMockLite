@@ -1170,6 +1170,19 @@ namespace Telerik.JustMock.Core
             }
         }
 
+        internal void DisableInterception(Type typeToIntercept)
+        {
+            if (ProfilerInterceptor.IsProfilerAttached)
+            {
+                if (this.arrangedTypes.Remove(typeToIntercept))
+                {
+                    ProfilerInterceptor.EnableInterception(typeToIntercept, false, this);
+                }
+
+                this.disabledTypes.Add(typeToIntercept);
+            }
+        }
+
         private List<MethodMockMatcherTreeNode> GetMethodMocksFromObject(object mock, Type mockType = null)
         {
             MockingUtil.UnwrapDelegateTarget(ref mock);
