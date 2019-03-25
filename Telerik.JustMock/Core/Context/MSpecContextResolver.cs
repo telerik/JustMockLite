@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2019 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -36,40 +36,46 @@ namespace Telerik.JustMock.Core.Context
 
 		public override MocksRepository ResolveRepository(UnresolvedContextBehavior unresolvedContextBehavior)
 		{
-			var stackTrace = new StackTrace();
-			var frames = stackTrace.EnumerateFrames().ToList();
-			var testMethod = FindExistingTestMethod(frames);
-			if (testMethod != null)
-				return repositories[testMethod.DeclaringType];
-			if (unresolvedContextBehavior == UnresolvedContextBehavior.DoNotCreateNew)
-				return null;
+			lock (this.repositorySync)
+			{
+				var stackTrace = new StackTrace();
+				var frames = stackTrace.EnumerateFrames().ToList();
+				var testMethod = FindExistingTestMethod(frames);
+				if (testMethod != null)
+					return repositories[testMethod.DeclaringType];
+				if (unresolvedContextBehavior == UnresolvedContextBehavior.DoNotCreateNew)
+					return null;
 
-			var caller = frames.FirstOrDefault(method => method.Module.Assembly != typeof(MocksRepository).Assembly);
-			var mspecTestClass = caller.DeclaringType;
+				var caller = frames.FirstOrDefault(method => method.Module.Assembly != typeof(MocksRepository).Assembly);
+				var mspecTestClass = caller.DeclaringType;
 
-			MocksRepository parentRepo;
-			repositories.TryGetValue(mspecTestClass.BaseType, out parentRepo);
+				MocksRepository parentRepo;
+				repositories.TryGetValue(mspecTestClass.BaseType, out parentRepo);
 
-			var repo = new MocksRepository(parentRepo, caller);
-			repositories.Add(mspecTestClass, repo);
+				var repo = new MocksRepository(parentRepo, caller);
+				repositories.Add(mspecTestClass, repo);
 
-			return repo;
+				return repo;
+			}
 		}
 
 		public override bool RetireRepository()
 		{
-			var stackTrace = new StackTrace();
-			var testMethod = FindExistingTestMethod(stackTrace.EnumerateFrames());
+			lock (this.repositorySync)
+			{
+				var stackTrace = new StackTrace();
+				var testMethod = FindExistingTestMethod(stackTrace.EnumerateFrames());
 
-			if (testMethod == null)
-				return false;
+				if (testMethod == null)
+					return false;
 
-			var key = testMethod.DeclaringType;
-			var repo = repositories[key];
-			repositories.Remove(key);
-			repo.Retire();
+				var key = testMethod.DeclaringType;
+				var repo = repositories[key];
+				repositories.Remove(key);
+				repo.Retire();
 
-			return true;
+				return true;
+			}
 		}
 
 		public static bool IsAvailable

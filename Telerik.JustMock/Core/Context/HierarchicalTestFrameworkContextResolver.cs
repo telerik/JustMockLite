@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2019 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -37,68 +37,77 @@ namespace Telerik.JustMock.Core.Context
 
 		public override MocksRepository ResolveRepository(UnresolvedContextBehavior unresolvedContextBehavior)
 		{
-			RepositoryOperationsBase entryOps = null;
-			int repoIdx;
-			var testMethod = FindTestMethod(out repoIdx, out entryOps);
-			if (testMethod == null)
-				return null;
-
-			object entryKey = entryOps.GetKey(testMethod);
-
-			MocksRepository repo = this.FindRepositoryInOps(entryOps, entryKey);
-			if (repo != null)
-				return repo;
-			if (unresolvedContextBehavior == UnresolvedContextBehavior.DoNotCreateNew)
-				return null;
-
-			//Check if this is the same kind of method but from a derived class, thus building context.
-			MocksRepository parentRepo = entryOps.FindRepositoryToInherit(testMethod);
-			if (parentRepo == null)
+			lock (this.repositorySync)
 			{
-				for (var repoIdxParent = repoIdx + 1; parentRepo == null && repoIdxParent < this.repoOperations.Count; ++repoIdxParent)
+				RepositoryOperationsBase entryOps = null;
+				int repoIdx;
+				var testMethod = FindTestMethod(out repoIdx, out entryOps);
+				if (testMethod == null)
+					return null;
+
+				object entryKey = entryOps.GetKey(testMethod);
+
+				MocksRepository repo = this.FindRepositoryInOps(entryOps, entryKey);
+				if (repo != null)
+					return repo;
+				if (unresolvedContextBehavior == UnresolvedContextBehavior.DoNotCreateNew)
+					return null;
+
+				//Check if this is the same kind of method but from a derived class, thus building context.
+				MocksRepository parentRepo = entryOps.FindRepositoryToInherit(testMethod);
+				if (parentRepo == null)
 				{
-					var ops = this.repoOperations[repoIdxParent];
-					if (ops.IsLeaf)
-						continue;
+					for (var repoIdxParent = repoIdx + 1; parentRepo == null && repoIdxParent < this.repoOperations.Count; ++repoIdxParent)
+					{
+						var ops = this.repoOperations[repoIdxParent];
+						if (ops.IsLeaf)
+							continue;
 
-					object parentKey = ops.GetKey(testMethod);
-					if (ops.IsUsedOnAllThreads)
-						parentRepo = ops.FindRepositoryFromAnyThread(parentKey);
-					else
-						parentRepo = ops.FindRepository(parentKey) ?? ops.FindRepositoryToInherit(testMethod);
+						object parentKey = ops.GetKey(testMethod);
+						if (ops.IsUsedOnAllThreads)
+							parentRepo = ops.FindRepositoryFromAnyThread(parentKey);
+						else
+							parentRepo = ops.FindRepository(parentKey) ?? ops.FindRepositoryToInherit(testMethod);
+					}
 				}
-			}
 
-			MocksRepository entryRepo;
-			try
-			{
-				entryRepo = new MocksRepository(parentRepo, testMethod);
-				entryOps.AddRepository(entryKey, entryRepo);
-				OnMocksRepositoryCreated(repo);
-			}
-			catch (TypeInitializationException e)
-			{
-				throw e.InnerException;
-			}
+				MocksRepository entryRepo;
+				try
+				{
+					entryRepo = new MocksRepository(parentRepo, testMethod);
+					entryOps.AddRepository(entryKey, entryRepo);
+					OnMocksRepositoryCreated(repo);
+				}
+				catch (TypeInitializationException e)
+				{
+					throw e.InnerException;
+				}
 
-			return entryRepo;
+				return entryRepo;
+			}
 		}
 
 		public override bool RetireRepository()
 		{
-			RepositoryOperationsBase entryOps = null;
-			int repoIdx;
-			var testMethod = FindTestMethod(out repoIdx, out entryOps);
-			if (testMethod == null)
-				return false;
+			lock (this.repositorySync)
+			{
+				RepositoryOperationsBase entryOps = null;
+				int repoIdx;
+				var testMethod = FindTestMethod(out repoIdx, out entryOps);
+				if (testMethod == null)
+				{
+					return false;
+				}
 
-			var entryKey = entryOps.GetKey(testMethod);
+				var entryKey = entryOps.GetKey(testMethod);
+				MocksRepository repo = FindRepositoryInOps(entryOps, entryKey);
+				if (repo != null)
+				{
+					entryOps.RetireRepository(entryKey, repo);
+				}
 
-			MocksRepository repo = FindRepositoryInOps(entryOps, entryKey);
-			if (repo != null)
-				entryOps.RetireRepository(entryKey, repo);
-
-			return true;
+				return true;
+			}
 		}
 
 		protected virtual void OnMocksRepositoryCreated(MocksRepository repo)
