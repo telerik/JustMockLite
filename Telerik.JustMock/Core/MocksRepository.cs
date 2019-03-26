@@ -23,6 +23,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Telerik.JustMock.Core.Behaviors;
 using Telerik.JustMock.Core.Context;
 using Telerik.JustMock.Core.MatcherTree;
@@ -420,7 +421,29 @@ namespace Telerik.JustMock.Core
             }
 
             if (!invocation.CallOriginal && !invocation.IsReturnValueSet && invocation.Method.GetReturnType() != typeof(void))
-                invocation.ReturnValue = invocation.Method.GetReturnType().GetDefaultValue();
+            {
+                Type returnType = invocation.Method.GetReturnType();
+
+                object defaultValue = null;
+
+                if(returnType.BaseType != null && returnType.BaseType == typeof(Task))
+                {
+                    Type taskGenericArgument = returnType.GenericTypeArguments.FirstOrDefault();
+                    object taskArgumentDefaultValue = taskGenericArgument.GetDefaultValue();
+
+                    // create a task with default value to return, by using the casting help method in MockingUtil
+                    MethodInfo castMethod = typeof(MockingUtil).GetMethod("CastHelper", BindingFlags.Static | BindingFlags.Public);
+                    MethodInfo castMethodGeneric = castMethod.MakeGenericMethod(taskGenericArgument);
+
+                    defaultValue = castMethodGeneric.Invoke(null, new object[] { taskArgumentDefaultValue });
+                }
+                else
+                {
+                    defaultValue = returnType.GetDefaultValue();
+                }
+
+                invocation.ReturnValue = defaultValue;
+            }
         }
 
         internal T GetValue<T>(object owner, object key, T dflt)

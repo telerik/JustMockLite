@@ -931,5 +931,12 @@ namespace Telerik.JustMock.Core
 			return false;
 		}
 #endif
-	}
+
+        public static Task<T> CastHelper<T>(object o)
+        {
+            T value = (T)o;
+
+            return Task.Run(() => value);
+        }
+    }
 }
