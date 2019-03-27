@@ -1,6 +1,6 @@
 ﻿/*
  JustMock Lite
- Copyright © 2010-2015 Telerik EAD
+ Copyright © 2010-2015,2019 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -22,27 +22,28 @@ using System.Text;
 
 namespace Telerik.JustMock.Core.Context
 {
-	internal abstract class MockingContextResolverBase : IMockingContextResolver
-	{
-		private readonly string assertFailedExceptionTypeName;
+    internal abstract class MockingContextResolverBase : IMockingContextResolver
+    {
+        private readonly string assertFailedExceptionTypeName;
+        protected readonly object repositorySync = new object();
 
-		public MockingContextResolverBase(string assertFailedExceptionTypeName, params string[] frameworkAssemblyNames)
-		{
-			this.assertFailedExceptionTypeName = assertFailedExceptionTypeName;
-		}
+        public MockingContextResolverBase(string assertFailedExceptionTypeName, params string[] frameworkAssemblyNames)
+        {
+            this.assertFailedExceptionTypeName = assertFailedExceptionTypeName;
+        }
 
-		public abstract MocksRepository ResolveRepository(UnresolvedContextBehavior unresolvedContextBehavior);
+        public abstract MocksRepository ResolveRepository(UnresolvedContextBehavior unresolvedContextBehavior);
 
-		public abstract bool RetireRepository();
+        public abstract bool RetireRepository();
 
-		public Action<string, Exception> GetFailMethod()
-		{
-			return LocalMockingContextResolver.GetFailMethod(Type.GetType(this.assertFailedExceptionTypeName));
-		}
+        public Action<string, Exception> GetFailMethod()
+        {
+            return LocalMockingContextResolver.GetFailMethod(Type.GetType(this.assertFailedExceptionTypeName));
+        }
 
-		protected static Type FindType(string assemblyAndTypeName, bool throwOnNotFound)
-		{
-			return Type.GetType(assemblyAndTypeName, throwOnNotFound);
-		}
-	}
+        protected static Type FindType(string assemblyAndTypeName, bool throwOnNotFound)
+        {
+            return Type.GetType(assemblyAndTypeName, throwOnNotFound);
+        }
+    }
 }
