@@ -1,33 +1,21 @@
-﻿using System;
+﻿#if !NETCORE
+using System;
 using System.Reflection;
-
-#if !NETCORE
 using System.Runtime.Remoting.Messaging;
-#endif
 
 namespace Telerik.JustMock.Core.Context
 {
-    internal class CallContextWrapper
+    internal class CallContextWrapper : IAsyncContextResolver
     {
         private static readonly string key = Guid.NewGuid().ToString("N");
 
-        internal static MethodBase GetData()
+        public MethodBase GetContext()
         {
-#if !NETCORE
             MethodBase methodBase = CallContext.LogicalGetData(key) as MethodBase;
-
-            if(methodBase != null)
-            {
-
-            }
-
             return methodBase;
-#else
-            return null;
-#endif
         }
 
-        internal static void SetAsyncStaticMockingData(CallPattern callPattern)
+        public void SetContext(CallPattern callPattern)
         {
             if (callPattern.Method.IsStatic)
             {
@@ -36,14 +24,13 @@ namespace Telerik.JustMock.Core.Context
             }
         }
 
-        private static void SetData(MethodBase methodBase)
+        private void SetData(MethodBase methodBase)
         {
-#if !NETCORE
             if (methodBase != null)
             {
                 CallContext.LogicalSetData(key, methodBase);
             }
-#endif
         }
     }
 }
+#endif
