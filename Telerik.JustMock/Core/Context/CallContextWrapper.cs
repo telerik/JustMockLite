@@ -15,13 +15,10 @@ namespace Telerik.JustMock.Core.Context
             return methodBase;
         }
 
-        public void SetContext(CallPattern callPattern)
+        public void CaptureContext()
         {
-            if (callPattern.Method.IsStatic)
-            {
-                MethodBase testMethod = MockingContext.GetTestMethod();
-                SetData(testMethod);
-            }
+            MethodBase testMethod = MockingContext.GetTestMethod();
+            SetData(testMethod);
         }
 
         private void SetData(MethodBase methodBase)

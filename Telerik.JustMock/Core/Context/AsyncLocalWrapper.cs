@@ -10,14 +10,10 @@ namespace Telerik.JustMock.Core.Context
     internal class AsyncLocalWrapper : IAsyncContextResolver
     {
         static AsyncLocal<MethodBase> asyncCallPattern = new AsyncLocal<MethodBase>();
-
-        public void SetContext(CallPattern callPattern)
+        public void CaptureContext()
         {
-            if (callPattern.Method.IsStatic)
-            {
-                MethodBase testMethod = MockingContext.GetTestMethod();
-			    asyncCallPattern.Value = testMethod;
-            }
+            MethodBase testMethod = MockingContext.GetTestMethod();
+			asyncCallPattern.Value = testMethod;
         }
 
         public MethodBase GetContext()

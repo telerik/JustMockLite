@@ -1,6 +1,6 @@
 ﻿namespace Telerik.JustMock.Core.Context
 {
-	internal static class AsyncContextResolver
+	public static class AsyncContextResolver
     {
 #if NETCORE
         static AsyncLocalWrapper resolver = new AsyncLocalWrapper();

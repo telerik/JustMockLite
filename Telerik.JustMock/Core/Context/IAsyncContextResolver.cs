@@ -2,9 +2,9 @@
 
 namespace Telerik.JustMock.Core.Context
 {
-    interface IAsyncContextResolver
+    public interface IAsyncContextResolver
     {
-        void SetContext(CallPattern callPattern);
+        void CaptureContext();
         MethodBase GetContext();
     }
 }
