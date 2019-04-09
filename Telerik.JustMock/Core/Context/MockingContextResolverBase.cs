@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2019 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ namespace Telerik.JustMock.Core.Context
 	internal abstract class MockingContextResolverBase : IMockingContextResolver
 	{
         protected string AssertFailedExceptionTypeName { get; private set; }
+		protected readonly object repositorySync = new object();
 
         public MockingContextResolverBase(string assertFailedExceptionTypeName)
         {
