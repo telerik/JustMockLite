@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Telerik.JustMock.Core.Context
 {
-    internal class AsyncLocalWrapper : IAsyncContextResolver
+    public class AsyncLocalWrapper : IAsyncContextResolver
     {
         static AsyncLocal<MethodBase> asyncCallPattern = new AsyncLocal<MethodBase>();
         public void CaptureContext()

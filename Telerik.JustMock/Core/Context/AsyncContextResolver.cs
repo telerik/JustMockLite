@@ -11,5 +11,10 @@
         {
             return resolver;
         }
+
+        public static void CaptureContext()
+        {
+            resolver.CaptureContext();
+        }
     }
 }
