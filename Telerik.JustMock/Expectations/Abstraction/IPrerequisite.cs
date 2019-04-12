@@ -23,12 +23,12 @@ namespace Telerik.JustMock.Expectations.Abstraction
     public interface IPrerequisite
     {
         /// <summary>
-        /// Determines wheter prerequisite is met
+        /// Determines whether prerequisite is met
         /// </summary>
         bool IsMet { get; }
 
         /// <summary>
-        /// Specifies a call should occur only after all of the given prerequisites have been called.
+        /// Specifies that a call should occur only after all of the given prerequisites have been met.
         /// </summary>
         IAssertable AfterAll(params IPrerequisite[] prerequisites);
     }

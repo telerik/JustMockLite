@@ -405,10 +405,10 @@ namespace Telerik.JustMock.Expectations
 				});
 		}
 
-		/// <summary>
-		/// Determines wheter prerequisite is met
-		/// </summary>
-		public bool IsMet
+        /// <summary>
+        /// Determines whether prerequisite is met
+        /// </summary>
+        public bool IsMet
 		{
 			get
 			{
@@ -416,10 +416,10 @@ namespace Telerik.JustMock.Expectations
 			}
 		}
 
-		/// <summary>
-		/// Specifies a call should occur only after all of the given prerequisites have been called.
-		/// </summary>
-		public IAssertable AfterAll(params IPrerequisite[] prerequisites)
+        /// <summary>
+        /// Specifies that a call should occur only after all of the given prerequisites have been met.
+        /// </summary>
+        public IAssertable AfterAll(params IPrerequisite[] prerequisites)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
