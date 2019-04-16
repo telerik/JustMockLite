@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2019 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -403,6 +403,29 @@ namespace Telerik.JustMock.Expectations
 					this.behaviors.Add(new InOrderBehavior(this.Repository, this.Mock, message));
 					return this;
 				});
+		}
+
+        /// <summary>
+        /// Determines whether prerequisite is met
+        /// </summary>
+        public bool IsMet
+		{
+			get
+			{
+				return ProfilerInterceptor.GuardInternal(() => ((IMethodMock)this).IsUsed);
+			}
+		}
+
+        /// <summary>
+        /// Specifies that a call should occur only after all of the given prerequisites have been met.
+        /// </summary>
+        public IAssertable AfterAll(params IPrerequisite[] prerequisites)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				this.behaviors.Add(new AfterAllBehavior(prerequisites));
+				return this;
+			});
 		}
 
 		/// <summary>
