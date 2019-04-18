@@ -286,6 +286,47 @@ namespace Telerik.JustMock.Expectations
 				});
 		}
 
+#if !LITE_EDITION
+		/// <summary>
+		/// Throws a the specified exception for the target async call causing returned task to fail.
+		/// </summary>
+		/// <param name="exception"></param>
+		/// <returns></returns>
+		public IAssertable ThrowsAsync(Exception exception)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				this.behaviors.Add(new ThrowAsyncExceptionBehavior(exception));
+				return this;
+			});
+		}
+
+		/// <summary>
+		/// Throws a the specified exception for the target async call causing returned task to fail.
+		/// </summary>
+		/// <returns></returns>
+		public IAssertable ThrowsAsync<T>() where T : Exception
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				this.behaviors.Add(new ThrowAsyncExceptionBehavior((T)MockingUtil.CreateInstance(typeof(T))));
+				return this;
+			});
+		}
+
+		/// <summary>
+		/// Throws a the specified exception for the target async call causing returned task to fail.
+		/// </summary>
+		/// <returns></returns>
+		public IAssertable ThrowsAsync<T>(params object[] args) where T : Exception
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				this.behaviors.Add(new ThrowAsyncExceptionBehavior((T)MockingUtil.CreateInstance(typeof(T), args)));
+				return this;
+			});
+		}
+#endif
 
 		/// <summary>
 		/// Use it to call the real implementation.
