@@ -117,64 +117,7 @@ namespace Telerik.JustMock.Tests
             Assert.Throws<AssertionException>(() => Mock.AssertAll(foo));
         }
 
-        [TestMethod, TestCategory("Lite"), TestCategory("AfterAll")]
-        public void ShouldAssertAfterAllInderectWithPrerequisites()
-        {
-            var fooCollection = new List<IFoo>()
-            {
-                Mock.Create<IFoo>(),
-                Mock.Create<IFoo>(),
-                Mock.Create<IFoo>()
-            };
-            var fooContainer = Mock.Create<IFooContainer>();
-
-            var inits = fooCollection.Select(foo => Mock.Arrange(() => foo.Init())).ToArray();
-            Mock.Arrange(() => fooContainer.Values).ReturnsCollection(fooCollection).AfterAll(inits);
-
-            fooCollection.ForEach(foo => foo.Init());
-            var actualCollection = fooContainer.Values;
-
-            Mock.AssertAll(fooContainer);
-        }
-
-        [TestMethod, TestCategory("Lite"), TestCategory("AfterAll")]
-        public void ShouldThrowAfterAllInderectWithoutPrerequisites()
-        {
-            var fooCollection = new List<IFoo>()
-            {
-                Mock.Create<IFoo>(),
-                Mock.Create<IFoo>(),
-                Mock.Create<IFoo>()
-            };
-            var fooContainer = Mock.Create<IFooContainer>();
-
-            var inits = fooCollection.Select(foo => Mock.Arrange(() => foo.Init())).ToArray();
-            Mock.Arrange(() => fooContainer.Values).ReturnsCollection(fooCollection).AfterAll(inits);
-
-            var actualCollection = fooContainer.Values;
-
-            Assert.Throws<AssertionException>(() => Mock.AssertAll(fooContainer));
-        }
-
-        [TestMethod, TestCategory("Lite"), TestCategory("AfterAll")]
-        public void ShouldThrowAfterAllInderectWithPartialPrerequisites()
-        {
-            var fooCollection = new List<IFoo>()
-            {
-                Mock.Create<IFoo>(),
-                Mock.Create<IFoo>(),
-                Mock.Create<IFoo>()
-            };
-            var fooContainer = Mock.Create<IFooContainer>();
-
-            var inits = fooCollection.Select(foo => Mock.Arrange(() => foo.Init())).ToArray();
-            Mock.Arrange(() => fooContainer.Values).ReturnsCollection(fooCollection).AfterAll(inits);
-
-            fooCollection[new Random().Next(0, fooCollection.Count - 1)].Init();
-            var actualCollection = fooContainer.Values;
-
-            Assert.Throws<AssertionException>(() => Mock.AssertAll(fooContainer));
-        }
+        
 
         [TestMethod, TestCategory("Lite"), TestCategory("AfterAll")]
         public void ShouldAssertAfterAllInderectChainedWithPrerequisites()
