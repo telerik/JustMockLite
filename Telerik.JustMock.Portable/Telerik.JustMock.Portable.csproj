@@ -73,6 +73,9 @@
     <Compile Include="..\Telerik.JustMock\Core\ArrangeMethodAttribute.cs">
       <Link>Core\ArrangeMethodAttribute.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\AfterAllBehavior.cs" >
+      <Link>Core\Behaviors\AfterAllBehavior.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Core\Behaviors\CallOriginalBehavior.cs">
       <Link>Core\Behaviors\CallOriginalBehavior.cs</Link>
     </Compile>
@@ -378,6 +381,9 @@
     </Compile>
     <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IOrder.cs">
       <Link>Expectations\Abstraction\IOrder.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IPrerequisite.cs">
+      <Link>Expectations\Abstraction\IPrerequisite.cs</Link>
     </Compile>
     <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IReturnCollection.cs">
       <Link>Expectations\Abstraction\IReturnCollection.cs</Link>

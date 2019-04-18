@@ -132,6 +132,24 @@ namespace Telerik.JustMock
 		{
 			ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.EnableInterception(typeToIntercept));
 		}
+
+		/// <summary>
+		/// Explicitly disables the interception of the given type by the profiler.
+		/// </summary>
+		/// <typeparam name="TTypeToIntercept">The type to intercept</typeparam>
+		public static void NotIntercept<TTypeToIntercept>()
+		{
+			ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.DisableInterception(typeof(TTypeToIntercept)));
+		}
+
+		/// <summary>
+		/// Explicitly disables the interception of the given type by the profiler.
+		/// </summary>
+		/// <param name="typeToIntercept">The type to intercept</param>
+		public static void NotIntercept(Type typeToIntercept)
+		{
+			ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.DisableInterception(typeToIntercept));
+		}
 #endif
 	}
 }

@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2019 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -782,6 +782,13 @@ namespace Telerik.JustMock.Core
 		{
 			var tcs = new TaskCompletionSource<T>();
 			tcs.SetResult(value);
+			return tcs.Task;
+		}
+
+		public static Task<T> TaskFromException<T>(Exception exception)
+		{
+			var tcs = new TaskCompletionSource<T>();
+			tcs.SetException(exception);
 			return tcs.Task;
 		}
 

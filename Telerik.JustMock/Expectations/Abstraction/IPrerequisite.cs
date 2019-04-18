@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015,2019 Progress Software Corporation
+ Copyright © 2019 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -15,19 +15,21 @@
    limitations under the License.
 */
 
-using System;
-
 namespace Telerik.JustMock.Expectations.Abstraction
 {
-	/// <summary>
-	/// Mark the statement as assertable in <see cref="Mock.Assert{T}(T)"/>.
-	/// </summary>
-	public interface IAssertable : IMustBeCalled, ISetupBehavior, IOccurrence, IOrder, IPrerequisite, IDisposable
-	{
-		/// <summary>
-		/// Use it to call the real implementation.
-		/// </summary>
-		/// <returns></returns>
-		IAssertable CallOriginal();
-	}
+    /// <summary>
+    /// Defines the prerequisite for mock setups.
+    /// </summary>
+    public interface IPrerequisite
+    {
+        /// <summary>
+        /// Determines whether prerequisite is met
+        /// </summary>
+        bool IsMet { get; }
+
+        /// <summary>
+        /// Specifies that a call should occur only after all of the given prerequisites have been met.
+        /// </summary>
+        IAssertable AfterAll(params IPrerequisite[] prerequisites);
+    }
 }
