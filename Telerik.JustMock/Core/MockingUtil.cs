@@ -939,11 +939,13 @@ namespace Telerik.JustMock.Core
 		}
 #endif
 
-        public static Task<T> CastHelper<T>(object o)
+#if !PORTABLE
+        public static Task<T> TaskFromObject<T>(object o)
         {
             T value = (T)o;
 
             return Task.Run(() => value);
         }
+#endif
     }
 }

@@ -62,11 +62,11 @@ namespace Telerik.JustMock.Core
         private readonly HashSet<Type> arrangedTypes = new HashSet<Type>();
         private readonly HashSet<Type> disabledTypes = new HashSet<Type>();
         private readonly HashSet<MethodBase> globallyInterceptedMethods = new HashSet<MethodBase>();
-        
+
         private readonly RepositorySharedContext sharedContext;
         private readonly MocksRepository parentRepository;
         private readonly List<WeakReference> controlledMocks = new List<WeakReference>();
-        
+
         private bool isRetired;
 
         internal static readonly HashSet<Type> KnownUnmockableTypes = new HashSet<Type>
@@ -425,19 +425,20 @@ namespace Telerik.JustMock.Core
                 Type returnType = invocation.Method.GetReturnType();
 
                 object defaultValue = null;
-
+#if !PORTABLE
                 if(returnType.BaseType != null && returnType.BaseType == typeof(Task))
                 {
                     Type taskGenericArgument = returnType.GenericTypeArguments.FirstOrDefault();
                     object taskArgumentDefaultValue = taskGenericArgument.GetDefaultValue();
 
                     // create a task with default value to return, by using the casting help method in MockingUtil
-                    MethodInfo castMethod = typeof(MockingUtil).GetMethod("CastHelper", BindingFlags.Static | BindingFlags.Public);
+                    MethodInfo castMethod = typeof(MockingUtil).GetMethod("TaskFromObject", BindingFlags.Static | BindingFlags.Public);
                     MethodInfo castMethodGeneric = castMethod.MakeGenericMethod(taskGenericArgument);
 
                     defaultValue = castMethodGeneric.Invoke(null, new object[] { taskArgumentDefaultValue });
                 }
                 else
+#endif
                 {
                     defaultValue = returnType.GetDefaultValue();
                 }
