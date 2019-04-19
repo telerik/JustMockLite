@@ -478,6 +478,7 @@
     <Compile Include="..\Telerik.JustMock\Core\JMDebug.cs">
       <Link>Core\JMDebug.cs</Link>
     </Compile>
+    <Compile Include="Core\Context\AsyncContextResolver.cs" />
     <Compile Include="Core\Context\LocalMockingContextResolver.cs" />
     <Compile Include="Core\Context\MockingContextResolverBase.cs" />
     <Compile Include="Core\Context\VisualStudioPortableContextResolver.cs" />
