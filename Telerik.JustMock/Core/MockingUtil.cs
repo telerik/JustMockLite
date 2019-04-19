@@ -938,5 +938,14 @@ namespace Telerik.JustMock.Core
 			return false;
 		}
 #endif
-	}
+
+#if !PORTABLE
+        public static Task<T> TaskFromObject<T>(object o)
+        {
+            T value = (T)o;
+
+            return Task.Run(() => value);
+        }
+#endif
+    }
 }
