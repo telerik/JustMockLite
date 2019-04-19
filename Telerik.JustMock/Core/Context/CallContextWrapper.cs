@@ -22,7 +22,7 @@ using System.Runtime.Remoting.Messaging;
 
 namespace Telerik.JustMock.Core.Context
 {
-    public class CallContextWrapper : IAsyncContextResolver
+    internal class CallContextWrapper : IAsyncContextResolver
     {
         private static readonly string key = Guid.NewGuid().ToString("N");
 

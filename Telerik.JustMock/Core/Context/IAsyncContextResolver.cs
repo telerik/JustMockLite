@@ -19,7 +19,7 @@ using System.Reflection;
 
 namespace Telerik.JustMock.Core.Context
 {
-    public interface IAsyncContextResolver
+    internal interface IAsyncContextResolver
     {
         void CaptureContext();
         MethodBase GetContext();

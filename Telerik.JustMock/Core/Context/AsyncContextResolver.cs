@@ -14,6 +14,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+using System.Reflection;
 
 namespace Telerik.JustMock.Core.Context
 {
@@ -24,9 +25,9 @@ namespace Telerik.JustMock.Core.Context
 #else
         static IAsyncContextResolver resolver = new CallContextWrapper();
 #endif
-        public static IAsyncContextResolver GetResolver()
+        public static MethodBase GetContext()
         {
-            return resolver;
+            return resolver.GetContext();
         }
 
         public static void CaptureContext()

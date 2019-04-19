@@ -146,7 +146,7 @@ namespace Telerik.JustMock.Core.Context
 			}
             else
             {
-                testMethod = AsyncContextResolver.GetResolver().GetContext();
+                testMethod = AsyncContextResolver.GetContext();
             }
 
 			repoIdx = 0;
