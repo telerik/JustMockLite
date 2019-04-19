@@ -61,11 +61,11 @@ namespace Telerik.JustMock.Core
         private readonly HashSet<Type> arrangedTypes = new HashSet<Type>();
         private readonly HashSet<Type> disabledTypes = new HashSet<Type>();
         private readonly HashSet<MethodBase> globallyInterceptedMethods = new HashSet<MethodBase>();
-        
+
         private readonly RepositorySharedContext sharedContext;
         private readonly MocksRepository parentRepository;
         private readonly List<WeakReference> controlledMocks = new List<WeakReference>();
-        
+
         private bool isRetired;
 
         internal static readonly HashSet<Type> KnownUnmockableTypes = new HashSet<Type>
@@ -93,7 +93,6 @@ namespace Telerik.JustMock.Core
                 typeof(WeakReference),
 #endif
             };
-
 
         internal IRecorder Recorder
         {
@@ -380,6 +379,7 @@ namespace Telerik.JustMock.Core
             }
 
             invocation.InArrange = this.sharedContext.InArrange;
+            invocation.InArrangeArgMatching = this.sharedContext.InArrangeArgMatching;
             invocation.InAssertSet = this.sharedContext.InAssertSet;
             invocation.Recording = this.Recorder != null;
             invocation.RetainBehaviorDuringRecording = this.sharedContext.DispatchToMethodMocks;
@@ -444,6 +444,11 @@ namespace Telerik.JustMock.Core
         internal IDisposable StartRecording(IRecorder recorder, bool dispatchToMethodMocks)
         {
             return this.sharedContext.StartRecording(recorder, dispatchToMethodMocks);
+        }
+
+        internal IDisposable StartArrangeArgMathing()
+        {
+            return this.sharedContext.StartArrangeArgMathing();
         }
 
         internal void AddMatcherInContext(IMatcher matcher)
@@ -712,7 +717,7 @@ namespace Telerik.JustMock.Core
             {
                 var result = methodMockFactory();
                 result.Repository = this;
-                result.CallPattern = CallPatternCreator.FromMethodBase(instance, method, arguments);
+                result.CallPattern = CallPatternCreator.FromMethodBase(this, instance, method, arguments);
 
                 AddArrange(result);
                 return result;

@@ -271,42 +271,46 @@ namespace Telerik.JustMock.Core
             callPattern.SetMethod(method, checkCompatibility: true);
 
             //Finally, construct the arguments part of the call pattern.
-            bool hasParams = false;
-            bool hasSingleValueInParams = false;
-            if (args != null && args.Length > 0)
+            using (repository.StartArrangeArgMathing())
             {
-                var lastParameter = method.GetParameters().Last();
-                if (Attribute.IsDefined(lastParameter, typeof(ParamArrayAttribute)) && args.Last() is NewArrayExpression)
-                {
-                    hasParams = true;
-                    var paramsArg = (NewArrayExpression)args.Last();
-                    args = args.Take(args.Length - 1).Concat(paramsArg.Expressions).ToArray();
-                    if (paramsArg.Expressions.Count == 1)
-                        hasSingleValueInParams = true;
-                }
+                bool hasParams = false;
+                bool hasSingleValueInParams = false;
 
-                foreach (var argument in args)
+                if (args != null && args.Length > 0)
                 {
-                    callPattern.ArgumentMatchers.Add(MocksRepository.CreateMatcherForArgument(argument));
-                }
-
-                if (hasParams)
-                {
-                    int paramsCount = method.GetParameters().Count();
-                    if (hasSingleValueInParams)
+                    var lastParameter = method.GetParameters().Last();
+                    if (Attribute.IsDefined(lastParameter, typeof(ParamArrayAttribute)) && args.Last() is NewArrayExpression)
                     {
-                        IMatcher matcher = callPattern.ArgumentMatchers[paramsCount - 1];
-                        ITypedMatcher typeMatcher = matcher as ITypedMatcher;
-                        if (typeMatcher != null && typeMatcher.Type != method.GetParameters().Last().ParameterType)
-                        {
-                            callPattern.ArgumentMatchers[paramsCount - 1] = new ParamsMatcher(new IMatcher[] { matcher });
-                        }
+                        hasParams = true;
+                        var paramsArg = (NewArrayExpression)args.Last();
+                        args = args.Take(args.Length - 1).Concat(paramsArg.Expressions).ToArray();
+                        if (paramsArg.Expressions.Count == 1)
+                            hasSingleValueInParams = true;
                     }
-                    else
+
+                    foreach (var argument in args)
                     {
-                        IEnumerable<IMatcher> paramMatchers = callPattern.ArgumentMatchers.Skip(paramsCount - 1).Take(callPattern.ArgumentMatchers.Count - paramsCount + 1);
-                        callPattern.ArgumentMatchers = callPattern.ArgumentMatchers.Take(paramsCount - 1).ToList();
-                        callPattern.ArgumentMatchers.Add(new ParamsMatcher(paramMatchers.ToArray()));
+                        callPattern.ArgumentMatchers.Add(MocksRepository.CreateMatcherForArgument(argument));
+                    }
+
+                    if (hasParams)
+                    {
+                        int paramsCount = method.GetParameters().Count();
+                        if (hasSingleValueInParams)
+                        {
+                            IMatcher matcher = callPattern.ArgumentMatchers[paramsCount - 1];
+                            ITypedMatcher typeMatcher = matcher as ITypedMatcher;
+                            if (typeMatcher != null && typeMatcher.Type != method.GetParameters().Last().ParameterType)
+                            {
+                                callPattern.ArgumentMatchers[paramsCount - 1] = new ParamsMatcher(new IMatcher[] { matcher });
+                            }
+                        }
+                        else
+                        {
+                            IEnumerable<IMatcher> paramMatchers = callPattern.ArgumentMatchers.Skip(paramsCount - 1).Take(callPattern.ArgumentMatchers.Count - paramsCount + 1);
+                            callPattern.ArgumentMatchers = callPattern.ArgumentMatchers.Take(paramsCount - 1).ToList();
+                            callPattern.ArgumentMatchers.Add(new ParamsMatcher(paramMatchers.ToArray()));
+                        }
                     }
                 }
             }
@@ -315,6 +319,41 @@ namespace Telerik.JustMock.Core
 
             callPattern.AdjustForExtensionMethod();
             callPattern.SetMethod(methodFromCallPattern, checkCompatibility: false);
+
+            return callPattern;
+        }
+
+        internal static CallPattern FromMethodBase(MocksRepository repository, object instance, MethodBase method, object[] arguments)
+        {
+            var callPattern = new CallPattern
+            {
+                InstanceMatcher =
+                   method.IsStatic ? new ReferenceMatcher(null)
+                   : instance == null ? (IMatcher)new AnyMatcher()
+                   : new ReferenceMatcher(instance),
+            };
+
+            callPattern.SetMethod(method, checkCompatibility: true);
+
+            using (repository.StartArrangeArgMathing())
+            {
+                var parameters = method.GetParameters();
+                if (arguments == null || arguments.Length == 0)
+                {
+                    callPattern.ArgumentMatchers.AddRange(method.GetParameters().Select(p => (IMatcher)new TypeMatcher(p.ParameterType)));
+                }
+                else
+                {
+                    if (arguments.Length != method.GetParameters().Length)
+                    {
+                        throw new MockException("Argument count mismatch.");
+                    }
+
+                    callPattern.ArgumentMatchers.AddRange(arguments.Select(arg => MocksRepository.CreateMatcherForArgument(arg)));
+                }
+            }
+
+            callPattern.AdjustForExtensionMethod();
 
             return callPattern;
         }
@@ -365,7 +404,9 @@ namespace Telerik.JustMock.Core
             }
 
             if (lastInvocation == null)
+            {
                 throw new MockException("The specified action did not call a mocked method.");
+            }
 
             callPattern.SetMethod(lastInvocation.Method, checkCompatibility: true);
             callPattern.InstanceMatcher = new ReferenceMatcher(lastInvocation.Instance);
@@ -374,11 +415,14 @@ namespace Telerik.JustMock.Core
             // one coming from a matcher, it is impossible to tell exactly which arguments are literal and which are matchers.
             // So, we assume that the user always first specifies some literal values, and then some matchers.
             // We assume that the user will never pass a literal after a matcher.
-            for (int i = 0; i < lastInvocation.Args.Length; ++i)
+            using (repository.StartArrangeArgMathing())
             {
-                var indexInMatchers = i - (lastInvocation.Args.Length - repository.MatchersInContext.Count);
-                var matcher = indexInMatchers >= 0 ? repository.MatchersInContext[indexInMatchers] : new ValueMatcher(lastInvocation.Args[i]);
-                callPattern.ArgumentMatchers.Add(matcher);
+                for (int i = 0; i < lastInvocation.Args.Length; ++i)
+                {
+                    var indexInMatchers = i - (lastInvocation.Args.Length - repository.MatchersInContext.Count);
+                    var matcher = indexInMatchers >= 0 ? repository.MatchersInContext[indexInMatchers] : new ValueMatcher(lastInvocation.Args[i]);
+                    callPattern.ArgumentMatchers.Add(matcher);
+                }
             }
             repository.MatchersInContext.Clear();
 
