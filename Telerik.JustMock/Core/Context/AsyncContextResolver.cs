@@ -14,22 +14,25 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+using System.ComponentModel;
 using System.Reflection;
 
 namespace Telerik.JustMock.Core.Context
 {
-	public static class AsyncContextResolver
+    public static class AsyncContextResolver
     {
 #if NETCORE
         static IAsyncContextResolver resolver = new AsyncLocalWrapper();
 #else
         static IAsyncContextResolver resolver = new CallContextWrapper();
 #endif
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static MethodBase GetContext()
         {
             return resolver.GetContext();
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void CaptureContext()
         {
             resolver.CaptureContext();
