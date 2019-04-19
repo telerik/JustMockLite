@@ -3,9 +3,9 @@
 	public static class AsyncContextResolver
     {
 #if NETCORE
-        static AsyncLocalWrapper resolver = new AsyncLocalWrapper();
+        static IAsyncContextResolver resolver = new AsyncLocalWrapper();
 #else
-        static CallContextWrapper resolver = new CallContextWrapper();
+        static IAsyncContextResolver resolver = new CallContextWrapper();
 #endif
         public static IAsyncContextResolver GetResolver()
         {
