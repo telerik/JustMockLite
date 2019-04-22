@@ -335,7 +335,7 @@ namespace Telerik.JustMock.Core
 
             callPattern.SetMethod(method, checkCompatibility: true);
 
-            using (repository.StartArrangeArgMatching())
+            using (repository != null ? repository.StartArrangeArgMatching() : null)
             {
                 var parameters = method.GetParameters();
                 if (arguments == null || arguments.Length == 0)
@@ -360,34 +360,7 @@ namespace Telerik.JustMock.Core
 
         internal static CallPattern FromMethodBase(object instance, MethodBase method, object[] arguments)
         {
-            var callPattern = new CallPattern
-            {
-                InstanceMatcher =
-                   method.IsStatic ? new ReferenceMatcher(null)
-                   : instance == null ? (IMatcher)new AnyMatcher()
-                   : new ReferenceMatcher(instance),
-            };
-
-            callPattern.SetMethod(method, checkCompatibility: true);
-
-            var parameters = method.GetParameters();
-            if (arguments == null || arguments.Length == 0)
-            {
-                callPattern.ArgumentMatchers.AddRange(method.GetParameters().Select(p => (IMatcher)new TypeMatcher(p.ParameterType)));
-            }
-            else
-            {
-                if (arguments.Length != method.GetParameters().Length)
-                {
-                    throw new MockException("Argument count mismatch.");
-                }
-
-                callPattern.ArgumentMatchers.AddRange(arguments.Select(arg => MocksRepository.CreateMatcherForArgument(arg)));
-            }
-
-            callPattern.AdjustForExtensionMethod();
-
-            return callPattern;
+            return FromMethodBase(null, instance, method, arguments);
         }
 
         internal static CallPattern FromAction(MocksRepository repository, Action memberAction, bool dispatchToMethodMocks = false)
