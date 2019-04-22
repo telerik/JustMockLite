@@ -446,9 +446,9 @@ namespace Telerik.JustMock.Core
             return this.sharedContext.StartRecording(recorder, dispatchToMethodMocks);
         }
 
-        internal IDisposable StartArrangeArgMathing()
+        internal IDisposable StartArrangeArgMatching()
         {
-            return this.sharedContext.StartArrangeArgMathing();
+            return this.sharedContext.StartArrangeArgMatching();
         }
 
         internal void AddMatcherInContext(IMatcher matcher)

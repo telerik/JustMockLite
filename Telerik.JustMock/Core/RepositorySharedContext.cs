@@ -80,7 +80,7 @@ namespace Telerik.JustMock.Core
 			return new InArrangeContext(this);
 		}
 
-		public IDisposable StartArrangeArgMathing()
+		public IDisposable StartArrangeArgMatching()
 		{
 			Monitor.Enter(this);
 			return new InArrangeArgMatchingContext(this);

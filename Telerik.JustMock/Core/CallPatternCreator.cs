@@ -271,7 +271,7 @@ namespace Telerik.JustMock.Core
             callPattern.SetMethod(method, checkCompatibility: true);
 
             //Finally, construct the arguments part of the call pattern.
-            using (repository.StartArrangeArgMathing())
+            using (repository.StartArrangeArgMatching())
             {
                 bool hasParams = false;
                 bool hasSingleValueInParams = false;
@@ -335,7 +335,7 @@ namespace Telerik.JustMock.Core
 
             callPattern.SetMethod(method, checkCompatibility: true);
 
-            using (repository.StartArrangeArgMathing())
+            using (repository.StartArrangeArgMatching())
             {
                 var parameters = method.GetParameters();
                 if (arguments == null || arguments.Length == 0)
@@ -415,7 +415,7 @@ namespace Telerik.JustMock.Core
             // one coming from a matcher, it is impossible to tell exactly which arguments are literal and which are matchers.
             // So, we assume that the user always first specifies some literal values, and then some matchers.
             // We assume that the user will never pass a literal after a matcher.
-            using (repository.StartArrangeArgMathing())
+            using (repository.StartArrangeArgMatching())
             {
                 for (int i = 0; i < lastInvocation.Args.Length; ++i)
                 {
