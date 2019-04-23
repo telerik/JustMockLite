@@ -95,7 +95,6 @@ namespace Telerik.JustMock.Core
 #endif
             };
 
-
         internal IRecorder Recorder
         {
             get { return this.sharedContext.Recorder; }
@@ -381,6 +380,7 @@ namespace Telerik.JustMock.Core
             }
 
             invocation.InArrange = this.sharedContext.InArrange;
+            invocation.InArrangeArgMatching = this.sharedContext.InArrangeArgMatching;
             invocation.InAssertSet = this.sharedContext.InAssertSet;
             invocation.Recording = this.Recorder != null;
             invocation.RetainBehaviorDuringRecording = this.sharedContext.DispatchToMethodMocks;
@@ -468,6 +468,11 @@ namespace Telerik.JustMock.Core
         internal IDisposable StartRecording(IRecorder recorder, bool dispatchToMethodMocks)
         {
             return this.sharedContext.StartRecording(recorder, dispatchToMethodMocks);
+        }
+
+        internal IDisposable StartArrangeArgMatching()
+        {
+            return this.sharedContext.StartArrangeArgMatching();
         }
 
         internal void AddMatcherInContext(IMatcher matcher)
@@ -736,7 +741,7 @@ namespace Telerik.JustMock.Core
             {
                 var result = methodMockFactory();
                 result.Repository = this;
-                result.CallPattern = CallPatternCreator.FromMethodBase(instance, method, arguments);
+                result.CallPattern = CallPatternCreator.FromMethodBase(this, instance, method, arguments);
 
                 AddArrange(result);
                 return result;

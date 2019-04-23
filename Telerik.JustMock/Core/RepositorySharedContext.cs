@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015,2018 Progress Software Corporation
+ Copyright © 2010-2015,2018-2019 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ namespace Telerik.JustMock.Core
 
 		private readonly ThreadLocalProperty<IRecorder> recorder = new ThreadLocalProperty<IRecorder>();
 		private readonly ThreadLocalProperty<object> inArrange = new ThreadLocalProperty<object>();
+		private readonly ThreadLocalProperty<object> inArrangeArgMatching = new ThreadLocalProperty<object>();
 		private readonly ThreadLocalProperty<object> dispatchToMethodMocks = new ThreadLocalProperty<object>();
 		private readonly ThreadLocalProperty<object> inAssertSet = new ThreadLocalProperty<object>();
 
@@ -45,6 +46,12 @@ namespace Telerik.JustMock.Core
 		{
 			get { return this.inArrange.Get() != null; }
 			private set { this.inArrange.Set(value ? (object)value : null); }
+		}
+
+		public bool InArrangeArgMatching
+		{
+			get { return this.inArrangeArgMatching.Get() != null; }
+			private set { this.inArrangeArgMatching.Set(value ? (object)value : null); }
 		}
 
 		public bool InAssertSet
@@ -71,6 +78,12 @@ namespace Telerik.JustMock.Core
 		{
 			Monitor.Enter(this);
 			return new InArrangeContext(this);
+		}
+
+		public IDisposable StartArrangeArgMatching()
+		{
+			Monitor.Enter(this);
+			return new InArrangeArgMatchingContext(this);
 		}
 
 		public IDisposable StartAssertSet()
@@ -125,7 +138,7 @@ namespace Telerik.JustMock.Core
 			public InArrangeContext(RepositorySharedContext context)
 				: base(context)
 			{
-                Debug.Assert(!this.Context.InArrange);
+				Debug.Assert(!this.Context.InArrange);
 				context.InArrange = true;
 			}
 
@@ -136,12 +149,28 @@ namespace Telerik.JustMock.Core
 			}
 		}
 
+		private class InArrangeArgMatchingContext : ContextSession
+		{
+			public InArrangeArgMatchingContext(RepositorySharedContext context)
+				: base(context)
+			{
+				Debug.Assert(!this.Context.InArrangeArgMatching);
+				context.InArrangeArgMatching = true;
+			}
+
+			public override void Dispose()
+			{
+				this.Context.InArrangeArgMatching = false;
+				Monitor.Exit(this.Context);
+			}
+		}
+
 		private class InAssertSetContext : ContextSession
 		{
 			public InAssertSetContext(RepositorySharedContext context)
 				: base(context)
 			{
-                Debug.Assert(!this.Context.InAssertSet);
+				Debug.Assert(!this.Context.InAssertSet);
 				context.InAssertSet = true;
 			}
 
