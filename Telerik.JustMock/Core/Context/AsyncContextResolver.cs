@@ -29,12 +29,16 @@ namespace Telerik.JustMock.Core.Context
 #endif
         public static MethodBase GetContext()
         {
-            return resolver.GetContext();
+            return ProfilerInterceptor.GuardInternal(() =>
+                resolver.GetContext()
+            );
         }
-        
+
         public static void CaptureContext()
         {
-            resolver.CaptureContext();
+            ProfilerInterceptor.GuardInternal(() =>
+                resolver.CaptureContext()
+            );
         }
     }
 }
