@@ -19,6 +19,7 @@ using System.Reflection;
 
 namespace Telerik.JustMock.Core.Context
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class AsyncContextResolver
     {
 #if NETCORE
@@ -26,13 +27,11 @@ namespace Telerik.JustMock.Core.Context
 #else
         static IAsyncContextResolver resolver = new CallContextWrapper();
 #endif
-        [EditorBrowsable(EditorBrowsableState.Never)]
         public static MethodBase GetContext()
         {
             return resolver.GetContext();
         }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
+        
         public static void CaptureContext()
         {
             resolver.CaptureContext();
