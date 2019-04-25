@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2019 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -785,6 +785,13 @@ namespace Telerik.JustMock.Core
 			return tcs.Task;
 		}
 
+		public static Task<T> TaskFromException<T>(Exception exception)
+		{
+			var tcs = new TaskCompletionSource<T>();
+			tcs.SetException(exception);
+			return tcs.Task;
+		}
+
 		public static bool StringEqual(string a, string b, bool ignoreCase)
 		{
 			return String.Equals(a, b, ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
@@ -931,5 +938,14 @@ namespace Telerik.JustMock.Core
 			return false;
 		}
 #endif
-	}
+
+#if !PORTABLE
+        public static Task<T> TaskFromObject<T>(object o)
+        {
+            T value = (T)o;
+
+            return Task.Run(() => value);
+        }
+#endif
+    }
 }
