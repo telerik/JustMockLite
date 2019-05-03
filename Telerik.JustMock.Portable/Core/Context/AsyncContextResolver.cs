@@ -1,6 +1,6 @@
-/*
+﻿/*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2019 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -20,14 +20,18 @@ using System.Reflection;
 
 namespace Telerik.JustMock.Core.Context
 {
-	internal interface IMockingContextResolver
-	{
-		MocksRepository ResolveRepository(UnresolvedContextBehavior unresolvedContextBehavior);
-
-		bool RetireRepository();
-
-		Action<string, Exception> GetFailMethod();
-
-        MethodBase GetTestMethod();
-	}
+    /// <summary>
+    /// Class for automatically resolving the context of async method calls.
+    /// </summary>
+    public class AsyncContextResolver
+    {
+        /// <summary>
+        /// Returns the actual test method from where the async call starts.
+        /// </summary>
+        /// <returns>The test method</returns>
+        public static MethodBase GetContext()
+        {
+            return null;
+        }
+    }
 }

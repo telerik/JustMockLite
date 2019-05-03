@@ -39,19 +39,25 @@ namespace Telerik.JustMock.Core.Context
 		{
 			lock (this.repositorySync)
 			{
-				RepositoryOperationsBase entryOps = null;
 				int repoIdx;
+				RepositoryOperationsBase entryOps = null;
 				var testMethod = FindTestMethod(out repoIdx, out entryOps);
-				if (testMethod == null)
+				if (testMethod == null || entryOps == null)
+				{
 					return null;
+				}
 
 				object entryKey = entryOps.GetKey(testMethod);
-
 				MocksRepository repo = this.FindRepositoryInOps(entryOps, entryKey);
 				if (repo != null)
+				{
 					return repo;
+				}
+
 				if (unresolvedContextBehavior == UnresolvedContextBehavior.DoNotCreateNew)
+				{
 					return null;
+				}
 
 				//Check if this is the same kind of method but from a derived class, thus building context.
 				MocksRepository parentRepo = entryOps.FindRepositoryToInherit(testMethod);
@@ -61,13 +67,19 @@ namespace Telerik.JustMock.Core.Context
 					{
 						var ops = this.repoOperations[repoIdxParent];
 						if (ops.IsLeaf)
+						{
 							continue;
+						}
 
 						object parentKey = ops.GetKey(testMethod);
 						if (ops.IsUsedOnAllThreads)
+						{
 							parentRepo = ops.FindRepositoryFromAnyThread(parentKey);
+						}
 						else
+						{
 							parentRepo = ops.FindRepository(parentKey) ?? ops.FindRepositoryToInherit(testMethod);
+						}
 					}
 				}
 
@@ -110,11 +122,7 @@ namespace Telerik.JustMock.Core.Context
 			}
 		}
 
-		protected virtual void OnMocksRepositoryCreated(MocksRepository repo)
-		{
-		}
-
-		private MethodBase FindTestMethod(out int repoIdx, out RepositoryOperationsBase entryOps)
+		public override MethodBase GetTestMethod()
 		{
 			var stackTrace = new StackTrace();
 			var q = from method in stackTrace.EnumerateFrames()
@@ -124,11 +132,22 @@ namespace Telerik.JustMock.Core.Context
 			var allTestMethods = q.Distinct().ToArray();
 			if (allTestMethods.Length > 1)
 			{
-				var message = "Calling one test method from another could result in unexpected behavior and must be avoided. Extract common mocking logic to a non-test method. At:\n" + stackTrace;
+				string message = "Calling one test method from another could result in unexpected behavior and must be avoided. Extract common mocking logic to a non-test method. At:\n" + stackTrace;
 				DebugView.DebugTrace(message);
 			}
-			var testMethod = allTestMethods.FirstOrDefault();
 
+			MethodBase testMethod = allTestMethods.FirstOrDefault();
+
+			return testMethod;
+		}
+
+		protected virtual void OnMocksRepositoryCreated(MocksRepository repo)
+		{
+		}
+
+		private MethodBase FindTestMethod(out int repoIdx, out RepositoryOperationsBase entryOps)
+		{
+			MethodBase testMethod = this.GetTestMethod();
 			if (testMethod != null)
 			{
 				var disableAttr = Attribute.GetCustomAttribute(testMethod, typeof(DisableAutomaticRepositoryResetAttribute)) as DisableAutomaticRepositoryResetAttribute;
@@ -136,6 +155,10 @@ namespace Telerik.JustMock.Core.Context
 					&& ProfilerInterceptor.IsProfilerAttached
 					&& !disableAttr.AllowMocking)
 					throw new MockException("Using the mocking API in a test method decorated with DisableAutomaticRepositoryResetAttribute is unsafe. Read the documentation of the DisableAutomaticRepositoryResetAttribute class for further information and possible solutions.");
+			}
+			else
+			{
+				testMethod = AsyncContextResolver.GetContext();
 			}
 
 			repoIdx = 0;
@@ -152,7 +175,7 @@ namespace Telerik.JustMock.Core.Context
 					}
 				}
 
-                JMDebug.Assert(entryOps != null);
+				JMDebug.Assert(entryOps != null);
 			}
 
 			return testMethod;
@@ -162,7 +185,7 @@ namespace Telerik.JustMock.Core.Context
 		{
 			if (entryOps.IsUsedOnAllThreads)
 			{
-                MocksRepository repo = entryOps.FindRepositoryFromAnyThread(entryKey);
+				MocksRepository repo = entryOps.FindRepositoryFromAnyThread(entryKey);
 				if (repo != null)
 				{
 					if (repo.IsRetired)
@@ -211,7 +234,7 @@ namespace Telerik.JustMock.Core.Context
 			if (isInheritingContext == null)
 				isInheritingContext = (_, __) => false;
 
-            RepositoryOperationsBase ops = this.CreateRepositoryOperations(getKey, matchesMethod, isLeaf, isUsedOnAllThreads, isInheritingContext);
+			RepositoryOperationsBase ops = this.CreateRepositoryOperations(getKey, matchesMethod, isLeaf, isUsedOnAllThreads, isInheritingContext);
 
 			this.repoOperations.Add(ops);
 		}
@@ -282,10 +305,10 @@ namespace Telerik.JustMock.Core.Context
 					break;
 			}
 
-            if (assemblySetupAttrs != null)
-            {
-                this.AddRepositoryOperations(assemblySetupAttrs, method => method.DeclaringType.Assembly, null, false, true);
-            }
+			if (assemblySetupAttrs != null)
+			{
+				this.AddRepositoryOperations(assemblySetupAttrs, method => method.DeclaringType.Assembly, null, false, true);
+			}
 		}
 
 		private static bool IsTypeAssignableIgnoreGenericArgs(Type typeToCheck, Type derivedType)

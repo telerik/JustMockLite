@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Telerik.JustMock.Core.Context
@@ -35,6 +36,8 @@ namespace Telerik.JustMock.Core.Context
         public abstract MocksRepository ResolveRepository(UnresolvedContextBehavior unresolvedContextBehavior);
 
         public abstract bool RetireRepository();
+
+        public abstract MethodBase GetTestMethod();
 
         public Action<string, Exception> GetFailMethod()
         {
