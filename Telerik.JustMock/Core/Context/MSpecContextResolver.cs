@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2019 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -36,52 +36,64 @@ namespace Telerik.JustMock.Core.Context
 
 		public override MocksRepository ResolveRepository(UnresolvedContextBehavior unresolvedContextBehavior)
 		{
-            var testMethod = this.GetTestMethod();
-            if (testMethod != null)
-				return repositories[testMethod.DeclaringType];
-			if (unresolvedContextBehavior == UnresolvedContextBehavior.DoNotCreateNew)
-				return null;
+			lock (this.repositorySync)
+			{
+				var testMethod = this.GetTestMethod();
+				if (testMethod != null)
+				{
+					return repositories[testMethod.DeclaringType];
+				}
 
-            var stackTrace = new StackTrace();
-            var frames = stackTrace.EnumerateFrames().ToList();
-            var caller = frames.FirstOrDefault(method => method.Module.Assembly != typeof(MocksRepository).Assembly);
-			var mspecTestClass = caller.DeclaringType;
+				if (unresolvedContextBehavior == UnresolvedContextBehavior.DoNotCreateNew)
+				{
+					return null;
+				}
 
-			MocksRepository parentRepo;
-			repositories.TryGetValue(mspecTestClass.BaseType, out parentRepo);
+				var stackTrace = new StackTrace();
+				var frames = stackTrace.EnumerateFrames().ToList();
+				var caller = frames.FirstOrDefault(method => method.Module.Assembly != typeof(MocksRepository).Assembly);
+				var mspecTestClass = caller.DeclaringType;
 
-			var repo = new MocksRepository(parentRepo, caller);
-			repositories.Add(mspecTestClass, repo);
+				MocksRepository parentRepo;
+				repositories.TryGetValue(mspecTestClass.BaseType, out parentRepo);
 
-			return repo;
+				var repo = new MocksRepository(parentRepo, caller);
+				repositories.Add(mspecTestClass, repo);
+
+				return repo;
+			}
 		}
 
 		public override bool RetireRepository()
 		{
-			var stackTrace = new StackTrace();
-			var testMethod = FindExistingTestMethod(stackTrace.EnumerateFrames());
+			lock (this.repositorySync)
+			{
+				var stackTrace = new StackTrace();
+				var testMethod = FindExistingTestMethod(stackTrace.EnumerateFrames());
+				if (testMethod == null)
+				{
+					return false;
+				}
 
-			if (testMethod == null)
-				return false;
+				var key = testMethod.DeclaringType;
+				var repo = repositories[key];
+				repositories.Remove(key);
+				repo.Retire();
 
-			var key = testMethod.DeclaringType;
-			var repo = repositories[key];
-			repositories.Remove(key);
-			repo.Retire();
-
-			return true;
+				return true;
+			}
 		}
 
-        public override MethodBase GetTestMethod()
-        {
-            var stackTrace = new StackTrace();
-            var frames = stackTrace.EnumerateFrames().ToList();
-            var testMethod = this.FindExistingTestMethod(frames);
+		public override MethodBase GetTestMethod()
+		{
+			var stackTrace = new StackTrace();
+			var frames = stackTrace.EnumerateFrames().ToList();
+			var testMethod = this.FindExistingTestMethod(frames);
 
-            return testMethod;
-        }
+			return testMethod;
+		}
 
-        public static bool IsAvailable
+		public static bool IsAvailable
 		{
 			get { return FindType(MSpecAssertionFailedName, false) != null; }
 		}
@@ -94,5 +106,5 @@ namespace Telerik.JustMock.Core.Context
 
 			return q.FirstOrDefault();
 		}
-    }
+	}
 }
