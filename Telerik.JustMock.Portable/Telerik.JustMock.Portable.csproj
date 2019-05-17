@@ -73,6 +73,9 @@
     <Compile Include="..\Telerik.JustMock\Core\ArrangeMethodAttribute.cs">
       <Link>Core\ArrangeMethodAttribute.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\AfterAllBehavior.cs" >
+      <Link>Core\Behaviors\AfterAllBehavior.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Core\Behaviors\CallOriginalBehavior.cs">
       <Link>Core\Behaviors\CallOriginalBehavior.cs</Link>
     </Compile>
@@ -141,6 +144,9 @@
     </Compile>
     <Compile Include="..\Telerik.JustMock\Core\CallPattern.cs">
       <Link>Core\CallPattern.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\CallPatternCreator.cs">
+      <Link>Core\CallPatternCreator.cs</Link>
     </Compile>
     <Compile Include="..\Telerik.JustMock\Core\ClrProfilerSetupHelper.cs">
       <Link>Core\ClrProfilerSetupHelper.cs</Link>
@@ -376,6 +382,9 @@
     <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IOrder.cs">
       <Link>Expectations\Abstraction\IOrder.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IPrerequisite.cs">
+      <Link>Expectations\Abstraction\IPrerequisite.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Expectations\Abstraction\IReturnCollection.cs">
       <Link>Expectations\Abstraction\IReturnCollection.cs</Link>
     </Compile>
@@ -475,6 +484,7 @@
     <Compile Include="..\Telerik.JustMock\Core\JMDebug.cs">
       <Link>Core\JMDebug.cs</Link>
     </Compile>
+    <Compile Include="Core\Context\AsyncContextResolver.cs" />
     <Compile Include="Core\Context\LocalMockingContextResolver.cs" />
     <Compile Include="Core\Context\MockingContextResolverBase.cs" />
     <Compile Include="Core\Context\VisualStudioPortableContextResolver.cs" />

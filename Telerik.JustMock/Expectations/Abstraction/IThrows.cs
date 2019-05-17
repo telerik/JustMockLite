@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2019 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -43,5 +43,26 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// </summary>
 		/// <returns></returns>
 		IAssertable Throws<TException>(params object[] args) where TException : Exception;
+
+#if !LITE_EDITION
+		/// <summary>
+		/// Throws a the specified exception for the target async call causing returned task to fail.
+		/// </summary>
+		/// <param name="exception"></param>
+		/// <returns></returns>
+		IAssertable ThrowsAsync(Exception exception);
+
+		/// <summary>
+		/// Throws a the specified exception for the target async call causing returned task to fail.
+		/// </summary>
+		/// <returns></returns>
+		IAssertable ThrowsAsync<TException>() where TException : Exception;
+
+		/// <summary>
+		/// Throws a the specified exception for the target async call causing returned task to fail.
+		/// </summary>
+		/// <returns></returns>
+		IAssertable ThrowsAsync<TException>(params object[] args) where TException : Exception;
+#endif
 	}
 }

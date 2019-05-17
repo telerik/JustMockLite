@@ -1,4 +1,4 @@
-/*
+﻿/*
  JustMock Lite
  Copyright © 2010-2015,2019 Progress Software Corporation
 
@@ -16,18 +16,22 @@
 */
 
 using System;
+using System.Reflection;
 
-namespace Telerik.JustMock.Expectations.Abstraction
+namespace Telerik.JustMock.Core.Context
 {
-	/// <summary>
-	/// Mark the statement as assertable in <see cref="Mock.Assert{T}(T)"/>.
-	/// </summary>
-	public interface IAssertable : IMustBeCalled, ISetupBehavior, IOccurrence, IOrder, IPrerequisite, IDisposable
-	{
-		/// <summary>
-		/// Use it to call the real implementation.
-		/// </summary>
-		/// <returns></returns>
-		IAssertable CallOriginal();
-	}
+    /// <summary>
+    /// Class for automatically resolving the context of async method calls.
+    /// </summary>
+    public class AsyncContextResolver
+    {
+        /// <summary>
+        /// Returns the actual test method from where the async call starts.
+        /// </summary>
+        /// <returns>The test method</returns>
+        public static MethodBase GetContext()
+        {
+            return null;
+        }
+    }
 }

@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2019 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -26,16 +26,19 @@ namespace Telerik.JustMock.Core.Context
 {
 	internal abstract class MockingContextResolverBase : IMockingContextResolver
 	{
-		protected readonly string assertFailedExceptionTypeName;
+        protected string AssertFailedExceptionTypeName { get; private set; }
+		protected readonly object repositorySync = new object();
 
-		public abstract MocksRepository ResolveRepository(UnresolvedContextBehavior unresolvedContextBehavior);
+        public MockingContextResolverBase(string assertFailedExceptionTypeName)
+        {
+            this.AssertFailedExceptionTypeName = assertFailedExceptionTypeName;
+        }
+
+        public abstract MocksRepository ResolveRepository(UnresolvedContextBehavior unresolvedContextBehavior);
 
 		public abstract bool RetireRepository();
 
-		public MockingContextResolverBase(string assertFailedExceptionTypeName)
-		{
-			this.assertFailedExceptionTypeName = assertFailedExceptionTypeName;
-		}
+        public abstract MethodBase GetTestMethod();
 
 		public Action<string, Exception> GetFailMethod()
 		{
@@ -54,7 +57,7 @@ namespace Telerik.JustMock.Core.Context
 
 		protected virtual Expression<Func<string, Exception, Exception>> CreateExceptionFactory()
 		{
-			Type assertionException = FindType(this.assertFailedExceptionTypeName);
+			Type assertionException = FindType(this.AssertFailedExceptionTypeName);
 			return this.CreateExceptionFactory(assertionException);
 		}
 
