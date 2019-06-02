@@ -33,7 +33,209 @@ namespace Telerik.JustMock.Expectations
 	internal sealed class NonPublicExpectation : INonPublicExpectation
 	{
 
-		public ActionExpectation Arrange(object target, string memberName, params object[] args)
+        private MethodInfo GetGenericMethodInstance(object target, Type returnType, string memberName, Type[] typeArguments, params object[] args)
+        {
+            var type = target.GetType();
+            return GetGenericMethodInstance(type, returnType, memberName, typeArguments, args);
+        }
+
+        private MethodInfo GetGenericMethodInstance(Type targetType, Type returnType, string memberName, Type[] typeArguments, params object[] args)
+        {
+            var type = targetType;
+            var mixin = MocksRepository.GetMockMixin(targetType, null);
+            if (mixin != null)
+                type = mixin.DeclaringType;
+
+            var method = MockingUtil.GetGenericMethodInstanceByName(type, returnType, memberName, typeArguments, ref args);
+
+            return method;
+        }
+
+
+        public ActionExpectation Arrange(object target, string memberName, Type[] typeArguments, params object[] args)
+        {
+            return ProfilerInterceptor.GuardInternal(() =>
+            {
+                var method = GetGenericMethodInstance(target, typeof(void), memberName, typeArguments, args);
+                return MockingContext.CurrentRepository.Arrange(target, method, args, () => new ActionExpectation());
+            });
+        }
+
+        public FuncExpectation<TReturn> Arrange<TReturn>(object target, string memberName, Type[] typeArguments, params object[] args)
+        {
+            return ProfilerInterceptor.GuardInternal(() =>
+            {
+                var method = GetGenericMethodInstance(target, typeof(TReturn), memberName, typeArguments, args);
+                return MockingContext.CurrentRepository.Arrange(target, method, args, () => new FuncExpectation<TReturn>());
+            });
+        }
+
+        public ActionExpectation Arrange<T>(string memberName, Type[] typeArguments, params object[] args)
+        {
+            return ProfilerInterceptor.GuardInternal(() =>
+            {
+                return Arrange(typeof(T), memberName, typeArguments, args);
+            });
+        }
+
+        public ActionExpectation Arrange(Type targetType, string memberName, Type[] typeArguments, params object[] args)
+        {
+            return ProfilerInterceptor.GuardInternal(() =>
+            {
+                var method = GetGenericMethodInstance(targetType, typeof(void), memberName, typeArguments, args);
+
+                return MockingContext.CurrentRepository.Arrange(targetType, method, args, () => new ActionExpectation());
+            });
+        }
+
+        public FuncExpectation<TReturn> Arrange<T, TReturn>(string memberName, Type[] typeArguments, params object[] args)
+        {
+            return ProfilerInterceptor.GuardInternal(() =>
+            {
+                return Arrange<TReturn>(typeof(T), memberName, typeArguments, args);
+            });
+        }
+
+        public FuncExpectation<TReturn> Arrange<TReturn>(Type targetType, string memberName, Type[] typeArguments, params object[] args)
+        {
+            return ProfilerInterceptor.GuardInternal(() =>
+            {
+                var method = GetGenericMethodInstance(targetType, typeof(TReturn), memberName, typeArguments, args);
+
+                return MockingContext.CurrentRepository.Arrange(targetType, method, args, () => new FuncExpectation<TReturn>());
+            });
+        }
+
+        public void Assert(object target, string memberName, Type[] typeArguments, params object[] args)
+        {
+            ProfilerInterceptor.GuardInternal(() =>
+            {
+                var method = GetGenericMethodInstance(target, typeof(void), memberName, typeArguments, args);
+                this.Assert(target, method, args);
+            });
+        }
+        public void Assert<TReturn>(object target, string memberName, Type[] typeArguments, params object[] args)
+        {
+            ProfilerInterceptor.GuardInternal(() =>
+            {
+                var method = GetGenericMethodInstance(target, typeof(TReturn), memberName, typeArguments, args);
+                this.Assert(target, method, args);
+            });
+        }
+
+        public void Assert(object target, string memberName, Type[] typeArguments, Occurs occurs, params object[] args)
+        {
+            ProfilerInterceptor.GuardInternal(() =>
+            {
+                var method = GetGenericMethodInstance(target, typeof(void), memberName, typeArguments, args);
+                this.Assert(target, method, occurs, args);
+            });
+        }
+
+        public void Assert<TReturn>(object target, string memberName, Type[] typeArguments, Occurs occurs, params object[] args)
+        {
+            ProfilerInterceptor.GuardInternal(() =>
+            {
+                var method = GetGenericMethodInstance(target, typeof(TReturn), memberName, typeArguments, args);
+                this.Assert(target, method, occurs, args);
+            });
+        }
+
+        public void Assert<T>(string memberName, Type[] typeArguments, Occurs occurs, params object[] args)
+        {
+            ProfilerInterceptor.GuardInternal(() =>
+            {
+                var method = GetGenericMethodInstance(typeof(T), typeof(void), memberName, typeArguments, args);
+                this.Assert(method, occurs, args);
+            });
+        }
+
+        public void Assert(Type targetType, string memberName, Type[] typeArguments, Occurs occurs, params object[] args)
+        {
+            ProfilerInterceptor.GuardInternal(() =>
+            {
+                var method = GetGenericMethodInstance(targetType, typeof(void), memberName, typeArguments, args);
+                this.Assert(method, occurs, args);
+            });
+        }
+
+        public void Assert<T>(string memberName, Type[] typeArguments, params object[] args)
+        {
+            ProfilerInterceptor.GuardInternal(() =>
+            {
+                var method = GetGenericMethodInstance(typeof(T), typeof(void), memberName, typeArguments, args);
+                this.Assert(method, args);
+            });
+        }
+
+        public void Assert(Type targetType, string memberName, Type[] typeArguments, params object[] args)
+        {
+            ProfilerInterceptor.GuardInternal(() =>
+            {
+                var method = GetGenericMethodInstance(targetType, typeof(void), memberName, typeArguments, args);
+                this.Assert(method, args);
+            });
+        }
+
+        public void Assert<TReturn>(Type targetType, string memberName, Type[] typeArguments, Occurs occurs, params object[] args)
+        {
+            ProfilerInterceptor.GuardInternal(() =>
+            {
+                var method = GetGenericMethodInstance(targetType, typeof(TReturn), memberName, typeArguments, args);
+                this.Assert(method, occurs, args);
+            });
+        }
+
+        public void Assert<TReturn>(Type targetType, string memberName, Type[] typeArguments, params object[] args)
+        {
+            ProfilerInterceptor.GuardInternal(() =>
+            {
+                var method = GetGenericMethodInstance(targetType, typeof(TReturn), memberName, typeArguments, args);
+                this.Assert(method, args);
+            });
+        }
+
+        public void Assert<T, TReturn>(string memberName, Type[] typeArguments, Occurs occurs, params object[] args)
+        {
+            ProfilerInterceptor.GuardInternal(() =>
+            {
+                var method = GetGenericMethodInstance(typeof(T), typeof(TReturn), memberName, typeArguments);
+                this.Assert(method, occurs, args);
+            });
+        }
+
+        public void Assert<T, TReturn>(string memberName, Type[] typeArguments, params object[] args)
+        {
+            ProfilerInterceptor.GuardInternal(() =>
+            {
+                var method = GetGenericMethodInstance(typeof(T), typeof(TReturn), memberName, typeArguments, args);
+                this.Assert(method, args);
+            });
+        }
+
+
+        public int GetTimesCalled(object target, string memberName, Type[] typeArguments, params object[] args)
+        {
+            return ProfilerInterceptor.GuardInternal(() =>
+            {
+                var method = GetGenericMethodInstance(target, typeof(void), memberName, typeArguments, args);
+                return this.GetTimesCalled(method, args);
+            });
+        }
+
+        public int GetTimesCalled(Type type, string memberName, Type[] typeArguments, params object[] args)
+        {
+            return ProfilerInterceptor.GuardInternal(() =>
+            {
+                var method = GetGenericMethodInstance(type, typeof(void), memberName, typeArguments, args);
+                return this.GetTimesCalled(method, args);
+            });
+        }
+
+
+
+
+        public ActionExpectation Arrange(object target, string memberName, params object[] args)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 				{

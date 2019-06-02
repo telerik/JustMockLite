@@ -61,7 +61,26 @@ namespace Telerik.JustMock.Core
 				|| (method.ReturnType.IsPointer && returnType == typeof(IntPtr));
 		}
 
-		internal static MethodInfo GetMethodByName(Type type, Type returnType, string memberName, ref object[] args)
+        internal static MethodInfo GetGenericMethodInstanceByName(Type type, Type returnType, string memberName, Type[] typeArguments, ref object[] args)
+        {
+            if (type.IsProxy())
+                type = type.BaseType;
+
+
+            object[] arguments = args;
+
+            var allGenericMethods = type.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic).Where(p => p.IsGenericMethod);
+            var candidateGenerics = allGenericMethods.Where(p => p.Name == memberName);
+            var candidates = candidateGenerics.Where(p => p.MakeGenericMethod(typeArguments).ArgumentsMatchSignature(arguments) == true);
+
+            var method = candidates.FirstOrDefault();
+            var methodInstance = method.MakeGenericMethod(typeArguments);
+
+            return methodInstance;
+        }
+
+
+        internal static MethodInfo GetMethodByName(Type type, Type returnType, string memberName, ref object[] args)
 		{
 			if (type.IsProxy())
 				type = type.BaseType;
