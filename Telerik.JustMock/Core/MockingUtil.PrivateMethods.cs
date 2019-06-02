@@ -277,13 +277,13 @@ namespace Telerik.JustMock.Core
 			return null;
 		}
 
-		public static MethodInfo GetLocalFunction(object target, MethodInfo method, string localMemberName)
+		public static MethodInfo GetLocalFunction(object target, MethodInfo method, string localMemberName, Type[] localFunctionGenericTypes)
 		{
 			Type type = target.GetType();
-			return GetLocalFunction(type, method, localMemberName);
+			return GetLocalFunction(type, method, localMemberName, localFunctionGenericTypes);
 		}
 
-		public static MethodInfo GetLocalFunction(Type type, MethodInfo method, string localMemberName)
+		public static MethodInfo GetLocalFunction(Type type, MethodInfo method, string localMemberName, Type[] localFunctionGenericTypes)
 		{
 #if !PORTABLE
 			if (type.IsProxy())
@@ -299,8 +299,29 @@ namespace Telerik.JustMock.Core
 			MethodInfo localMethod = null;
 			foreach (var instruction in callInstructions)
 			{
-				MethodBase methodBase = type.Module.ResolveMethod(instruction.Operand.Int);
-				if (methodBase != null && methodBase.DeclaringType == type && methodBase.Name.StartsWith(expectedName))
+                MethodBase methodBase = null;
+                try
+                {
+                    methodBase = type.Module.ResolveMethod(instruction.Operand.Int);
+                }catch(Exception)
+                {
+
+                }
+
+                if (methodBase == null && localFunctionGenericTypes != null)
+                {
+
+                    try
+                    {
+                        methodBase = type.Module.ResolveMethod(instruction.Operand.Int, null, localFunctionGenericTypes);
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+                }
+
+                if (methodBase != null && methodBase.DeclaringType == type && methodBase.Name.StartsWith(expectedName))
 				{
 					localMethod = methodBase as MethodInfo;
 					break;
@@ -327,16 +348,16 @@ namespace Telerik.JustMock.Core
 		public static MethodInfo GetMethodWithLocalFunction(Type type, string methodName)
 		{
 			Type[] emptyParamTypes = new Type[] { };
-			return GetMethodWithLocalFunction( type, methodName, emptyParamTypes);
+			return GetMethodWithLocalFunction( type, methodName, emptyParamTypes, null);
 		}
 
-		public static MethodInfo GetMethodWithLocalFunction(object target, string methodName, Type[] methodParamTypes)
+		public static MethodInfo GetMethodWithLocalFunction(object target, string methodName, Type[] methodParamTypes, Type[] methodGenericTypes)
 		{
 			Type type = target.GetType();
-			return GetMethodWithLocalFunction(type, methodName, methodParamTypes);
+			return GetMethodWithLocalFunction(type, methodName, methodParamTypes, methodGenericTypes);
 		}
 
-		public static MethodInfo GetMethodWithLocalFunction(Type type, string methodName, Type[] methodParamTypes)
+		public static MethodInfo GetMethodWithLocalFunction(Type type, string methodName, Type[] methodParamTypes, Type[] methodGenericTypes)
 		{
 #if !PORTABLE
 			if (type.IsProxy())
@@ -349,6 +370,17 @@ namespace Telerik.JustMock.Core
 			{
 				throw new MissingMemberException(MockingUtil.BuildMissingMethodMessage(type, null, methodName));
 			}
+
+            if(method.ContainsGenericParameters && (methodGenericTypes == null || methodGenericTypes.Length == 0))
+            {
+                throw new MissingMemberException(MockingUtil.BuildMissingMethodMessage(type, null, methodName));
+            }
+
+            if (method.ContainsGenericParameters)
+            {
+                method = method.MakeGenericMethod(methodGenericTypes);
+            }
+
 			return method;
 #else
 			return null;
