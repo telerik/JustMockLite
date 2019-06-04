@@ -32,6 +32,7 @@ using Telerik.JustMock.Core.TransparentProxy;
 using Telerik.JustMock.Diagnostics;
 #if !PORTABLE
 using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
+using Telerik.JustMock.Expectations;
 #endif
 
 #if NETCORE
@@ -719,6 +720,31 @@ namespace Telerik.JustMock.Core
             return result;
         }
 
+        /// <summary>
+        /// Since we are not able to record deffered execution, check whether mock is about to present
+        /// IQueryable<> or IEnumerable<>. If it so, then throw an exception to prompt the user to use
+        /// Mock.Arrange overloads with expressions.
+        /// See also https://stackoverflow.com/questions/3894490/linq-what-is-the-quickest-way-to-find-out-deferred-execution-or-not
+        /// </summary>
+        /// <typeparam name="TMethodMock">Mock return type</typeparam>
+        /// <param name="methodMockFactory">Mock factory</param>
+        private void CheckDefferedExecutionTypes<TMethodMock>(Func<TMethodMock> methodMockFactory)
+        {
+            var mockFactoryType = methodMockFactory.GetType().GetGenericArguments().FirstOrDefault();
+            if (mockFactoryType.IsGenericType && mockFactoryType.GetGenericTypeDefinition() == typeof(FuncExpectation<>))
+            {
+                var mockFactoryGenericArguments = mockFactoryType.GetGenericArguments();
+                if (mockFactoryGenericArguments
+                        .Where(a => a.IsGenericType)
+                        .Where(a => a.GetGenericTypeDefinition() == typeof(IQueryable<>)
+                            || a.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                        .Any())
+                {
+                    throw new MockException("Cannot arrange action with potential deffered execution, use Mock.Arrange with expressions instead.");
+                }
+            }
+        }
+
         [ArrangeMethod]
         internal TMethodMock Arrange<TMethodMock>(Action memberAction, Func<TMethodMock> methodMockFactory)
             where TMethodMock : IMethodMock
@@ -726,8 +752,12 @@ namespace Telerik.JustMock.Core
             using (this.sharedContext.StartArrange())
             {
                 var result = methodMockFactory();
+
+                CheckDefferedExecutionTypes(methodMockFactory);
+
                 result.Repository = this;
                 result.CallPattern = CallPatternCreator.FromAction(this, memberAction);
+
                 AddArrange(result);
                 return result;
             }
@@ -757,6 +787,7 @@ namespace Telerik.JustMock.Core
                 var result = methodMockFactory();
                 result.Repository = this;
                 result.CallPattern = callPattern;
+
                 AddArrange(result);
                 return result;
             }
