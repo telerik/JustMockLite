@@ -141,6 +141,9 @@ namespace Telerik.JustMock.Expectations
             });
         }
 
+
+#if !LITE_EDITION
+
         public void Assert<T>(string memberName, Type[] typeArguments, Occurs occurs, params object[] args)
         {
             ProfilerInterceptor.GuardInternal(() =>
@@ -231,8 +234,8 @@ namespace Telerik.JustMock.Expectations
                 return this.GetTimesCalled(method, args);
             });
         }
-
-
+        
+#endif
 
 
         public ActionExpectation Arrange(object target, string memberName, params object[] args)

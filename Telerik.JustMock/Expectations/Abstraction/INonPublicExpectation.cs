@@ -233,6 +233,8 @@ namespace Telerik.JustMock.Expectations.Abstraction
 		/// <returns>Number of calls.</returns>
 		int GetTimesCalled(object target, string memberName, params object[] args);
 
+
+#if !LITE_EDITION
         /// <summary>
         /// Returns the number of times the specified member was called.
         /// </summary>
@@ -243,7 +245,6 @@ namespace Telerik.JustMock.Expectations.Abstraction
         /// <returns>Number of calls.</returns>
         int GetTimesCalled(object target, string memberName, Type[] typeArguments, params object[] args);
 
-#if !LITE_EDITION
         /// <summary>
         /// Arranges a method for mocking.
         /// </summary>
