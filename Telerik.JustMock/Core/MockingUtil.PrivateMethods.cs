@@ -69,9 +69,9 @@ namespace Telerik.JustMock.Core
 
             object[] arguments = args;
 
-            var allGenericMethods = type.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic).Where(p => p.IsGenericMethod);
+            var allGenericMethods = type.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic).Where(p => p.IsGenericMethodDefinition);
             var candidateGenerics = allGenericMethods.Where(p => p.Name == memberName);
-            var candidates = candidateGenerics.Where(p => p.MakeGenericMethod(typeArguments).ArgumentsMatchSignature(arguments) == true);
+            var candidates = candidateGenerics.Where(p => p.IsGenericMethodDefinition &&  p.MakeGenericMethod(typeArguments).ArgumentsMatchSignature(arguments) == true);
 
             var method = candidates.FirstOrDefault();
             var methodInstance = method.MakeGenericMethod(typeArguments);
@@ -226,9 +226,40 @@ namespace Telerik.JustMock.Core
 			}
 
 			return sb.ToString();
-		}
+        }
 
-		internal static string FormatMethodArrangementExpression(string memberName, MethodBase method, SourceLanguage language)
+        internal static string BuildGenericMethodNonMatchingTypesMessage(Type type, MethodInfo method, Type[] providedGenericTypes)
+        {
+            return BuildGenericMethodNonMatchingTypesMessage(type, method.ToString(), providedGenericTypes);
+        }
+        internal static string BuildGenericMethodNonMatchingTypesMessage(Type type, string methodName, Type[] providedGenericTypes)
+        {
+            string typeNames = "";
+            if (providedGenericTypes == null)
+            {
+                typeNames = "null";
+            }
+            else if (providedGenericTypes.Length == 0)
+            {
+                typeNames = "empty array";
+            } else if (providedGenericTypes != null)
+            {
+                List<string> providedTypeNames = new List<string>();
+                foreach (var t in providedGenericTypes)
+                {
+                    providedTypeNames.Add(t.Name);
+                }
+                typeNames = String.Join(",", providedTypeNames.ToArray());
+            }
+
+            var sb = new StringBuilder();
+            sb.AppendLine(
+              String.Format("Provided generic parameters '{2}' do not match Method '{0}' generic definition on type {1}", methodName, type, typeNames));
+
+            return sb.ToString();
+        }
+
+        internal static string FormatMethodArrangementExpression(string memberName, MethodBase method, SourceLanguage language)
 		{
 			return String.Format("Mock.NonPublic.Arrange{0}({1}\"{2}\"{3}){4}",
 				FormatGenericArg(method.GetReturnType(), language),
@@ -305,7 +336,8 @@ namespace Telerik.JustMock.Core
                     methodBase = type.Module.ResolveMethod(instruction.Operand.Int);
                 }catch(Exception)
                 {
-
+                    //The exception is captured when the metadata token refers generic method.
+                    //Do not handle the exception since there is no way to know in advance if the metadata token refers non-generic or generic method.
                 }
 
                 if (methodBase == null && localFunctionGenericTypes != null)
@@ -314,10 +346,19 @@ namespace Telerik.JustMock.Core
                     try
                     {
                         methodBase = type.Module.ResolveMethod(instruction.Operand.Int, null, localFunctionGenericTypes);
+                        if(methodBase != null)
+                        {
+                            Type[] genericArgDefinition = methodBase.GetGenericArguments();
+                            if(genericArgDefinition.Length != localFunctionGenericTypes.Length)
+                            {
+                                methodBase = null;
+                            }
+                        }
                     }
                     catch (Exception)
                     {
-
+                        //The exception is captured when the metadata token refers non-generic method.
+                        //Do not handle the exception since there is no way to know in advance if the metadata token refers non-generic or generic method.
                     }
                 }
 
@@ -329,8 +370,17 @@ namespace Telerik.JustMock.Core
 			}
 
 			if (localMethod == null)
-			{
-				throw new MissingMemberException(BuildMissingLocalFunctionMessage(type, method, localMemberName));
+            {
+                int methodGenericArgCount = method.GetGenericArguments().Length;
+                List<Type> userFriendlyLocalFunctionTypes = new List<Type>();
+                for (int index = methodGenericArgCount; index < localFunctionGenericTypes.Length; index++)
+                {
+                    userFriendlyLocalFunctionTypes.Add(localFunctionGenericTypes[index]);
+                }
+
+                string userFriendlyName = String.Join(".", method.ToString(), localMemberName);
+
+                throw new MissingMemberException(BuildGenericMethodNonMatchingTypesMessage(type, userFriendlyName, userFriendlyLocalFunctionTypes.ToArray()));
 			}
 
 			return localMethod;
@@ -371,14 +421,15 @@ namespace Telerik.JustMock.Core
 				throw new MissingMemberException(MockingUtil.BuildMissingMethodMessage(type, null, methodName));
 			}
 
-            if(method.ContainsGenericParameters && (methodGenericTypes == null || methodGenericTypes.Length == 0))
+            if (method.ContainsGenericParameters && (!GenericTypesMatch(methodGenericTypes, method)))
             {
-                throw new MissingMemberException(MockingUtil.BuildMissingMethodMessage(type, null, methodName));
+                throw new MissingMemberException(MockingUtil.BuildGenericMethodNonMatchingTypesMessage(type, method, methodGenericTypes));
             }
 
             if (method.ContainsGenericParameters)
             {
                 method = method.MakeGenericMethod(methodGenericTypes);
+               
             }
 
 			return method;
@@ -386,6 +437,22 @@ namespace Telerik.JustMock.Core
 			return null;
 #endif
 		}
+
+        private static bool GenericTypesMatch(Type[] provided, MethodInfo method)
+        {
+            if(provided == null)
+            {
+                return false;
+            }
+
+            Type[] defined = method.GetGenericArguments();
+
+            if (defined.Length != provided.Length)
+            {
+                return false;
+            }
+            return true;
+        }
 
 		public static string BuildMissingLocalFunctionMessage(Type type, MethodInfo method, string localFunctionName)
 		{
