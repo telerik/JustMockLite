@@ -362,9 +362,8 @@ namespace Telerik.JustMock.Expectations
 
                 MethodInfo localMethod = MockingUtil.GetLocalFunction(typeof(T), method, localMemberName, combinedTypes.ToArray());
 
-                return Mock.NonPublic.Arrange(localMethod, args);
+                return Mock.NonPublic.Arrange(typeof(T), localMethod, args);
             });
-
         }
 
         public ActionExpectation Arrange<T>(string methodName, Type[] methodParamTypes, string localMemberName, params object[] args)
