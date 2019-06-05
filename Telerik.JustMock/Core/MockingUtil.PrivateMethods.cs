@@ -346,7 +346,10 @@ namespace Telerik.JustMock.Core
                     try
                     {
                         methodBase = type.Module.ResolveMethod(instruction.Operand.Int, null, localFunctionGenericTypes);
-                        if(methodBase != null)
+
+                        //This additional check is required because if we have function<T1,T2> and pass localFunctionGenericTypes weith <T1,T2,T3>
+                        //the method ResolveMethod returns function<T1,T2> even if the typenames are less than those in the provided array.
+                        if (methodBase != null)
                         {
                             Type[] genericArgDefinition = methodBase.GetGenericArguments();
                             if(genericArgDefinition.Length != localFunctionGenericTypes.Length)
@@ -371,16 +374,24 @@ namespace Telerik.JustMock.Core
 
 			if (localMethod == null)
             {
-                int methodGenericArgCount = method.GetGenericArguments().Length;
-                List<Type> userFriendlyLocalFunctionTypes = new List<Type>();
-                for (int index = methodGenericArgCount; index < localFunctionGenericTypes.Length; index++)
+                if(localFunctionGenericTypes == null)
                 {
-                    userFriendlyLocalFunctionTypes.Add(localFunctionGenericTypes[index]);
+
+                    throw new MissingMemberException(BuildMissingLocalFunctionMessage(type, method, localMemberName));
                 }
+                else
+                {
+                    int methodGenericArgCount = method.GetGenericArguments().Length;
+                    List<Type> userFriendlyLocalFunctionTypes = new List<Type>();
+                    for (int index = methodGenericArgCount; index < localFunctionGenericTypes.Length; index++)
+                    {
+                        userFriendlyLocalFunctionTypes.Add(localFunctionGenericTypes[index]);
+                    }
 
-                string userFriendlyName = String.Join(".", method.ToString(), localMemberName);
+                    string userFriendlyName = String.Join(".", method.ToString(), localMemberName);
 
-                throw new MissingMemberException(BuildGenericMethodNonMatchingTypesMessage(type, userFriendlyName, userFriendlyLocalFunctionTypes.ToArray()));
+                    throw new MissingMemberException(BuildGenericMethodNonMatchingTypesMessage(type, userFriendlyName, userFriendlyLocalFunctionTypes.ToArray()));
+                }
 			}
 
 			return localMethod;
