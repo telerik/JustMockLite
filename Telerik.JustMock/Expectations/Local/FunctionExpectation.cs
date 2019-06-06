@@ -659,7 +659,7 @@ namespace Telerik.JustMock.Expectations
 
                 MethodInfo localMethod = MockingUtil.GetLocalFunction(target.GetType(), method, localFunctionName, combinedTypes.ToArray());
 
-                Mock.NonPublic.Assert(localMethod, args);
+                Mock.NonPublic.Assert(target, localMethod, args);
             });
         }
 
@@ -733,7 +733,7 @@ namespace Telerik.JustMock.Expectations
 
                 MethodInfo localMethod = MockingUtil.GetLocalFunction(target.GetType(), method, localFunctionName, combinedTypes.ToArray());
 
-                Mock.NonPublic.Assert(localMethod, occurs, args);
+                Mock.NonPublic.Assert(target, localMethod, occurs, args);
             });
         }
 
