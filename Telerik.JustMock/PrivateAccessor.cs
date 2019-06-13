@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015,2018 Progress Software Corporation
+ Copyright © 2010-2015,2018-2019 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -94,12 +94,18 @@ namespace Telerik.JustMock
 #if (!COREFX && !NETCORE)
 						var realProxy = MockingProxy.GetRealProxy(instance);
 						if (realProxy != null)
+						{
 							instance = realProxy.WrappedInstance;
+						}
 #endif
 						type = instance.GetType();
 					}
 					if (type.IsProxy() && type.BaseType != typeof(object))
+					{
 						type = type.BaseType;
+					}
+
+					Mock.Intercept(type);
 				});
 
 			this.instance = instance;
