@@ -105,7 +105,9 @@ namespace Telerik.JustMock
 						type = type.BaseType;
 					}
 
+#if (!PORTABLE && !LITE_EDITION)
 					Mock.Intercept(type);
+#endif
 				});
 
 			this.instance = instance;
@@ -522,8 +524,8 @@ namespace Telerik.JustMock
 #if (COREFX)
 			return false;
 #else
-            try
-            {
+			try
+			{
 				new ReflectionPermission(ReflectionPermissionFlag.MemberAccess).Demand();
 				return true;
 			}
