@@ -2530,6 +2530,8 @@ namespace Telerik.JustMock.Tests
 			Assert.Null(proxy as IDisposable);
 		}
 
+		// Implementation differs for .NETFramework and .NETCore, see DynamicProxyMockFactory.Create method
+#if !NETCORE
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
 		public void ShouldThrowWhenMissingPameterlessConstructorAndCallOriginalWithFluentGenericConfig()
 		{
@@ -2538,6 +2540,18 @@ namespace Telerik.JustMock.Tests
 					fluentConfig.SetBehavior(Behavior.CallOriginal))
 				);
 		}
+#else
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
+		public void ShouldMockWhenMissingPameterlessConstructorAndCallOriginalWithFluentGenericConfig()
+		{
+			var proxy = Mock.Create<Base>(fluentConfig =>
+				fluentConfig.SetBehavior(Behavior.CallOriginal)
+			);
+
+			Assert.Equal(default(int), proxy.i);
+			Assert.Null(proxy as IDisposable);
+		}
+#endif
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
 		public void ShouldThrowWhenMockConstructorAndCallConstructorWithFluentGenericConfig()
@@ -2618,6 +2632,8 @@ namespace Telerik.JustMock.Tests
 			Assert.Equal(default(int), proxy.i);
 		}
 
+		// Implementation differs for .NETFramework and .NETCore, see DynamicProxyMockFactory.Create method
+#if !NETCORE
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
 		public void ShouldThrowWhenMissingPameterlessConstructorAndCallOriginalWithFluentConfig()
 		{
@@ -2626,6 +2642,17 @@ namespace Telerik.JustMock.Tests
 					fluentConfig.SetBehavior(Behavior.CallOriginal))
 				);
 		}
+#else
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
+		public void ShouldMockWhenMissingPameterlessConstructorAndCallOriginalWithFluentConfig()
+		{
+			var proxy = (Base)Mock.Create(typeof(Base), fluentConfig =>
+				fluentConfig.SetBehavior(Behavior.CallOriginal)
+			);
+
+			Assert.Equal(default(int), proxy.i);
+		}
+#endif
 
 		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
 		public void ShouldThrowWhenMockConstructorAndCallConstructorWithFluentConfig()
