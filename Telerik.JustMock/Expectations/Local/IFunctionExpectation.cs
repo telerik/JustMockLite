@@ -24,16 +24,16 @@ namespace Telerik.JustMock.Expectations.Abstraction.Local.Function
     /// Interface used to arrange and call local functions.
     /// </summary>
 	public interface IFunctionExpectation
-	{
-		/// <summary>
-		/// Arranges a local function for mocking.
-		/// </summary>
-		/// <param name="target">Target instance</param>
-		/// <param name="methodName">Name of the method where the local function is nested</param>
-		/// <param name="localFunctionName">Name of the nested local function</param>
-		/// <param name="args">Local function arguments</param>
-		/// <returns>Reference to setup actions calls</returns>
-		ActionExpectation Arrange(object target, string methodName, string localFunctionName, params object[] args);
+    {
+        /// <summary>
+        /// Arranges a local function for mocking.
+        /// </summary>
+        /// <param name="target">Target instance</param>
+        /// <param name="methodName">Name of the method where the local function is nested</param>
+        /// <param name="localFunctionName">Name of the nested local function</param>
+        /// <param name="args">Local function arguments</param>
+        /// <returns>Reference to setup actions calls</returns>
+        ActionExpectation Arrange(object target, string methodName, string localFunctionName, params object[] args);
 
         /// <summary>
         /// Arranges a local function for mocking.
@@ -269,15 +269,15 @@ namespace Telerik.JustMock.Expectations.Abstraction.Local.Function
         /// <returns>Reference to setup actions calls</returns>
         ActionExpectation Arrange<T>(MethodInfo method, string localFunctionName, params object[] args);
 
-		/// <summary>
-		/// Arranges a local function inside static method for mocking.
-		/// </summary>
-		/// <param name="type">The type with static method containing local function</param>
-		/// <param name="methodName">Name of the method where the local function is nested</param>
-		/// <param name="localFunctionName">Name of the nested local function</param>
-		/// <param name="args">Local function arguments</param>
-		/// <returns>Reference to setup actions calls</returns>
-		ActionExpectation Arrange(Type type, string methodName, string localFunctionName, params object[] args);
+        /// <summary>
+        /// Arranges a local function inside static method for mocking.
+        /// </summary>
+        /// <param name="type">The type with static method containing local function</param>
+        /// <param name="methodName">Name of the method where the local function is nested</param>
+        /// <param name="localFunctionName">Name of the nested local function</param>
+        /// <param name="args">Local function arguments</param>
+        /// <returns>Reference to setup actions calls</returns>
+        ActionExpectation Arrange(Type type, string methodName, string localFunctionName, params object[] args);
 
         /// <summary>
         /// Arranges a local function inside static method for mocking.
@@ -517,15 +517,15 @@ namespace Telerik.JustMock.Expectations.Abstraction.Local.Function
         /// <returns>Reference to setup actions calls</returns>
         FuncExpectation<TReturn> Arrange<TReturn>(Type type, MethodInfo method, string localFunctionName, params object[] args);
 
-		/// <summary>
-		/// Calls the specified local function by name.
-		/// </summary>
-		/// <param name="target">Target instance</param>
-		/// <param name="methodName">Name of the method where the local function is nested</param>
-		/// <param name="localFunctionName">Name of the nested local function</param>
-		/// <param name="args">Local function arguments</param>
-		/// <returns>The value returned by the specified local function.</returns>
-		object Call(object target, string methodName, string localFunctionName, params object[] args);
+        /// <summary>
+        /// Calls the specified local function by name.
+        /// </summary>
+        /// <param name="target">Target instance</param>
+        /// <param name="methodName">Name of the method where the local function is nested</param>
+        /// <param name="localFunctionName">Name of the nested local function</param>
+        /// <param name="args">Local function arguments</param>
+        /// <returns>The value returned by the specified local function.</returns>
+        object Call(object target, string methodName, string localFunctionName, params object[] args);
 
         /// <summary>
         /// Calls the specified local function by name.
@@ -665,33 +665,33 @@ namespace Telerik.JustMock.Expectations.Abstraction.Local.Function
         /// <returns>Reference to setup actions calls</returns>
         object Call(object target, MethodInfo method, string localFunctionName, params object[] args);
 
-		/// <summary>
-		/// Setups a non-public method for mocking.
-		/// </summary>
-		/// <param name="target">Target instance</param>
-		/// <param name="method">Method to setup taken from reflection.</param>
-		/// <param name="localFunctionName">Name of the nested local function</param>
-		/// <param name="args">Method arguments</param>
-		/// <returns>Reference to setup actions calls</returns>
-		T Call<T>(object target, MethodInfo method, string localFunctionName, params object[] args);
+        /// <summary>
+        /// Setups a non-public method for mocking.
+        /// </summary>
+        /// <param name="target">Target instance</param>
+        /// <param name="method">Method to setup taken from reflection.</param>
+        /// <param name="localFunctionName">Name of the nested local function</param>
+        /// <param name="args">Method arguments</param>
+        /// <returns>Reference to setup actions calls</returns>
+        T Call<T>(object target, MethodInfo method, string localFunctionName, params object[] args);
 
-		/// <summary>
-		/// Asserts the specified local function that it is called as expected.
-		/// </summary>
-		/// <param name="target">Target mock</param>
-		/// <param name="method">Metadata for the method where the local function is nested</param>
-		/// <param name="localFunctionName">Name of the nested local function</param>
-		/// <param name="args">Method arguments</param>
-		void Assert(object target, MethodInfo method, string localFunctionName, params object[] args);
+        /// <summary>
+        /// Asserts the specified local function that it is called as expected.
+        /// </summary>
+        /// <param name="target">Target mock</param>
+        /// <param name="method">Metadata for the method where the local function is nested</param>
+        /// <param name="localFunctionName">Name of the nested local function</param>
+        /// <param name="args">Method arguments</param>
+        void Assert(object target, MethodInfo method, string localFunctionName, params object[] args);
 
-		/// <summary>
-		/// Asserts the specified local function that it is called as expected.
-		/// </summary>
-		/// <param name="target">Target mock</param>
-		/// <param name="methodName">Name of the  where the local function is nested</param>
-		/// <param name="localFunctionName">Name of the nested local function</param>
-		/// <param name="args">Method arguments</param>
-		void Assert(object target, string methodName, string localFunctionName, params object[] args);
+        /// <summary>
+        /// Asserts the specified local function that it is called as expected.
+        /// </summary>
+        /// <param name="target">Target mock</param>
+        /// <param name="methodName">Name of the  where the local function is nested</param>
+        /// <param name="localFunctionName">Name of the nested local function</param>
+        /// <param name="args">Method arguments</param>
+        void Assert(object target, string methodName, string localFunctionName, params object[] args);
 
         /// <summary>
         /// Asserts the specified local function that it is called as expected.
@@ -757,15 +757,15 @@ namespace Telerik.JustMock.Expectations.Abstraction.Local.Function
         /// <param name="args">Method arguments</param>
         void Assert(object target, MethodInfo method, string localFunctionName, Occurs occurs, params object[] args);
 
-		/// <summary>
-		/// Asserts the specified local function that it is called as expected.
-		/// </summary>
-		/// <param name="target">Target mock</param>
-		/// <param name="methodName">Name of the  where the local function is nested</param>
-		/// <param name="localFunctionName">Name of the nested local function</param>
-		/// <param name="occurs">Specifies the number of times a call should occur.</param>
-		/// <param name="args">Method arguments</param>
-		void Assert(object target, string methodName, string localFunctionName, Occurs occurs, params object[] args);
+        /// <summary>
+        /// Asserts the specified local function that it is called as expected.
+        /// </summary>
+        /// <param name="target">Target mock</param>
+        /// <param name="methodName">Name of the  where the local function is nested</param>
+        /// <param name="localFunctionName">Name of the nested local function</param>
+        /// <param name="occurs">Specifies the number of times a call should occur.</param>
+        /// <param name="args">Method arguments</param>
+        void Assert(object target, string methodName, string localFunctionName, Occurs occurs, params object[] args);
 
         /// <summary>
         /// Asserts the specified local function that it is called as expected.
