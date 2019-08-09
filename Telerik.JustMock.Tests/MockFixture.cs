@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2019 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -2479,10 +2479,220 @@ namespace Telerik.JustMock.Tests
 			}
 		}
 #endif
+
+		internal abstract class InternalAbstract
+		{
+			internal abstract string Bar { get; set; }
+		}
+
+		#region Category "FluentConfig"
+
+		public class Base
+		{
+			public const int DefaultValue = 3;
+
+			public int i = DefaultValue;
+
+			public Base(int i)
+			{
+				this.i = i;
+			}
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
+		public void ShouldUseAutoselectedConstructorMockingBehaviorWithFluentGenericConfig()
+		{
+			var proxy = Mock.Create<Base>(fluentConfig => { });
+
+			Assert.Equal(default(int), proxy.i);
+			Assert.Null(proxy as IDisposable);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
+		public void ShouldMockWhenMissingPameterlessConstructorAndRecursiveLooseWithFluentGenericConfig()
+		{
+			var proxy = Mock.Create<Base>(fluentConfig =>
+				fluentConfig.SetBehavior(Behavior.RecursiveLoose)
+			);
+
+			Assert.Equal(default(int), proxy.i);
+			Assert.Null(proxy as IDisposable);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
+		public void ShouldMockWhenMissingPameterlessConstructorAndLooseWithFluentGenericConfig()
+		{
+			var proxy = Mock.Create<Base>(fluentConfig =>
+				fluentConfig.SetBehavior(Behavior.Loose)
+			);
+
+			Assert.Equal(default(int), proxy.i);
+			Assert.Null(proxy as IDisposable);
+		}
+
+		// Implementation differs for .NETFramework and .NETCore, see DynamicProxyMockFactory.Create method
+#if !NETCORE
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
+		public void ShouldThrowWhenMissingPameterlessConstructorAndCallOriginalWithFluentGenericConfig()
+		{
+			Assert.Throws<MockException>(() =>
+				Mock.Create<Base>(fluentConfig =>
+					fluentConfig.SetBehavior(Behavior.CallOriginal))
+				);
+		}
+#else
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
+		public void ShouldMockWhenMissingPameterlessConstructorAndCallOriginalWithFluentGenericConfig()
+		{
+			var proxy = Mock.Create<Base>(fluentConfig =>
+				fluentConfig.SetBehavior(Behavior.CallOriginal)
+			);
+
+			Assert.Equal(default(int), proxy.i);
+			Assert.Null(proxy as IDisposable);
+		}
+#endif
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
+		public void ShouldThrowWhenMockConstructorAndCallConstructorWithFluentGenericConfig()
+		{
+			Assert.Throws<MockException>(() =>
+				Mock.Create<Base>(fluentConfig =>
+					fluentConfig.MockConstructor().CallConstructor(new object[] { 5 }))
+			);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
+		public void ShouldThrowWhenCallConstructorAndMockConstructorWithFluentGenericConfig()
+		{
+			Assert.Throws<MockException>(() =>
+				Mock.Create<Base>(fluentConfig =>
+					fluentConfig.CallConstructor(new object[] { 5 }).MockConstructor())
+			);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
+		public void ShouldSpecifyConstructorArgumentsWithFluentGenericConfig()
+		{
+			var proxy = Mock.Create<Base>(fluentConfig =>
+				fluentConfig.CallConstructor(new object[] { 5 })
+			);
+
+			Assert.Equal(5, proxy.i);
+			Assert.Null(proxy as IDisposable);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
+		public void ShouldMockConstructorWithFluentGenericConfig()
+		{
+			var proxy = Mock.Create<Base>(fluentConfig =>
+				fluentConfig.MockConstructor()
+			);
+
+			Assert.Equal(default(int), proxy.i);
+			Assert.Null(proxy as IDisposable);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
+		public void ShouldImplementInterfaceWithFluentGenericConfig()
+		{
+			var proxy = Mock.Create<Base>(fluentConfig =>
+				fluentConfig.Implements<IDisposable>()
+			);
+
+			Assert.Equal(default(int), proxy.i);
+			Assert.NotNull(proxy as IDisposable);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
+		public void ShouldUseAutoselectedConstructorMockingBehaviorWithFluentConfig()
+		{
+			var proxy = (Base)Mock.Create(typeof(Base), fluentConfig => { });
+
+			Assert.Equal(default(int), proxy.i);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
+		public void ShouldMockWhenMissingPameterlessConstructorAndRecursiveLooseWithFluentConfig()
+		{
+			var proxy = (Base)Mock.Create(typeof(Base), fluentConfig =>
+				fluentConfig.SetBehavior(Behavior.RecursiveLoose)
+			);
+
+			Assert.Equal(default(int), proxy.i);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
+		public void ShouldMockWhenMissingPameterlessConstructorAndLooseWithFluentConfig()
+		{
+			var proxy = (Base)Mock.Create(typeof(Base), fluentConfig =>
+				fluentConfig.SetBehavior(Behavior.Loose)
+			);
+
+			Assert.Equal(default(int), proxy.i);
+		}
+
+		// Implementation differs for .NETFramework and .NETCore, see DynamicProxyMockFactory.Create method
+#if !NETCORE
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
+		public void ShouldThrowWhenMissingPameterlessConstructorAndCallOriginalWithFluentConfig()
+		{
+			Assert.Throws<MockException>(() =>
+				Mock.Create(typeof(Base), fluentConfig =>
+					fluentConfig.SetBehavior(Behavior.CallOriginal))
+				);
+		}
+#else
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
+		public void ShouldMockWhenMissingPameterlessConstructorAndCallOriginalWithFluentConfig()
+		{
+			var proxy = (Base)Mock.Create(typeof(Base), fluentConfig =>
+				fluentConfig.SetBehavior(Behavior.CallOriginal)
+			);
+
+			Assert.Equal(default(int), proxy.i);
+		}
+#endif
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
+		public void ShouldThrowWhenMockConstructorAndCallConstructorWithFluentConfig()
+		{
+			Assert.Throws<MockException>(() =>
+				Mock.Create(typeof(Base), fluentConfig =>
+					fluentConfig.MockConstructor().CallConstructor(new object[] { 5 }))
+			);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
+		public void ShouldThrowWhenCallConstructorAndMockConstructorWithFluentConfig()
+		{
+			Assert.Throws<MockException>(() =>
+				Mock.Create(typeof(Base), fluentConfig =>
+					fluentConfig.CallConstructor(new object[] { 5 }).MockConstructor())
+			);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
+		public void ShouldSpecifyConstructorArgumentsWithFluentConfig()
+		{
+			var proxy = (Base)Mock.Create(typeof(Base), fluentConfig =>
+				fluentConfig.CallConstructor(new object[] { 5 })
+			);
+
+			Assert.Equal(5, proxy.i);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Mock"), TestCategory("FluentConfig")]
+		public void ShouldMockConstructorWithFluentConfig()
+		{
+			var proxy = (Base)Mock.Create(typeof(Base), fluentConfig =>
+				fluentConfig.MockConstructor()
+			);
+
+			Assert.Equal(default(int), proxy.i);
+		}
+
+		#endregion
 	}
 
-	internal abstract class InternalAbstract
-	{
-		internal abstract string Bar { get; set; }
-	}
 }
