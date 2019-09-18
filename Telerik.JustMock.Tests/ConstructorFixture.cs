@@ -131,38 +131,6 @@ namespace Telerik.JustMock.Tests
 			public CtorLongArg(long l) { }
 		}
 
-		public class Base
-		{
-			public int i;
-
-			public Base(int i)
-			{
-				this.i = i;
-			}
-		}
-
-		[TestMethod, TestCategory("Lite"), TestCategory("Constructor")]
-		public void ShouldUseAutoselectedConstructorMockingBehaviorWithFluentConfig()
-		{
-			var proxy = Mock.Create<Base>(fluentConfig =>
-			{
-				fluentConfig.Implements<IDisposable>();
-			});
-
-			Assert.Equal(0, proxy.i);
-		}
-
-		[TestMethod, TestCategory("Lite"), TestCategory("Constructor")]
-		public void ShouldSpecifyConstructorArgumentsWithFluentConfig()
-		{
-			var proxy = Mock.Create<Base>(fluentConfig =>
-				fluentConfig.Implements<IDisposable>()
-					.CallConstructor(new object[] { 5 })
-			);
-
-			Assert.Equal(5, proxy.i);
-		}
-
 		public class CallsCtor
 		{
 			public bool ok;
