@@ -61,6 +61,7 @@ namespace Telerik.JustMock.Core
 		internal bool InArrange { get; set; }
 		internal bool InArrangeArgMatching { get; set; }
 		internal bool InAssertSet { get; set; }
+		internal bool InRunClassConstructor { get; set; }
 		internal bool Recording { get; set; }
 		internal bool RetainBehaviorDuringRecording { get; set; }
 
