@@ -135,7 +135,6 @@ namespace Telerik.JustMock.Expectations.Abstraction
         /// Asserts the specified member that it is called as expected.
         /// </summary>
         /// <param name="target">Target mock</param>
-        /// <param name="args">Method arguments</param>
         /// <param name="memberName">Name of the member</param>
         /// <typeparam name="TReturn">Return type of the method</typeparam>
         /// <param name="args">Method arguments</param>
