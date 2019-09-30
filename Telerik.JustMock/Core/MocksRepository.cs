@@ -383,6 +383,7 @@ namespace Telerik.JustMock.Core
             invocation.InArrange = this.sharedContext.InArrange;
             invocation.InArrangeArgMatching = this.sharedContext.InArrangeArgMatching;
             invocation.InAssertSet = this.sharedContext.InAssertSet;
+            invocation.InRunClassConstructor = this.sharedContext.RunClassConstructorCount > 0;
             invocation.Recording = this.Recorder != null;
             invocation.RetainBehaviorDuringRecording = this.sharedContext.DispatchToMethodMocks;
             invocation.Repository = this;
@@ -1223,10 +1224,13 @@ namespace Telerik.JustMock.Core
                         break;
                 }
 
-                var handle = typeToIntercept.TypeHandle;
-                this.disabledTypes.Add(typeof(RuntimeHelpers));
-                ProfilerInterceptor.RunClassConstructor(handle);
-                this.disabledTypes.Remove(typeof(RuntimeHelpers));
+                using (this.sharedContext.StartRunClassConstructor())
+                {
+                    var handle = typeToIntercept.TypeHandle;
+                    this.disabledTypes.Add(typeof(RuntimeHelpers));
+                    ProfilerInterceptor.RunClassConstructor(handle);
+                    this.disabledTypes.Remove(typeof(RuntimeHelpers));
+                }
             }
         }
 
