@@ -53,7 +53,7 @@ namespace Telerik.JustMock.Core.MatcherTree
 		{
 			List<MethodMockMatcherTreeNode> results = new List<MethodMockMatcherTreeNode>();
 			GetMethodMockInternal(callPattern, 0, results, MatchingOptions.Concretizing);
-			return results.ToList();
+			return results;
 		}
 
 		public List<MethodMockMatcherTreeNode> GetMethodMock(CallPattern callPattern)
