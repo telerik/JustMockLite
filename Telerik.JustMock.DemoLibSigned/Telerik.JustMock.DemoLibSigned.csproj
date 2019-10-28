@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net45;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>net45;netcoreapp2.0;netcoreapp3.0</TargetFrameworks>
     <Configurations>Debug;Release;DebugFree;ReleaseFree</Configurations>
     <AssemblyName>Telerik.JustMock.DemoLibSigned</AssemblyName>
     <RootNamespace>Telerik.JustMock.DemoLibSigned</RootNamespace>
@@ -43,7 +43,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0' ">
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0' Or '$(TargetFramework)' == 'netcoreapp3.0'">
     <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
