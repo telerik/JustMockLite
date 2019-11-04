@@ -74,24 +74,6 @@ namespace Telerik.JustMock.Helpers
 		}
 
 		/// <summary>
-		/// Setups target property set operation to act in a specific way.
-		/// <example>
-		/// <code>
-		/// Mock.ArrangeSet(() =&gt;; foo.MyValue = 10).Throws(new InvalidOperationException());
-		/// </code>
-		/// This will throw InvalidOperationException for when foo.MyValue is set with 10.
-		/// </example>
-		/// </summary>
-		/// <typeparam name="T">Mock type.</typeparam>
-		/// <param name="obj">Target mock object.</param>
-		/// <param name="action">Target action.</param>
-		/// <returns>Reference to <see cref="ActionExpectation" /> to setup the mock.</returns>
-		public static ActionExpectation ArrangeSet<T>(this T obj, Action<T> action)
-		{
-			return ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.Arrange(() => action(obj), () => new ActionExpectation()));
-		}
-
-		/// <summary>
 		/// Setups the target call to act in a specific way.
 		/// </summary>
 		/// <typeparam name="T">Return type for the target setup.</typeparam>
@@ -103,6 +85,21 @@ namespace Telerik.JustMock.Helpers
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
 				return DoArrange(obj, typeof(T), expression, () => new ActionExpectation());
+			});
+		}
+
+		/// <summary>
+		/// Setups target property set operation to act in a specific way.
+		/// </summary>
+		/// <typeparam name="T">Mock type</typeparam>
+		/// <param name="obj">Target mock object</param>
+		/// <param name="action">Propery set action</param>
+		/// <returns>Reference to <see cref="ActionExpectation" /> to setup the mock.</returns>
+		public static ActionExpectation ArrangeSet<T>(this T obj, Action<T> action)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				return MockingContext.CurrentRepository.Arrange(() => action(obj), () => new ActionExpectation());
 			});
 		}
 
@@ -177,6 +174,35 @@ namespace Telerik.JustMock.Helpers
 			ProfilerInterceptor.GuardInternal(() =>
 			{
 				DoAssert(message, obj, typeof(T), expression, null, occurs);
+			});
+		}
+
+		/// <summary>
+		/// Asserts the specific call
+		/// </summary>
+		/// <typeparam name="T">Type of the mock.</typeparam>
+		/// <param name="obj">Target mock object</param>
+		/// <param name="action">Propert set action</param>
+		public static void AssertSet<T>(this T obj, Action<T> action, string message = null)
+		{
+			ProfilerInterceptor.GuardInternal(() =>
+			{
+				MockingContext.CurrentRepository.AssertSetAction(message, () => action(obj));
+			});
+		}
+
+		/// <summary>
+		/// Asserts the specific call
+		/// </summary>
+		/// <typeparam name="T">Type of the mock.</typeparam>
+		/// <param name="obj">Target mock object</param>
+		/// <param name="action">Propert set action</param>
+		/// <param name="occurs">Specifies the number of times a set action should occur.</param>
+		public static void AssertSet<T>(this T obj, Action<T> action, Occurs occurs, string message = null)
+		{
+			ProfilerInterceptor.GuardInternal(() =>
+			{
+				MockingContext.CurrentRepository.AssertSetAction(message, () => action(obj), null, occurs);
 			});
 		}
 
