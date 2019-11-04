@@ -121,6 +121,12 @@ namespace Telerik.JustMock.Core.Behaviors
 #endif
 			}
 
+			// mock invocations in static constructors according to the behavior
+			if (invocation.InRunClassConstructor)
+			{
+				return invocation.InArrange && !invocation.CallOriginal;
+			}
+
 			return invocation.InArrange && !invocation.InArrangeArgMatching || this.type == RecursiveMockingBehaviorType.ReturnMock;
 		}
 

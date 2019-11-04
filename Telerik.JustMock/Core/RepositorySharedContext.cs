@@ -35,6 +35,7 @@ namespace Telerik.JustMock.Core
 		private readonly ThreadLocalProperty<object> inArrangeArgMatching = new ThreadLocalProperty<object>();
 		private readonly ThreadLocalProperty<object> dispatchToMethodMocks = new ThreadLocalProperty<object>();
 		private readonly ThreadLocalProperty<object> inAssertSet = new ThreadLocalProperty<object>();
+		private readonly ThreadLocalProperty<object> runClassConstructorCount = new ThreadLocalProperty<object>();
 
 		public IRecorder Recorder
 		{
@@ -58,6 +59,21 @@ namespace Telerik.JustMock.Core
 		{
 			get { return this.inAssertSet.Get() != null; }
 			private set { this.inAssertSet.Set(value ? (object)value : null); }
+		}
+
+		public int RunClassConstructorCount
+		{
+			get
+			{
+				var value = this.runClassConstructorCount.Get();
+				if (value == null)
+				{
+					value = 0;
+					this.runClassConstructorCount.Set(value);
+				}
+				return (int)value;
+			}
+			private set { this.runClassConstructorCount.Set(value); }
 		}
 
 		public bool DispatchToMethodMocks
@@ -90,6 +106,12 @@ namespace Telerik.JustMock.Core
 		{
 			Monitor.Enter(this);
 			return new InAssertSetContext(this);
+		}
+
+		public IDisposable StartRunClassConstructor()
+		{
+			Monitor.Enter(this);
+			return new InRunClassConstructorContext(this);
 		}
 
 		public int GetNextArrangeId()
@@ -177,6 +199,22 @@ namespace Telerik.JustMock.Core
 			public override void Dispose()
 			{
 				this.Context.InAssertSet = false;
+				Monitor.Exit(this.Context);
+			}
+		}
+
+		private class InRunClassConstructorContext : ContextSession
+		{
+			public InRunClassConstructorContext(RepositorySharedContext context)
+				: base(context)
+			{
+				context.RunClassConstructorCount++;
+			}
+
+			public override void Dispose()
+			{
+				Debug.Assert(this.Context.RunClassConstructorCount >= 1);
+				this.Context.RunClassConstructorCount--;
 				Monitor.Exit(this.Context);
 			}
 		}
