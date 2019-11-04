@@ -34,10 +34,9 @@ namespace Telerik.JustMock.Expectations.DynaMock
 			: base(expression, restrictions, value)
 		{ }
 
-		private static DynamicMetaObject CreateRecorder(Expression expression, Type returnType)
+		private static DynamicMetaObject CreateRecorder(Expression expression, Type returnType, BindingRestrictions restrictions)
 		{
-			return new ExpressionRecorder(Expression.Constant(new ExpressionContainer(expression), returnType),
-				BindingRestrictions.GetExpressionRestriction(Expression.Constant(true)));
+			return new ExpressionRecorder(Expression.Constant(new ExpressionContainer(expression), returnType), restrictions);
 		}
 
 		private static Expression FromArg(DynamicMetaObject arg)
@@ -85,7 +84,7 @@ namespace Telerik.JustMock.Expectations.DynaMock
 
 			var memberExpr = Expression.Property(!wrapper.IsStatic ? valueExpr : null, property);
 
-			return CreateRecorder(memberExpr, returnType);
+			return CreateRecorder(memberExpr, returnType, BindingRestrictions.GetInstanceRestriction(this.Expression, this.Value));
 		}
 
 		public override DynamicMetaObject BindSetMember(SetMemberBinder binder, DynamicMetaObject value)
@@ -102,7 +101,7 @@ namespace Telerik.JustMock.Expectations.DynaMock
 
 			var memberExpr = Expression.Assign(Expression.Property(!wrapper.IsStatic ? valueExpr : null, property), FromArg(value));
 
-			return CreateRecorder(memberExpr, returnType);
+			return CreateRecorder(memberExpr, returnType, BindingRestrictions.GetInstanceRestriction(this.Expression, this.Value));
 		}
 
 		public override DynamicMetaObject BindGetIndex(GetIndexBinder binder, DynamicMetaObject[] indexes)
@@ -115,7 +114,7 @@ namespace Telerik.JustMock.Expectations.DynaMock
 				ThrowMissingMemberException(valueExpr.Type, "Item");
 
 			var memberExpr = Expression.MakeIndex(!wrapper.IsStatic ? valueExpr : null, property, indexes.Select(FromArg));
-			return CreateRecorder(memberExpr, binder.ReturnType);
+			return CreateRecorder(memberExpr, binder.ReturnType, BindingRestrictions.GetInstanceRestriction(this.Expression, this.Value));
 		}
 
 		public override DynamicMetaObject BindSetIndex(SetIndexBinder binder, DynamicMetaObject[] indexes, DynamicMetaObject value)
@@ -130,7 +129,7 @@ namespace Telerik.JustMock.Expectations.DynaMock
 			var memberExpr = Expression.Assign(
 				Expression.MakeIndex(!wrapper.IsStatic ? valueExpr : null, property, indexes.Select(FromArg)),
 				FromArg(value));
-			return CreateRecorder(memberExpr, binder.ReturnType);
+			return CreateRecorder(memberExpr, binder.ReturnType, BindingRestrictions.GetInstanceRestriction(this.Expression, this.Value));
 		}
 
 		public override DynamicMetaObject BindInvokeMember(InvokeMemberBinder binder, DynamicMetaObject[] args)
@@ -188,7 +187,7 @@ namespace Telerik.JustMock.Expectations.DynaMock
 
 			var memberExpr = Expression.Call(!wrapper.IsStatic ? valueExpr : null, method, args.Select(FromArg).ToArray());
 
-			return CreateRecorder(memberExpr, binder.ReturnType);
+			return CreateRecorder(memberExpr, binder.ReturnType, BindingRestrictions.GetInstanceRestriction(this.Expression, this.Value));
 		}
 
 		public override DynamicMetaObject BindBinaryOperation(BinaryOperationBinder binder, DynamicMetaObject arg)
