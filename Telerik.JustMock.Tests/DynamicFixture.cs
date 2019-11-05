@@ -245,7 +245,6 @@ namespace Telerik.JustMock.Tests
 			Mock.Assert(mock);
 		}
 
-#if !NETCORE30
 		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
 		public void ShouldArrangeNonPublicMemberRecursivelyViaDynaMock()
 		{
@@ -274,7 +273,6 @@ namespace Telerik.JustMock.Tests
 			Mock.NonPublic.Assert(wrapper.Value = 123, Occurs.Once());
 			Mock.NonPublic.Assert(wrapper.Value = ArgExpr.IsAny<int>(), Occurs.Once());
 		}
-#endif
 
 #if !COREFX
 		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
