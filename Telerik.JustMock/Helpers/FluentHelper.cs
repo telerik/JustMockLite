@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2019 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -183,6 +183,7 @@ namespace Telerik.JustMock.Helpers
 		/// <typeparam name="T">Type of the mock.</typeparam>
 		/// <param name="obj">Target mock object</param>
 		/// <param name="action">Propert set action</param>
+		/// <param name="message">A message to display if the assertion fails.</param>
 		public static void AssertSet<T>(this T obj, Action<T> action, string message = null)
 		{
 			ProfilerInterceptor.GuardInternal(() =>
@@ -198,6 +199,7 @@ namespace Telerik.JustMock.Helpers
 		/// <param name="obj">Target mock object</param>
 		/// <param name="action">Propert set action</param>
 		/// <param name="occurs">Specifies the number of times a set action should occur.</param>
+		/// <param name="message">A message to display if the assertion fails.</param>
 		public static void AssertSet<T>(this T obj, Action<T> action, Occurs occurs, string message = null)
 		{
 			ProfilerInterceptor.GuardInternal(() =>
