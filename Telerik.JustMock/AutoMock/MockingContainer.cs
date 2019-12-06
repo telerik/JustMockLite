@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015,2018 Progress Software Corporation
+ Copyright © 2010-2015,2018-2019 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -98,10 +98,10 @@ namespace Telerik.JustMock.AutoMock
 					var targetType = typeof(T);
 					if (targetType.IsAbstract)
 					{
-                        MockCreationSettings settings = MockCreationSettings.GetSettings(Behavior.CallOriginal);
-                        ProxyTypeInfo typeInfo = MockingContext.CurrentRepository.CreateClassProxyType(targetType, settings);
+						MockCreationSettings settings = MockCreationSettings.GetSettings(Behavior.CallOriginal);
+						ProxyTypeInfo typeInfo = MockingContext.CurrentRepository.CreateClassProxyType(targetType, settings);
 
-                        this.implementationType = typeInfo.ProxyType;
+						this.implementationType = typeInfo.ProxyType;
 						foreach (var mixin in typeInfo.Mixins)
 						{
 							this.Bind(mixin.Key).ToConstant(mixin.Value);
@@ -196,6 +196,21 @@ namespace Telerik.JustMock.AutoMock
 		public ActionExpectation Arrange<TInterface>(Expression<Action<TInterface>> expression)
 		{
 			return ProfilerInterceptor.GuardInternal(() => this.Get<TInterface>().Arrange(expression));
+		}
+
+		/// <summary>
+		/// Entry-point for setting expectations.
+		/// </summary>
+		/// <typeparam name="TInterface">
+		/// Mocking interface
+		/// </typeparam>
+		/// <param name="action">Target action</param>
+		/// <returns>
+		/// Reference to <see cref="ActionExpectation"/> to setup the mock.
+		/// </returns>
+		public ActionExpectation ArrangeSet<TInterface>(Action<TInterface> action)
+		{
+			return ProfilerInterceptor.GuardInternal(() => this.Get<TInterface>().ArrangeSet(action));
 		}
 
 		/// <summary>
@@ -331,6 +346,29 @@ namespace Telerik.JustMock.AutoMock
 		public void Assert<TService>(string bindingName, Expression<Action<TService>> expression, Occurs occurs, string message = null)
 		{
 			ProfilerInterceptor.GuardInternal(() => this.Get<TService>(bindingName).Assert(expression, occurs, message));
+		}
+
+		/// <summary>
+		/// Asserts the specific call
+		/// </summary>
+		/// <typeparam name="TService">Service type.</typeparam>
+		/// <param name="action">Target action.</param>
+		/// <param name="message">A message to display if the assertion fails.</param>
+		public void AssertSet<TService>(Action<TService> action, string message = null)
+		{
+			ProfilerInterceptor.GuardInternal(() => this.Get<TService>().AssertSet(action, message));
+		}
+
+		/// <summary>
+		/// Asserts the specific call
+		/// </summary>
+		/// <typeparam name="TService">Service type.</typeparam>
+		/// <param name="action">Target action.</param>
+		/// <param name="occurs">Specifies the number of times a mock call should occur.</param>
+		/// <param name="message">A message to display if the assertion fails.</param>
+		public void AssertSet<TService>(Action<TService> action, Occurs occurs, string message = null)
+		{
+			ProfilerInterceptor.GuardInternal(() => this.Get<TService>().AssertSet(action, occurs, message));
 		}
 	}
 }
