@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2019 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -255,7 +255,10 @@ namespace Telerik.JustMock.Tests
 			Assert.Throws<MockException>(() => new MockingContainer<VariousCtors>(new AutoMockSettings { ConstructorArgTypes = new[] { typeof(ICalendar) } }));
 		}
 
-		public interface IService { }
+		public interface IService
+		{
+			int Value { get; set; }
+		}
 
 		public class Module
 		{
@@ -274,6 +277,84 @@ namespace Telerik.JustMock.Tests
 			var s1 = container.Get<IService>();
 			var s2 = container.Instance.service;
 			Assert.Same(s1, s2);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+		public void ShouldArrangePropertySet()
+		{
+			// Arrange
+			var container = new MockingContainer<Module>();
+			container.ArrangeSet<IService>(x => x.Value = 99).MustBeCalled();
+			var service = container.Get<IService>();
+
+			// Act 
+			service.Value = 99;
+
+			// Assert
+			container.Assert<IService>();
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+		public void ShouldArrangePropertySetWithMatcher()
+		{
+			// Arrange
+			var container = new MockingContainer<Module>();
+			container.ArrangeSet<IService>(x => x.Value = Arg.AnyInt).MustBeCalled();
+			var service = container.Get<IService>();
+
+			// Act 
+			service.Value = 99;
+
+			// Assert
+			container.Assert<IService>();
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+		public void ShouldAssertPropertySet()
+		{
+			// Arrange
+			var container = new MockingContainer<Module>();
+
+			// Act 
+			container.Get<IService>().Value = 99;
+
+			// Assert
+			container.AssertSet<IService>(x => x.Value = 99);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+		public void ShouldAssertPropertySetWithMatcher()
+		{
+			// Arrange
+			var container = new MockingContainer<Module>();
+
+			// Act 
+			container.Get<IService>().Value = 99;
+
+			// Assert
+			container.AssertSet<IService>(x => x.Value = Arg.AnyInt);
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+		public void ShouldAssertPropertySetNegative()
+		{
+            DebugView.IsTraceEnabled = true;
+
+			// Arrange
+			var container = new MockingContainer<Module>();
+
+			// Assert
+			container.AssertSet<IService>(x => x.Value = 99, Occurs.Never());
+		}
+
+		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+		public void ShouldAssertPropertySetNegativeWithMatcher()
+		{
+			// Arrange
+			var container = new MockingContainer<Module>();
+
+			// Assert
+			container.AssertSet<IService>(x => x.Value = Arg.AnyInt, Occurs.Never());
 		}
 
 		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
