@@ -91,6 +91,11 @@
   <ItemGroup>
     <Compile Include="..\CommonAssemblyInfo.cs" Link="Properties\CommonAssemblyInfo.cs" />
     <EmbeddedResource Include="Core\DynamicProxy\DynamicProxy.snk" />
+    <Compile Update="ArgExpr.part.cs">
+      <DependentUpon>ArgExpr.part.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
     <Compile Update="Args.Matching.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -180,6 +185,10 @@
     <PackageReference Include="System.Security.Permissions" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="ArgExpr.part.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ArgExpr.part.cs</LastGenOutput>
+    </None>
     <None Update="Core\TransparentProxy\JustMockLite.bak\Telerik.JustMock.Tests\Coverage\DoInsteadFixture.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
     </None>
