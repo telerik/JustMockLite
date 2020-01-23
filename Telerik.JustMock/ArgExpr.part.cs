@@ -25,7 +25,7 @@ namespace Telerik.JustMock
 	/// <summary>
 	/// Provides various argument matching shortcuts.
 	/// </summary>
-	public static partial class ArgExpr
+	public partial class ArgExpr
 	{
 			
 		/// <summary>
