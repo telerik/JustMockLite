@@ -27,7 +27,7 @@ namespace Telerik.JustMock
 	/// <summary>
 	/// Provides various argument matching shortcuts.
 	/// </summary>
-	public static partial class ArgExpr
+	public partial class ArgExpr
 	{
 		<#
 		string [] arguments = new string[] { "int", "float", "double", "decimal" ,"long", "char", "string", "object", "short", "bool", "Guid", "DateTime", "TimeSpan", "byte", "SByte", "Uri" };

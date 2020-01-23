@@ -166,7 +166,26 @@ namespace Telerik.JustMock
 		/// <returns>A special value with member 'Value' that must be passed by ref.</returns>
 		public static OutRefResult<T> Ref<T>(T value)
 		{
-            return ProfilerInterceptor.GuardInternal(() => new OutRefResult<T>() { Value = value });
+			return ProfilerInterceptor.GuardInternal(() => new OutRefResult<T>() { Value = value });
 		}
+
+		/// <summary>
+		/// Specifies an argument matcher used in non-public method arrangements.
+		/// </summary>
+		/// <example>
+		/// class Foo
+		/// {
+		///     void Bar(int a)
+		///     {
+		///         throw new NotImplementedException();
+		///     }
+		/// }
+		/// 
+		/// var mock = Mock.Create&lt;Foo&gt;()
+		/// Mock.NonPublic.Arrange(mock, "Bar", Arg.NonPublic.AnyInt).DoNothing();
+		/// 
+		/// The above example arranges Foo.Bar to do nothing for any integer value given.
+		/// </example>
+		public class NonPublic : ArgExpr { }
 	}
 }
