@@ -26,7 +26,7 @@ namespace Telerik.JustMock
 	/// Allows specification of a matching condition for an argument for a non-public method, rather
 	/// a specific value.
 	/// </summary>
-	public static class ArgExpr
+	public static partial class ArgExpr
 	{
 		/// <summary>
 		/// Matches argument for any value.
