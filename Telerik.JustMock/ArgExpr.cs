@@ -27,8 +27,10 @@ namespace Telerik.JustMock
     /// Allows specification of a matching condition for an argument for a non-public method, rather
     /// a specific value.
     /// </summary>
+#if !PORTABLE
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
+#endif
     public partial class ArgExpr
 	{
 		internal ArgExpr() { }
