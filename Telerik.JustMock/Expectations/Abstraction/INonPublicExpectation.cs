@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015, 2018 Progress Software Corporation
+ Copyright © 2010-2015, 2018-2020 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -28,22 +28,21 @@ namespace Telerik.JustMock.Expectations.Abstraction
 	/// when there's a need to disambiguate between overloads, or when you need to specify
 	/// matchers for the arguments using. Arguments are passed using either constant objects
 	/// when a specific value needs to be matched, or using one of the members of the
-	/// <see cref="ArgExpr"/> class. If a member is not overloaded and you want the arrangement
+	/// <see cref="Arg.Expr"/> class. If a member is not overloaded and you want the arrangement
 	/// to work for all arguments, then you can specify just the name of the member and omit
-	/// all arguments. This is equivalent to passing the correct ArgExpr.IsAny&lt;T&gt;() arguments
+	/// all arguments. This is equivalent to passing the correct Arg.Expr.IsAny&lt;T&gt;() arguments
 	/// or adding the .IgnoreArguments() clause.
 	/// </remarks>
 	public interface INonPublicExpectation
 	{
-		/// <summary>
-		/// Arranges a method for mocking.
-		/// </summary>
-		/// <param name="target">Target instance</param>
-		/// <param name="memberName">Member name</param>
-		/// <param name="args">Method arguments</param>
-		/// <returns>Reference to setup actions calls</returns>
-		ActionExpectation Arrange(object target, string memberName, params object[] args);
-
+        /// <summary>
+        /// Arranges a method for mocking.
+        /// </summary>
+        /// <param name="target">Target instance</param>
+        /// <param name="memberName">Member name</param>
+        /// <param name="args">Method arguments. Use <see cref="Arg.Expr"/> for predefined argument matchers.</param>
+        /// <returns>Reference to setup actions calls</returns>
+        ActionExpectation Arrange(object target, string memberName, params object[] args);
 
         /// <summary>
         /// Arranges a method for mocking.
@@ -51,7 +50,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
         /// <param name="target">Target instance</param>
         /// <param name="memberName">Member name</param>
         /// <param name="typeArguments">Generic type arguments of the member specified by memberName</param>
-        /// <param name="args">Method arguments</param>
+        /// <param name="args">Method arguments. Use <see cref="Arg.Expr"/> for predefined argument matchers.</param>
         /// <returns>Reference to setup actions calls</returns>
         ActionExpectation Arrange(object target, string memberName, Type[] typeArguments, params object[] args);
 
@@ -60,19 +59,19 @@ namespace Telerik.JustMock.Expectations.Abstraction
         /// </summary>
         /// <param name="target">Target instance</param>
         /// <param name="method">Method to setup taken from reflection.</param>
-        /// <param name="args">Method arguments</param>
+        /// <param name="args">Method arguments. Use <see cref="Arg.Expr"/> for predefined argument matchers.</param>
         /// <returns>Reference to setup actions calls</returns>
         ActionExpectation Arrange(object target, MethodInfo method, params object[] args);
 
 
-		/// <summary>
-		/// Arranges a method for mocking.
-		/// </summary>
-		/// <typeparam name="TReturn">Return type</typeparam>
-		/// <param name="target">Target instance.</param>
-		/// <param name="memberName">Target member name</param>
-		/// <param name="args">Method arguments</param>
-		FuncExpectation<TReturn> Arrange<TReturn>(object target, string memberName, params object[] args);
+        /// <summary>
+        /// Arranges a method for mocking.
+        /// </summary>
+        /// <typeparam name="TReturn">Return type</typeparam>
+        /// <param name="target">Target instance.</param>
+        /// <param name="memberName">Target member name</param>
+        /// <param name="args">Method arguments. Use <see cref="Arg.Expr"/> for predefined argument matchers.</param>
+        FuncExpectation<TReturn> Arrange<TReturn>(object target, string memberName, params object[] args);
 
 
         /// <summary>
@@ -82,7 +81,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
         /// <param name="target">Target instance.</param>
         /// <param name="memberName">Target member name</param>
         /// <param name="typeArguments">Generic type arguments of the member specified by memberName</param>
-        /// <param name="args">Method arguments</param>
+        /// <param name="args">Method arguments. Use <see cref="Arg.Expr"/> for predefined argument matchers.</param>
         FuncExpectation<TReturn> Arrange<TReturn>(object target, string memberName, Type[] typeArguments, params object[] args);
 
         /// <summary>
@@ -91,45 +90,45 @@ namespace Telerik.JustMock.Expectations.Abstraction
         /// <typeparam name="TReturn">Return type</typeparam>
         /// <param name="target">Target instance</param>
         /// <param name="method">Method to setup taken from reflection.</param>
-        /// <param name="args">Method arguments</param>
+        /// <param name="args">Method arguments. Use <see cref="Arg.Expr"/> for predefined argument matchers.</param>
         /// <returns>Reference to setup actions calls</returns>
         FuncExpectation<TReturn> Arrange<TReturn>(object target, MethodInfo method, params object[] args);
 
-		/// <summary>
-		/// Arranges a non-public property setter for mocking.
-		/// </summary>
-		/// <param name="target">Target instance</param>
-		/// <param name="propertyName">Property name</param>
-		/// <param name="value">Property value</param>
-		/// <returns>Reference to setup actions calls</returns>
-		ActionExpectation ArrangeSet(object target, string propertyName, object value);
+        /// <summary>
+        /// Arranges a non-public property setter for mocking.
+        /// </summary>
+        /// <param name="target">Target instance</param>
+        /// <param name="propertyName">Property name</param>
+        /// <param name="value">Property value. Use <see cref="Arg.Expr"/> for predefined argument matchers.</param>
+        /// <returns>Reference to setup actions calls</returns>
+        ActionExpectation ArrangeSet(object target, string propertyName, object value);
 
-		/// <summary>
-		/// Arranges a non-public static property setter contained by type parameter "T" for mocking.
-		/// </summary>
-		/// <typeparam name="T">Type that contains the non-public static property</typeparam>
-		/// <param name="propertyName">Property name</param>
-		/// <param name="value">Property value</param>
-		/// <returns>Reference to setup actions calls</returns>
-		ActionExpectation ArrangeSet<T>(string propertyName, object value);
+        /// <summary>
+        /// Arranges a non-public static property setter contained by type parameter "T" for mocking.
+        /// </summary>
+        /// <typeparam name="T">Type that contains the non-public static property</typeparam>
+        /// <param name="propertyName">Property name</param>
+        /// <param name="value">Property value. Use <see cref="Arg.Expr"/> for predefined argument matchers.</param>
+        /// <returns>Reference to setup actions calls</returns>
+        ActionExpectation ArrangeSet<T>(string propertyName, object value);
 
-		/// <summary>
-		/// Arranges a non-public static property setter contained by "type" for mocking.
-		/// </summary>
-		/// <param name="type">Type that contains the non-public static property</param>
-		/// <param name="propertyName">Property name</param>
-		/// <param name="value">Property value</param>
-		/// <returns>Reference to setup actions calls</returns>
-		ActionExpectation ArrangeSet(Type type, string propertyName, object value);
+        /// <summary>
+        /// Arranges a non-public static property setter contained by "type" for mocking.
+        /// </summary>
+        /// <param name="type">Type that contains the non-public static property</param>
+        /// <param name="propertyName">Property name</param>
+        /// <param name="value">Property value. Use <see cref="Arg.Expr"/> for predefined argument matchers.</param>
+        /// <returns>Reference to setup actions calls</returns>
+        ActionExpectation ArrangeSet(Type type, string propertyName, object value);
 
-		/// <summary>
-		/// Asserts the specified member that it is called as expected.
-		/// </summary>
-		/// <param name="target">Target mock</param>
-		/// <param name="memberName">Name of the member</param>
-		/// <typeparam name="TReturn">Return type of the method</typeparam>
-		/// <param name="args">Method arguments</param>
-		void Assert<TReturn>(object target, string memberName, params object[] args);
+        /// <summary>
+        /// Asserts the specified member that it is called as expected.
+        /// </summary>
+        /// <param name="target">Target mock</param>
+        /// <param name="memberName">Name of the member</param>
+        /// <typeparam name="TReturn">Return type of the method</typeparam>
+        /// <param name="args">Method arguments</param>
+        void Assert<TReturn>(object target, string memberName, params object[] args);
 
         /// <summary>
         /// Asserts the specified member that it is called as expected.
@@ -148,13 +147,13 @@ namespace Telerik.JustMock.Expectations.Abstraction
         /// <param name="args">Method arguments</param>
         void Assert(object target, MethodInfo method, params object[] args);
 
-		/// <summary>
-		/// Asserts the specified member that it is called as expected.
-		/// </summary>
-		/// <param name="target">Target mock</param>
-		/// <param name="memberName">Name of the member</param>
-		/// <param name="args">Method arguments</param>
-		void Assert(object target, string memberName, params object[] args);
+        /// <summary>
+        /// Asserts the specified member that it is called as expected.
+        /// </summary>
+        /// <param name="target">Target mock</param>
+        /// <param name="memberName">Name of the member</param>
+        /// <param name="args">Method arguments</param>
+        void Assert(object target, string memberName, params object[] args);
 
         /// <summary>
         /// Asserts the specified member that it is called as expected.
@@ -223,14 +222,14 @@ namespace Telerik.JustMock.Expectations.Abstraction
         /// <returns>Number of calls.</returns>
         int GetTimesCalled(object target, MethodInfo method, params object[] args);
 
-		/// <summary>
-		/// Returns the number of times the specified member was called.
-		/// </summary>
-		/// <param name="target">Target mock</param>
-		/// <param name="memberName">Name of the member</param>
-		/// <param name="args">Method arguments</param>
-		/// <returns>Number of calls.</returns>
-		int GetTimesCalled(object target, string memberName, params object[] args);
+        /// <summary>
+        /// Returns the number of times the specified member was called.
+        /// </summary>
+        /// <param name="target">Target mock</param>
+        /// <param name="memberName">Name of the member</param>
+        /// <param name="args">Method arguments</param>
+        /// <returns>Number of calls.</returns>
+        int GetTimesCalled(object target, string memberName, params object[] args);
 
 
 #if !LITE_EDITION
@@ -250,7 +249,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
         /// <typeparam name="T">Type of the target.</typeparam>
         /// <typeparam name="TReturn">Return type</typeparam>
         /// <param name="memberName">Target member name</param>
-        /// <param name="args">Method arguments</param>
+        /// <param name="args">Method arguments. Use <see cref="Arg.Expr"/> for predefined argument matchers.</param>
         FuncExpectation<TReturn> Arrange<T, TReturn>(string memberName, params object[] args);
 
         /// <summary>
@@ -260,7 +259,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
         /// <typeparam name="TReturn">Return type</typeparam>
         /// <param name="memberName">Target member name</param>
         /// <param name="typeArguments">Generic type arguments of the member specified by memberName</param>
-        /// <param name="args">Method arguments</param>
+        /// <param name="args">Method arguments. Use <see cref="Arg.Expr"/> for predefined argument matchers.</param>
         FuncExpectation<TReturn> Arrange<T, TReturn>(string memberName, Type[] typeArguments, params object[] args);
 
         /// <summary>
@@ -268,7 +267,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
         /// </summary>
         /// <typeparam name="T">Type of the target.</typeparam>
         /// <param name="memberName">Target member name</param>
-        /// <param name="args">Method arguments</param>
+        /// <param name="args">Method arguments. Use <see cref="Arg.Expr"/> for predefined argument matchers.</param>
         ActionExpectation Arrange<T>(string memberName, params object[] args);
 
         /// <summary>
@@ -277,7 +276,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
         /// <typeparam name="T">Type of the target.</typeparam>
         /// <param name="memberName">Target member name</param>
         /// <param name="typeArguments">Generic type arguments of the member specified by memberName</param>
-        /// <param name="args">Method arguments</param>
+        /// <param name="args">Method arguments. Use <see cref="Arg.Expr"/> for predefined argument matchers.</param>
         ActionExpectation Arrange<T>(string memberName, Type[] typeArguments, params object[] args);
 
         /// <summary>
@@ -286,7 +285,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
         /// <typeparam name="TReturn">Return type</typeparam>
         /// <param name="targetType">Target type</param>
         /// <param name="memberName">Target member name</param>
-        /// <param name="args">Method arguments</param>
+        /// <param name="args">Method arguments. Use <see cref="Arg.Expr"/> for predefined argument matchers.</param>
         FuncExpectation<TReturn> Arrange<TReturn>(Type targetType, string memberName, params object[] args);
 
         /// <summary>
@@ -296,7 +295,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
         /// <param name="targetType">Target type</param>
         /// <param name="memberName">Target member name</param>
         /// <param name="typeArguments">Generic type arguments of the member specified by memberName</param>
-        /// <param name="args">Method arguments</param>
+        /// <param name="args">Method arguments. Use <see cref="Arg.Expr"/> for predefined argument matchers.</param>
         FuncExpectation<TReturn> Arrange<TReturn>(Type targetType, string memberName, Type[] typeArguments, params object[] args);
 
         /// <summary>
@@ -304,7 +303,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
         /// </summary>
         /// <param name="targetType">Target type</param>
         /// <param name="memberName">Target member name</param>
-        /// <param name="args">Method arguments</param>
+        /// <param name="args">Method arguments. Use <see cref="Arg.Expr"/> for predefined argument matchers.</param>
         ActionExpectation Arrange(Type targetType, string memberName, params object[] args);
 
         /// <summary>
@@ -313,7 +312,7 @@ namespace Telerik.JustMock.Expectations.Abstraction
         /// <param name="targetType">Target type</param>
         /// <param name="memberName">Target member name</param>
         /// <param name="typeArguments">Generic type arguments of the member specified by memberName</param>
-        /// <param name="args">Method arguments</param>
+        /// <param name="args">Method arguments. Use <see cref="Arg.Expr"/> for predefined argument matchers.</param>
         ActionExpectation Arrange(Type targetType, string memberName, Type[] typeArguments, params object[] args);
 
         /// <summary>
@@ -321,15 +320,15 @@ namespace Telerik.JustMock.Expectations.Abstraction
         /// </summary>
         /// <typeparam name="TReturn">Return type</typeparam>
         /// <param name="method">Target method</param>
-        /// <param name="args">Method arguments</param>
+        /// <param name="args">Method arguments. Use <see cref="Arg.Expr"/> for predefined argument matchers.</param>
         FuncExpectation<TReturn> Arrange<TReturn>(MethodBase method, params object[] args);
 
-		/// <summary>
-		/// Arranges a method for mocking.
-		/// </summary>
-		/// <param name="method">Target method</param>
-		/// <param name="args">Method arguments</param>
-		ActionExpectation Arrange(MethodBase method, params object[] args);
+        /// <summary>
+        /// Arranges a method for mocking.
+        /// </summary>
+        /// <param name="method">Target method</param>
+        /// <param name="args">Method arguments. Use <see cref="Arg.Expr"/> for predefined argument matchers.</param>
+        ActionExpectation Arrange(MethodBase method, params object[] args);
 
 		/// <summary>
 		/// Asserts the specified member that it is called as expected.

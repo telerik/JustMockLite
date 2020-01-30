@@ -111,6 +111,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Arg.part.tt</DependentUpon>
     </Compile>
+    <Compile Update="Core\ArgExprImplementation.part.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ArgExprImplementation.part.tt</DependentUpon>
+    </Compile>
     <Compile Update="Expectations\Abstraction\IReturns.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -120,6 +125,11 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>IWhen.tt</DependentUpon>
+    </Compile>
+    <Compile Update="IArgExpr.part.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>IArgExpr.part.tt</DependentUpon>
     </Compile>
     <Compile Update="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -189,6 +199,14 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>ArgExpr.part.cs</LastGenOutput>
     </None>
+    <None Update="Core\ArgExprImplementation.part.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ArgExprImplementation.part.cs</LastGenOutput>
+    </None>
+    <None Update="IArgExpr.part.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>IArgExpr.part.cs</LastGenOutput>
+    </None>
     <None Update="Core\TransparentProxy\JustMockLite.bak\Telerik.JustMock.Tests\Coverage\DoInsteadFixture.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
     </None>
@@ -213,5 +231,8 @@
     <None Update="Core\TransparentProxy\JustMockLite.bak\Telerik.JustMock\Mock.VisualBasic2008.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 </Project>

@@ -17,8 +17,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 	using System;
 	using System.Reflection;
 
-	public abstract class CompositionInvocation : AbstractInvocation
-	{
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    public abstract class CompositionInvocation : AbstractInvocation
+    {
 		protected object target;
 
 		protected CompositionInvocation(
@@ -83,4 +84,5 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 			throw new InvalidOperationException(message);
 		}
 	}
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }
