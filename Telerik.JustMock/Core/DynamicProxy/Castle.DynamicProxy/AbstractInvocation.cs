@@ -19,8 +19,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 	using System.Reflection;
     using Telerik.JustMock.Diagnostics;
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     public abstract class AbstractInvocation : IInvocation
-	{
+    {
 		private readonly IInterceptor[] interceptors;
 		private readonly object[] arguments;
 		private int currentInterceptorIndex = -1;
@@ -190,4 +191,5 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 			return method;
 		}
 	}
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }

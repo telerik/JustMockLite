@@ -29,7 +29,7 @@ namespace Telerik.JustMock
     /// <example>
     /// <see cref="AttributesToAvoidReplicating"/>.Add(typeof(ServiceContractAttribute));
     /// </example>
-
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     public static class AttributesToAvoidReplicating
 	{
 		private static readonly object lockObject = new object();
@@ -51,8 +51,10 @@ namespace Telerik.JustMock
 			};
 		}
 
-		public static void Add(Type attribute)
-		{
+
+        public static void Add(Type attribute)
+
+        {
             ProfilerInterceptor.GuardInternal(() =>
             {
                 if (attributes.Contains(attribute) == false)
@@ -81,4 +83,5 @@ namespace Telerik.JustMock
 			return attributes.Any(attr => attr.GetTypeInfo().IsAssignableFrom(attribute.GetTypeInfo()));
 		}
 	}
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }

@@ -399,7 +399,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldFailToChainReturnsCallToActionExpectationFromNonPublicInterface()
 		{
 			var mock = Mock.Create<IGuidResolver>();
-			Assert.Throws<MockException>(() => Mock.NonPublic.Arrange(mock, "GetGuid", ArgExpr.IsNull<string>()).Returns((Guid?)new Guid()));
+			Assert.Throws<MockException>(() => Mock.NonPublic.Arrange(mock, "GetGuid", Arg.Expr.IsNull<string>()).Returns((Guid?)new Guid()));
 		}
 	}
 

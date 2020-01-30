@@ -180,7 +180,7 @@ namespace Telerik.JustMock.Tests
 			dynamic wrapper = Mock.NonPublic.Wrap(mock);
 			var acc = new TestBed.Accessor(mock);
 
-			Mock.NonPublic.Arrange(wrapper.Value = ArgExpr.IsAny<int>()).MustBeCalled();
+			Mock.NonPublic.Arrange(wrapper.Value = Arg.Expr.IsAny<int>()).MustBeCalled();
 			Assert.Throws<AssertionException>(() => Mock.Assert(mock));
 
 			acc.Value = 77;
@@ -208,7 +208,7 @@ namespace Telerik.JustMock.Tests
 			dynamic wrapper = Mock.NonPublic.Wrap(mock);
 			var acc = new TestBed.Accessor(mock);
 
-			Mock.NonPublic.Arrange<int>(wrapper.Get(ArgExpr.Matches<int>(x => x > 40), ArgExpr.IsAny<string>())).Returns(123);
+			Mock.NonPublic.Arrange<int>(wrapper.Get(Arg.Expr.Matches<int>(x => x > 40), Arg.Expr.IsAny<string>())).Returns(123);
 
 			Assert.Equal(0, acc.Get(20, "ss"));
 			Assert.Equal(123, acc.Get(50, "dd"));
@@ -266,12 +266,12 @@ namespace Telerik.JustMock.Tests
 			var acc = new TestBed.Accessor(mock);
 
 			Assert.Throws<AssertionException>(() => Mock.NonPublic.Assert(wrapper.Value = 123, Occurs.Once()));
-			Assert.Throws<AssertionException>(() => Mock.NonPublic.Assert(wrapper.Value = ArgExpr.IsAny<int>(), Occurs.Once()));
+			Assert.Throws<AssertionException>(() => Mock.NonPublic.Assert(wrapper.Value = Arg.Expr.IsAny<int>(), Occurs.Once()));
 
 			acc.Value = 123;
 
 			Mock.NonPublic.Assert(wrapper.Value = 123, Occurs.Once());
-			Mock.NonPublic.Assert(wrapper.Value = ArgExpr.IsAny<int>(), Occurs.Once());
+			Mock.NonPublic.Assert(wrapper.Value = Arg.Expr.IsAny<int>(), Occurs.Once());
 		}
 
 #if !COREFX
