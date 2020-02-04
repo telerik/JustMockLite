@@ -29,15 +29,21 @@ namespace Telerik.JustMock
     /// </summary>
     public static partial class Arg
     {
-        static Arg()
-        {
-            Expr = new ArgExprImplementation();
-        }
+        private static ArgExprImplementation expr = new ArgExprImplementation();
 
         /// <summary>
 		/// Specifies argument matchers used in non-public method arrangements.
 		/// </summary>
-        public static IArgExpr Expr { get; private set; }
+        public static IArgExpr Expr
+        {
+            get
+            {
+                return ProfilerInterceptor.GuardInternal(() =>
+                {
+                    return expr;
+                });
+            }
+        }
 
         /// <summary>
         /// Matches argument for the expected condition.

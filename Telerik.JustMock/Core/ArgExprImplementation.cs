@@ -23,27 +23,42 @@ namespace Telerik.JustMock.Core
     {
         public Expression IsAny<T>()
         {
-            return ArgExpr.IsAny<T>();
+            return ProfilerInterceptor.GuardInternal(() =>
+            {
+                return ArgExpr.IsAny<T>();
+            });
         }
 
         public Expression IsNull<T>()
         {
-            return ArgExpr.IsNull<T>();
+            return ProfilerInterceptor.GuardInternal(() =>
+            {
+                return ArgExpr.IsNull<T>();
+            });
         }
 
         public Expression Matches<T>(Expression<Predicate<T>> match)
         {
-            return ArgExpr.Matches<T>(match);
+            return ProfilerInterceptor.GuardInternal(() =>
+            {
+                return ArgExpr.Matches<T>(match);
+            });
         }
 
         public Expression Out<T>(T value)
         {
-            return ArgExpr.Out<T>(value);
+            return ProfilerInterceptor.GuardInternal(() =>
+            {
+                return ArgExpr.Out<T>(value);
+            });
         }
 
         public Expression Ref<T>(T value)
         {
-            return ArgExpr.Ref<T>(value);
+            return ProfilerInterceptor.GuardInternal(() =>
+            {
+                return ArgExpr.Ref<T>(value);
+            });
         }
     }
 }
