@@ -44,7 +44,10 @@ namespace Telerik.JustMock.Core
 		{
 			get
 			{
-				return ArgExpr.IsAny<<#= argument #>>();
+				return ProfilerInterceptor.GuardInternal(() =>
+				{
+					return ArgExpr.IsAny<<#= argument #>>();
+				});
 			}
 		}
 		<#					

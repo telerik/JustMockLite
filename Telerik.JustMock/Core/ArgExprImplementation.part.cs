@@ -35,7 +35,10 @@ namespace Telerik.JustMock.Core
 		{
 			get
 			{
-				return ArgExpr.IsAny<int>();
+				return ProfilerInterceptor.GuardInternal(() =>
+				{
+					return ArgExpr.IsAny<int>();
+				});
 			}
 		}
 			
@@ -46,7 +49,10 @@ namespace Telerik.JustMock.Core
 		{
 			get
 			{
-				return ArgExpr.IsAny<float>();
+				return ProfilerInterceptor.GuardInternal(() =>
+				{
+					return ArgExpr.IsAny<float>();
+				});
 			}
 		}
 			
@@ -57,7 +63,10 @@ namespace Telerik.JustMock.Core
 		{
 			get
 			{
-				return ArgExpr.IsAny<double>();
+				return ProfilerInterceptor.GuardInternal(() =>
+				{
+					return ArgExpr.IsAny<double>();
+				});
 			}
 		}
 			
@@ -68,7 +77,10 @@ namespace Telerik.JustMock.Core
 		{
 			get
 			{
-				return ArgExpr.IsAny<decimal>();
+				return ProfilerInterceptor.GuardInternal(() =>
+				{
+					return ArgExpr.IsAny<decimal>();
+				});
 			}
 		}
 			
@@ -79,7 +91,10 @@ namespace Telerik.JustMock.Core
 		{
 			get
 			{
-				return ArgExpr.IsAny<long>();
+				return ProfilerInterceptor.GuardInternal(() =>
+				{
+					return ArgExpr.IsAny<long>();
+				});
 			}
 		}
 			
@@ -90,7 +105,10 @@ namespace Telerik.JustMock.Core
 		{
 			get
 			{
-				return ArgExpr.IsAny<char>();
+				return ProfilerInterceptor.GuardInternal(() =>
+				{
+					return ArgExpr.IsAny<char>();
+				});
 			}
 		}
 			
@@ -101,7 +119,10 @@ namespace Telerik.JustMock.Core
 		{
 			get
 			{
-				return ArgExpr.IsAny<string>();
+				return ProfilerInterceptor.GuardInternal(() =>
+				{
+					return ArgExpr.IsAny<string>();
+				});
 			}
 		}
 			
@@ -112,7 +133,10 @@ namespace Telerik.JustMock.Core
 		{
 			get
 			{
-				return ArgExpr.IsAny<object>();
+				return ProfilerInterceptor.GuardInternal(() =>
+				{
+					return ArgExpr.IsAny<object>();
+				});
 			}
 		}
 			
@@ -123,7 +147,10 @@ namespace Telerik.JustMock.Core
 		{
 			get
 			{
-				return ArgExpr.IsAny<short>();
+				return ProfilerInterceptor.GuardInternal(() =>
+				{
+					return ArgExpr.IsAny<short>();
+				});
 			}
 		}
 			
@@ -134,7 +161,10 @@ namespace Telerik.JustMock.Core
 		{
 			get
 			{
-				return ArgExpr.IsAny<bool>();
+				return ProfilerInterceptor.GuardInternal(() =>
+				{
+					return ArgExpr.IsAny<bool>();
+				});
 			}
 		}
 			
@@ -145,7 +175,10 @@ namespace Telerik.JustMock.Core
 		{
 			get
 			{
-				return ArgExpr.IsAny<Guid>();
+				return ProfilerInterceptor.GuardInternal(() =>
+				{
+					return ArgExpr.IsAny<Guid>();
+				});
 			}
 		}
 			
@@ -156,7 +189,10 @@ namespace Telerik.JustMock.Core
 		{
 			get
 			{
-				return ArgExpr.IsAny<DateTime>();
+				return ProfilerInterceptor.GuardInternal(() =>
+				{
+					return ArgExpr.IsAny<DateTime>();
+				});
 			}
 		}
 			
@@ -167,7 +203,10 @@ namespace Telerik.JustMock.Core
 		{
 			get
 			{
-				return ArgExpr.IsAny<TimeSpan>();
+				return ProfilerInterceptor.GuardInternal(() =>
+				{
+					return ArgExpr.IsAny<TimeSpan>();
+				});
 			}
 		}
 			
@@ -178,7 +217,10 @@ namespace Telerik.JustMock.Core
 		{
 			get
 			{
-				return ArgExpr.IsAny<byte>();
+				return ProfilerInterceptor.GuardInternal(() =>
+				{
+					return ArgExpr.IsAny<byte>();
+				});
 			}
 		}
 			
@@ -189,7 +231,10 @@ namespace Telerik.JustMock.Core
 		{
 			get
 			{
-				return ArgExpr.IsAny<SByte>();
+				return ProfilerInterceptor.GuardInternal(() =>
+				{
+					return ArgExpr.IsAny<SByte>();
+				});
 			}
 		}
 			
@@ -200,7 +245,10 @@ namespace Telerik.JustMock.Core
 		{
 			get
 			{
-				return ArgExpr.IsAny<Uri>();
+				return ProfilerInterceptor.GuardInternal(() =>
+				{
+					return ArgExpr.IsAny<Uri>();
+				});
 			}
 		}
 		
