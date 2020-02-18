@@ -38,11 +38,7 @@ using TestClass = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestClassAttribute
 using TestMethod = Xunit.FactAttribute;
 using TestInitialize = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestInitializeAttribute;
 using TestCleanup = Telerik.JustMock.XUnit.Test.Attributes.EmptyTestCleanupAttribute;
-#if XUNIT2
-using AssertionException = Xunit.Sdk.XunitException;
-#else
-using AssertionException = Xunit.Sdk.AssertException;
-#endif
+using AssertionException = Telerik.JustMock.XUnit.AssertFailedException;
 #elif VSTEST_PORTABLE
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using AssertionException = Microsoft.VisualStudio.TestPlatform.UnitTestFramework.AssertFailedException;
