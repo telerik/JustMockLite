@@ -25,7 +25,7 @@ namespace Telerik.JustMock.Core.Context
 {
 	internal abstract class XUnitMockingContextResolver : HierarchicalTestFrameworkContextResolver
 	{
-		private Type exceptionType;
+		private Type exceptionType = typeof(XUnit.AssertFailedException);
 
 		protected XUnitMockingContextResolver(string exceptionName)
 			: base(exceptionName)
@@ -34,34 +34,7 @@ namespace Telerik.JustMock.Core.Context
 
 		protected override Expression<Func<string, Exception, Exception>> CreateExceptionFactory()
 		{
-			if (exceptionType == null)
-			{
-				CreateExceptionType();
-			}
-			return exceptionType != null ? this.CreateExceptionFactory(this.exceptionType) : null;
-		}
-
-		protected abstract Type GetExceptionType();
-
-		private void CreateExceptionType()
-		{
-			var baseType = GetExceptionType();
-			if (baseType == null)
-				return;
-			var typeBuilder = MockingUtil.ModuleBuilder.DefineType(
-				"Telerik.JustMock.Xunit.AssertFailedException", TypeAttributes.Public, baseType);
-
-			var signature = new[] { typeof(string), typeof(Exception) };
-			var ctor = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.HasThis, signature);
-			var il = ctor.GetILGenerator();
-			il.Emit(OpCodes.Ldarg_0);
-			il.Emit(OpCodes.Ldarg_1);
-			il.Emit(OpCodes.Ldarg_2);
-			il.Emit(OpCodes.Call, baseType.GetConstructor(
-				BindingFlags.NonPublic | BindingFlags.Instance, Type.DefaultBinder, signature, null));
-			il.Emit(OpCodes.Ret);
-
-			this.exceptionType = typeBuilder.CreateType();
+			return this.CreateExceptionFactory(this.exceptionType);
 		}
 	}
 
@@ -82,17 +55,6 @@ namespace Telerik.JustMock.Core.Context
 				null, null, null,
 				FixtureConstuctorSemantics.InstanceConstructorCalledOncePerTest);
 		}
-
-		protected override Type GetExceptionType()
-		{
-			var exceptionType = FindType(this.AssertFailedExceptionTypeName, false);
-			if (exceptionType != null)
-			{
-				exceptionType = exceptionType.BaseType;
-			}
-
-			return exceptionType;
-		}
 	}
 
 	internal class XUnit2xMockingContextResolver : XUnitMockingContextResolver
@@ -111,11 +73,6 @@ namespace Telerik.JustMock.Core.Context
 				new[] { "Xunit.FactAttribute, xunit.core", "Xunit.TheoryAttribute, xunit.core" },
 				null, null, null,
 				FixtureConstuctorSemantics.InstanceConstructorCalledOncePerTest);
-		}
-
-		protected override Type GetExceptionType()
-		{
-			return FindType(this.AssertFailedExceptionTypeName, false, true);
 		}
 	}
 }
