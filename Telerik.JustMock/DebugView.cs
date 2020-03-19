@@ -21,6 +21,7 @@ using System.Linq;
 using System.Text;
 using Telerik.JustMock.Core;
 using Telerik.JustMock.Core.Context;
+using Telerik.JustMock.DebugWindow.Service.Client;
 
 namespace Telerik.JustMock
 {
@@ -84,6 +85,17 @@ namespace Telerik.JustMock
 		}
 
 		/// <summary>
+		/// Enables or disables remote event tracing.
+		/// </summary>
+
+		private static bool isRemoteTraceEnabled;
+		public static bool IsRemoteTraceEnabled
+		{
+			get { return ProfilerInterceptor.GuardInternal(() => isRemoteTraceEnabled); }
+			set { ProfilerInterceptor.GuardInternal(() => isRemoteTraceEnabled = value); }
+		}
+
+		/// <summary>
 		/// Enables or disables the step-by-step event trace.
 		/// </summary>
 		public static bool IsTraceEnabled
@@ -96,7 +108,7 @@ namespace Telerik.JustMock
 						if (value)
 						{
 							if (traceSink == null)
-								traceSink = new Trace();
+								traceSink = new Trace(isRemoteTraceEnabled);
 						}
 						else
 							traceSink = null;
@@ -238,6 +250,12 @@ namespace Telerik.JustMock.Diagnostics
 		private readonly StringBuilder log = new StringBuilder();
 		private readonly StringBuilder currentTrace = new StringBuilder();
 		private bool currentTraceRead;
+		private bool isRemoteTraceEnabled;
+
+		internal Trace(bool isRemoteTraceEnabled)
+		{
+			this.isRemoteTraceEnabled = isRemoteTraceEnabled;
+		}
 
 		public string FullTrace
 		{
@@ -264,6 +282,14 @@ namespace Telerik.JustMock.Diagnostics
 		{
 			lock (mutex)
 			{
+				if (this.isRemoteTraceEnabled)
+				{
+					using (var publisher = new TraceEventsPublishingServiceClient("net.tcp://localhost:10001/TraceEventsPublishingService"))
+					{
+						publisher.TraceMessage(message);
+					}
+				}
+
 				log.AppendLine(message);
 
 				if (currentTraceRead)

@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using Telerik.JustMock.DebugWindow.Service.Client;
 using Telerik.JustMock.Diagnostics;
 using Telerik.JustMock.Setup;
 
@@ -393,6 +394,14 @@ namespace Telerik.JustMock.Core.Context
 			public override void AddRepository(object entryKey, MocksRepository entryRepo)
 			{
 				this.GetCurrentDictionary().Add(entryKey, entryRepo);
+
+				if (DebugView.IsRemoteTraceEnabled)
+				{
+					using (var publisher = new MockRepositoryPublishingServiceClient("net.tcp://localhost:10003/MockRepositoryPublishingService"))
+					{
+						publisher.RepositoryCreated();
+					}
+				}
 			}
 
 			public override MocksRepository FindRepository(object key)
@@ -419,6 +428,14 @@ namespace Telerik.JustMock.Core.Context
 				{
 					dict.Remove(key);
 					repo.Retire();
+
+					if (DebugView.IsRemoteTraceEnabled)
+					{
+						using (var publisher = new MockRepositoryPublishingServiceClient("net.tcp://localhost:10003/MockRepositoryPublishingService"))
+						{
+							publisher.RepositoryRetired();
+						}
+					}
 				}
 			}
 
@@ -449,6 +466,14 @@ namespace Telerik.JustMock.Core.Context
 			public override void AddRepository(object entryKey, MocksRepository entryRepo)
 			{
 				this.GetCurrentDictionary().Add(entryKey, new WeakReference(entryRepo));
+
+				if (DebugView.IsRemoteTraceEnabled)
+				{
+					using (var publisher = new MockRepositoryPublishingServiceClient("net.tcp://localhost:10003/MockRepositoryPublishingService"))
+					{
+						publisher.RepositoryCreated();
+					}
+				}
 			}
 
 			public override MocksRepository FindRepository(object key)
@@ -496,6 +521,14 @@ namespace Telerik.JustMock.Core.Context
 				{
 					dict.Remove(key);
 					repo.Retire();
+
+					if (DebugView.IsRemoteTraceEnabled)
+					{
+						using (var publisher = new MockRepositoryPublishingServiceClient("net.tcp://localhost:10003/MockRepositoryPublishingService"))
+						{
+							publisher.RepositoryRetired();
+						}
+					}
 				}
 			}
 
