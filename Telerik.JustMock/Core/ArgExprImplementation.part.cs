@@ -20,18 +20,18 @@ using Telerik.JustMock.Core;
 using System.Linq.Expressions;
 
 
-namespace Telerik.JustMock
+namespace Telerik.JustMock.Core
 {
 	/// <summary>
 	/// Provides various argument matching shortcuts.
 	/// </summary>
-	public partial class ArgExpr
+	internal partial class ArgExprImplementation : IArgExpr
 	{
 			
 		/// <summary>
 		/// Matches argument can contain any int value.
 		/// </summary>
-		public static Expression AnyInt
+		public Expression AnyInt
 		{
 			get
 			{
@@ -45,7 +45,7 @@ namespace Telerik.JustMock
 		/// <summary>
 		/// Matches argument can contain any float value.
 		/// </summary>
-		public static Expression AnyFloat
+		public Expression AnyFloat
 		{
 			get
 			{
@@ -59,7 +59,7 @@ namespace Telerik.JustMock
 		/// <summary>
 		/// Matches argument can contain any double value.
 		/// </summary>
-		public static Expression AnyDouble
+		public Expression AnyDouble
 		{
 			get
 			{
@@ -73,7 +73,7 @@ namespace Telerik.JustMock
 		/// <summary>
 		/// Matches argument can contain any decimal value.
 		/// </summary>
-		public static Expression AnyDecimal
+		public Expression AnyDecimal
 		{
 			get
 			{
@@ -87,7 +87,7 @@ namespace Telerik.JustMock
 		/// <summary>
 		/// Matches argument can contain any long value.
 		/// </summary>
-		public static Expression AnyLong
+		public Expression AnyLong
 		{
 			get
 			{
@@ -101,7 +101,7 @@ namespace Telerik.JustMock
 		/// <summary>
 		/// Matches argument can contain any char value.
 		/// </summary>
-		public static Expression AnyChar
+		public Expression AnyChar
 		{
 			get
 			{
@@ -115,7 +115,7 @@ namespace Telerik.JustMock
 		/// <summary>
 		/// Matches argument can contain any string value.
 		/// </summary>
-		public static Expression AnyString
+		public Expression AnyString
 		{
 			get
 			{
@@ -129,7 +129,7 @@ namespace Telerik.JustMock
 		/// <summary>
 		/// Matches argument can contain any object value.
 		/// </summary>
-		public static Expression AnyObject
+		public Expression AnyObject
 		{
 			get
 			{
@@ -143,7 +143,7 @@ namespace Telerik.JustMock
 		/// <summary>
 		/// Matches argument can contain any short value.
 		/// </summary>
-		public static Expression AnyShort
+		public Expression AnyShort
 		{
 			get
 			{
@@ -157,7 +157,7 @@ namespace Telerik.JustMock
 		/// <summary>
 		/// Matches argument can contain any bool value.
 		/// </summary>
-		public static Expression AnyBool
+		public Expression AnyBool
 		{
 			get
 			{
@@ -171,7 +171,7 @@ namespace Telerik.JustMock
 		/// <summary>
 		/// Matches argument can contain any Guid value.
 		/// </summary>
-		public static Expression AnyGuid
+		public Expression AnyGuid
 		{
 			get
 			{
@@ -185,7 +185,7 @@ namespace Telerik.JustMock
 		/// <summary>
 		/// Matches argument can contain any DateTime value.
 		/// </summary>
-		public static Expression AnyDateTime
+		public Expression AnyDateTime
 		{
 			get
 			{
@@ -199,7 +199,7 @@ namespace Telerik.JustMock
 		/// <summary>
 		/// Matches argument can contain any TimeSpan value.
 		/// </summary>
-		public static Expression AnyTimeSpan
+		public Expression AnyTimeSpan
 		{
 			get
 			{
@@ -213,7 +213,7 @@ namespace Telerik.JustMock
 		/// <summary>
 		/// Matches argument can contain any byte value.
 		/// </summary>
-		public static Expression AnyByte
+		public Expression AnyByte
 		{
 			get
 			{
@@ -227,7 +227,7 @@ namespace Telerik.JustMock
 		/// <summary>
 		/// Matches argument can contain any SByte value.
 		/// </summary>
-		public static Expression AnySByte
+		public Expression AnySByte
 		{
 			get
 			{
@@ -241,7 +241,7 @@ namespace Telerik.JustMock
 		/// <summary>
 		/// Matches argument can contain any Uri value.
 		/// </summary>
-		public static Expression AnyUri
+		public Expression AnyUri
 		{
 			get
 			{

@@ -27,7 +27,7 @@ namespace Telerik.JustMock
 	/// <summary>
 	/// Provides various argument matching shortcuts.
 	/// </summary>
-	public partial class ArgExpr
+	public partial interface IArgExpr
 	{
 		<#
 		string [] arguments = new string[] { "int", "float", "double", "decimal" ,"long", "char", "string", "object", "short", "bool", "Guid", "DateTime", "TimeSpan", "byte", "SByte", "Uri" };
@@ -40,19 +40,10 @@ namespace Telerik.JustMock
 		/// <summary>
 		/// Matches argument can contain any <#= argument #> value.
 		/// </summary>
-		public static Expression <#= propertyName #>
-		{
-			get
-			{
-				return ProfilerInterceptor.GuardInternal(() =>
-				{
-					return ArgExpr.IsAny<<#= argument #>>();
-				});
-			}
-		}
+		Expression <#= propertyName #> { get; }
 		<#					
 		}
-#>
+		#>
 
 	}
 }

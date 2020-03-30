@@ -17,8 +17,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 	using System;
 	using System.Reflection;
 
-	public abstract class InheritanceInvocation : AbstractInvocation
-	{
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    public abstract class InheritanceInvocation : AbstractInvocation
+    {
 		private readonly Type targetType;
 
 		protected InheritanceInvocation(
@@ -49,4 +50,5 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 
 		protected abstract override void InvokeMethodOnTarget();
 	}
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }
