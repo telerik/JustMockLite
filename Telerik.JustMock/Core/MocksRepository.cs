@@ -32,9 +32,7 @@ using Telerik.JustMock.Core.TransparentProxy;
 using Telerik.JustMock.Diagnostics;
 using Telerik.JustMock.Expectations;
 #if !PORTABLE
-using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
-using Telerik.JustMock.DebugWindow.Service.Client;
-using Telerik.JustMock.DebugWindow.Service.Model;
+using Telerik.JustMock.Plugins;
 #endif
 
 #if NETCORE
@@ -450,28 +448,20 @@ namespace Telerik.JustMock.Core
                 invocation.ReturnValue = defaultValue;
             }
 
-            if (DebugView.IsRemoteTraceEnabled)
+#if !PORTABLE
+            try
             {
-                using (var publisher = new MockRepositoryPublishingServiceClient("net.tcp://localhost:10003/MockRepositoryPublishingService"))
+                if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
                 {
-                    publisher.MockInvoked(
-                        new DebugWindow.Service.Model.Mock()
-                        {
-                            MethodInfo = new MethodMockInfo(invocation.Method)
-                        },
-                        new DebugWindow.Service.Model.Invocation()
-                        {
-                            Instance = 
-                                invocation.Instance != null
-                                    ?
-                                        new ObjectValue(invocation.Instance.GetType(), invocation.Instance)
-                                        :
-                                        new ObjectValue(invocation.Method.DeclaringType.GetType(), invocation.Method.DeclaringType),
-                            Arguments = invocation.Args.Select(arg => new ObjectValue(arg.GetType(), arg)).ToArray(),
-                            ReturnValue = new ObjectValue(invocation.Method.GetReturnType(), invocation.ReturnValue)
-                        });
+                    var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
+                    debugWindowPlugin.MockInvoked(invocation);
                 }
             }
+            catch (Exception e)
+            {
+                DebugView.DebugTrace("Exception thrown calling IDebugWindowPlugin plugin: " + e);
+            }
+#endif
         }
 
         internal T GetValue<T>(object owner, object key, T dflt)
@@ -741,15 +731,20 @@ namespace Telerik.JustMock.Core
                 var createInstanceMethodMock = Arrange(createInstanceLambda, methodMockFactory);
                 ActivatorCreateInstanceTBehavior.Attach(result, createInstanceMethodMock);
             }
-#endif
 
-            if (DebugView.IsRemoteTraceEnabled)
+            try
             {
-                using (var publisher = new MockRepositoryPublishingServiceClient("net.tcp://localhost:10003/MockRepositoryPublishingService"))
+                if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
                 {
-                    publisher.MockCreated(new DebugWindow.Service.Model.Mock() { MethodInfo = new MethodMockInfo(result.CallPattern.Method) });
+                    var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
+                    debugWindowPlugin.MockCreated(result.CallPattern.Method);
                 }
             }
+            catch (Exception e)
+            {
+                DebugView.DebugTrace("Exception thrown calling IDebugWindowPlugin plugin: " + e);
+            }
+#endif
 
             return result;
         }

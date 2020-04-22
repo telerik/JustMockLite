@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015,2019 Progress Software Corporation
+ Copyright © 2010-2015,2019-2020 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -20,9 +20,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using Telerik.JustMock.DebugWindow.Service.Client;
 using Telerik.JustMock.Diagnostics;
 using Telerik.JustMock.Setup;
+#if !PORTABLE
+using Telerik.JustMock.Plugins;
+#endif
 
 namespace Telerik.JustMock.Core.Context
 {
@@ -395,13 +397,20 @@ namespace Telerik.JustMock.Core.Context
 			{
 				this.GetCurrentDictionary().Add(entryKey, entryRepo);
 
-				if (DebugView.IsRemoteTraceEnabled)
+#if !PORTABLE
+				try
 				{
-					using (var publisher = new MockRepositoryPublishingServiceClient("net.tcp://localhost:10003/MockRepositoryPublishingService"))
+					if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
 					{
-						publisher.RepositoryCreated();
+						var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
+						debugWindowPlugin.RepositoryCreated();
 					}
 				}
+				catch (Exception e)
+				{
+					DebugView.DebugTrace("Exception thrown calling IDebugWindowPlugin plugin: " + e);
+				}
+#endif
 			}
 
 			public override MocksRepository FindRepository(object key)
@@ -429,13 +438,20 @@ namespace Telerik.JustMock.Core.Context
 					dict.Remove(key);
 					repo.Retire();
 
-					if (DebugView.IsRemoteTraceEnabled)
+#if !PORTABLE
+					try
 					{
-						using (var publisher = new MockRepositoryPublishingServiceClient("net.tcp://localhost:10003/MockRepositoryPublishingService"))
+						if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
 						{
-							publisher.RepositoryRetired();
+							var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
+							debugWindowPlugin.RepositoryRetired();
 						}
 					}
+					catch (Exception e)
+					{
+						DebugView.DebugTrace("Exception thrown calling IDebugWindowPlugin plugin: " + e);
+					}
+#endif
 				}
 			}
 
@@ -467,13 +483,20 @@ namespace Telerik.JustMock.Core.Context
 			{
 				this.GetCurrentDictionary().Add(entryKey, new WeakReference(entryRepo));
 
-				if (DebugView.IsRemoteTraceEnabled)
+#if !PORTABLE
+				try
 				{
-					using (var publisher = new MockRepositoryPublishingServiceClient("net.tcp://localhost:10003/MockRepositoryPublishingService"))
+					if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
 					{
-						publisher.RepositoryCreated();
+						var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
+						debugWindowPlugin.RepositoryCreated();
 					}
 				}
+				catch (Exception e)
+				{
+					DebugView.DebugTrace("Exception thrown calling IDebugWindowPlugin plugin: " + e);
+				}
+#endif
 			}
 
 			public override MocksRepository FindRepository(object key)
@@ -522,13 +545,20 @@ namespace Telerik.JustMock.Core.Context
 					dict.Remove(key);
 					repo.Retire();
 
-					if (DebugView.IsRemoteTraceEnabled)
+#if !PORTABLE
+					try
 					{
-						using (var publisher = new MockRepositoryPublishingServiceClient("net.tcp://localhost:10003/MockRepositoryPublishingService"))
+						if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
 						{
-							publisher.RepositoryRetired();
+							var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
+							debugWindowPlugin.RepositoryRetired();
 						}
 					}
+					catch (Exception e)
+					{
+						DebugView.DebugTrace("Exception thrown calling IDebugWindowPlugin plugin: " + e);
+					}
+#endif
 				}
 			}
 

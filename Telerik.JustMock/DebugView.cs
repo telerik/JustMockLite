@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015,2018 Progress Software Corporation
+ Copyright © 2010-2015,2018,2020 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -21,7 +21,9 @@ using System.Linq;
 using System.Text;
 using Telerik.JustMock.Core;
 using Telerik.JustMock.Core.Context;
-using Telerik.JustMock.DebugWindow.Service.Client;
+#if !PORTABLE
+using Telerik.JustMock.Plugins;
+#endif
 
 namespace Telerik.JustMock
 {
@@ -85,17 +87,6 @@ namespace Telerik.JustMock
 		}
 
 		/// <summary>
-		/// Enables or disables remote event tracing.
-		/// </summary>
-
-		private static bool isRemoteTraceEnabled;
-		public static bool IsRemoteTraceEnabled
-		{
-			get { return ProfilerInterceptor.GuardInternal(() => isRemoteTraceEnabled); }
-			set { ProfilerInterceptor.GuardInternal(() => isRemoteTraceEnabled = value); }
-		}
-
-		/// <summary>
 		/// Enables or disables the step-by-step event trace.
 		/// </summary>
 		public static bool IsTraceEnabled
@@ -108,7 +99,7 @@ namespace Telerik.JustMock
 						if (value)
 						{
 							if (traceSink == null)
-								traceSink = new Trace(isRemoteTraceEnabled);
+								traceSink = new Trace();
 						}
 						else
 							traceSink = null;
@@ -250,12 +241,6 @@ namespace Telerik.JustMock.Diagnostics
 		private readonly StringBuilder log = new StringBuilder();
 		private readonly StringBuilder currentTrace = new StringBuilder();
 		private bool currentTraceRead;
-		private bool isRemoteTraceEnabled;
-
-		internal Trace(bool isRemoteTraceEnabled)
-		{
-			this.isRemoteTraceEnabled = isRemoteTraceEnabled;
-		}
 
 		public string FullTrace
 		{
@@ -282,13 +267,20 @@ namespace Telerik.JustMock.Diagnostics
 		{
 			lock (mutex)
 			{
-				if (this.isRemoteTraceEnabled)
+#if !PORTABLE
+				try
 				{
-					using (var publisher = new TraceEventsPublishingServiceClient("net.tcp://localhost:10001/TraceEventsPublishingService"))
+					if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
 					{
-						publisher.TraceMessage(message);
+						var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
+						debugWindowPlugin.TraceMessage(message);
 					}
 				}
+				catch (Exception e)
+				{
+					DebugView.DebugTrace("Exception thrown calling IDebugWindowPlugin plugin: " + e);
+				}
+#endif
 
 				log.AppendLine(message);
 

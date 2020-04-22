@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2020 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -18,12 +18,14 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using Telerik.JustMock.Diagnostics;
 #if !PORTABLE
 using Telerik.JustMock.Helpers;
+using Telerik.JustMock.Plugins;
 #endif
 
 namespace Telerik.JustMock.Core.Context
@@ -80,19 +82,19 @@ namespace Telerik.JustMock.Core.Context
 #endif
 		}
 
-        public static MethodBase GetTestMethod()
-        {
-            foreach (IMockingContextResolver resolver in registeredContextResolvers)
-            {
-                var testMethod = resolver.GetTestMethod();
-                if (testMethod != null)
-                {
-                    return testMethod;
-                }
-            }
+		public static MethodBase GetTestMethod()
+		{
+			foreach (IMockingContextResolver resolver in registeredContextResolvers)
+			{
+				var testMethod = resolver.GetTestMethod();
+				if (testMethod != null)
+				{
+					return testMethod;
+				}
+			}
 
-            return null;
-        }
+			return null;
+		}
 
 		public static void Fail(string message, params object[] args)
 		{
@@ -144,8 +146,36 @@ namespace Telerik.JustMock.Core.Context
 		[ThreadStatic]
 		private static MocksRepository lastFrameworkAwareRepository;
 
+#if !PORTABLE
+		public static PluginsRegistry Plugins { get; private set; }
+#endif
+
 		static MockingContext()
 		{
+#if !PORTABLE
+			MockingContext.Plugins = new PluginsRegistry();
+			try
+			{
+				var clrVersion = Environment.Version;
+				if (clrVersion.Major >= 4 && clrVersion.Minor >= 0
+					&& clrVersion.Build >= 30319 && clrVersion.Revision >= 42000)
+				{
+					var debugWindowAssemblyPath =
+						Path.Combine(
+							Path.GetDirectoryName(typeof(MockingContext).Assembly.Location),
+							"Telerik.JustMock.DebugWindow.Plugin.dll");
+					if (File.Exists(debugWindowAssemblyPath))
+					{
+						MockingContext.Plugins.Register<IDebugWindowPlugin>(debugWindowAssemblyPath);
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				DebugView.DebugTrace("Exception thrown during plugin registration: " + e);
+			}
+#endif
+
 #if PORTABLE
 			if (VisualStudioPortableContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new VisualStudioPortableContextResolver());
