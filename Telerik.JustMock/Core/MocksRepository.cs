@@ -454,7 +454,20 @@ namespace Telerik.JustMock.Core
                 if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
                 {
                     var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
-                    debugWindowPlugin.MockInvoked(invocation);
+                    debugWindowPlugin.MockInvoked(
+                        new MockInfo(invocation.Method.Name, invocation.Method.MemberType, invocation.Method.DeclaringType, invocation.Method.ReflectedType),
+                        new InvocationInfo(
+                            invocation.Instance != null
+                                ?
+                                    ObjectInfo.FromObject(invocation.Instance)
+                                    :
+                                    ObjectInfo.FromObject(invocation.Method.DeclaringType),
+                            invocation.Args.Select(arg => ObjectInfo.FromObject(arg)).ToArray(),
+                            invocation.ReturnValue != null
+                                ?
+                                    ObjectInfo.FromObject(invocation.ReturnValue)
+                                    :
+                                    ObjectInfo.FromNullObject(invocation.Method.GetReturnType())));
                 }
             }
             catch (Exception e)
@@ -737,7 +750,12 @@ namespace Telerik.JustMock.Core
                 if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
                 {
                     var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
-                    debugWindowPlugin.MockCreated(result.CallPattern.Method);
+                    debugWindowPlugin.MockCreated(
+                        new MockInfo(
+                            result.CallPattern.Method.Name,
+                            result.CallPattern.Method.MemberType,
+                            result.CallPattern.Method.DeclaringType,
+                            result.CallPattern.Method.ReflectedType));
                 }
             }
             catch (Exception e)

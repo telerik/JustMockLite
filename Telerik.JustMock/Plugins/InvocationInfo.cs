@@ -1,4 +1,4 @@
-/*
+﻿/*
  JustMock Lite
  Copyright © 2020 Progress Software Corporation
 
@@ -15,22 +15,21 @@
    limitations under the License.
 */
 
-using System;
-using System.Reflection;
-using Telerik.JustMock.AutoMock.Ninject.Modules;
-using Telerik.JustMock.Core;
-
 #if !PORTABLE
 namespace Telerik.JustMock.Plugins
 {
-    internal interface IDebugWindowPlugin : INinjectModule, IDisposable
+    public class InvocationInfo
     {
-        void TraceMessage(string message);
+        public ObjectInfo Instance { get; private set; }
+        public ObjectInfo[] Arguments { get;  private set; }
+        public ObjectInfo ReturnValue { get; private set; }
 
-        void MockCreated(MockInfo mock);
-        void MockInvoked(MockInfo mock, InvocationInfo invocation);
-        void RepositoryCreated();
-        void RepositoryRetired();
+        public InvocationInfo(ObjectInfo instance, ObjectInfo[] arguments, ObjectInfo returnValue)
+        {
+            this.Instance = instance;
+            this.Arguments = arguments;
+            this.ReturnValue = returnValue;
+        }
     }
 }
 #endif

@@ -19,36 +19,89 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Telerik.JustMock.AutoMock.Ninject;
+using Telerik.JustMock.AutoMock.Ninject.Infrastructure.Disposal;
+using Telerik.JustMock.AutoMock.Ninject.Modules;
 using Telerik.JustMock.AutoMock.Ninject.Parameters;
 
 #if !PORTABLE
 namespace Telerik.JustMock.Plugins
 {
-    internal class PluginsRegistry
+    internal class PluginsRegistry : DisposableObject
     {
-        private Dictionary<Type, object> plugins = new Dictionary<Type, object>();
+        private Dictionary<Type, INinjectModule> plugins = new Dictionary<Type, INinjectModule>();
+        private readonly StandardKernel kernel = new StandardKernel();
 
-        public void Register<PluginT>(string assemblyPath, params IParameter[] parameters)
+        public PluginT Register<PluginT>(string assemblyPath, params IParameter[] parameters)
+            where PluginT : INinjectModule
         {
-            var kernel = new StandardKernel();
-            var assembly = Assembly.LoadFile(assemblyPath);
-            kernel.Load(assembly);
-            var plugin = kernel.TryGet<PluginT>(parameters);
-            if (plugin == null)
+            lock (this)
             {
-                throw new NotSupportedException(string.Format("Plugin type {0} not found, lookup assembly {1}", typeof(PluginT), assembly));
+                var assembly = Assembly.LoadFile(assemblyPath);
+                this.kernel.Load(assembly);
+
+                var plugin = this.kernel.TryGet<PluginT>(parameters);
+                if (plugin == null)
+                {
+                    throw new NotSupportedException(string.Format("Plugin type {0} not found, lookup assembly {1}", typeof(PluginT), assembly));
+                }
+
+                plugins.Add(typeof(PluginT), plugin);
+
+                return plugin;
             }
-            plugins.Add(typeof(PluginT), plugin);
         }
 
-        public bool Exists<PluginT>()
+        public bool Exists<PluginT>() where PluginT : INinjectModule
         {
-            return plugins.ContainsKey(typeof(PluginT));
+            lock (this)
+            {
+                return plugins.ContainsKey(typeof(PluginT));
+            }
         }
 
-        public PluginT Get<PluginT>()
+        public PluginT Get<PluginT>() where PluginT : INinjectModule
         {
-            return (PluginT)plugins[typeof(PluginT)];
+            lock (this)
+            {
+                return (PluginT)plugins[typeof(PluginT)];
+            }
+        }
+
+        public PluginT Unregister<PluginT>() where PluginT : INinjectModule
+        {
+            lock (this)
+            {
+                INinjectModule plugin = null;
+                if (plugins.TryGetValue(typeof(PluginT), out plugin))
+                {
+                    var pluginDisposable = plugin as IDisposable;
+                    if (pluginDisposable != null)
+                    {
+                        pluginDisposable.Dispose();
+                    }
+                }
+                return (PluginT)plugin;
+            }
+        }
+
+        public override void Dispose(bool disposing)
+        {
+            lock (this)
+            {
+                if (disposing && !this.IsDisposed)
+                {
+                    foreach (var plugin in plugins.Values)
+                    {
+                        var pluginDisposable = plugin as IDisposable;
+                        if (pluginDisposable != null)
+                        {
+                            pluginDisposable.Dispose();
+                        }
+                    }
+                }
+
+                base.Dispose(disposing);
+            }
         }
     }
 }
