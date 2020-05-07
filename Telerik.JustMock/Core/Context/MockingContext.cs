@@ -167,13 +167,13 @@ namespace Telerik.JustMock.Core.Context
 				if (clrVersion.Major >= 4 && clrVersion.Minor >= 0
 					&& clrVersion.Build >= 30319 && clrVersion.Revision >= 42000)
 				{
-					var debugWindowEnabeledEnv = Environment.GetEnvironmentVariable("JUSTMOCK_DEBUG_VIEW_ENABLED");
+					var debugWindowEnabledEnv = Environment.GetEnvironmentVariable("JUSTMOCK_DEBUG_VIEW_ENABLED");
 					var debugWindowServicesStringEnv = Environment.GetEnvironmentVariable("JUSTMOCK_DEBUG_VIEW_SERVICES");
 					var debugWindowAssemblyPathEnv = Environment.GetEnvironmentVariable("JUSTMOCK_DEBUG_VIEW_PLUGIN_PATH");
-					if (!string.IsNullOrEmpty(debugWindowEnabeledEnv)
+					if (!string.IsNullOrEmpty(debugWindowEnabledEnv)
 						&& !string.IsNullOrEmpty(debugWindowServicesStringEnv)
 						&& !string.IsNullOrEmpty(debugWindowAssemblyPathEnv)
-						&& debugWindowEnabeledEnv == "1" && File.Exists(debugWindowAssemblyPathEnv))
+						&& debugWindowEnabledEnv == "1" && File.Exists(debugWindowAssemblyPathEnv))
 					{
 						var pluginAssemblyLoaderRoot = Path.GetDirectoryName(debugWindowAssemblyPathEnv);
 #if NETCORE
@@ -188,6 +188,7 @@ namespace Telerik.JustMock.Core.Context
 						MockingContext.pluginLoadHelper = new PluginLoadHelper(pluginAssemblyLoaderRoot);
 						MockingContext.Plugins.Register<IDebugWindowPlugin>(
 							debugWindowAssemblyPathEnv, new ConstructorArgument("debugWindowServicesString", debugWindowServicesStringEnv));
+						DebugView.IsRemoteTraceEnabled = true;
 					}
 				}
 			}

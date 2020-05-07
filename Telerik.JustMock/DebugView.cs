@@ -91,19 +91,67 @@ namespace Telerik.JustMock
 		/// </summary>
 		public static bool IsTraceEnabled
 		{
-			get { return ProfilerInterceptor.GuardInternal(() => traceSink != null); }
+			get
+			{
+				return ProfilerInterceptor.GuardInternal(
+					() =>
+						traceSink != null && (traceSink.TraceOptions & TraceOptions.InternalTrace) != 0);
+			}
 			set
 			{
-				ProfilerInterceptor.GuardInternal(() =>
-					{
-						if (value)
+				ProfilerInterceptor.GuardInternal(
+					() =>
 						{
-							if (traceSink == null)
-								traceSink = new Trace();
-						}
-						else
-							traceSink = null;
-					});
+							if (value)
+							{
+								if (traceSink == null)
+								{
+									traceSink = new Trace();
+								}
+
+								(traceSink as Trace).TraceOptions |= TraceOptions.InternalTrace;
+							}
+							else
+							{
+								if (traceSink != null)
+								{
+									(traceSink as Trace).TraceOptions ^= TraceOptions.InternalTrace;
+								}
+							}
+						});
+			}
+		}
+
+		internal static bool IsRemoteTraceEnabled
+		{
+			get
+			{
+				return ProfilerInterceptor.GuardInternal(
+					() =>
+						IsTraceEnabled && (traceSink.TraceOptions & TraceOptions.RemoteTrace) != 0);
+			}
+			set
+			{
+				ProfilerInterceptor.GuardInternal(
+					() =>
+						{
+							if (value)
+							{
+								if (traceSink == null)
+								{
+									traceSink = new Trace() { TraceOptions = TraceOptions.RemoteTrace };
+								}
+
+								(traceSink as Trace).TraceOptions |= TraceOptions.RemoteTrace;
+							}
+							else
+							{
+								if (traceSink != null)
+								{
+									(traceSink as Trace).TraceOptions ^= TraceOptions.RemoteTrace;
+								}
+							}
+						});
 			}
 		}
 
@@ -127,8 +175,10 @@ namespace Telerik.JustMock
 		internal static void TraceEvent(IndentLevel traceLevel, Func<string> message)
 		{
 			var lTraceSink = DebugView.traceSink;
-			if (lTraceSink == null)
+			if (lTraceSink == null || lTraceSink.TraceOptions == TraceOptions.Disabled)
+			{
 				return;
+			}
 
 			string messageStr = null;
 			try
@@ -143,9 +193,13 @@ namespace Telerik.JustMock
 			var formattedMessage = String.Join(Environment.NewLine, messageStr.Split('\n')
 					.Select(line => String.Format("{0}{1}", traceLevel.AsIndent(), line.TrimEnd())).ToArray())
 				+ (traceLevel.IsLeaf() ? "" : ":");
+
 			lTraceSink.TraceEvent(formattedMessage);
 
-			Debug.WriteLine(formattedMessage);
+			if ((lTraceSink.TraceOptions & TraceOptions.InternalTrace) != 0)
+			{
+				Debug.WriteLine(formattedMessage);
+			}
 
 			GC.KeepAlive(CurrentState); // for coverage testing
 		}
@@ -230,8 +284,19 @@ namespace Telerik.JustMock.Diagnostics
 		string LastTrace { get; }
 	}
 
+
+	[Flags]
+	internal enum TraceOptions
+	{
+		Disabled = 0,
+		InternalTrace = 1,
+		RemoteTrace= 2
+	}
+
 	internal interface ITraceSink : ITrace
 	{
+		TraceOptions TraceOptions { get; }
+
 		void TraceEvent(string message);
 	}
 
@@ -241,13 +306,16 @@ namespace Telerik.JustMock.Diagnostics
 		private readonly StringBuilder log = new StringBuilder();
 		private readonly StringBuilder currentTrace = new StringBuilder();
 		private bool currentTraceRead;
+		private TraceOptions traceOptions = TraceOptions.InternalTrace;
 
 		public string FullTrace
 		{
 			get
 			{
-				lock (mutex)
-					return log.ToString();
+				lock (this.mutex)
+				{
+					return this.log.ToString();
+				}
 			}
 		}
 
@@ -255,41 +323,66 @@ namespace Telerik.JustMock.Diagnostics
 		{
 			get
 			{
-				lock (mutex)
+				lock (this.mutex)
 				{
-					currentTraceRead = true;
-					return currentTrace.ToString();
+					this.currentTraceRead = true;
+					return this.currentTrace.ToString();
+				}
+			}
+		}
+
+		public TraceOptions TraceOptions
+		{
+			get
+			{
+				lock (this.mutex)
+				{
+					return this.traceOptions;
+				}
+			}
+			set
+			{
+				lock (this.mutex)
+				{
+					this.traceOptions = value;
 				}
 			}
 		}
 
 		public void TraceEvent(string message)
 		{
-			lock (mutex)
+			lock (this.mutex)
 			{
+				if ((this.traceOptions & TraceOptions.InternalTrace) != 0 || (this.traceOptions & TraceOptions.RemoteTrace) != 0)
+				{
 #if !PORTABLE
-				try
-				{
-					if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
+					if ((this.traceOptions & TraceOptions.RemoteTrace) != 0)
 					{
-						var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
-						debugWindowPlugin.TraceMessage(message);
+						try
+						{
+							if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
+							{
+								var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
+								debugWindowPlugin.TraceMessage(message);
+							}
+						}
+						catch (Exception e)
+						{
+							DebugView.DebugTrace("Exception thrown calling IDebugWindowPlugin plugin: " + e);
+						}
 					}
-				}
-				catch (Exception e)
-				{
-					DebugView.DebugTrace("Exception thrown calling IDebugWindowPlugin plugin: " + e);
-				}
 #endif
 
-				log.AppendLine(message);
+					this.log.AppendLine(message);
 
-				if (currentTraceRead)
-				{
-					currentTraceRead = false;
-					currentTrace.Length = 0;
+					if (this.currentTraceRead)
+					{
+						this.currentTraceRead = false;
+						this.currentTrace.Length = 0;
+					}
+
+					this.currentTrace.AppendLine(message);
 				}
-				currentTrace.AppendLine(message);
 			}
 		}
 	}
