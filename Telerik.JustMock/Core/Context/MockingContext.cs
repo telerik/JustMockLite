@@ -164,10 +164,12 @@ namespace Telerik.JustMock.Core.Context
 			try
 			{
 				var clrVersion = Environment.Version;
-				if (clrVersion.Major >= 4 && clrVersion.Minor >= 0
+#if !NETCORE
+                if (clrVersion.Major >= 4 && clrVersion.Minor >= 0
 					&& clrVersion.Build >= 30319 && clrVersion.Revision >= 42000)
-				{
-					var debugWindowEnabledEnv = Environment.GetEnvironmentVariable("JUSTMOCK_DEBUG_VIEW_ENABLED");
+#endif
+                {
+                    var debugWindowEnabledEnv = Environment.GetEnvironmentVariable("JUSTMOCK_DEBUG_VIEW_ENABLED");
 					var debugWindowServicesStringEnv = Environment.GetEnvironmentVariable("JUSTMOCK_DEBUG_VIEW_SERVICES");
 					var debugWindowAssemblyPathEnv = Environment.GetEnvironmentVariable("JUSTMOCK_DEBUG_VIEW_PLUGIN_PATH");
 					if (!string.IsNullOrEmpty(debugWindowEnabledEnv)
@@ -185,7 +187,7 @@ namespace Telerik.JustMock.Core.Context
 							debugWindowAssemblyPathEnv = Path.Combine(pluginAssemblyLoaderRoot, pluginFileName);
 						}
 #endif
-						MockingContext.pluginLoadHelper = new PluginLoadHelper(pluginAssemblyLoaderRoot);
+                        MockingContext.pluginLoadHelper = new PluginLoadHelper(pluginAssemblyLoaderRoot);
 						MockingContext.Plugins.Register<IDebugWindowPlugin>(
 							debugWindowAssemblyPathEnv, new ConstructorArgument("debugWindowServicesString", debugWindowServicesStringEnv));
 						DebugView.IsRemoteTraceEnabled = true;
