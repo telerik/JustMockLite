@@ -368,7 +368,7 @@ namespace Telerik.JustMock.Diagnostics
 						}
 						catch (Exception e)
 						{
-							DebugView.DebugTrace("Exception thrown calling IDebugWindowPlugin plugin: " + e);
+							System.Diagnostics.Trace.WriteLine("Exception thrown calling IDebugWindowPlugin plugin: " + e);
 						}
 					}
 #endif

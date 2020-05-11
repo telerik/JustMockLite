@@ -194,7 +194,7 @@ namespace Telerik.JustMock.Core.Context
 			}
 			catch (Exception e)
 			{
-				Debug.Print("Exception thrown during plugin registration: " + e);
+				System.Diagnostics.Trace.WriteLine("Exception thrown during plugin registration: " + e);
 			}
 #endif
 
