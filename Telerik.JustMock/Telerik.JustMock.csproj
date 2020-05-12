@@ -9,7 +9,7 @@
     <Description></Description>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <CommonConstants>NO_ASSEMBLY_SCANNING;NO_EXCEPTION_SERIALIZATION</CommonConstants>
+    <CommonConstants>NO_EXCEPTION_SERIALIZATION</CommonConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

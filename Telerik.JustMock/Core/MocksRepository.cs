@@ -32,7 +32,7 @@ using Telerik.JustMock.Core.TransparentProxy;
 using Telerik.JustMock.Diagnostics;
 using Telerik.JustMock.Expectations;
 #if !PORTABLE
-using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
+using Telerik.JustMock.Plugins;
 #endif
 
 #if NETCORE
@@ -447,6 +447,34 @@ namespace Telerik.JustMock.Core
 
                 invocation.ReturnValue = defaultValue;
             }
+
+#if !PORTABLE
+            try
+            {
+                if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
+                {
+                    var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
+                    debugWindowPlugin.MockInvoked(
+                        new MockInfo(invocation.Method.Name, invocation.Method.MemberType, invocation.Method.DeclaringType, invocation.Method.ReflectedType),
+                        new InvocationInfo(
+                            invocation.Instance != null
+                                ?
+                                    ObjectInfo.FromObject(invocation.Instance)
+                                    :
+                                    ObjectInfo.FromObject(invocation.Method.DeclaringType),
+                            invocation.Args.Select(arg => ObjectInfo.FromObject(arg)).ToArray(),
+                            invocation.ReturnValue != null
+                                ?
+                                    ObjectInfo.FromObject(invocation.ReturnValue)
+                                    :
+                                    ObjectInfo.FromNullObject(invocation.Method.GetReturnType())));
+                }
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Trace.WriteLine("Exception thrown calling IDebugWindowPlugin plugin: " + e);
+            }
+#endif
         }
 
         internal T GetValue<T>(object owner, object key, T dflt)
@@ -715,6 +743,24 @@ namespace Telerik.JustMock.Core
             {
                 var createInstanceMethodMock = Arrange(createInstanceLambda, methodMockFactory);
                 ActivatorCreateInstanceTBehavior.Attach(result, createInstanceMethodMock);
+            }
+
+            try
+            {
+                if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
+                {
+                    var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
+                    debugWindowPlugin.MockCreated(
+                        new MockInfo(
+                            result.CallPattern.Method.Name,
+                            result.CallPattern.Method.MemberType,
+                            result.CallPattern.Method.DeclaringType,
+                            result.CallPattern.Method.ReflectedType));
+                }
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Trace.WriteLine("Exception thrown calling IDebugWindowPlugin plugin: " + e);
             }
 #endif
 

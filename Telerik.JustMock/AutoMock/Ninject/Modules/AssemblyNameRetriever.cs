@@ -19,7 +19,7 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
-#if !NO_ASSEMBLY_SCANNING
+#if !NETCORE && !NO_ASSEMBLY_SCANNING
 namespace Telerik.JustMock.AutoMock.Ninject.Modules
 {
     using System;
