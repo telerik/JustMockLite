@@ -88,7 +88,7 @@ namespace Telerik.JustMock.Tests
 			bool called = false;
 
 			Mock.NonPublic
-				.Arrange(foo, "ExecuteProtected", ArgExpr.IsAny<int>(), ArgExpr.IsNull<Foo>())
+				.Arrange(foo, "ExecuteProtected", Arg.Expr.IsAny<int>(), Arg.Expr.IsNull<Foo>())
 				.DoInstead(() => called = true);
 
 			foo.Execute(10, null);
@@ -104,11 +104,11 @@ namespace Telerik.JustMock.Tests
 			bool called = false, called2 = false;
 
 			Mock.NonPublic
-				.Arrange(foo, "ExecuteProtected", 10, ArgExpr.IsNull<FooDerived>())
+				.Arrange(foo, "ExecuteProtected", 10, Arg.Expr.IsNull<FooDerived>())
 				.DoInstead(() => called = true);
 
 			Mock.NonPublic
-				.Arrange(foo, "ExecuteProtected", ArgExpr.IsNull<FooDerived>(), 10)
+				.Arrange(foo, "ExecuteProtected", Arg.Expr.IsNull<FooDerived>(), 10)
 				.DoInstead(() => called2 = true);
 
 			foo.Execute(10, null);
@@ -368,7 +368,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldArrangeNonPublicUsingByRefArgumentWithMatcher()
 		{
 			var foo = Mock.Create<RefTest>(Behavior.CallOriginal);
-			Mock.NonPublic.Arrange(foo, "Test", ArgExpr.IsAny<string>(), ArgExpr.Ref(ArgExpr.IsAny<string>())).MustBeCalled();
+			Mock.NonPublic.Arrange(foo, "Test", Arg.Expr.IsAny<string>(), Arg.Expr.Ref(Arg.Expr.IsAny<string>())).MustBeCalled();
 			string asd = "asd";
 			foo.ExecuteTest(ref asd);
 			Mock.Assert(foo);
@@ -381,8 +381,8 @@ namespace Telerik.JustMock.Tests
 			int callA = 0, callB = 0;
 
 			var foo = Mock.Create<RefTest>(Behavior.CallOriginal);
-			Mock.NonPublic.Arrange(foo, "Test", ArgExpr.IsAny<string>(), ArgExpr.Ref(ArgExpr.IsAny<string>())).DoInstead(() => callB = call++);
-			Mock.NonPublic.Arrange(foo, "Test", ArgExpr.IsAny<string>(), ArgExpr.Ref("asd")).DoInstead(() => callA = call++);
+			Mock.NonPublic.Arrange(foo, "Test", Arg.Expr.IsAny<string>(), Arg.Expr.Ref(Arg.Expr.IsAny<string>())).DoInstead(() => callB = call++);
+			Mock.NonPublic.Arrange(foo, "Test", Arg.Expr.IsAny<string>(), Arg.Expr.Ref("asd")).DoInstead(() => callA = call++);
 
 			string input = "asd";
 			foo.ExecuteTest(ref input);
@@ -397,7 +397,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldArrangeNonPublicUsingByRefArgumentAsOutputParameter()
 		{
 			var foo = Mock.Create<RefTest>(Behavior.CallOriginal);
-			Mock.NonPublic.Arrange(foo, "Test", ArgExpr.IsAny<string>(), ArgExpr.Out("asd"));
+			Mock.NonPublic.Arrange(foo, "Test", Arg.Expr.IsAny<string>(), Arg.Expr.Out("asd"));
 
 			string input = "";
 			foo.ExecuteTest(ref input);
@@ -408,7 +408,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldNotArrangeNonPublicUsingConstantArgumentWhereByRefIsExpected()
 		{
 			var foo = Mock.Create<RefTest>(Behavior.CallOriginal);
-			Assert.Throws<MissingMemberException>(() => Mock.NonPublic.Arrange(foo, "Test", ArgExpr.IsAny<string>(), "asd"));
+			Assert.Throws<MissingMemberException>(() => Mock.NonPublic.Arrange(foo, "Test", Arg.Expr.IsAny<string>(), "asd"));
 		}
 
 		public abstract class WeirdSignature
@@ -430,24 +430,24 @@ namespace Telerik.JustMock.Tests
 "Review the available methods in the message below and optionally paste the appropriate arrangement snippet.\r\n" +
 "----------\r\n" +
 "Method 1: Int32 Do(Int32, System.String, System.Object ByRef, System.Collections.Generic.IEnumerable`1[System.Int32])\r\n" +
-"C#: Mock.NonPublic.Arrange<int>(mock, \"Do\", ArgExpr.IsAny<int>(), ArgExpr.IsAny<string>(), ArgExpr.Ref(ArgExpr.IsAny<object>()), ArgExpr.IsAny<IEnumerable<int>>());\r\n" +
-"VB: Mock.NonPublic.Arrange(Of Integer)(mock, \"Do\", ArgExpr.IsAny(Of Integer)(), ArgExpr.IsAny(Of String)(), ArgExpr.Ref(ArgExpr.IsAny(Of Object)()), ArgExpr.IsAny(Of IEnumerable(Of Integer))())\r\n" +
+"C#: Mock.NonPublic.Arrange<int>(mock, \"Do\", Arg.Expr.IsAny<int>(), Arg.Expr.IsAny<string>(), Arg.Expr.Ref(Arg.Expr.IsAny<object>()), Arg.Expr.IsAny<IEnumerable<int>>());\r\n" +
+"VB: Mock.NonPublic.Arrange(Of Integer)(mock, \"Do\", Arg.Expr.IsAny(Of Integer)(), Arg.Expr.IsAny(Of String)(), Arg.Expr.Ref(Arg.Expr.IsAny(Of Object)()), Arg.Expr.IsAny(Of IEnumerable(Of Integer))())\r\n" +
 "----------\r\n" +
 "Method 2: Void Do(Boolean)\r\n" +
-"C#: Mock.NonPublic.Arrange(mock, \"Do\", ArgExpr.IsAny<bool>());\r\n" +
-"VB: Mock.NonPublic.Arrange(mock, \"Do\", ArgExpr.IsAny(Of Boolean)())\r\n" +
+"C#: Mock.NonPublic.Arrange(mock, \"Do\", Arg.Expr.IsAny<bool>());\r\n" +
+"VB: Mock.NonPublic.Arrange(mock, \"Do\", Arg.Expr.IsAny(Of Boolean)())\r\n" +
 "----------\r\n" +
 "Method 3: System.DateTime Do(System.DateTime)\r\n" +
-"C#: Mock.NonPublic.Arrange<DateTime>(mock, \"Do\", ArgExpr.IsAny<DateTime>());\r\n" +
-"VB: Mock.NonPublic.Arrange(Of Date)(mock, \"Do\", ArgExpr.IsAny(Of Date)())\r\n" +
+"C#: Mock.NonPublic.Arrange<DateTime>(mock, \"Do\", Arg.Expr.IsAny<DateTime>());\r\n" +
+"VB: Mock.NonPublic.Arrange(Of Date)(mock, \"Do\", Arg.Expr.IsAny(Of Date)())\r\n" +
 "----------\r\n" +
 "Method 4: Void Do(Int32)\r\n" +
-"C#: Mock.NonPublic.Arrange(\"Do\", ArgExpr.IsAny<int>());\r\n" +
-"VB: Mock.NonPublic.Arrange(\"Do\", ArgExpr.IsAny(Of Integer)())\r\n" +
+"C#: Mock.NonPublic.Arrange(\"Do\", Arg.Expr.IsAny<int>());\r\n" +
+"VB: Mock.NonPublic.Arrange(\"Do\", Arg.Expr.IsAny(Of Integer)())\r\n" +
 "----------\r\n" +
 "Method 5: Int32 Do(Char)\r\n" +
-"C#: Mock.NonPublic.Arrange<int>(\"Do\", ArgExpr.IsAny<char>());\r\n" +
-"VB: Mock.NonPublic.Arrange(Of Integer)(\"Do\", ArgExpr.IsAny(Of Char)())\r\n").Replace("\r\n", Environment.NewLine), message);
+"C#: Mock.NonPublic.Arrange<int>(\"Do\", Arg.Expr.IsAny<char>());\r\n" +
+"VB: Mock.NonPublic.Arrange(Of Integer)(\"Do\", Arg.Expr.IsAny(Of Char)())\r\n").Replace("\r\n", Environment.NewLine), message);
 
 			var exception2 = Assert.Throws<MissingMemberException>(() => Mock.NonPublic.Arrange(foo, "Dont"));
 			var message2 = exception2.Message;
@@ -528,7 +528,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldArrangeNonPublicMethodReturningGenericValue()
 		{
 			var mock = Mock.Create<GenericTest>(Behavior.CallOriginal);
-			Mock.NonPublic.Arrange<int>(mock, "Do", ArgExpr.IsAny<int>()).Returns(123);
+			Mock.NonPublic.Arrange<int>(mock, "Do", Arg.Expr.IsAny<int>()).Returns(123);
 			Assert.Equal(123, mock.TestDo());
 		}
 

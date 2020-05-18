@@ -274,11 +274,11 @@ namespace Telerik.JustMock.Core
         {
             if (paramType.IsByRef)
             {
-                return String.Format("ArgExpr.Ref({0})", FormatMethodParameterMatcher(paramType.GetElementType(), language));
+                return String.Format("Arg.Expr.Ref({0})", FormatMethodParameterMatcher(paramType.GetElementType(), language));
             }
             else
             {
-                return String.Format("ArgExpr.IsAny{0}()", FormatGenericArg(paramType, language));
+                return String.Format("Arg.Expr.IsAny{0}()", FormatGenericArg(paramType, language));
             }
         }
 

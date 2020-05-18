@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015,2019 Progress Software Corporation
+ Copyright © 2010-2015,2019-2020 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -22,6 +22,9 @@ using System.Linq;
 using System.Reflection;
 using Telerik.JustMock.Diagnostics;
 using Telerik.JustMock.Setup;
+#if !PORTABLE
+using Telerik.JustMock.Plugins;
+#endif
 
 namespace Telerik.JustMock.Core.Context
 {
@@ -393,6 +396,21 @@ namespace Telerik.JustMock.Core.Context
 			public override void AddRepository(object entryKey, MocksRepository entryRepo)
 			{
 				this.GetCurrentDictionary().Add(entryKey, entryRepo);
+
+#if !PORTABLE
+				try
+				{
+					if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
+					{
+						var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
+						debugWindowPlugin.RepositoryCreated();
+					}
+				}
+				catch (Exception e)
+				{
+					System.Diagnostics.Trace.WriteLine("Exception thrown calling IDebugWindowPlugin plugin: " + e);
+				}
+#endif
 			}
 
 			public override MocksRepository FindRepository(object key)
@@ -419,6 +437,21 @@ namespace Telerik.JustMock.Core.Context
 				{
 					dict.Remove(key);
 					repo.Retire();
+
+#if !PORTABLE
+					try
+					{
+						if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
+						{
+							var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
+							debugWindowPlugin.RepositoryRetired();
+						}
+					}
+					catch (Exception e)
+					{
+						System.Diagnostics.Trace.WriteLine("Exception thrown calling IDebugWindowPlugin plugin: " + e);
+					}
+#endif
 				}
 			}
 
@@ -449,6 +482,21 @@ namespace Telerik.JustMock.Core.Context
 			public override void AddRepository(object entryKey, MocksRepository entryRepo)
 			{
 				this.GetCurrentDictionary().Add(entryKey, new WeakReference(entryRepo));
+
+#if !PORTABLE
+				try
+				{
+					if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
+					{
+						var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
+						debugWindowPlugin.RepositoryCreated();
+					}
+				}
+				catch (Exception e)
+				{
+					System.Diagnostics.Trace.WriteLine("Exception thrown calling IDebugWindowPlugin plugin: " + e);
+				}
+#endif
 			}
 
 			public override MocksRepository FindRepository(object key)
@@ -496,6 +544,21 @@ namespace Telerik.JustMock.Core.Context
 				{
 					dict.Remove(key);
 					repo.Retire();
+
+#if !PORTABLE
+					try
+					{
+						if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
+						{
+							var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
+							debugWindowPlugin.RepositoryRetired();
+						}
+					}
+					catch (Exception e)
+					{
+						System.Diagnostics.Trace.WriteLine("Exception thrown calling IDebugWindowPlugin plugin: " + e);
+					}
+#endif
 				}
 			}
 

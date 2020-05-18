@@ -133,11 +133,13 @@ namespace Telerik.JustMock.AutoMock.Ninject
             AddComponent<IActivationCache, ActivationCache>();
             AddComponent<ICachePruner, GarbageCollectionCachePruner>();
 
-            #if !NO_ASSEMBLY_SCANNING
+#if !NO_ASSEMBLY_SCANNING
             AddComponent<IModuleLoader, ModuleLoader>();
             AddComponent<IModuleLoaderPlugin, CompiledModuleLoaderPlugin>();
+#if !NETCORE
             AddComponent<IAssemblyNameRetriever, AssemblyNameRetriever>();
-            #endif
+#endif
+#endif
         }
     }
 }

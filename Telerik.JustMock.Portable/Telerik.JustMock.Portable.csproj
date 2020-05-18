@@ -55,6 +55,9 @@
     <Compile Include="..\Telerik.JustMock\ArgExpr.cs">
       <Link>ArgExpr.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\IArgExpr.cs">
+      <Link>IArgExpr.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Args.cs">
       <Link>Args.cs</Link>
     </Compile>
@@ -73,7 +76,7 @@
     <Compile Include="..\Telerik.JustMock\Core\ArrangeMethodAttribute.cs">
       <Link>Core\ArrangeMethodAttribute.cs</Link>
     </Compile>
-    <Compile Include="..\Telerik.JustMock\Core\Behaviors\AfterAllBehavior.cs" >
+    <Compile Include="..\Telerik.JustMock\Core\Behaviors\AfterAllBehavior.cs">
       <Link>Core\Behaviors\AfterAllBehavior.cs</Link>
     </Compile>
     <Compile Include="..\Telerik.JustMock\Core\Behaviors\CallOriginalBehavior.cs">
@@ -484,6 +487,9 @@
     <Compile Include="..\Telerik.JustMock\Core\JMDebug.cs">
       <Link>Core\JMDebug.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\ArgExprImplementation.cs">
+      <Link>Core\ArgExprImplementation.cs</Link>
+    </Compile>
     <Compile Include="Core\Context\AsyncContextResolver.cs" />
     <Compile Include="Core\Context\LocalMockingContextResolver.cs" />
     <Compile Include="Core\Context\MockingContextResolverBase.cs" />
@@ -511,7 +517,6 @@
   <ItemGroup>
     <Compile Include="Core\MockingUtil.CodeGen.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

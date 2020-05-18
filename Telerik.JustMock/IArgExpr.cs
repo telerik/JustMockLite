@@ -1,6 +1,6 @@
-/*
+﻿/*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2020 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,40 +14,28 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-
 using System;
-using System.ComponentModel;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
-using Telerik.JustMock.Core;
+using System.Text;
+using System.Threading.Tasks;
 using Telerik.JustMock.Core.MatcherTree;
 
 namespace Telerik.JustMock
 {
     /// <summary>
-    /// Allows specification of a matching condition for an argument for a non-public method, rather
-    /// a specific value.
-    /// </summary>
-#if !PORTABLE
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-#endif
-    public partial class ArgExpr
-	{
-		internal ArgExpr() { }
-
+	/// Allows specification of a matching condition for an argument for a non-public method, rather
+	/// a specific value.
+	/// </summary>
+    public partial interface IArgExpr
+    {
         /// <summary>
         /// Matches argument for any value.
         /// </summary>
         /// <typeparam name="T">Type for the argument</typeparam>
         /// <returns>Argument type</returns>
-        public static Expression IsAny<T>()
-		{
-			return ProfilerInterceptor.GuardInternal(() =>
-			{
-				Expression<Func<T>> expr = () => Arg.IsAny<T>();
-				return expr.Body;
-			});
-		}
+        Expression IsAny<T>();
 
         /// <summary>
         /// Matches argument for the expected condition.
@@ -57,63 +45,29 @@ namespace Telerik.JustMock
         /// </typeparam>
         /// <param name="match">Matcher expression</param>
         /// <returns>Argument type</returns>
-        public static Expression Matches<T>(Expression<Predicate<T>> match)
-		{
-			return ProfilerInterceptor.GuardInternal(() =>
-			{
-				Expression<Func<T>> expr = () => Arg.Matches<T>(match);
-				return expr.Body;
-			});
-		}
+        Expression Matches<T>(Expression<Predicate<T>> match);
 
-		/// <summary>
+        /// <summary>
 		/// Matches argument for null value.
 		/// </summary>
 		/// <typeparam name="T">Type for the argument</typeparam>
 		/// <returns>Argument type</returns>
-		public static Expression IsNull<T>()
-		{
-			return ProfilerInterceptor.GuardInternal(() =>
-			{
-				Expression<Func<T>> expr = () => Arg.IsNull<T>();
-				return expr.Body;
-			});
-		}
+        Expression IsNull<T>();
 
-		/// <summary>
-		/// Returns a value from a ref or out argument
+        /// <summary>
+		/// Returns a value from a ref or out argument.
 		/// </summary>
 		/// <typeparam name="T">Type for the argument</typeparam>
 		/// <param name="value">Value to match.</param>
 		/// <returns>Argument type</returns>
-		public static Expression Out<T>(T value)
-		{
-			return ProfilerInterceptor.GuardInternal(() =>
-			{
-				Expression<Func<T>> expr = () => OutArg(value);
-				return expr.Body;
-			});
-		}
+        Expression Out<T>(T value);
 
-		[OutArg]
-		private static T OutArg<T>(T value)
-		{
-			return value;
-		}
-	
-		/// <summary>
-		/// Matches a value for ref argument
+        /// <summary>
+		/// Matches a value for ref argument.
 		/// </summary>
 		/// <typeparam name="T">Type for the argument</typeparam>
 		/// <param name="value">Value to match.</param>
 		/// <returns>Argument type</returns>
-		public static Expression Ref<T>(T value)
-		{
-			return ProfilerInterceptor.GuardInternal(() =>
-			{
-				Expression<Func<T>> expr = () => Arg.Ref<T>(value).Value;
-				return expr.Body;
-			});
-		}
-	}
+        Expression Ref<T>(T value);
+    }
 }

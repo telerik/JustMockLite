@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2020 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -18,12 +18,18 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using Telerik.JustMock.Diagnostics;
 #if !PORTABLE
 using Telerik.JustMock.Helpers;
+using Telerik.JustMock.Plugins;
+using Telerik.JustMock.AutoMock.Ninject.Parameters;
+#if NETCORE
+using System.Runtime.InteropServices;
+#endif
 #endif
 
 namespace Telerik.JustMock.Core.Context
@@ -80,19 +86,19 @@ namespace Telerik.JustMock.Core.Context
 #endif
 		}
 
-        public static MethodBase GetTestMethod()
-        {
-            foreach (IMockingContextResolver resolver in registeredContextResolvers)
-            {
-                var testMethod = resolver.GetTestMethod();
-                if (testMethod != null)
-                {
-                    return testMethod;
-                }
-            }
+		public static MethodBase GetTestMethod()
+		{
+			foreach (IMockingContextResolver resolver in registeredContextResolvers)
+			{
+				var testMethod = resolver.GetTestMethod();
+				if (testMethod != null)
+				{
+					return testMethod;
+				}
+			}
 
-            return null;
-        }
+			return null;
+		}
 
 		public static void Fail(string message, params object[] args)
 		{
@@ -144,8 +150,56 @@ namespace Telerik.JustMock.Core.Context
 		[ThreadStatic]
 		private static MocksRepository lastFrameworkAwareRepository;
 
+#if !PORTABLE
+		public static PluginsRegistry Plugins { get; private set; }
+		private static PluginLoadHelper pluginLoadHelper;
+#endif
+
 		static MockingContext()
 		{
+#if !PORTABLE
+			MockingContext.Plugins = new PluginsRegistry();
+			AppDomain.CurrentDomain.DomainUnload += CurrentDomain_DomainUnload;
+
+			try
+			{
+				var clrVersion = Environment.Version;
+#if !NETCORE
+                if (clrVersion.Major >= 4 && clrVersion.Minor >= 0
+					&& clrVersion.Build >= 30319 && clrVersion.Revision >= 42000)
+#endif
+                {
+                    var debugWindowEnabledEnv = Environment.GetEnvironmentVariable("JUSTMOCK_DEBUG_VIEW_ENABLED");
+					var debugWindowServicesStringEnv = Environment.GetEnvironmentVariable("JUSTMOCK_DEBUG_VIEW_SERVICES");
+					var debugWindowAssemblyPathEnv = Environment.GetEnvironmentVariable("JUSTMOCK_DEBUG_VIEW_PLUGIN_PATH");
+					if (!string.IsNullOrEmpty(debugWindowEnabledEnv)
+						&& !string.IsNullOrEmpty(debugWindowServicesStringEnv)
+						&& !string.IsNullOrEmpty(debugWindowAssemblyPathEnv)
+						&& debugWindowEnabledEnv == "1" && File.Exists(debugWindowAssemblyPathEnv))
+					{
+						var pluginAssemblyLoaderRoot = Path.GetDirectoryName(debugWindowAssemblyPathEnv);
+#if NETCORE
+						//TODO: Move this code to data collector
+						if (RuntimeInformation.FrameworkDescription.Contains(".NET Core"))
+						{
+							pluginAssemblyLoaderRoot = Path.Combine(pluginAssemblyLoaderRoot, "netcoreapp2.1");
+							var pluginFileName = Path.GetFileName(debugWindowAssemblyPathEnv);
+							debugWindowAssemblyPathEnv = Path.Combine(pluginAssemblyLoaderRoot, pluginFileName);
+						}
+#endif
+                        MockingContext.pluginLoadHelper = new PluginLoadHelper(pluginAssemblyLoaderRoot);
+						MockingContext.Plugins.Register<IDebugWindowPlugin>(
+							debugWindowAssemblyPathEnv, new ConstructorArgument("debugWindowServicesString", debugWindowServicesStringEnv));
+						DebugView.IsRemoteTraceEnabled = true;
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				System.Diagnostics.Trace.WriteLine("Exception thrown during plugin registration: " + e);
+			}
+#endif
+
 #if PORTABLE
 			if (VisualStudioPortableContextResolver.IsAvailable)
 				registeredContextResolvers.Add(new VisualStudioPortableContextResolver());
@@ -184,6 +238,13 @@ namespace Telerik.JustMock.Core.Context
 			if (failThrower == null)
 				failThrower = LocalMockingContextResolver.GetFailMethod();
 		}
+
+#if !PORTABLE
+		private static void CurrentDomain_DomainUnload(object sender, EventArgs e)
+		{
+			MockingContext.Plugins.Dispose();
+		}
+#endif
 
 		private static void Fail(string msg)
 		{
