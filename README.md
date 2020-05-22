@@ -1,7 +1,7 @@
 JustMock Lite
 ===
 
-[![release](https://img.shields.io/badge/release-R1%202020-blue.svg)](https://www.nuget.org/packages/JustMock/)
+[![release](https://img.shields.io/badge/release-R2%202020-blue.svg)](https://www.nuget.org/packages/JustMock/)
 [![nuget](https://img.shields.io/nuget/v/JustMock.svg?label=nuget)](https://www.nuget.org/packages/JustMock/)
 [![license](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/telerik/JustMockLite/blob/master/LICENSE/)
 
