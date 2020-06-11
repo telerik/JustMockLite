@@ -43,6 +43,8 @@ namespace Telerik.JustMock.Core.Context
 
 	internal static class MockingContext
 	{
+		internal const string DebugViewPluginAssemblyFileName = "Telerik.JustMock.DebugWindow.Plugin.dll";
+
 		public static MocksRepository CurrentRepository
 		{
 			get { return ResolveRepository(UnresolvedContextBehavior.CreateNewContextualOrLocal); }
@@ -165,31 +167,32 @@ namespace Telerik.JustMock.Core.Context
 			{
 				var clrVersion = Environment.Version;
 #if !NETCORE
-                if (clrVersion.Major >= 4 && clrVersion.Minor >= 0
+				if (clrVersion.Major >= 4 && clrVersion.Minor >= 0
 					&& clrVersion.Build >= 30319 && clrVersion.Revision >= 42000)
 #endif
-                {
-                    var debugWindowEnabledEnv = Environment.GetEnvironmentVariable("JUSTMOCK_DEBUG_VIEW_ENABLED");
+				{
+					var debugWindowEnabledEnv = Environment.GetEnvironmentVariable("JUSTMOCK_DEBUG_VIEW_ENABLED");
 					var debugWindowServicesStringEnv = Environment.GetEnvironmentVariable("JUSTMOCK_DEBUG_VIEW_SERVICES");
-					var debugWindowAssemblyPathEnv = Environment.GetEnvironmentVariable("JUSTMOCK_DEBUG_VIEW_PLUGIN_PATH");
+					var debugWindowAssemblyDirectoryEnv = Environment.GetEnvironmentVariable("JUSTMOCK_DEBUG_VIEW_PLUGIN_DIRECTORY");
 					if (!string.IsNullOrEmpty(debugWindowEnabledEnv)
 						&& !string.IsNullOrEmpty(debugWindowServicesStringEnv)
-						&& !string.IsNullOrEmpty(debugWindowAssemblyPathEnv)
-						&& debugWindowEnabledEnv == "1" && File.Exists(debugWindowAssemblyPathEnv))
+						&& !string.IsNullOrEmpty(debugWindowAssemblyDirectoryEnv)
+						&& debugWindowEnabledEnv == "1" && Directory.Exists(debugWindowAssemblyDirectoryEnv))
 					{
-						var pluginAssemblyLoaderRoot = Path.GetDirectoryName(debugWindowAssemblyPathEnv);
 #if NETCORE
-						//TODO: Move this code to data collector
 						if (RuntimeInformation.FrameworkDescription.Contains(".NET Core"))
 						{
-							pluginAssemblyLoaderRoot = Path.Combine(pluginAssemblyLoaderRoot, "netcoreapp2.1");
-							var pluginFileName = Path.GetFileName(debugWindowAssemblyPathEnv);
-							debugWindowAssemblyPathEnv = Path.Combine(pluginAssemblyLoaderRoot, pluginFileName);
+							// append 'netcoreapp2.1' suffix if necessary
+							if (string.Compare(Path.GetDirectoryName(debugWindowAssemblyDirectoryEnv), "netcoreapp2.1", StringComparison.InvariantCultureIgnoreCase) != 0)
+							{
+								debugWindowAssemblyDirectoryEnv = Path.Combine(debugWindowAssemblyDirectoryEnv, "netcoreapp2.1");
+							}
 						}
 #endif
-                        MockingContext.pluginLoadHelper = new PluginLoadHelper(pluginAssemblyLoaderRoot);
+						var debugWindowAssemblyPath = Path.Combine(debugWindowAssemblyDirectoryEnv, DebugViewPluginAssemblyFileName);
+						MockingContext.pluginLoadHelper = new PluginLoadHelper(debugWindowAssemblyDirectoryEnv);
 						MockingContext.Plugins.Register<IDebugWindowPlugin>(
-							debugWindowAssemblyPathEnv, new ConstructorArgument("debugWindowServicesString", debugWindowServicesStringEnv));
+							debugWindowAssemblyPath, new ConstructorArgument("debugWindowServicesString", debugWindowServicesStringEnv));
 						DebugView.IsRemoteTraceEnabled = true;
 					}
 				}
