@@ -74,7 +74,7 @@ namespace Telerik.JustMock.Core.Context
 		}
 
 #if !PORTABLE
-		private static readonly object retireRepositoryounterSync = new object();
+		private static readonly object retireRepositoryCounterSync = new object();
 		private static int retireRepositoryCounter = 0;
 
 		[DebuggerHidden]
@@ -82,14 +82,14 @@ namespace Telerik.JustMock.Core.Context
 		{
 			get
 			{
-				lock (retireRepositoryounterSync)
+				lock (retireRepositoryCounterSync)
 				{
 					return retireRepositoryCounter;
 				}
 			}
 			set
 			{
-				lock (retireRepositoryounterSync)
+				lock (retireRepositoryCounterSync)
 				{
 					if (value < 0)
 					{
