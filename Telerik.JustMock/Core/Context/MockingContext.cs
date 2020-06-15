@@ -73,56 +73,18 @@ namespace Telerik.JustMock.Core.Context
 			return LocalMockingContextResolver.ResolveRepository(unresolvedContextBehavior);
 		}
 
-#if !PORTABLE
-		private static readonly object retireRepositoryCounterSync = new object();
-		private static int retireRepositoryCounter = 0;
-
-		[DebuggerHidden]
-		public static int RetireRepositoryCounter
-		{
-			get
-			{
-				lock (retireRepositoryCounterSync)
-				{
-					return retireRepositoryCounter;
-				}
-			}
-			set
-			{
-				lock (retireRepositoryCounterSync)
-				{
-					if (value < 0)
-					{
-						throw new InvalidOperationException();
-					}
-					retireRepositoryCounter = value;
-				}
-			}
-		}
-#endif
-
 		public static void RetireRepository()
 		{
-#if !PORTABLE
-			try
+			foreach (var resolver in registeredContextResolvers)
 			{
-				RetireRepositoryCounter++;
-#endif
-				foreach (var resolver in registeredContextResolvers)
-				{
-					if (resolver.RetireRepository())
-						return;
-				}
+				if (resolver.RetireRepository())
+					return;
+			}
 
-				LocalMockingContextResolver.RetireRepository();
+			LocalMockingContextResolver.RetireRepository();
 
 #if !PORTABLE
-				DynamicTypeHelper.Reset();
-			}
-			finally
-			{
-				RetireRepositoryCounter--;
-			}
+			DynamicTypeHelper.Reset();
 #endif
 		}
 
@@ -193,9 +155,6 @@ namespace Telerik.JustMock.Core.Context
 #if !PORTABLE
 		public static PluginsRegistry Plugins { get; private set; }
 		private static PluginLoadHelper pluginLoadHelper;
-#if DEBUG
-		private static TraceSource wcfTraceSource;
-#endif
 #endif
 
 		static MockingContext()
@@ -203,13 +162,6 @@ namespace Telerik.JustMock.Core.Context
 #if !PORTABLE
 			MockingContext.Plugins = new PluginsRegistry();
 			AppDomain.CurrentDomain.DomainUnload += CurrentDomain_DomainUnload;
-
-#if DEBUG
-			System.Diagnostics.Trace.AutoFlush = true;
-
-			wcfTraceSource = new TraceSource("System.ServiceModel", SourceLevels.All);
-			wcfTraceSource.Listeners.Add(new TextWriterTraceListener(@"c:\temp\justmock_wcf.log"));
-#endif
 
 			try
 			{

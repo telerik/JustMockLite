@@ -62,34 +62,6 @@ namespace Telerik.JustMock.Core
 			return true;
 		}
 
-#if !PORTABLE
-		private static readonly object profilerInterceptionCounterSync = new object();
-		private static int profilerInterceptionCounter = 0;
-
-		[DebuggerHidden]
-		public static int ProfilerInterceptionCounter
-		{
-			get
-			{
-				lock (profilerInterceptionCounterSync)
-				{
-					return profilerInterceptionCounter;
-				}
-			}
-			set
-			{
-				lock (profilerInterceptionCounterSync)
-				{
-					if (value < 0)
-					{
-						throw new InvalidOperationException();
-					}
-					profilerInterceptionCounter = value;
-				}
-			}
-		}
-#endif
-
 		private static bool InterceptCall(RuntimeTypeHandle typeHandle, RuntimeMethodHandle methodHandle, object[] data)
 		{
 			if (!IsInterceptionEnabled || isFinalizerThread)
@@ -98,9 +70,6 @@ namespace Telerik.JustMock.Core
 			try
 			{
 				ReentrancyCounter++;
-#if !PORTABLE
-				ProfilerInterceptionCounter++;
-#endif
 
 				var method = MethodBase.GetMethodFromHandle(methodHandle, typeHandle);
 				if (method.DeclaringType == null)
@@ -119,9 +88,7 @@ namespace Telerik.JustMock.Core
 					data[1] = invocation.ReturnValue;
 					int methodArgsCount = method.GetParameters().Length;
 					for (int i = 0; i < methodArgsCount; ++i)
-					{
 						data[i + 2] = invocation.Args[i];
-					}
 
 					return invocation.CallOriginal;
 				}
@@ -130,9 +97,6 @@ namespace Telerik.JustMock.Core
 			finally
 			{
 				ReentrancyCounter--;
-#if !PORTABLE
-				ProfilerInterceptionCounter--;
-#endif
 			}
 		}
 
@@ -144,9 +108,6 @@ namespace Telerik.JustMock.Core
 			try
 			{
 				ReentrancyCounter++;
-#if !PORTABLE
-				ProfilerInterceptionCounter++;
-#endif
 
 				var method = MethodBase.GetMethodFromHandle(methodHandle, typeHandle);
 
@@ -170,9 +131,6 @@ namespace Telerik.JustMock.Core
 			finally
 			{
 				ReentrancyCounter--;
-#if !PORTABLE
-				ProfilerInterceptionCounter--;
-#endif
 			}
 		}
 
@@ -215,7 +173,7 @@ namespace Telerik.JustMock.Core
 				throw new MockException("Telerik.CodeWeaver.Profiler.dll is old.\nRegister the updated version.");
 
 			string profilerVersion = (string)getProfilerVersion.Invoke(null, null);
-			JMDebug.Assert(null != profilerVersion);
+            JMDebug.Assert(null != profilerVersion);
 			var codeWeaverAssemblyVersion = new Version(profilerVersion);
 			int comparison = justMockAssemblyVersion.CompareTo(codeWeaverAssemblyVersion);
 
@@ -671,7 +629,7 @@ namespace Telerik.JustMock.Core
 
 		internal static void SkipMethodInterceptionOnce(MethodBase method)
 		{
-			JMDebug.Assert(skipMethodInterceptionOnce == null || skipMethodInterceptionOnce == method);
+            JMDebug.Assert(skipMethodInterceptionOnce == null || skipMethodInterceptionOnce == method);
 			skipMethodInterceptionOnce = method;
 		}
 	}
