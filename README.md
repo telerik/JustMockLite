@@ -1,3 +1,14 @@
+30% discount campaign on Telerik JustMock - only this August
+===
+
+### With **Telerik JustMock you could save up to 50% in development time**. The product can be integrated seamlessly into your organization and doesn’t disrupt your existing business processes. 
+[ Get Telerik JustMock at a 30% discount  ➤](https://store.progress.com/configure-purchase?utm_medium=external-website&utm_source=github&skuId=6443&coupon=prom-bhuasa&utm_campaign=devcraft-promo-aug2020-kui-mals&elqTrackId=88d9d9ae237948c5baa01fb48bee2c06&elq=55a98f35fdfa42d5ab65f5c85ce41772&elqaid=21974&elqat=1&elqCampaignId=)
+
+### Are you building for **ASP.NET Web Forms/MVC/Core or WPF/Winforms or need a sturdy reporting solution?*** Get JustMock as part of our complete developer tools collection with priority support. 
+[ Get DevCraft at a 30% discount  ➤](https://store.progress.com/configure-purchase?utm_medium=external-website&utm_source=github&skuId=6127&coupon=prom-bhuasa&utm_campaign=devcraft-promo-aug2020-kui-mals&elqTrackId=88d9d9ae237948c5baa01fb48bee2c06&elq=55a98f35fdfa42d5ab65f5c85ce41772&elqaid=21974&elqat=1&elqCampaignId=)
+
+To receive your discount, simply apply this promo code at checkout: **PROM-BHUASA**.
+
 JustMock Lite
 ===
 
@@ -27,7 +38,7 @@ JustMock Lite
 JustMock
 ===
 
-**JustMock Lite** is backed by a commercial version **[JustMock](https://www.telerik.com/products/mocking.aspx)** which is more advanced mocking framework based on JustMock Lite. JustMock is for developers who does not want to have any restrictions and be able to mock literally everything. For more information visit our [JustMock website](https://www.telerik.com/products/mocking.aspx).
+**JustMock Lite** is backed by a commercial version **[JustMock](https://www.telerik.com/products/mocking.aspx)** which is more advanced mocking framework based on JustMock Lite. JustMock is for developers who doesn't want to have any restrictions and be able to mock literally everything. For more information visit our [JustMock website](https://www.telerik.com/products/mocking.aspx).
 
 ### JustMock Key Features
 - **All key features from JustMock Lite**
