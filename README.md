@@ -1,3 +1,14 @@
+30% discount campaign on Telerik JustMock - only this August
+===
+
+### With **Telerik JustMock you could save up to 50% in development time**. The product can be integrated seamlessly into your organization and doesn’t disrupt your existing business processes. 
+[ Get Telerik JustMock at a 30% discount  ➤](https://store.progress.com/configure-purchase?utm_medium=external-website&utm_source=github&skuId=6443&coupon=prom-bhuasa&utm_campaign=devcraft-promo-aug2020-kui-mals&elqTrackId=88d9d9ae237948c5baa01fb48bee2c06&elq=55a98f35fdfa42d5ab65f5c85ce41772&elqaid=21974&elqat=1&elqCampaignId=)
+
+### Are you building for **ASP.NET Web Forms/MVC/Core or WPF/Winforms or need a sturdy reporting solution?*** Get JustMock as part of our complete developer tools collection with priority support. 
+[ Get DevCraft at a 30% discount  ➤](https://store.progress.com/configure-purchase?utm_medium=external-website&utm_source=github&skuId=6127&coupon=prom-bhuasa&utm_campaign=devcraft-promo-aug2020-kui-mals&elqTrackId=88d9d9ae237948c5baa01fb48bee2c06&elq=55a98f35fdfa42d5ab65f5c85ce41772&elqaid=21974&elqat=1&elqCampaignId=)
+
+To receive your discount, simply apply this promo code at checkout: **PROM-BHUASA**.
+
 JustMock Lite
 ===
 
@@ -7,20 +18,44 @@ JustMock Lite
 
 **JustMock Lite by Telerik** is for developers who practice unit testing and want to deliver exceptional software. JustMock Lite is the superior free mocking framework that makes unit testing simpler for SOLID testable projects. It is also an open source product that is easy to use, feature rich, with great power and flexibility, making it the superior choice. JustMock Lite cuts your development time and helps you create better unit tests. It enables you to perform fast and controlled tests that are independent of external dependencies like databases, web services or proprietary code. For more information, refer to our <a href="http://www.telerik.com/justmock/free-mocking" target="_blank">JustMock Lite website</a>.
 
-### Key Features
-- AAA pattern – JustMockLite uses the Arrange Act Assert (AAA) pattern.
-- Error-Free Mocking - Thanks to its strongly typed framework API, JustMock detects errors in your mock definitions and highlights them in Visual Studio. The JustMock Lite API fully leverages Visual Studio IntelliSense to make it easy to start mocking.
-- Mock interfaces - Allows you to test public interfaces.
-- Mock classes - Allows you to test public classes.
-- Mock properties - Allows you to test the property getter and setter.
-- Mock and rise events - Allows you to test events.
-- Control mock behavior - Allows you to control the default behavior of a mock whether be to do nothing, call the original code or throw an exception.
-- Assert call occurrences - Allows you to determine how many times a call has occurred.
-- Recursive mocking - Еnable you to mock members that are obtained as a result of "chained" calls on a mock.
-- Sequential mocking - Аllows you to return different values on the same or different consecutive calls to one and the same type.
-- Support for out/ref - Mock methods accepting our and ref parameters.
-- Support for Generics - Mock generic classes and methods.
+### JustMock Lite Key Features
+- **AAA pattern** – JustMockLite uses the Arrange Act Assert (AAA) pattern.
+- **Error-Free Mocking** - Thanks to its strongly typed framework API, JustMock detects errors in your mock definitions and highlights them in Visual Studio. The JustMock Lite API fully leverages Visual Studio IntelliSense to make it easy to start mocking.
+- **Mock interfaces** - Allows you to test public interfaces.
+- **Mock classes** - Allows you to test public classes.
+- **Mock properties** - Allows you to test the property getter and setter.
+- **Mock and rise events** - Allows you to test events.
+- **Control mock behavior** - Allows you to control the default behavior of a mock whether be to do nothing, call the original code or throw an exception.
+- **Assert call occurrences** - Allows you to determine how many times a call has occurred.
+- **Recursive mocking** - Еnable you to mock members that are obtained as a result of "chained" calls on a mock.
+- **Sequential mocking** - Allows you to return different values on the same or different consecutive calls to one and the same type.
+- **Support for out/ref** - Mock methods accepting our and ref parameters.
+- **Support for Generics** - Mock generic classes and methods.
+- **Fluent mocking** - Allows you setup your test arrangements and expectations from your mock object.
+- **Being able to seamlessly upgrade to JustMock** - No rework of test is required. Simply install JustMock and make sure your project is referencing the correct assemblies.
 - And many more.
+
+JustMock
+===
+
+**JustMock Lite** is backed by a commercial version **[JustMock](https://www.telerik.com/products/mocking.aspx)** which is more advanced mocking framework based on JustMock Lite. JustMock is for developers who doesn't want to have any restrictions and be able to mock literally everything. For more information visit our [JustMock website](https://www.telerik.com/products/mocking.aspx).
+
+### JustMock Key Features
+- **All key features from JustMock Lite**
+- **Mock non-public members and types** - Allows you to mock non-public members or types.
+- **Mock non-virtual methods** - Allows you to mock non-virtual methods.
+- **Mock extension method** - Allows you to mock extension methods.
+- **Mock static classes, methods, and properties** - Allows you to mock static constructors, methods and properties getters and setters, set expectations and verify results.
+- **Mock sealed classes** - Allows you to mock sealed classes and calls to their methods/properties
+- **Mock partial mocking** - Allows you keep your original object and mock only the required methods.
+- **Mock LINQ queries** - Allows you to mock LINQ queries with custom select.
+- **Mock DLL imports** - Allows you to mock imported functions (decorated with the [DLLImport()] attribute)
+- **Mock Ref return values and ref locals** - Allows you to arrange and verify Ref return and Ref locals
+- **Mock Local functions** - Allows you mock Local functions.
+- **Mock MsCorLib members** - Allows you to mock types and methods from .NET Framework/.NET Core, i.e. from MsCorLib.
+- **Mock Microsoft SharePoint** - Allows you to mock types and method from SharePoint.
+- **Mock Microsoft EntityFramework** - Allows you to easily create in-memory mocks of the DbSet and DbContext types.
+- And many more
 
 ### Examples
 
@@ -50,7 +85,7 @@ public void TestBookService()
 - .Net Core 2.0 and later.
 
 ### Documentation
-JustMock Lite comes with extensive <a href="http://docs.telerik.com/devtools/justmock/introduction.html" target="_blank">Documentation</a> and examples that will help you quickly get started with the framework.
+JustMock Lite and JustMock are coming with extensive <a href="http://docs.telerik.com/devtools/justmock/introduction.html" target="_blank">Documentation</a> and examples that will help you quickly get started with the framework.
 
 ### Feedback
 JustMock Lite is constantly improved through customer interaction and feedback. If you want to suggest a new feature, bug report or vote for a popular one, please visit our <a href="https://feedback.telerik.com/Project/105" target="_blank">Feedback Portal</a>.
