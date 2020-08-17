@@ -403,7 +403,10 @@ namespace Telerik.JustMock.Core.Context
 					if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
 					{
 						var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
-						debugWindowPlugin.RepositoryCreated();
+						debugWindowPlugin.RepositoryCreated(
+							entryRepo.RepositoryId,
+							entryRepo.GetRepositoryPath(),
+							new MethodMockInfo(entryRepo.Method.Name, entryRepo.Method.MemberType, entryRepo.Method.DeclaringType, entryRepo.Method.ReflectedType));
 					}
 				}
 				catch (Exception e)
@@ -435,16 +438,17 @@ namespace Telerik.JustMock.Core.Context
 
 				if (dict != null)
 				{
+					var repositoryId = repo.RepositoryId;
+					var repositoryPath = repo.GetRepositoryPath();
 					dict.Remove(key);
 					repo.Retire();
-
 #if !PORTABLE
 					try
 					{
 						if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
 						{
 							var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
-							debugWindowPlugin.RepositoryRetired();
+							debugWindowPlugin.RepositoryRetired(repositoryId, repositoryPath);
 						}
 					}
 					catch (Exception e)
@@ -489,7 +493,10 @@ namespace Telerik.JustMock.Core.Context
 					if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
 					{
 						var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
-						debugWindowPlugin.RepositoryCreated();
+						debugWindowPlugin.RepositoryCreated(
+							entryRepo.RepositoryId,
+							entryRepo.GetRepositoryPath(),
+							new MethodMockInfo(entryRepo.Method.Name, entryRepo.Method.MemberType, entryRepo.Method.DeclaringType, entryRepo.Method.ReflectedType));
 					}
 				}
 				catch (Exception e)
@@ -542,6 +549,8 @@ namespace Telerik.JustMock.Core.Context
 
 				if (dict != null)
 				{
+					var repositoryId = repo.RepositoryId;
+					var repositoryPath = repo.GetRepositoryPath();
 					dict.Remove(key);
 					repo.Retire();
 
@@ -551,7 +560,7 @@ namespace Telerik.JustMock.Core.Context
 						if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
 						{
 							var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
-							debugWindowPlugin.RepositoryRetired();
+							debugWindowPlugin.RepositoryRetired(repositoryId, repositoryPath);
 						}
 					}
 					catch (Exception e)
