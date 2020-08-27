@@ -23,15 +23,15 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Telerik.JustMock.Tests.Base
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Telerik.JustMock.Tests.Base\Telerik.JustMock.Tests.Base.projitems*{12629109-a1aa-4abb-852a-087dd15205f3}*SharedItemsImports = 4
-		Telerik.JustMock.Tests\Telerik.JustMock.Tests.projitems*{12629109-a1aa-4abb-852a-087dd15205f3}*SharedItemsImports = 4
-		Telerik.JustMock.Tests.Base\Telerik.JustMock.Tests.Base.projitems*{1b34a434-aa3f-412a-b843-f6c082a92bda}*SharedItemsImports = 4
-		Telerik.JustMock.Tests\Telerik.JustMock.Tests.projitems*{1b34a434-aa3f-412a-b843-f6c082a92bda}*SharedItemsImports = 4
-		Telerik.JustMock.Tests.Base\Telerik.JustMock.Tests.Base.projitems*{3aedda3d-9525-4d05-bbda-9613ac30b0d1}*SharedItemsImports = 4
-		Telerik.JustMock.Tests\Telerik.JustMock.Tests.projitems*{3aedda3d-9525-4d05-bbda-9613ac30b0d1}*SharedItemsImports = 4
+		Telerik.JustMock.Tests.Base\Telerik.JustMock.Tests.Base.projitems*{12629109-a1aa-4abb-852a-087dd15205f3}*SharedItemsImports = 5
+		Telerik.JustMock.Tests\Telerik.JustMock.Tests.projitems*{12629109-a1aa-4abb-852a-087dd15205f3}*SharedItemsImports = 5
+		Telerik.JustMock.Tests.Base\Telerik.JustMock.Tests.Base.projitems*{1b34a434-aa3f-412a-b843-f6c082a92bda}*SharedItemsImports = 5
+		Telerik.JustMock.Tests\Telerik.JustMock.Tests.projitems*{1b34a434-aa3f-412a-b843-f6c082a92bda}*SharedItemsImports = 5
+		Telerik.JustMock.Tests.Base\Telerik.JustMock.Tests.Base.projitems*{3aedda3d-9525-4d05-bbda-9613ac30b0d1}*SharedItemsImports = 5
+		Telerik.JustMock.Tests\Telerik.JustMock.Tests.projitems*{3aedda3d-9525-4d05-bbda-9613ac30b0d1}*SharedItemsImports = 5
 		Telerik.JustMock.Tests\Telerik.JustMock.Tests.projitems*{6f2aea8b-7295-4446-9686-663993ae0b18}*SharedItemsImports = 13
-		Telerik.JustMock.Tests.Base\Telerik.JustMock.Tests.Base.projitems*{83f0c270-db35-4b80-beda-5aed79c0fb2d}*SharedItemsImports = 4
-		Telerik.JustMock.Tests\Telerik.JustMock.Tests.projitems*{83f0c270-db35-4b80-beda-5aed79c0fb2d}*SharedItemsImports = 4
+		Telerik.JustMock.Tests.Base\Telerik.JustMock.Tests.Base.projitems*{83f0c270-db35-4b80-beda-5aed79c0fb2d}*SharedItemsImports = 5
+		Telerik.JustMock.Tests\Telerik.JustMock.Tests.projitems*{83f0c270-db35-4b80-beda-5aed79c0fb2d}*SharedItemsImports = 5
 		Telerik.JustMock.Tests.Base\Telerik.JustMock.Tests.Base.projitems*{eb616afe-5bac-4b9f-a46e-7efc592249d0}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
