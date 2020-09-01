@@ -1,14 +1,3 @@
-30% discount campaign on Telerik JustMock - only this August
-===
-
-### With **Telerik JustMock you could save up to 50% in development time**. The product can be integrated seamlessly into your organization and doesn’t disrupt your existing business processes. 
-[ Get Telerik JustMock at a 30% discount  ➤](https://store.progress.com/configure-purchase?utm_medium=external-website&utm_source=github&skuId=6443&coupon=prom-bhuasa&utm_campaign=devcraft-promo-aug2020-kui-gifthub)
-
-### Are you building for **ASP.NET Web Forms/MVC/Core or WPF/Winforms or need a sturdy reporting solution?*** Get JustMock as part of our complete developer tools collection with priority support. 
-[ Get DevCraft at a 30% discount  ➤](https://store.progress.com/configure-purchase?utm_medium=external-website&utm_source=github&skuId=6127&coupon=prom-bhuasa&utm_campaign=devcraft-promo-aug2020-kui-gifthub)
-
-To receive your discount, simply apply this promo code at checkout: **PROM-BHUASA**.
-
 JustMock Lite
 ===
 
