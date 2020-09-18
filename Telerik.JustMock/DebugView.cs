@@ -128,7 +128,7 @@ namespace Telerik.JustMock
 			{
 				return ProfilerInterceptor.GuardInternal(
 					() =>
-						IsTraceEnabled && (traceSink.TraceOptions & TraceOptions.RemoteTrace) != 0);
+						(traceSink.TraceOptions & TraceOptions.RemoteTrace) != 0);
 			}
 			set
 			{
@@ -139,7 +139,7 @@ namespace Telerik.JustMock
 							{
 								if (traceSink == null)
 								{
-									traceSink = new Trace() { TraceOptions = TraceOptions.RemoteTrace };
+									traceSink = new Trace();
 								}
 
 								(traceSink as Trace).TraceOptions |= TraceOptions.RemoteTrace;
@@ -174,8 +174,8 @@ namespace Telerik.JustMock
 
 		internal static void TraceEvent(IndentLevel traceLevel, Func<string> message)
 		{
-			var lTraceSink = DebugView.traceSink;
-			if (lTraceSink == null || lTraceSink.TraceOptions == TraceOptions.Disabled)
+			var activeTrace = DebugView.traceSink;
+			if (activeTrace == null || activeTrace.TraceOptions == TraceOptions.Disabled)
 			{
 				return;
 			}
@@ -194,12 +194,7 @@ namespace Telerik.JustMock
 					.Select(line => String.Format("{0}{1}", traceLevel.AsIndent(), line.TrimEnd())).ToArray())
 				+ (traceLevel.IsLeaf() ? "" : ":");
 
-			lTraceSink.TraceEvent(formattedMessage);
-
-			if ((lTraceSink.TraceOptions & TraceOptions.InternalTrace) != 0)
-			{
-				Debug.WriteLine(formattedMessage);
-			}
+			activeTrace.TraceEvent(formattedMessage);
 
 			GC.KeepAlive(CurrentState); // for coverage testing
 		}
@@ -302,17 +297,17 @@ namespace Telerik.JustMock.Diagnostics
 
 	internal class Trace : ITraceSink
 	{
-		private readonly object mutex = new object();
+		private readonly object traceSync = new object();
 		private readonly StringBuilder log = new StringBuilder();
 		private readonly StringBuilder currentTrace = new StringBuilder();
 		private bool currentTraceRead;
-		private TraceOptions traceOptions = TraceOptions.InternalTrace;
+		private TraceOptions traceOptions = TraceOptions.Disabled;
 
 		public string FullTrace
 		{
 			get
 			{
-				lock (this.mutex)
+				lock (this.traceSync)
 				{
 					return this.log.ToString();
 				}
@@ -323,7 +318,7 @@ namespace Telerik.JustMock.Diagnostics
 		{
 			get
 			{
-				lock (this.mutex)
+				lock (this.traceSync)
 				{
 					this.currentTraceRead = true;
 					return this.currentTrace.ToString();
@@ -335,14 +330,14 @@ namespace Telerik.JustMock.Diagnostics
 		{
 			get
 			{
-				lock (this.mutex)
+				lock (this.traceSync)
 				{
 					return this.traceOptions;
 				}
 			}
 			set
 			{
-				lock (this.mutex)
+				lock (this.traceSync)
 				{
 					this.traceOptions = value;
 				}
@@ -351,28 +346,37 @@ namespace Telerik.JustMock.Diagnostics
 
 		public void TraceEvent(string message)
 		{
-			lock (this.mutex)
-			{
-				if ((this.traceOptions & TraceOptions.InternalTrace) != 0 || (this.traceOptions & TraceOptions.RemoteTrace) != 0)
-				{
 #if !PORTABLE
-					if ((this.traceOptions & TraceOptions.RemoteTrace) != 0)
+			if ((this.TraceOptions & TraceOptions.RemoteTrace) != 0)
+			{
+				try
+				{
+					if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
 					{
-						try
+						// traces triggered by profiler intercepted calls and repository retirement
+						// could cause deadlocks and infinite loops in remote tracing, so skip them
+						var testMethod = MockingContext.GetTestMethod();
+						var repo = MockingContext.ResolveRepository(UnresolvedContextBehavior.DoNotCreateNew);
+						if (testMethod != null && repo != null && !repo.IsRetired)
 						{
-							if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
-							{
-								var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
-								debugWindowPlugin.TraceMessage(message);
-							}
-						}
-						catch (Exception e)
-						{
-							System.Diagnostics.Trace.WriteLine("Exception thrown calling IDebugWindowPlugin plugin: " + e);
+							var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
+							debugWindowPlugin.TraceMessage(message);
 						}
 					}
+				}
+				catch (Exception e)
+				{
+					System.Diagnostics.Trace.WriteLine("Exception thrown calling IDebugWindowPlugin plugin: " + e);
+				}
+			}
 #endif
 
+			if ((this.TraceOptions & TraceOptions.InternalTrace) != 0)
+			{
+				Debug.WriteLine(message);
+
+				lock (this.traceSync)
+				{
 					this.log.AppendLine(message);
 
 					if (this.currentTraceRead)

@@ -126,6 +126,8 @@ namespace Telerik.JustMock.Core
 
         internal List<IMatcher> MatchersInContext { get; private set; }
 
+        internal int RepositoryId { get { return this.repositoryId; } }
+
         static MocksRepository()
         {
 #if !COREFX
@@ -151,7 +153,7 @@ namespace Telerik.JustMock.Core
 
         internal MocksRepository(MocksRepository parentRepository, MethodBase method)
         {
-            this.repositoryId = ++repositoryCounter;
+            this.repositoryId = Interlocked.Increment(ref repositoryCounter);
             this.Method = method;
             this.creatingThread = Thread.CurrentThread;
             this.Interceptor = new DynamicProxyInterceptor(this);
@@ -455,6 +457,8 @@ namespace Telerik.JustMock.Core
                 {
                     var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
                     debugWindowPlugin.MockInvoked(
+                        invocation.Repository.RepositoryId,
+                        invocation.Repository.GetRepositoryPath(),
                         new MockInfo(invocation.Method.Name, invocation.Method.MemberType, invocation.Method.DeclaringType, invocation.Method.ReflectedType),
                         new InvocationInfo(
                             invocation.Instance != null
@@ -743,24 +747,6 @@ namespace Telerik.JustMock.Core
             {
                 var createInstanceMethodMock = Arrange(createInstanceLambda, methodMockFactory);
                 ActivatorCreateInstanceTBehavior.Attach(result, createInstanceMethodMock);
-            }
-
-            try
-            {
-                if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
-                {
-                    var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
-                    debugWindowPlugin.MockCreated(
-                        new MockInfo(
-                            result.CallPattern.Method.Name,
-                            result.CallPattern.Method.MemberType,
-                            result.CallPattern.Method.DeclaringType,
-                            result.CallPattern.Method.ReflectedType));
-                }
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Trace.WriteLine("Exception thrown calling IDebugWindowPlugin plugin: " + e);
             }
 #endif
 
@@ -1231,6 +1217,29 @@ namespace Telerik.JustMock.Core
             }
 
             funcRoot.AddChild(methodMock.CallPattern, methodMock, this.sharedContext.GetNextArrangeId());
+
+#if !PORTABLE
+
+            try
+            {
+                if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
+                {
+                    var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
+                    debugWindowPlugin.MockCreated(
+                        methodMock.Repository.RepositoryId,
+                        methodMock.Repository.GetRepositoryPath(),
+                        new MockInfo(
+                            methodMock.CallPattern.Method.Name,
+                            methodMock.CallPattern.Method.MemberType,
+                            methodMock.CallPattern.Method.DeclaringType,
+                            methodMock.CallPattern.Method.ReflectedType));
+                }
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Trace.WriteLine("Exception thrown calling IDebugWindowPlugin plugin: " + e);
+            }
+#endif
         }
 
         private void CheckMethodInterceptorAvailable(IMatcher instanceMatcher, MethodBase method)
@@ -1555,5 +1564,18 @@ namespace Telerik.JustMock.Core
         /// </summary>
         public abstract class ExternalMockMixin
         { }
+
+        internal string GetRepositoryPath(string delimiter = "/")
+        {
+            var parentIds = new Queue<int>();
+            var parentRepo = this.parentRepository;
+            while (parentRepo != null)
+            {
+                parentIds.Enqueue(parentRepo.repositoryId);
+                parentRepo = parentRepo.parentRepository;
+            }
+
+            return delimiter + string.Join(delimiter, parentIds.Reverse());
+        }
     }
 }

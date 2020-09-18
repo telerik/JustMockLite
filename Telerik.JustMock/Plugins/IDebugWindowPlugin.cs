@@ -23,14 +23,22 @@ using Telerik.JustMock.Core;
 #if !PORTABLE
 namespace Telerik.JustMock.Plugins
 {
-    internal interface IDebugWindowPlugin : INinjectModule, IDisposable
+    internal interface ITraceEventsPublisher
     {
         void TraceMessage(string message);
+    }
 
-        void MockCreated(MockInfo mock);
-        void MockInvoked(MockInfo mock, InvocationInfo invocation);
-        void RepositoryCreated();
-        void RepositoryRetired();
+    internal interface IMockRepositoryEventsPublisher
+    {
+        void MockCreated(int repositoryId, string prepositoryPath, MockInfo mock);
+        void MockInvoked(int repositoryId, string prepositoryPath, MockInfo mock, InvocationInfo invocation);
+        void RepositoryCreated(int repositoryId, string prepositoryPath, MethodMockInfo methodInfo);
+        void RepositoryRetired(int repositoryId, string prepositoryPath);
+    }
+
+    internal interface IDebugWindowPlugin : ITraceEventsPublisher, IMockRepositoryEventsPublisher, INinjectModule, IDisposable
+    {
+
     }
 }
 #endif
