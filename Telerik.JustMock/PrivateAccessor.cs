@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015,2018-2019 Progress Software Corporation
+ Copyright © 2010-2015,2018-2019,2020 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -143,6 +143,73 @@ namespace Telerik.JustMock
                 return CallInvoke(method, args);
             });
         }
+
+#if !PORTABLE
+        /// <summary>
+        /// Calls the specified method by name and given argument types and values.
+        /// </summary>
+        /// <param name="name">The name of the method to call.</param>
+        /// <param name="argTypes">The method argument types.</param>
+        /// <param name="argModifiers">The argument type modifiers, such as out and ref.</param>
+        /// <param name="argValues">The argument values to pass to the method.</param>
+        /// <returns>The value returned by the specified method.</returns>
+        public object CallMethod(string name, ICollection<Type> argTypes, ParameterModifier argModifiers, object[] argValues)
+        {
+            return ProfilerInterceptor.GuardInternal(() => CallMethodInternal(name, argTypes, new[] { argModifiers }, argValues));
+        }
+
+        /// <summary>
+        /// Calls the specified method by name and given argument types and values.
+        /// </summary>
+        /// <param name="name">The name of the method to call.</param>
+        /// <param name="argTypes">The method argument types.</param>
+        /// <param name="argValues">The argument values to pass to the method.</param>
+        /// <returns>The value returned by the specified method.</returns>
+        public object CallMethod(string name, ICollection<Type> argTypes, object[] argValues)
+        {
+            return ProfilerInterceptor.GuardInternal(() => CallMethodInternal(name, argTypes, null, argValues));
+        }
+
+        private object CallMethodInternal(string name, ICollection<Type> argTypes, ParameterModifier[] argModifiers, object[] argValues)
+        {
+            if (argTypes == null)
+            {
+                throw new ArgumentNullException("argTypes");
+            }
+
+            argValues =
+                argValues == null || argValues.Length == 0
+                    ?
+                        argTypes.Select(t => MockingUtil.GetDefaultValue(t)).ToArray()
+                        :
+                        argValues;
+
+            if (argTypes.Count != argValues.Length)
+            {
+                throw new ArgumentException("The number of argument types does not match the number of argument values");
+            }
+
+            var argValueIndex = 0;
+            foreach (var argType in argTypes)
+            {
+                if (argValues[argValueIndex] != null && argType != argValues[argValueIndex].GetType()
+                    || argValues[argValueIndex] == null && argValues[argValueIndex] != MockingUtil.GetDefaultValue(argType))
+                {
+                    throw new ArgumentException("One or more arguments types does not match the argument values");
+                }
+                argValueIndex++;
+            }
+
+            var candidates = type.GetAllMethods()
+                .Where(m => m.Name == name && MockingUtil.CanCall(m, this.instance != null))
+                .Select(m => MockingUtil.TrySpecializeGenericMethod(m, argTypes.ToArray()) ?? m)
+                .ToArray();
+
+            var method = MockingUtil.SelectMethod(MockingUtil.AllMembers, candidates, argTypes.ToArray(), argModifiers);
+
+            return CallInvoke(method, argValues);
+        }
+#endif
 
         /// <summary>
         /// Calls the specified generic method by name.
