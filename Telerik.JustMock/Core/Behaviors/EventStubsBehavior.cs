@@ -52,9 +52,9 @@ namespace Telerik.JustMock.Core.Behaviors
 				return;
 
 			invocation.UserProvidedImplementation = true;
-
 			var delg = (Delegate)invocation.Args[0];
-			if (candidateEvent.GetAddMethod() == invocation.Method)
+
+			if (candidateEvent.GetAddMethod(true) == invocation.Method)
 				this.AddEventHandler(candidateEvent, delg);
 			else
 				this.RemoveEventHandler(candidateEvent, delg);
