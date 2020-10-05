@@ -177,12 +177,10 @@ namespace Telerik.JustMock
                 throw new ArgumentNullException("argTypes");
             }
 
-            argValues =
-                argValues == null || argValues.Length == 0
-                    ?
-                        argTypes.Select(t => MockingUtil.GetDefaultValue(t)).ToArray()
-                        :
-                        argValues;
+            if (argValues == null || argValues.Length == 0)
+            {
+                argValues = argTypes.Select(t => MockingUtil.GetDefaultValue(t)).ToArray();
+            }
 
             if (argTypes.Count != argValues.Length)
             {
