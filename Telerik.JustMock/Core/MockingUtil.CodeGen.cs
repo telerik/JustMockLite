@@ -1,6 +1,6 @@
 ﻿/*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2020 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -182,6 +182,11 @@ namespace Telerik.JustMock.Core
 			ParameterModifier[] modifiers, CultureInfo culture, string[] names, out Object state)
 		{
 			return Type.DefaultBinder.BindToMethod(bindingAttr, match, ref args, modifiers, culture, names, out state);
+		}
+
+		public static MethodBase SelectMethod(BindingFlags bindingAttr, MethodBase[] match, Type[] types, ParameterModifier[] modifiers)
+		{
+			return Type.DefaultBinder.SelectMethod(bindingAttr, match, types, modifiers);
 		}
 
 		private static int? GetDispId(MemberInfo member)
