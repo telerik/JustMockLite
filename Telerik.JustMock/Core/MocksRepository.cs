@@ -466,7 +466,17 @@ namespace Telerik.JustMock.Core
                                     ObjectInfo.FromObject(invocation.Instance)
                                     :
                                     ObjectInfo.FromObject(invocation.Method.DeclaringType),
-                            invocation.Args.Select(arg => ObjectInfo.FromObject(arg)).ToArray(),
+                            invocation.Args.Select(
+                                (arg, index) =>
+                                    {
+                                        return
+                                            (arg != null)
+                                                ?
+                                                ObjectInfo.FromObject(arg)
+                                                :
+                                                ObjectInfo.FromNullObject(invocation.Method.GetParameters()[index].ParameterType);
+                                    })
+                                    .ToArray(),
                             invocation.ReturnValue != null
                                 ?
                                     ObjectInfo.FromObject(invocation.ReturnValue)
