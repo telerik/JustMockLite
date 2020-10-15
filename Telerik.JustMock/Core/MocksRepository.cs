@@ -456,32 +456,42 @@ namespace Telerik.JustMock.Core
                 if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
                 {
                     var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
-                    debugWindowPlugin.MockInvoked(
-                        invocation.Repository.RepositoryId,
-                        invocation.Repository.GetRepositoryPath(),
-                        new MockInfo(invocation.Method.Name, invocation.Method.MemberType, invocation.Method.DeclaringType, invocation.Method.ReflectedType),
-                        new InvocationInfo(
-                            invocation.Instance != null
+
+                    var mockInfo = new MockInfo(invocation.Method.Name, invocation.Method.MemberType, invocation.Method.DeclaringType, invocation.Method.ReflectedType);
+
+                    var invocationInstanceInfo =
+                        invocation.Instance != null
                                 ?
                                     ObjectInfo.FromObject(invocation.Instance)
                                     :
-                                    ObjectInfo.FromObject(invocation.Method.DeclaringType),
-                            invocation.Args.Select(
+                                    ObjectInfo.FromObject(invocation.Method.DeclaringType);
+                    var invocationsArgInfos =
+                        invocation.Args.Select(
                                 (arg, index) =>
                                     {
-                                        return
+                                        var argInfo =
                                             (arg != null)
                                                 ?
-                                                ObjectInfo.FromObject(arg)
-                                                :
-                                                ObjectInfo.FromNullObject(invocation.Method.GetParameters()[index].ParameterType);
+                                                    ObjectInfo.FromObject(arg)
+                                                    :
+                                                    ObjectInfo.FromNullObject(invocation.Method.GetParameters()[index].ParameterType);
+
+                                        return argInfo;
                                     })
-                                    .ToArray(),
-                            invocation.ReturnValue != null
+                                    .ToArray();
+                    var invocationResultInfo =
+                        invocation.ReturnValue != null
                                 ?
                                     ObjectInfo.FromObject(invocation.ReturnValue)
                                     :
-                                    ObjectInfo.FromNullObject(invocation.Method.GetReturnType())));
+                                    ObjectInfo.FromNullObject(invocation.Method.GetReturnType());
+                    var invocationInfo = new InvocationInfo(invocationInstanceInfo, invocationsArgInfos, invocationResultInfo);
+
+                    debugWindowPlugin.MockInvoked(
+                        invocation.Repository.RepositoryId,
+                        invocation.Repository.GetRepositoryPath(),
+                        mockInfo,
+                        invocationInfo);
                 }
             }
             catch (Exception e)
