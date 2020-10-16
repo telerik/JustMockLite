@@ -29,6 +29,8 @@ namespace Telerik.JustMock.Plugins
         {
             this.MethodMock = new MethodMockInfo(name, memberType, declaringType, reflectedType);
         }
+
+        public MockInfo(MethodBase method): this(method.Name, method.MemberType, method.DeclaringType, method.ReflectedType) {}
     }
 }
 #endif
