@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Telerik.JustMock.Core
@@ -315,91 +316,116 @@ namespace Telerik.JustMock.Core
             return GetLocalFunction(type, method, localMemberName, localFunctionGenericTypes);
         }
 
-        public static MethodInfo GetLocalFunction(Type type, MethodInfo method, string localMemberName, Type[] localFunctionGenericTypes)
+        public static MethodInfo GetLocalFunction(Type type, MethodInfo method, string localMemberName, Type[] localFunctionGenericTypes, string originalMethodName = null)
         {
-#if !PORTABLE
-            if (type.IsProxy())
-            {
-                type = type.BaseType;
-            }
-
-            string expectedName = String.Format("<{0}>g__{1}|", method.Name, localMemberName);
-
-            MethodBody body = method.GetMethodBody();
-            var disasembledBody = MethodBodyDisassembler.DisassembleMethodInfo(method);
-            var callInstructions = disasembledBody.Where(instr => instr.OpCode == System.Reflection.Emit.OpCodes.Call).ToArray();
             MethodInfo localMethod = null;
-            foreach (var instruction in callInstructions)
+
+#if !PORTABLE
+            AsyncStateMachineAttribute asyncStateMachineAttribute =
+                method.CustomAttributes.Select(
+                    attributeData =>
+                    {
+                        AsyncStateMachineAttribute attribute = null;
+                        if (attributeData.AttributeType == typeof(AsyncStateMachineAttribute))
+                        {
+                            attribute = (AsyncStateMachineAttribute)method.GetCustomAttribute(attributeData.AttributeType);
+                        }
+                        return attribute;
+                    }).FirstOrDefault();
+
+            if (asyncStateMachineAttribute != null)
             {
-                MethodBase methodBase = null;
-                try
+                var asyncMethodName = method.Name;
+                // check for existing async state machine method "MoveNext" 
+                method = asyncStateMachineAttribute.StateMachineType.GetMethod("MoveNext", BindingFlags.NonPublic | BindingFlags.Instance);
+                if (method != null)
                 {
-                    methodBase = type.Module.ResolveMethod(instruction.Operand.Int);
+                    // search for local method inside "MoveNext"
+                    localMethod = GetLocalFunction(type, method, localMemberName, localFunctionGenericTypes, asyncMethodName);
                 }
-                catch (Exception)
+            }
+            else
+            {
+                if (type.IsProxy())
                 {
-                    //The exception is captured when the metadata token refers generic method.
-                    //Do not handle the exception since there is no way to know in advance if the metadata token refers non-generic or generic method.
+                    type = type.BaseType;
                 }
 
-                if (methodBase == null && localFunctionGenericTypes != null)
-                {
+                string expectedName = String.Format("<{0}>g__{1}|", string.IsNullOrEmpty(originalMethodName) ? method.Name : originalMethodName, localMemberName);
 
+                MethodBody body = method.GetMethodBody();
+                var disasembledBody = MethodBodyDisassembler.DisassembleMethodInfo(method);
+                var callInstructions = disasembledBody.Where(instr => instr.OpCode == System.Reflection.Emit.OpCodes.Call).ToArray();
+
+                foreach (var instruction in callInstructions)
+                {
+                    MethodBase methodBase = null;
                     try
                     {
-                        methodBase = type.Module.ResolveMethod(instruction.Operand.Int, null, localFunctionGenericTypes);
-
-                        //This additional check is required because if we have function<T1,T2> and pass localFunctionGenericTypes weith <T1,T2,T3>
-                        //the method ResolveMethod returns function<T1,T2> even if the typenames are less than those in the provided array.
-                        if (methodBase != null)
-                        {
-                            Type[] genericArgDefinition = methodBase.GetGenericArguments();
-                            if (genericArgDefinition.Length != localFunctionGenericTypes.Length)
-                            {
-                                methodBase = null;
-                            }
-                        }
+                        methodBase = type.Module.ResolveMethod(instruction.Operand.Int);
                     }
                     catch (Exception)
                     {
-                        //The exception is captured when the metadata token refers non-generic method.
+                        //The exception is captured when the metadata token refers generic method.
                         //Do not handle the exception since there is no way to know in advance if the metadata token refers non-generic or generic method.
                     }
-                }
 
-                if (methodBase != null && methodBase.DeclaringType == type && methodBase.Name.StartsWith(expectedName))
-                {
-                    localMethod = methodBase as MethodInfo;
-                    break;
-                }
-            }
-
-            if (localMethod == null)
-            {
-                if (localFunctionGenericTypes == null)
-                {
-
-                    throw new MissingMemberException(BuildMissingLocalFunctionMessage(type, method, localMemberName));
-                }
-                else
-                {
-                    int methodGenericArgCount = method.GetGenericArguments().Length;
-                    List<Type> userFriendlyLocalFunctionTypes = new List<Type>();
-                    for (int index = methodGenericArgCount; index < localFunctionGenericTypes.Length; index++)
+                    if (methodBase == null && localFunctionGenericTypes != null)
                     {
-                        userFriendlyLocalFunctionTypes.Add(localFunctionGenericTypes[index]);
+
+                        try
+                        {
+                            methodBase = type.Module.ResolveMethod(instruction.Operand.Int, null, localFunctionGenericTypes);
+
+                            //This additional check is required because if we have function<T1,T2> and pass localFunctionGenericTypes weith <T1,T2,T3>
+                            //the method ResolveMethod returns function<T1,T2> even if the typenames are less than those in the provided array.
+                            if (methodBase != null)
+                            {
+                                Type[] genericArgDefinition = methodBase.GetGenericArguments();
+                                if (genericArgDefinition.Length != localFunctionGenericTypes.Length)
+                                {
+                                    methodBase = null;
+                                }
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            //The exception is captured when the metadata token refers non-generic method.
+                            //Do not handle the exception since there is no way to know in advance if the metadata token refers non-generic or generic method.
+                        }
                     }
 
-                    string userFriendlyName = String.Join(".", method.ToString(), localMemberName);
+                    if (methodBase != null && methodBase.DeclaringType == type && methodBase.Name.StartsWith(expectedName))
+                    {
+                        localMethod = methodBase as MethodInfo;
+                        break;
+                    }
+                }
 
-                    throw new MissingMemberException(BuildGenericMethodNonMatchingTypesMessage(type, userFriendlyName, userFriendlyLocalFunctionTypes.ToArray()));
+                if (localMethod == null)
+                {
+                    if (localFunctionGenericTypes == null)
+                    {
+                        throw new MissingMemberException(BuildMissingLocalFunctionMessage(type, method, localMemberName));
+                    }
+                    else
+                    {
+                        int methodGenericArgCount = method.GetGenericArguments().Length;
+                        List<Type> userFriendlyLocalFunctionTypes = new List<Type>();
+                        for (int index = methodGenericArgCount; index < localFunctionGenericTypes.Length; index++)
+                        {
+                            userFriendlyLocalFunctionTypes.Add(localFunctionGenericTypes[index]);
+                        }
+
+                        string userFriendlyName = String.Join(".", method.ToString(), localMemberName);
+
+                        throw new MissingMemberException(BuildGenericMethodNonMatchingTypesMessage(type, userFriendlyName, userFriendlyLocalFunctionTypes.ToArray()));
+                    }
                 }
             }
+#endif
 
             return localMethod;
-#else
-			return null;
-#endif
         }
 
         public static MethodInfo GetMethodWithLocalFunction(object target, string methodName)
