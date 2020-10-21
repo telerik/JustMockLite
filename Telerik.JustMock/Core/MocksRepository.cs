@@ -430,7 +430,7 @@ namespace Telerik.JustMock.Core
 
                 object defaultValue = null;
 #if !PORTABLE
-                if(returnType.BaseType != null && returnType.BaseType == typeof(Task))
+                if (returnType.BaseType != null && returnType.BaseType == typeof(Task))
                 {
                     Type taskGenericArgument = returnType.GenericTypeArguments.FirstOrDefault();
                     object taskArgumentDefaultValue = taskGenericArgument.GetDefaultValue();
@@ -455,23 +455,34 @@ namespace Telerik.JustMock.Core
             {
                 if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
                 {
+                    Func<object, Type, ObjectInfo> CreateObjectInfo = (value, type) =>
+                    {
+                        ObjectInfo resultInfo = (value != null) ? ObjectInfo.FromObject(value) : ObjectInfo.FromNullObject(type);
+
+                        return resultInfo;
+                    };
+
                     var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
+                    var mockInfo = new MockInfo(invocation.Method);
+                    
+                    ObjectInfo[] invocationsArgInfos =
+                        invocation.Args.Select(
+                                (arg, index) =>
+                                    {
+                                        var argInfo = CreateObjectInfo(arg, invocation.Method.GetParameters()[index].ParameterType);
+                                        return argInfo;
+                                    }).ToArray();
+
+                    ObjectInfo invocationInstanceInfo = ObjectInfo.FromObject(invocation.Instance ?? invocation.Method.DeclaringType);
+                    ObjectInfo invocationResultInfo = CreateObjectInfo(invocation.ReturnValue, invocation.Method.GetReturnType());
+
+                    var invocationInfo = new InvocationInfo(invocationInstanceInfo, invocationsArgInfos, invocationResultInfo);
+
                     debugWindowPlugin.MockInvoked(
                         invocation.Repository.RepositoryId,
                         invocation.Repository.GetRepositoryPath(),
-                        new MockInfo(invocation.Method.Name, invocation.Method.MemberType, invocation.Method.DeclaringType, invocation.Method.ReflectedType),
-                        new InvocationInfo(
-                            invocation.Instance != null
-                                ?
-                                    ObjectInfo.FromObject(invocation.Instance)
-                                    :
-                                    ObjectInfo.FromObject(invocation.Method.DeclaringType),
-                            invocation.Args.Select(arg => ObjectInfo.FromObject(arg)).ToArray(),
-                            invocation.ReturnValue != null
-                                ?
-                                    ObjectInfo.FromObject(invocation.ReturnValue)
-                                    :
-                                    ObjectInfo.FromNullObject(invocation.Method.GetReturnType())));
+                        mockInfo,
+                        invocationInfo);
                 }
             }
             catch (Exception e)
