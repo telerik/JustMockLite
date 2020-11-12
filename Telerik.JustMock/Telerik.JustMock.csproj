@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <NetCoreSupportedVersions>netcoreapp2.0;net5.0</NetCoreSupportedVersions>
+    <NetCoreSupportedVersions>netcoreapp2.0</NetCoreSupportedVersions>
     <TargetFrameworks>net45;$(NetCoreSupportedVersions)</TargetFrameworks>
     <Configurations>Debug;Release;ReleaseFree;DebugFree</Configurations>
     <AssemblyName>Telerik.JustMock</AssemblyName>
@@ -194,7 +194,7 @@
     <None Include="TextBuilder.include" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
-    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
     <PackageReference Include="System.Security.Permissions" Version="4.5.0" />
   </ItemGroup>
