@@ -544,8 +544,6 @@ namespace Telerik.JustMock
         {
 #if (COREFX)
 			return false;
-#elif NET5
-            return true; // code access security permissions are not supported or honored in .NET 5
 #else
             try
             {

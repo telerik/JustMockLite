@@ -56,9 +56,6 @@
   <PropertyGroup Condition="$(NetCoreSupportedVersions.Contains('$(TargetFramework)'))">
     <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net5.0'">
-    <DefineConstants>$(DefineConstants);NET5</DefineConstants>
-  </PropertyGroup>
   <PropertyGroup>
     <SccProjectName />
     <SccLocalPath />
@@ -194,7 +191,7 @@
     <None Include="TextBuilder.include" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
     <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
     <PackageReference Include="System.Security.Permissions" Version="4.5.0" />
   </ItemGroup>
