@@ -54,7 +54,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_REMOTING;FEATURE_APPDOMAIN;FEATURE_ASSEMBLYBUILDER_SAVE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="$(NetCoreSupportedVersions.Contains('$(TargetFramework)'))">
-    <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
+    <DefineConstants>$(DefineConstants);NETCORE;NO_APPDOMAIN_ISOLATION</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
     <SccProjectName />
