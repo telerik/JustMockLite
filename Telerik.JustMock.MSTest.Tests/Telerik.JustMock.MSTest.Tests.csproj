@@ -1,4 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\JustMockLite\Build\Config.targets"></Import>
+  
   <PropertyGroup>
     <TargetFramework>net451</TargetFramework>
     <Configurations>Debug;Release;ReleaseFree;DebugFree</Configurations>
