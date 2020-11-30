@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net45;netcoreapp2.0</TargetFrameworks>
+    <NetCoreSupportedVersions>netcoreapp2.0</NetCoreSupportedVersions>
+    <TargetFrameworks>net45;$(NetCoreSupportedVersions)</TargetFrameworks>
     <Configurations>Debug;Release;ReleaseFree;DebugFree</Configurations>
     <AssemblyName>Telerik.JustMock</AssemblyName>
     <RootNamespace>Telerik.JustMock</RootNamespace>
@@ -52,8 +53,8 @@
   <PropertyGroup Condition="'$(TargetFramework)' == 'net45' ">
     <DefineConstants>$(DefineConstants);FEATURE_REMOTING;FEATURE_APPDOMAIN;FEATURE_ASSEMBLYBUILDER_SAVE</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0' ">
-    <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
+  <PropertyGroup Condition="$(NetCoreSupportedVersions.Contains('$(TargetFramework)'))">
+    <DefineConstants>$(DefineConstants);NETCORE;NO_APPDOMAIN_ISOLATION</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
     <SccProjectName />
@@ -193,6 +194,11 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
     <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
     <PackageReference Include="System.Security.Permissions" Version="4.5.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
+    <PackageReference Include="System.Security.Permissions" Version="5.0" />
   </ItemGroup>
   <ItemGroup>
     <None Update="ArgExpr.part.tt">

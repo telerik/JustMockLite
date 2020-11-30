@@ -19,7 +19,7 @@
 // </copyright>
 //-------------------------------------------------------------------------------
 
-#if !NETCORE && !NO_ASSEMBLY_SCANNING
+#if !NO_ASSEMBLY_SCANNING
 namespace Telerik.JustMock.AutoMock.Ninject.Modules
 {
     using System;
@@ -43,6 +43,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Modules
         /// <returns>All assembly names of the assemblies in the given files that match the filter.</returns>
         public IEnumerable<AssemblyName> GetAssemblyNames(IEnumerable<string> filenames, Predicate<Assembly> filter)
         {
+#if !NO_APPDOMAIN_ISOLATION
             var assemblyCheckerType = typeof(AssemblyChecker);
             var temporaryDomain = CreateTemporaryAppDomain();
             try
@@ -57,8 +58,12 @@ namespace Telerik.JustMock.AutoMock.Ninject.Modules
             {
                 AppDomain.Unload(temporaryDomain);
             }
+#else
+            return new AssemblyChecker().GetAssemblyNames(filenames, filter);
+#endif // !NO_APPDOMAIN_ISOLATION
         }
 
+#if !NO_APPDOMAIN_ISOLATION
         /// <summary>
         /// Creates a temporary app domain.
         /// </summary>
@@ -70,6 +75,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Modules
                 AppDomain.CurrentDomain.Evidence,
                 AppDomain.CurrentDomain.SetupInformation);
         }
+#endif // !NO_APPDOMAIN_ISOLATION
 
         /// <summary>
         /// This class is loaded into the temporary appdomain to load and check if the assemblies match the filter.
@@ -92,28 +98,19 @@ namespace Telerik.JustMock.AutoMock.Ninject.Modules
                     {
                         try
                         {
-                            assembly = Assembly.LoadFrom(filename);
+                            // .NET Core -> creates a new (anonymous) load context to load the assembly into.
+                            // https://github.com/dotnet/coreclr/blob/master/Documentation/design-docs/assemblyloadcontext.md#assembly-load-apis-and-loadcontext
+                            assembly = Assembly.LoadFile(filename);
                         }
                         catch (BadImageFormatException)
                         {
                             continue;
                         }
-                    }
-                    else
-                    {
-                        try
-                        {
-                            assembly = Assembly.Load(filename);
-                        }
-                        catch (FileNotFoundException)
-                        {
-                            continue;
-                        }
-                    }
 
-                    if (filter(assembly))
-                    {
-                        result.Add(assembly.GetName(false));
+                        if (filter(assembly))
+                        {
+                            result.Add(assembly.GetName(false));
+                        }
                     }
                 }
 
