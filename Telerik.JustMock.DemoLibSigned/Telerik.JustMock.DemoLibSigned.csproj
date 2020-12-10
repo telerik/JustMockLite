@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net45;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net45;netcoreapp2.1;netcoreapp3.1;net5.0</TargetFrameworks>
     <Configurations>Debug;Release;DebugFree;ReleaseFree</Configurations>
     <AssemblyName>Telerik.JustMock.DemoLibSigned</AssemblyName>
     <RootNamespace>Telerik.JustMock.DemoLibSigned</RootNamespace>

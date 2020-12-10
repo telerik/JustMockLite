@@ -136,9 +136,7 @@ namespace Telerik.JustMock.AutoMock.Ninject
 #if !NO_ASSEMBLY_SCANNING
             AddComponent<IModuleLoader, ModuleLoader>();
             AddComponent<IModuleLoaderPlugin, CompiledModuleLoaderPlugin>();
-#if !NETCORE
             AddComponent<IAssemblyNameRetriever, AssemblyNameRetriever>();
-#endif
 #endif
         }
     }
