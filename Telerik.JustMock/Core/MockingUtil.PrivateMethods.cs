@@ -34,9 +34,17 @@ namespace Telerik.JustMock.Core
 
         internal static PropertyInfo ResolveProperty(Type type, string name, bool ignoreCase, object[] indexArgs, bool hasInstance, object setterValue = null, bool getter = true)
         {
-            var candidates = type.GetAllProperties().Where(prop => MockingUtil.StringEqual(prop.Name, name, ignoreCase)).ToArray();
-            if (candidates.Length == 1)
-                return candidates[0];
+            var fieldCandidates = type.GetAllFields().Where(candidate => MockingUtil.StringEqual(candidate.Name, name, ignoreCase)).ToArray();
+            if (fieldCandidates.Length > 0)
+            {
+                throw new MockException("Fields cannot be mocked, only properties.");
+            }
+
+            var propertyCandidates = type.GetAllProperties().Where(candidate => MockingUtil.StringEqual(candidate.Name, name, ignoreCase)).ToArray();
+            if (propertyCandidates.Length == 1)
+            {
+                return propertyCandidates[0];
+            }
 
             if (!getter)
             {
@@ -44,7 +52,7 @@ namespace Telerik.JustMock.Core
                 indexArgs[indexArgs.Length - 1] = setterValue;
             }
 
-            var propMethods = candidates
+            var propMethods = propertyCandidates
                 .Select(prop => getter ? prop.GetGetMethod(true) : prop.GetSetMethod(true))
                 .Where(m => m != null && CanCall(m, hasInstance))
                 .ToArray();
@@ -52,7 +60,7 @@ namespace Telerik.JustMock.Core
             indexArgs = indexArgs ?? MockingUtil.NoObjects;
             object state;
             var foundGetter = MockingUtil.BindToMethod(MockingUtil.AllMembers, propMethods, ref indexArgs, null, null, null, out state);
-            return candidates.First(prop => (getter ? prop.GetGetMethod(true) : prop.GetSetMethod(true)) == foundGetter);
+            return propertyCandidates.First(prop => (getter ? prop.GetGetMethod(true) : prop.GetSetMethod(true)) == foundGetter);
         }
 
         internal static bool ReturnTypeMatches(Type returnType, MethodInfo method)
@@ -66,7 +74,6 @@ namespace Telerik.JustMock.Core
         {
             if (type.IsProxy())
                 type = type.BaseType;
-
 
             object[] arguments = args;
 
