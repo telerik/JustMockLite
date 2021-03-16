@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <NetCoreSupportedVersions>netcoreapp2.1;netcoreapp3.1;net5.0</NetCoreSupportedVersions>
+    <NetCoreSupportedVersions>netcoreapp2.1;netcoreapp3.1;net5.0;net6.0</NetCoreSupportedVersions>
     <TargetFrameworks>net451;$(NetCoreSupportedVersions)</TargetFrameworks>
     <Configurations>Debug;Release;ReleaseFree;DebugFree</Configurations>
     <AssemblyName>Telerik.JustMock.MSTest2.Tests</AssemblyName>
