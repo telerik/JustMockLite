@@ -320,7 +320,7 @@ namespace Telerik.JustMock.Core
 
 		public static void RequestReJit(MethodBase method)
 		{
-			if (!IsProfilerAttached)
+			if (!IsReJitEnabled)
 			{
 				ThrowElevatedMockingException();
 			}
@@ -635,6 +635,7 @@ namespace Telerik.JustMock.Core
 
 		private static readonly Dictionary<MethodBase, List<MocksRepository>> globalInterceptors = new Dictionary<MethodBase, List<MocksRepository>>();
 
+		public static bool IsReJitEnabled { [DebuggerHidden] get { return IsProfilerAttached && (bool)bridge.GetMethod("IsReJitEnabled").Invoke(null, null); } }
 		private static readonly Func<IntPtr/*type handle*/, int /*method token*/, bool /*result*/> RequestReJitImpl;
 
 		[ThreadStatic]

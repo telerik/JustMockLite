@@ -1230,6 +1230,10 @@ namespace Telerik.JustMock.Core
             funcRoot.AddChild(methodMock.CallPattern, methodMock, this.sharedContext.GetNextArrangeId());
 
 #if !PORTABLE
+            if (ProfilerInterceptor.IsReJitEnabled)
+            {
+                ProfilerInterceptor.RequestReJit(method);
+            }
 
             try
             {
