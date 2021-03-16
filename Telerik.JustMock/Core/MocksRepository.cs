@@ -31,6 +31,9 @@ using Telerik.JustMock.Core.Recording;
 using Telerik.JustMock.Core.TransparentProxy;
 using Telerik.JustMock.Diagnostics;
 using Telerik.JustMock.Expectations;
+#if DEBUG
+using Telerik.JustMock.Helpers;
+#endif
 #if !PORTABLE
 using Telerik.JustMock.Plugins;
 #endif
@@ -149,6 +152,18 @@ namespace Telerik.JustMock.Core
 #endif
 
             ProfilerInterceptor.Initialize();
+
+#if DEBUG
+            if (ProfilerInterceptor.IsProfilerAttached)
+            {
+                var logLevelEnvVar = Environment.GetEnvironmentVariable("JUSTMOCK_LOG_LEVEL");
+                LogLevel logLevel;
+                if (Enum.TryParse(logLevelEnvVar, out logLevel))
+                {
+                    DefaultLogLevel.Value = logLevel;
+                }
+            }
+#endif
         }
 
         internal MocksRepository(MocksRepository parentRepository, MethodBase method)
@@ -1239,6 +1254,11 @@ namespace Telerik.JustMock.Core
             funcRoot.AddChild(methodMock.CallPattern, methodMock, this.sharedContext.GetNextArrangeId());
 
 #if !PORTABLE
+            if (ProfilerInterceptor.IsReJitEnabled)
+            {
+                ProfilerInterceptor.RequestReJit(method);
+            }
+
             try
             {
                 if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())

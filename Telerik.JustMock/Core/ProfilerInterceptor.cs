@@ -27,6 +27,9 @@ using System.Runtime.ConstrainedExecution;
 using Telerik.JustMock.Core.Context;
 using Telerik.JustMock.Diagnostics;
 using Telerik.JustMock.Setup;
+#if DEBUG
+using Telerik.JustMock.Helpers;
+#endif
 
 namespace Telerik.JustMock.Core
 {
@@ -81,6 +84,10 @@ namespace Telerik.JustMock.Core
 					return true;
 				}
 
+#if DEBUG
+				ProfilerLogger.Info("*** +++ [MANAGED] Intercepting call for {0}.{1}", method.DeclaringType.Name, method.Name);
+#endif
+
 				var invocation = new Invocation(data[0], method, data.Skip(2).ToArray());
 
 				if (DispatchInvocation(invocation))
@@ -110,6 +117,10 @@ namespace Telerik.JustMock.Core
 				ReentrancyCounter++;
 
 				var method = MethodBase.GetMethodFromHandle(methodHandle, typeHandle);
+
+#if DEBUG
+				ProfilerLogger.Info("*** +++ [MANAGED] Intercepting call for {0}.{1}", method.DeclaringType.Name, method.Name);
+#endif
 
 				var invocation = new Invocation(MockingUtil.TryGetUninitializedObject(method.DeclaringType), method, data ?? new object[0]);
 
@@ -158,6 +169,7 @@ namespace Telerik.JustMock.Core
 				InitializeFieldAccessors("ReentrancyCounter", ref getReentrancyCounter, ref setReentrancyCounter);
 
 				WrapCallToDelegate("GetTypeId", out GetTypeIdImpl);
+				WrapCallToDelegate("RequestReJit", out RequestReJitImpl);
 
 				bridge.GetMethod("Init").Invoke(null, null);
 			}
@@ -173,7 +185,7 @@ namespace Telerik.JustMock.Core
 				throw new MockException("Telerik.CodeWeaver.Profiler.dll is old.\nRegister the updated version.");
 
 			string profilerVersion = (string)getProfilerVersion.Invoke(null, null);
-            JMDebug.Assert(null != profilerVersion);
+			JMDebug.Assert(null != profilerVersion);
 			var codeWeaverAssemblyVersion = new Version(profilerVersion);
 			int comparison = justMockAssemblyVersion.CompareTo(codeWeaverAssemblyVersion);
 
@@ -315,6 +327,26 @@ namespace Telerik.JustMock.Core
 			var arrayIndex = typeId >> 3;
 			var arrayMask = 1 << (typeId & ((1 << 3) - 1));
 			return (arrangedTypesArray[arrayIndex] & arrayMask) != 0;
+		}
+
+		public static void RequestReJit(MethodBase method)
+		{
+			if (!IsReJitEnabled)
+			{
+				ThrowElevatedMockingException();
+			}
+
+#if DEBUG
+			ProfilerLogger.Info("*** [MANAGED] Requesting ReJit for {0}.{1}", method.DeclaringType.Name, method.Name);
+#endif
+
+			var typeHandle = method.DeclaringType.TypeHandle;
+			var methodToken = method.MetadataToken;
+			bool requestSucceeded = RequestReJitImpl(typeHandle.Value, methodToken);
+			if (!requestSucceeded)
+			{
+				throw new MockException(string.Format("ReJit request failed for {0}.{1}", method.DeclaringType.Name, method.Name));
+			}
 		}
 
 		internal static void RegisterGlobalInterceptor(MethodBase method, MocksRepository repo)
@@ -618,6 +650,9 @@ namespace Telerik.JustMock.Core
 
 		private static readonly Dictionary<MethodBase, List<MocksRepository>> globalInterceptors = new Dictionary<MethodBase, List<MocksRepository>>();
 
+		public static bool IsReJitEnabled { [DebuggerHidden] get { return IsProfilerAttached && (bool)bridge.GetMethod("IsReJitEnabled").Invoke(null, null); } }
+		private static readonly Func<IntPtr/*type handle*/, int /*method token*/, bool /*result*/> RequestReJitImpl;
+
 		[ThreadStatic]
 		private static int surrogateReentrancyCounter;
 
@@ -629,7 +664,7 @@ namespace Telerik.JustMock.Core
 
 		internal static void SkipMethodInterceptionOnce(MethodBase method)
 		{
-            JMDebug.Assert(skipMethodInterceptionOnce == null || skipMethodInterceptionOnce == method);
+			JMDebug.Assert(skipMethodInterceptionOnce == null || skipMethodInterceptionOnce == method);
 			skipMethodInterceptionOnce = method;
 		}
 	}
