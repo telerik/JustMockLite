@@ -27,6 +27,9 @@ using System.Runtime.ConstrainedExecution;
 using Telerik.JustMock.Core.Context;
 using Telerik.JustMock.Diagnostics;
 using Telerik.JustMock.Setup;
+#if DEBUG
+using Telerik.JustMock.Helpers;
+#endif
 
 namespace Telerik.JustMock.Core
 {
@@ -81,6 +84,10 @@ namespace Telerik.JustMock.Core
 					return true;
 				}
 
+#if DEBUG
+				ProfilerLogger.Info("*** +++ [MANAGED] Intercepting call for {0}.{1}", method.DeclaringType.Name, method.Name);
+#endif
+
 				var invocation = new Invocation(data[0], method, data.Skip(2).ToArray());
 
 				if (DispatchInvocation(invocation))
@@ -110,6 +117,10 @@ namespace Telerik.JustMock.Core
 				ReentrancyCounter++;
 
 				var method = MethodBase.GetMethodFromHandle(methodHandle, typeHandle);
+
+#if DEBUG
+				ProfilerLogger.Info("*** +++ [MANAGED] Intercepting call for {0}.{1}", method.DeclaringType.Name, method.Name);
+#endif
 
 				var invocation = new Invocation(MockingUtil.TryGetUninitializedObject(method.DeclaringType), method, data ?? new object[0]);
 
@@ -325,12 +336,16 @@ namespace Telerik.JustMock.Core
 				ThrowElevatedMockingException();
 			}
 
+#if DEBUG
+			ProfilerLogger.Info("*** [MANAGED] Requesting ReJit for {0}.{1}", method.DeclaringType.Name, method.Name);
+#endif
+
 			var typeHandle = method.DeclaringType.TypeHandle;
 			var methodToken = method.MetadataToken;
 			bool requestSucceeded = RequestReJitImpl(typeHandle.Value, methodToken);
 			if (!requestSucceeded)
 			{
-				throw new MockException("ReJit request failed for " + method);
+				throw new MockException(string.Format("ReJit request failed for {0}.{1}", method.DeclaringType.Name, method.Name));
 			}
 		}
 
