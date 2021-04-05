@@ -71,6 +71,7 @@ public void TestBookService()
 
 ### Supported Frameworks
 - .Net Framework 4.5+ and later.
+- .NET 5, .NET 6 preview 2
 - .Net Core 2.0 and later.
 
 ### Documentation
