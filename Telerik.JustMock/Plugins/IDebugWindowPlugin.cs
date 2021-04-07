@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2020 Progress Software Corporation
+ Copyright © 2020 - 2021 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -30,10 +30,10 @@ namespace Telerik.JustMock.Plugins
 
     internal interface IMockRepositoryEventsPublisher
     {
-        void MockCreated(int repositoryId, string prepositoryPath, MockInfo mock);
-        void MockInvoked(int repositoryId, string prepositoryPath, MockInfo mock, InvocationInfo invocation);
-        void RepositoryCreated(int repositoryId, string prepositoryPath, MethodMockInfo methodInfo);
-        void RepositoryRetired(int repositoryId, string prepositoryPath);
+        void MockCreated(int repositoryId, string repositoryPath, MockInfo mock, MatcherInfo[] argumentMatchers);
+        void MockInvoked(int repositoryId, string repositoryPath, MockInfo mock, InvocationInfo invocation);
+        void RepositoryCreated(int repositoryId, string repositoryPath, MethodMockInfo methodInfo);
+        void RepositoryRetired(int repositoryId, string repositoryPath);
     }
 
     internal interface IDebugWindowPlugin : ITraceEventsPublisher, IMockRepositoryEventsPublisher, INinjectModule, IDisposable
