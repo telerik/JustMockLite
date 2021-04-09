@@ -16,6 +16,7 @@
 */
 
 using System;
+using System.Linq;
 using System.Reflection;
 using Telerik.JustMock.Core;
 using Telerik.JustMock.Core.MatcherTree;
@@ -32,13 +33,15 @@ namespace Telerik.JustMock.Plugins
             Type,
             NullOrEmpty,
             Range,
-            Predicate
+            Predicate,
+            Params
         }
 
         public MatcherKind Kind { get; private set; }
         public Type ArgType { get; private set; }
         public int ArgPosition { get; private set; }
         public string ArgName { get; private set; }
+        public bool IsParamsArg { get; private set; }
         public string ExpressionString { get; private set; }
 
         private MatcherInfo(MatcherKind kind, Type argType, int argPosition, string argName, string expressionString)
@@ -50,11 +53,12 @@ namespace Telerik.JustMock.Plugins
             this.ExpressionString = expressionString;
         }
 
-        public static MatcherInfo FromMatcherAndParamInfo(object matcherObject, ParameterInfo paramInfo)
+        public static MatcherInfo FromMatcherAndParamInfo(object matcherObject, ParameterInfo paramInfo, out MatcherInfo[] paramsMatchers)
         {
             var kind = MatcherKind.Unknown;
             var argType = typeof(void);
             var expressionString = "n/a";
+            paramsMatchers = null;
 
             ITypedMatcher typedMatcher;
             if (MockingUtil.TryGetAs(matcherObject, out typedMatcher))
@@ -89,9 +93,35 @@ namespace Telerik.JustMock.Plugins
                     IMatcher matcher;
                     if (MockingUtil.TryGetAs(matcherObject, out matcher))
                     {
-                        argType = typedMatcher.Type != null ? typedMatcher.Type : paramInfo.ParameterType;
+                        argType =
+                            typedMatcher.Type != null
+                                ?
+                                typedMatcher.Type
+                                :
+                                paramInfo.ParameterType.IsArray
+                                    ?
+                                        paramInfo.ParameterType.GetElementType()
+                                        :
+                                        paramInfo.ParameterType;
                         expressionString = matcher.DebugView;
                     }
+                }
+            }
+            else if (matcherObject.GetType() == typeof(ParamsMatcher))
+            {
+                IContainerMatcher containerMatcher;
+                if (MockingUtil.TryGetAs<IContainerMatcher>(matcherObject, out containerMatcher))
+                {
+                    kind = MatcherKind.Params;
+                    paramsMatchers = containerMatcher.Matchers.Select(
+                        contained =>
+                            {
+                                MatcherInfo[] dummy;
+                                var result = FromMatcherAndParamInfo(contained, paramInfo, out dummy);
+                                result.IsParamsArg = true;
+                                return result;
+                            })
+                        .ToArray();
                 }
             }
 

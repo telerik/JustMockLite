@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2021 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -38,6 +38,11 @@ namespace Telerik.JustMock.Core.MatcherTree
 	internal interface IValueMatcher : IFunctionalMatcher, ICompositeMatcher
 	{
 		object Value { get; }
+	}
+
+	internal interface IContainerMatcher
+	{
+		IMatcher[] Matchers { get; }
 	}
 
 	internal abstract class CategoricalMatcherBase : IMatcher

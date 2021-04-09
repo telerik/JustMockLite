@@ -1237,9 +1237,19 @@ namespace Telerik.JustMock.Core
                     var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
                     var argumentMatchers =
                         methodMock.CallPattern.ArgumentMatchers
-                            .Select(
+                            .SelectMany(
                                 (IMatcher matcher, int index) =>
-                                    MatcherInfo.FromMatcherAndParamInfo(matcher, methodMock.CallPattern.Method.GetParameters()[index]))
+                                    {
+                                        MatcherInfo[] paramsMatchers;
+                                        var matcherInfo = MatcherInfo.FromMatcherAndParamInfo(matcher, methodMock.CallPattern.Method.GetParameters()[index], out paramsMatchers);
+                                        if (matcherInfo.Kind == MatcherInfo.MatcherKind.Params && paramsMatchers.Length > 0)
+                                        {
+                                            // skip params matcher, but add all contained matchers
+                                            return paramsMatchers;
+                                        }
+                                        return new MatcherInfo[] { matcherInfo };
+                                    },
+                                (IMatcher matcher, MatcherInfo resultMatcherInfo) => resultMatcherInfo)
                             .ToArray();
 
                     debugWindowPlugin.MockCreated(
