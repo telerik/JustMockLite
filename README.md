@@ -1,7 +1,7 @@
 JustMock Lite
 ===
 
-[![release](https://img.shields.io/badge/release-R1%202021-blue.svg)](https://www.nuget.org/packages/JustMock/)
+[![release](https://img.shields.io/badge/release-R1%20SP1%202021-blue.svg)](https://www.nuget.org/packages/JustMock/)
 [![nuget](https://img.shields.io/nuget/v/JustMock.svg?label=nuget)](https://www.nuget.org/packages/JustMock/)
 [![license](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/telerik/JustMockLite/blob/master/LICENSE/)
 
@@ -71,6 +71,7 @@ public void TestBookService()
 
 ### Supported Frameworks
 - .Net Framework 4.5+ and later.
+- .NET 5, .NET 6 preview 2
 - .Net Core 2.0 and later.
 
 ### Documentation
