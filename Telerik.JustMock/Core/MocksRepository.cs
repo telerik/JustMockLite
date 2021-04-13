@@ -1266,6 +1266,42 @@ namespace Telerik.JustMock.Core
 #endif
         }
 
+#if !PORTABLE
+        internal void UpdateMockDebugView(MethodBase method, IMatcher[] argumentMatchers)
+        {
+            try
+            {
+                if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
+                {
+                    var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
+
+                    MatcherInfo[] argumentMatcherInfos = null;
+                    if (argumentMatchers != null)
+                    {
+                        argumentMatcherInfos =
+                            argumentMatchers.Select(
+                                (IMatcher matcher, int index) =>
+                                    {
+                                        MatcherInfo[] dummy;
+                                        return MatcherInfo.FromMatcherAndParamInfo(matcher, method.GetParameters()[index], out dummy);
+                                    })
+                            .ToArray();
+                    }
+
+                    debugWindowPlugin.MockUpdated(
+                        this.RepositoryId,
+                        this.GetRepositoryPath(),
+                        MockInfo.FromMethodBase(method),
+                        argumentMatcherInfos);
+                }
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Trace.WriteLine("Exception thrown calling IDebugWindowPlugin plugin: " + e);
+            }
+        }
+#endif
+
         private void CheckMethodInterceptorAvailable(IMatcher instanceMatcher, MethodBase method)
         {
             if (ProfilerInterceptor.IsProfilerAttached)

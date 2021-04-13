@@ -63,11 +63,7 @@ namespace Telerik.JustMock.Plugins
             ITypedMatcher typedMatcher;
             if (MockingUtil.TryGetAs(matcherObject, out typedMatcher))
             {
-                if (matcherObject.GetType() == typeof(AnyMatcher))
-                {
-                    kind = MatcherKind.Any;
-                }
-                else if (matcherObject.GetType() == typeof(ValueMatcher))
+                if (matcherObject.GetType() == typeof(ValueMatcher))
                 {
                     kind = MatcherKind.Value;
                 }
@@ -123,6 +119,10 @@ namespace Telerik.JustMock.Plugins
                             })
                         .ToArray();
                 }
+            }
+            else if (matcherObject.GetType() == typeof(AnyMatcher))
+            {
+                kind = MatcherKind.Any;
             }
 
             return new MatcherInfo(kind, argType, paramInfo.Position, paramInfo.Name, expressionString);

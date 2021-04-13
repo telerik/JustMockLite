@@ -32,6 +32,7 @@ namespace Telerik.JustMock.Plugins
     {
         void MockCreated(int repositoryId, string repositoryPath, MockInfo mock, MatcherInfo[] argumentMatchers);
         void MockInvoked(int repositoryId, string repositoryPath, MockInfo mock, InvocationInfo invocation);
+        void MockUpdated(int repositoryId, string repositoryPath, MockInfo mock, MatcherInfo[] argumentMatchers);
         void RepositoryCreated(int repositoryId, string repositoryPath, MethodMockInfo methodInfo);
         void RepositoryRetired(int repositoryId, string repositoryPath);
     }
