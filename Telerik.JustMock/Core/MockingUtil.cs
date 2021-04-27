@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015,2019 Progress Software Corporation
+ Copyright © 2010-2015,2019,2021 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -947,5 +947,11 @@ namespace Telerik.JustMock.Core
             return Task.Run(() => value);
         }
 #endif
+
+        public static bool TryGetAs<T>(object o, out T v) where T : class
+        {
+            v = o as T;
+            return v != null;
+        }
     }
 }

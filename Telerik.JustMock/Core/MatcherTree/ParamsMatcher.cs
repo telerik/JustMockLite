@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2021 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -21,12 +21,18 @@ using System.Linq.Expressions;
 
 namespace Telerik.JustMock.Core.MatcherTree
 {
-	internal class ParamsMatcher : IMatcher, ICompositeMatcher
+	internal class ParamsMatcher : IMatcher, ICompositeMatcher, IContainerMatcher
 	{
 		private IMatcher[] matchers;
+
 		public ParamsMatcher(IMatcher[] matchers)
 		{
 			this.matchers = matchers;
+		}
+
+		public IMatcher[] Matchers
+		{
+			get { return this.matchers; }
 		}
 
 		public bool ProtectRefOut
