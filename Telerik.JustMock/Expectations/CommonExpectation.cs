@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015,2019 Progress Software Corporation
+ Copyright © 2010-2015,2019,2021 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -446,10 +446,10 @@ namespace Telerik.JustMock.Expectations
 				});
 		}
 
-        /// <summary>
-        /// Determines whether prerequisite is met
-        /// </summary>
-        public bool IsMet
+		/// <summary>
+		/// Determines whether prerequisite is met
+		/// </summary>
+		public bool IsMet
 		{
 			get
 			{
@@ -457,10 +457,10 @@ namespace Telerik.JustMock.Expectations
 			}
 		}
 
-        /// <summary>
-        /// Specifies that a call should occur only after all of the given prerequisites have been met.
-        /// </summary>
-        public IAssertable AfterAll(params IPrerequisite[] prerequisites)
+		/// <summary>
+		/// Specifies that a call should occur only after all of the given prerequisites have been met.
+		/// </summary>
+		public IAssertable AfterAll(params IPrerequisite[] prerequisites)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
@@ -540,6 +540,10 @@ namespace Telerik.JustMock.Expectations
 				{
 					callPattern.ArgumentMatchers[i] = new AnyMatcher();
 				}
+
+#if !PORTABLE
+				this.Repository.UpdateMockDebugView(callPattern.Method, callPattern.ArgumentMatchers.ToArray());
+#endif
 
 				callPattern.MethodMockNode.ReattachMethodMock();
 

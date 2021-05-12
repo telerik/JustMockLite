@@ -1,6 +1,6 @@
 ﻿/*
  JustMock Lite
- Copyright © 2020 Progress Software Corporation
+ Copyright © 2020 - 2021 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -25,12 +25,15 @@ namespace Telerik.JustMock.Plugins
     {
         public MethodMockInfo MethodMock { get; private set; }
 
-        public MockInfo(string name, MemberTypes memberType, Type declaringType, Type reflectedType)
+        private MockInfo(string name, MemberTypes memberType, Type declaringType, Type reflectedType)
         {
             this.MethodMock = new MethodMockInfo(name, memberType, declaringType, reflectedType);
         }
 
-        public MockInfo(MethodBase method): this(method.Name, method.MemberType, method.DeclaringType, method.ReflectedType) {}
+        public static MockInfo FromMethodBase(MethodBase method)
+        {
+            return new MockInfo(method.Name, method.MemberType, method.DeclaringType, method.ReflectedType);
+        }
     }
 }
 #endif

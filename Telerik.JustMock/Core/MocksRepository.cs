@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015,2018-2019 Progress Software Corporation
+ Copyright © 2010-2015,2018-2019,2021 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -463,7 +463,7 @@ namespace Telerik.JustMock.Core
                     };
 
                     var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
-                    var mockInfo = new MockInfo(invocation.Method);
+                    var mockInfo = MockInfo.FromMethodBase(invocation.Method);
                     
                     ObjectInfo[] invocationsArgInfos =
                         invocation.Args.Select(
@@ -1230,20 +1230,33 @@ namespace Telerik.JustMock.Core
             funcRoot.AddChild(methodMock.CallPattern, methodMock, this.sharedContext.GetNextArrangeId());
 
 #if !PORTABLE
-
             try
             {
                 if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
                 {
                     var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
+                    var argumentMatchers =
+                        methodMock.CallPattern.ArgumentMatchers
+                            .SelectMany(
+                                (IMatcher matcher, int index) =>
+                                    {
+                                        MatcherInfo[] paramsMatchers;
+                                        var matcherInfo = MatcherInfo.FromMatcherAndParamInfo(matcher, methodMock.CallPattern.Method.GetParameters()[index], out paramsMatchers);
+                                        if (matcherInfo.Kind == MatcherInfo.MatcherKind.Params && paramsMatchers.Length > 0)
+                                        {
+                                            // skip params matcher, but add all contained matchers
+                                            return paramsMatchers;
+                                        }
+                                        return new MatcherInfo[] { matcherInfo };
+                                    },
+                                (IMatcher matcher, MatcherInfo resultMatcherInfo) => resultMatcherInfo)
+                            .ToArray();
+
                     debugWindowPlugin.MockCreated(
                         methodMock.Repository.RepositoryId,
                         methodMock.Repository.GetRepositoryPath(),
-                        new MockInfo(
-                            methodMock.CallPattern.Method.Name,
-                            methodMock.CallPattern.Method.MemberType,
-                            methodMock.CallPattern.Method.DeclaringType,
-                            methodMock.CallPattern.Method.ReflectedType));
+                        MockInfo.FromMethodBase(methodMock.CallPattern.Method),
+                        argumentMatchers);
                 }
             }
             catch (Exception e)
@@ -1252,6 +1265,42 @@ namespace Telerik.JustMock.Core
             }
 #endif
         }
+
+#if !PORTABLE
+        internal void UpdateMockDebugView(MethodBase method, IMatcher[] argumentMatchers)
+        {
+            try
+            {
+                if (MockingContext.Plugins.Exists<IDebugWindowPlugin>())
+                {
+                    var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
+
+                    MatcherInfo[] argumentMatcherInfos = null;
+                    if (argumentMatchers != null)
+                    {
+                        argumentMatcherInfos =
+                            argumentMatchers.Select(
+                                (IMatcher matcher, int index) =>
+                                    {
+                                        MatcherInfo[] dummy;
+                                        return MatcherInfo.FromMatcherAndParamInfo(matcher, method.GetParameters()[index], out dummy);
+                                    })
+                            .ToArray();
+                    }
+
+                    debugWindowPlugin.MockUpdated(
+                        this.RepositoryId,
+                        this.GetRepositoryPath(),
+                        MockInfo.FromMethodBase(method),
+                        argumentMatcherInfos);
+                }
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Trace.WriteLine("Exception thrown calling IDebugWindowPlugin plugin: " + e);
+            }
+        }
+#endif
 
         private void CheckMethodInterceptorAvailable(IMatcher instanceMatcher, MethodBase method)
         {
