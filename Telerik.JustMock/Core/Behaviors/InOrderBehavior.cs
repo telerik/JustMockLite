@@ -78,7 +78,12 @@ namespace Telerik.JustMock.Core.Behaviors
 		public void Process(Invocation invocation)
 		{
 			this.wasCalled = true;
-			this.calledInWrongOrder = (this.LastIdInOrder != this.arrangementId - 1);
+
+			bool processedOnce = this.LastIdInOrder > -1;
+			this.calledInWrongOrder =
+				processedOnce
+				&& (this.LastIdInOrder - this.arrangementId) > 0 || (this.LastIdInOrder - this.arrangementId) < -1;
+
 			this.LastIdInOrder = this.arrangementId;
 
 			this.InOrderExecutionLog += invocation.InputToString() + " called at:\n" + MockingContext.GetStackTrace("    ");
