@@ -1539,7 +1539,9 @@ namespace Telerik.JustMock.Core
         private IMethodMock GetMethodMockFromNodes(List<MethodMockMatcherTreeNode> methodMockNodes, Invocation invocation)
         {
             if (methodMockNodes.Count == 0)
+            {
                 return null;
+            }
 
             var resultsQ =
                 from node in methodMockNodes
@@ -1552,15 +1554,25 @@ namespace Telerik.JustMock.Core
 
             var resultList = resultsQ.ToList();
 
-            var nonSequential = resultList.Where(x => !x.MethodMock.IsSequential && x.Acceptable).LastOrDefault();
-            if (nonSequential != null)
-                return nonSequential.MethodMock;
+            var nonSequentialOrInOrder = resultList.Where(x => !x.MethodMock.IsSequential && !x.MethodMock.IsInOrder && x.Acceptable).LastOrDefault();
+            if (nonSequentialOrInOrder != null)
+            {
+                return nonSequentialOrInOrder.MethodMock;
+            }
+
+            var inOrder = resultList.Where(x => x.MethodMock.IsInOrder && !x.MethodMock.IsUsed && x.Acceptable).FirstOrDefault();
+            if (inOrder != null)
+            {
+                return inOrder.MethodMock;
+            }
 
             var sequential = resultList.Where(x => x.MethodMock.IsSequential && !x.MethodMock.IsUsed && x.Acceptable).FirstOrDefault();
             if (sequential != null)
+            {
                 return sequential.MethodMock;
+            }
 
-            return resultList.Where(x => x.MethodMock.IsSequential && x.Acceptable).Select(x => x.MethodMock).LastOrDefault();
+            return resultList.Where(x => (x.MethodMock.IsSequential || x.MethodMock.IsInOrder) && x.Acceptable).Select(x => x.MethodMock).LastOrDefault();
         }
 
         internal string GetDebugView(object mock = null)
