@@ -41,7 +41,8 @@ namespace Telerik.JustMock.Expectations
 		IMockMixin IMethodMock.Mock { get; set; }
 
 		bool IMethodMock.IsSequential { get; set; }
-		bool IMethodMock.IsUsed { get; set; }
+        bool IMethodMock.IsInOrder { get; set; }
+        bool IMethodMock.IsUsed { get; set; }
 		CallPattern IMethodMock.CallPattern { get; set; }
 		ICollection<IBehavior> IMethodMock.Behaviors { get { return this.behaviors; } }
 		InvocationOccurrenceBehavior IMethodMock.OccurencesBehavior { get { return this.occurences; } }
@@ -441,7 +442,8 @@ namespace Telerik.JustMock.Expectations
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 				{
-					this.behaviors.Add(new InOrderBehavior(this.Repository, this.Mock, message));
+                    (this as IMethodMock).IsInOrder = true;
+                    this.behaviors.Add(new InOrderBehavior(this.Repository, this.Mock, message));
 					return this;
 				});
 		}
