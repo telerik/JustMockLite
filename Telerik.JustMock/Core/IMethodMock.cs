@@ -30,6 +30,7 @@ namespace Telerik.JustMock.Core
 		InvocationOccurrenceBehavior OccurencesBehavior { get; }
 		string ArrangementExpression { get; set; }
 		bool IsSequential { get; set; }
+		bool IsInOrder { get; set; }
 		bool IsUsed { get; set; }
 		ImplementationOverrideBehavior AcceptCondition { get; set; }
 	}

@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2021 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -37,7 +37,15 @@ namespace Telerik.JustMock.Core.Behaviors
 			var mockMethod = invocation.Method;
 			var inheritanceChain = mockMethod.GetInheritanceChain();
 
-			var delegatedImplMethod = inheritanceChain.FirstOrDefault(method => types.Any(t => method.DeclaringType.IsAssignableFrom(t)));
+			var delegatedImplMethod =
+				inheritanceChain.FirstOrDefault(
+					method =>
+						types.Any(
+							type =>
+								{
+									var targetType = method.IsExtensionMethod() ? method.GetParameters()[0].ParameterType : method.DeclaringType;
+									return targetType.IsAssignableFrom(type);
+								}));
 			if (delegatedImplMethod != null)
 			{
 				invocation.ReturnValue = delegatedImplMethod.Invoke(implementer, invocation.Args);
