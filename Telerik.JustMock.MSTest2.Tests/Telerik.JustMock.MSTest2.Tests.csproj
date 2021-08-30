@@ -8,6 +8,9 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(PreviewTargetFramework)' != '' ">
+    <TargetFrameworks>$(TargetFrameworks);$(PreviewTargetFramework)</TargetFrameworks>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
