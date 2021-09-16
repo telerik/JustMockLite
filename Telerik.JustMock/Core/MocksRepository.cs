@@ -1543,21 +1543,33 @@ namespace Telerik.JustMock.Core
                 return null;
             }
 
-            var resultsQ =
-                from node in methodMockNodes
-                orderby node.Id
-                select new
-                {
-                    node.MethodMock,
-                    Acceptable = new Lazy<bool>(() => node.MethodMock.AcceptCondition == null || (bool)node.MethodMock.AcceptCondition.CallOverride(invocation))
-                };
+            var resultList =
+                methodMockNodes
+                    .OrderBy(x => x.Id)
+                    .Select(
+                        x =>
+                            new
+                            {
+                                x.MethodMock,
+                                Acceptable = new Lazy<bool>(() => x.MethodMock.AcceptCondition == null
+                                    || (bool)x.MethodMock.AcceptCondition.CallOverride(invocation))
+                            })
+                    .ToList();
 
-            var resultList = resultsQ.ToList();
+            var isInOrderOverwrites =
+                resultList.Count() > 0
+                && resultList.Where(x => x.MethodMock.IsInOrder).Any()
+                && resultList.Last().MethodMock.IsInOrder;
 
-            var nonSequentialOrInOrder = resultList.Where(x => !x.MethodMock.IsSequential && !x.MethodMock.IsInOrder && x.Acceptable).LastOrDefault();
-            if (nonSequentialOrInOrder != null)
+            // if one or more InOrder arrangement overwrites other ones, then skip selecting others
+            if (!isInOrderOverwrites)
             {
-                return nonSequentialOrInOrder.MethodMock;
+                var nonSequentialOrInOrder =
+                    resultList.Where(x => !x.MethodMock.IsSequential && !x.MethodMock.IsInOrder && x.Acceptable).LastOrDefault();
+                if (nonSequentialOrInOrder != null)
+                {
+                    return nonSequentialOrInOrder.MethodMock;
+                }
             }
 
             var inOrder = resultList.Where(x => x.MethodMock.IsInOrder && !x.MethodMock.IsUsed && x.Acceptable).FirstOrDefault();
