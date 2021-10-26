@@ -1,6 +1,6 @@
 ﻿/*
  JustMock Lite
- Copyright © 2010-2015,2018 Progress Software Corporation
+ Copyright © 2010-2015,2018,2021 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -253,6 +253,14 @@ namespace Telerik.JustMock
 		public static void Assert<T>(string message = null)
 		{
 			ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.AssertIgnoreInstance(message, typeof(T), ignoreMethodMockOccurrences: false));
+		}
+
+		/// <summary>
+		/// Asserts all expected setups in the current context.
+		/// </summary>
+		public static void AssertAll(string message = null)
+		{
+			ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.AssertAll(message));
 		}
 
 		/// <summary>
