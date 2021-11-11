@@ -865,6 +865,15 @@ namespace Telerik.JustMock.Core
             }
         }
 
+        internal void AssertAll(string message)
+        {
+            using (MockingContext.BeginFailureAggregation(message))
+            {
+                var mocks = GetAllMethodMocks();
+                AssertBehaviorsForMocks(mocks.Select(m => m.MethodMock), false);
+            }
+        }
+
         internal void Assert(string message, object mock, Expression expr = null, Args args = null, Occurs occurs = null)
         {
             using (MockingContext.BeginFailureAggregation(message))
@@ -1417,6 +1426,23 @@ namespace Telerik.JustMock.Core
                     foreach (var dependentMock in mockMixin.DependentMocks)
                         GetMethodMocksFromObjectInternal(dependentMock, null, methodMocks, visitedMocks);
                 }
+            }
+        }
+
+        private List<MethodMockMatcherTreeNode> GetAllMethodMocks()
+        {
+            var methodMocks = new List<MethodMockMatcherTreeNode>();
+            GetAllMethodMocksInternal(methodMocks);
+            return methodMocks;
+        }
+
+        private void GetAllMethodMocksInternal(List<MethodMockMatcherTreeNode> methodMocks)
+        {
+            foreach (var funcRoot in arrangementTreeRoots.Values)
+            {
+                var callPattern = CallPattern.CreateUniversalCallPattern(funcRoot.MethodInfo);
+                var results = funcRoot.GetAllMethodMocks(callPattern);
+                methodMocks.AddRange(results);
             }
         }
 

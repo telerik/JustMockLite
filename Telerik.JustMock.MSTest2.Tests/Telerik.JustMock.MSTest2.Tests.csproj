@@ -9,6 +9,7 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(PreviewTargetFramework)' != '' ">
+    <NetCoreSupportedVersions>$(NetCoreSupportedVersions);$(PreviewTargetFramework)</NetCoreSupportedVersions>
     <TargetFrameworks>$(TargetFrameworks);$(PreviewTargetFramework)</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
