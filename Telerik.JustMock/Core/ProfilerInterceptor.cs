@@ -336,16 +336,32 @@ namespace Telerik.JustMock.Core
 				ThrowElevatedMockingException();
 			}
 
+			var typeName =
+				method.DeclaringType.IsGenericType
+					?
+						string.Format("{0}[{1}]", method.DeclaringType.Name, string.Join(", ", method.DeclaringType.GetGenericArguments().Select(current => current.ToString()).ToArray()))
+						:
+						method.DeclaringType.Name;
+
+			var methodName =
+				method.IsGenericMethod
+					?
+						string.Format("{0}[{1}]", method.Name, string.Join(", ", method.GetGenericArguments().Select(current => current.ToString()).ToArray()))
+						:
+						method.Name;
+
 #if DEBUG
-			ProfilerLogger.Info("*** [MANAGED] Requesting ReJit for {0}.{1}", method.DeclaringType.Name, method.Name);
+			ProfilerLogger.Info("*** [MANAGED] Requesting ReJit for {0}.{1}", typeName, methodName);
 #endif
 
 			var typeHandle = method.DeclaringType.TypeHandle;
 			var methodToken = method.MetadataToken;
-			bool requestSucceeded = RequestReJitImpl(typeHandle.Value, methodToken);
+			IntPtr[] methodGenericArgHandles = method.IsGenericMethod ? method.GetGenericArguments().Select(type => type.TypeHandle.Value).ToArray() : null;
+			var methodGenericArgHandlesCount = methodGenericArgHandles != null ? methodGenericArgHandles.Length : 0;
+			bool requestSucceeded = RequestReJitImpl(typeHandle.Value, methodToken, methodGenericArgHandlesCount, methodGenericArgHandles);
 			if (!requestSucceeded)
 			{
-				throw new MockException(string.Format("ReJit request failed for {0}.{1}", method.DeclaringType.Name, method.Name));
+				throw new MockException(string.Format("ReJit request failed for {0}.{1}", typeName, methodName));
 			}
 		}
 
@@ -651,7 +667,7 @@ namespace Telerik.JustMock.Core
 		private static readonly Dictionary<MethodBase, List<MocksRepository>> globalInterceptors = new Dictionary<MethodBase, List<MocksRepository>>();
 
 		public static bool IsReJitEnabled { [DebuggerHidden] get { return IsProfilerAttached && (bool)bridge.GetMethod("IsReJitEnabled").Invoke(null, null); } }
-		private static readonly Func<IntPtr/*type handle*/, int /*method token*/, bool /*result*/> RequestReJitImpl;
+		private static readonly Func<IntPtr/*type handle*/, int /* method token*/, int /* method generic args count */, IntPtr[] /* method generic args */, bool /*result*/> RequestReJitImpl;
 
 		[ThreadStatic]
 		private static int surrogateReentrancyCounter;
