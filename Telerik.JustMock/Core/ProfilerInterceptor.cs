@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2021 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -85,7 +85,7 @@ namespace Telerik.JustMock.Core
 				}
 
 #if DEBUG
-				ProfilerLogger.Info("*** +++ [MANAGED] Intercepting call for {0}.{1}", method.DeclaringType.Name, method.Name);
+				ProfilerLogger.Info("*** +++ [MANAGED] Intercepting method call for {0}.{1}", method.DeclaringType.Name, method.Name);
 #endif
 
 				var invocation = new Invocation(data[0], method, data.Skip(2).ToArray());
@@ -119,7 +119,7 @@ namespace Telerik.JustMock.Core
 				var method = MethodBase.GetMethodFromHandle(methodHandle, typeHandle);
 
 #if DEBUG
-				ProfilerLogger.Info("*** +++ [MANAGED] Intercepting call for {0}.{1}", method.DeclaringType.Name, method.Name);
+				ProfilerLogger.Info("*** +++ [MANAGED] Intercepting constructor call for {0}.{1}", method.DeclaringType.Name, method.Name);
 #endif
 
 				var invocation = new Invocation(MockingUtil.TryGetUninitializedObject(method.DeclaringType), method, data ?? new object[0]);

@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2021 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ namespace Telerik.JustMock.Core
 			this.method = method;
 		}
 
-		private static void CheckMethodCompatibility(MethodBase method)
+		public static void CheckMethodCompatibility(MethodBase method)
 		{
 			var sigTypes = method.GetParameters().Select(p => p.ParameterType).Concat(new[] { method.GetReturnType() });
 			if (sigTypes.Any(sigType =>
@@ -86,7 +86,7 @@ namespace Telerik.JustMock.Core
 			return method.IsConstructor;
 		}
 
-		private static void CheckInstrumentationAvailability(MethodBase value)
+		public static void CheckInstrumentationAvailability(MethodBase value)
 		{
 			if (IsInterceptedAtTheCallSite(value))
 			{

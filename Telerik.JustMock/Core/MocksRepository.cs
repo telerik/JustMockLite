@@ -479,7 +479,7 @@ namespace Telerik.JustMock.Core
 
                     var debugWindowPlugin = MockingContext.Plugins.Get<IDebugWindowPlugin>();
                     var mockInfo = MockInfo.FromMethodBase(invocation.Method);
-                    
+
                     ObjectInfo[] invocationsArgInfos =
                         invocation.Args.Select(
                                 (arg, index) =>
@@ -1256,6 +1256,9 @@ namespace Telerik.JustMock.Core
 #if !PORTABLE
             if (ProfilerInterceptor.IsReJitEnabled)
             {
+                CallPattern.CheckMethodCompatibility(method);
+                CallPattern.CheckInstrumentationAvailability(method);
+
                 ProfilerInterceptor.RequestReJit(method);
             }
 
@@ -1350,6 +1353,51 @@ namespace Telerik.JustMock.Core
                 ProfilerInterceptor.ThrowElevatedMockingException(method);
         }
 
+        private void RequestRejitForTypeMethods(Type typeToIntercept)
+        {
+            var methods = new HashSet<MethodBase>();
+            methods.UnionWith(typeToIntercept.GetMethods(MockingUtil.AllMembers));
+            methods.UnionWith(
+                typeToIntercept.GetInheritanceChain()
+                    .Where(type => type != typeToIntercept)
+                    .SelectMany(type => type.GetMethods(MockingUtil.AllMembers | BindingFlags.DeclaredOnly))
+                    .Where(method => !method.IsAbstract && method.DeclaringType != typeof(object)));
+            methods.UnionWith(
+                MockingUtil.GetAllProperties(typeToIntercept)
+                    .SelectMany(
+                        property =>
+                            {
+                                var propertyMethods = new List<MethodBase>();
+                                var getMethod = property.GetMethod;
+                                if (getMethod != null)
+                                {
+                                    propertyMethods.Add(getMethod);
+                                }
+                                var setMethod = property.SetMethod;
+                                if (setMethod != null)
+                                {
+                                    propertyMethods.Add(setMethod);
+                                }
+                                return propertyMethods;
+                            }));
+            foreach (var method in methods)
+            {
+                try
+                {
+                    CallPattern.CheckMethodCompatibility(method);
+                    CallPattern.CheckInstrumentationAvailability(method);
+
+                    ProfilerInterceptor.RequestReJit(method);
+                }
+                catch (MockException e)
+                {
+#if DEBUG
+                    System.Diagnostics.Trace.WriteLine(string.Format("Method {0} is skipped for interception: {1}", method, e));
+#endif
+                }
+            }
+        }
+
         internal void EnableInterception(Type typeToIntercept)
         {
             if (ProfilerInterceptor.IsProfilerAttached)
@@ -1360,7 +1408,13 @@ namespace Telerik.JustMock.Core
                         DebugView.TraceEvent(IndentLevel.Warning, () => String.Format("Elevated mocking for type {0} will not be available due to limitations in CLR", type));
 
                     if (this.arrangedTypes.Add(type))
+                    {
                         ProfilerInterceptor.EnableInterception(type, true, this);
+                        if (ProfilerInterceptor.IsReJitEnabled && type == typeToIntercept)
+                        {
+                            RequestRejitForTypeMethods(type);
+                        }
+                    }
 
                     type = type.BaseType;
 
