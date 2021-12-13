@@ -1353,6 +1353,7 @@ namespace Telerik.JustMock.Core
                 ProfilerInterceptor.ThrowElevatedMockingException(method);
         }
 
+#if !PORTABLE
         private void RequestRejitForTypeMethods(Type typeToIntercept)
         {
             var methods = new HashSet<MethodBase>();
@@ -1397,6 +1398,7 @@ namespace Telerik.JustMock.Core
                 }
             }
         }
+#endif
 
         internal void EnableInterception(Type typeToIntercept)
         {
@@ -1410,10 +1412,12 @@ namespace Telerik.JustMock.Core
                     if (this.arrangedTypes.Add(type))
                     {
                         ProfilerInterceptor.EnableInterception(type, true, this);
+#if !PORTABLE
                         if (ProfilerInterceptor.IsReJitEnabled && type == typeToIntercept)
                         {
                             RequestRejitForTypeMethods(type);
                         }
+#endif
                     }
 
                     type = type.BaseType;
