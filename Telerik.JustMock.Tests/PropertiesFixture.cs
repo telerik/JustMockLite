@@ -90,7 +90,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IFoo>(Behavior.Strict);
 
-			Mock.ArrangeSet(() => { foo.Value = 3; });
+			Mock.ArrangeSet<IFoo>(() => { foo.Value = 3; });
 
 			foo.Value = 3;
 
@@ -102,7 +102,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IFoo>(Behavior.Strict);
 
-			Mock.ArrangeSet(() => foo.Value = Arg.Matches<int>(x => x > 3));
+			Mock.ArrangeSet<IFoo>(() => foo.Value = Arg.Matches<int>(x => x > 3));
 
 			foo.Value = 4;
 			foo.Value = 5;
@@ -115,7 +115,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IIndexedFoo>(Behavior.Strict);
 
-			Mock.ArrangeSet(() => { foo[0] = "foo"; });
+			Mock.ArrangeSet<IIndexedFoo>(() => { foo[0] = "foo"; });
 
 			foo[0] = "foo";
 
@@ -127,8 +127,8 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IIndexedFoo>(Behavior.Strict);
 
-			Mock.ArrangeSet(() => { foo[0] = Arg.Matches<string>(x => x.Equals("ping")); });
-			Mock.ArrangeSet(() => { foo[1] = Arg.IsAny<string>(); });
+			Mock.ArrangeSet<IIndexedFoo>(() => { foo[0] = Arg.Matches<string>(x => x.Equals("ping")); });
+			Mock.ArrangeSet<IIndexedFoo>(() => { foo[1] = Arg.IsAny<string>(); });
 
 			foo[0] = "ping";
 			foo[1] = "pong";
@@ -139,7 +139,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IFoo>(Behavior.Strict);
 
-			Mock.ArrangeSet(() => foo.Value = 1).Throws(new ArgumentException());
+			Mock.ArrangeSet<IFoo>(() => foo.Value = 1).Throws(new ArgumentException());
 
 			Assert.Throws<ArgumentException>(() => foo.Value = 1);
 		}
@@ -158,7 +158,7 @@ namespace Telerik.JustMock.Tests
 		{
 			bool expected = false;
 			var foo = Mock.Create<IFoo>(Behavior.Strict);
-			Mock.ArrangeSet(() => { foo.Value = 1; }).DoInstead(() => expected = true);
+			Mock.ArrangeSet<IFoo>(() => { foo.Value = 1; }).DoInstead(() => expected = true);
 
 			foo.Value = 1;
 
@@ -169,7 +169,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldAssertCallOriginalForPropertySet()
 		{
 			var foo = Mock.Create<FooAbstract>(Behavior.Strict);
-			Mock.ArrangeSet(() => { foo.Value = 1; }).CallOriginal();
+			Mock.ArrangeSet<FooAbstract>(() => { foo.Value = 1; }).CallOriginal();
 			Assert.Throws<NotImplementedException>(() => { foo.Value = 1; });
 		}
 
@@ -177,7 +177,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldThrowExpectionForASpecificSet()
 		{
 			var foo = Mock.Create<Foo>();
-			Mock.ArrangeSet(() => foo.MyProperty = 10).Throws(new ArgumentException());
+			Mock.ArrangeSet<Foo>(() => foo.MyProperty = 10).Throws(new ArgumentException());
 
 			// should not throw any expection.
 			foo.MyProperty = 1;

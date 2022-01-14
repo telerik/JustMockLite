@@ -46,7 +46,7 @@ namespace Telerik.JustMock
 		/// <summary>
 		/// Gets a value indicating whether the JustMock profiler is enabled.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>True if the profiler is enabled, otherwise false.</returns>
 		public static bool IsProfilerEnabled
 		{
 			get
@@ -55,10 +55,22 @@ namespace Telerik.JustMock
 			}
 		}
 
-		/// <summary>
-		/// Arrange and assert expectations on non-public members.
+        /// <summary>
+		/// Gets a value indicating whether the the on demand optimization is enabled.
 		/// </summary>
-		public static INonPublicExpectation NonPublic
+		/// <returns>True if the On Demand optimization is enabled, otherwise false.</returns>
+		public static bool IsOnDemandEnabled
+        {
+            get
+            {
+                return ProfilerInterceptor.GuardInternal(() => ProfilerInterceptor.IsReJitEnabled);
+            }
+        }
+
+        /// <summary>
+        /// Arrange and assert expectations on non-public members.
+        /// </summary>
+        public static INonPublicExpectation NonPublic
 		{
 			get
 			{

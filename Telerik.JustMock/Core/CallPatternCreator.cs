@@ -69,6 +69,11 @@ namespace Telerik.JustMock.Core
             }
             else if (expr is NewExpression)
             {
+                if (Mock.IsOnDemandEnabled)
+                {
+                    throw new MockException("Mocking the new operator is not avaiable with OnDemand option enabled. Please use .IgnoreInstance()");
+                }
+
                 var newExpr = (NewExpression)expr;
 
                 method = newExpr.Constructor;

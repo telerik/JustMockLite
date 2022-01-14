@@ -50,7 +50,7 @@ namespace Telerik.JustMock.Tests
 			var mock = Mock.Create<UnsafeClass1>();
 			int called = 0;
 
-			Mock.ArrangeSet(() => mock.Do((void*)0)).IgnoreArguments().DoInstead(() => called++);
+			Mock.ArrangeSet<UnsafeClass1>(() => mock.Do((void*)0)).IgnoreArguments().DoInstead(() => called++);
 			mock.Do((void*)0);
 			mock.Do((void*)123);
 			Assert.Equal(2, called);
