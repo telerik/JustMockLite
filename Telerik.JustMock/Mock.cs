@@ -56,7 +56,7 @@ namespace Telerik.JustMock
 		}
 
         /// <summary>
-		/// Gets a value indicating whether the the on demand optimization is enabled.
+		/// Gets a value indicating whether the on demand optimization is enabled.
 		/// </summary>
 		/// <returns>True if the On Demand optimization is enabled, otherwise false.</returns>
 		public static bool IsOnDemandEnabled

@@ -17,6 +17,7 @@
 
 using System;
 using System.Linq.Expressions;
+using Telerik.JustMock.Core;
 
 namespace Telerik.JustMock
 {
@@ -38,8 +39,11 @@ namespace Telerik.JustMock
         /// <typeparam name="value">The value that should be set to the property.</typeparam>
         public Expression<Action> Set(T value)
         {
-            return Expression.Lambda<Action>(
+            return ProfilerInterceptor.GuardInternal(() =>
+            {
+                return Expression.Lambda<Action>(
                     Expression.Assign(this.propertyExpression, Expression.Constant(value)));
+            });
         }
 
         /// <summary>
@@ -47,7 +51,10 @@ namespace Telerik.JustMock
         /// </summary>
         public Expression<Func<T>> Get()
         {
-            return Expression.Lambda<Func<T>>(this.propertyExpression);
+            return ProfilerInterceptor.GuardInternal(() =>
+            {
+                return Expression.Lambda<Func<T>>(this.propertyExpression);
+            });
         }
     }
 }

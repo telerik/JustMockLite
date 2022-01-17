@@ -32,40 +32,43 @@ namespace Telerik.JustMock
         /// Commonly used to easily build an expression for a property set.
 		/// </summary>
         /// <typeparam name="T">The type of the property.</typeparam>
-        static public IPropertyExpressionBuilder<T> Property<T>(Expression<Func<T>> expression)
+        public static IPropertyExpressionBuilder<T> Property<T>(Expression<Func<T>> expression)
         {
-            var memberExpression = expression.Body;
-
-            if (memberExpression.NodeType != ExpressionType.MemberAccess)
+            return ProfilerInterceptor.GuardInternal(() =>
             {
-                throw new MockException("Wrong expression used, property access expression looks like obj.Property or Class.StaticProperty");
+                var memberExpression = expression.Body;
 
-            }
+                if (memberExpression.NodeType != ExpressionType.MemberAccess)
+                {
+                    throw new MockException("Wrong expression used, property access expression looks like obj.Property or Class.StaticProperty");
 
-            MemberExpression outerMemberExpression = (MemberExpression)memberExpression;
-            if (!(outerMemberExpression.Member is PropertyInfo))
-            {
-                throw new MockException("Fields cannot be mocked, only properties.");
-            }
+                }
 
-            PropertyInfo outerPropertyInfo = (PropertyInfo)outerMemberExpression.Member;
-            MemberExpression innerMember = (MemberExpression)outerMemberExpression.Expression;
-            Expression objExpression = null;
-            Type objType = null;
-            if (innerMember != null)
-            {
-                FieldInfo innerField = (FieldInfo)innerMember.Member;
-                ConstantExpression innerMemberConstant = (ConstantExpression)innerMember.Expression;
-                object outerObj = innerField.GetValue(innerMemberConstant.Value);
-                objExpression = Expression.Constant(outerObj);
-                objType = outerObj.GetType();
-            }
-            else
-            {
-                objType = outerPropertyInfo.DeclaringType;
-            }
+                MemberExpression outerMemberExpression = (MemberExpression)memberExpression;
+                if (!(outerMemberExpression.Member is PropertyInfo))
+                {
+                    throw new MockException("Fields cannot be mocked, only properties.");
+                }
 
-            return new PropertyExpressionBuilder<T>(Expression.Property(objExpression, objType, outerPropertyInfo.Name));
+                PropertyInfo outerPropertyInfo = (PropertyInfo)outerMemberExpression.Member;
+                MemberExpression innerMember = (MemberExpression)outerMemberExpression.Expression;
+                Expression objExpression = null;
+                Type objType = null;
+                if (innerMember != null)
+                {
+                    FieldInfo innerField = (FieldInfo)innerMember.Member;
+                    ConstantExpression innerMemberConstant = (ConstantExpression)innerMember.Expression;
+                    object outerObj = innerField.GetValue(innerMemberConstant.Value);
+                    objExpression = Expression.Constant(outerObj);
+                    objType = outerObj.GetType();
+                }
+                else
+                {
+                    objType = outerPropertyInfo.DeclaringType;
+                }
+
+                return new PropertyExpressionBuilder<T>(Expression.Property(objExpression, objType, outerPropertyInfo.Name));
+            });
         }
     }
 }

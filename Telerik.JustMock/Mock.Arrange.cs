@@ -136,7 +136,7 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Setups target property set operation to act in a specific way. Does not work with OnDemand option enabled.
+        /// Setups target property set operation to act in a specific way. Does not work correctly with OnDemand option enabled.
         /// <example>
         /// <code>
         /// Mock.ArrangeSet(() => foo.MyValue = 10).Throws(new InvalidOperationException());
