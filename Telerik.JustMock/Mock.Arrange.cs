@@ -152,22 +152,22 @@ namespace Telerik.JustMock
         /// </returns>
         public static ActionExpectation ArrangeSet(Action action)
         {
-            if (Mock.IsOnDemandEnabled)
-            {
-                var sb = new StringBuilder();
-                sb.AppendLine("ArrangeSet(Action) is not avaiable with OnDemand option enabled.");
-                sb.AppendLine("Please use Mock.ArrangeSet<OwnerTypeOfProperty>(Action). Or Mock.Arrange with appropriate expression for property set.");
-                sb.AppendLine("-------------");
-                sb.AppendLine("Example 1:");
-                sb.AppendLine("Mock.ArrangeSet<TypeOfMockObject>(() => mockObject.SomeProperty = 5);");
-                sb.AppendLine("Example 2:");
-                sb.AppendLine("Mock.Arrange(Expr.Property(() => mockObject.SomeProperty).Set(5));");
-
-                throw new MockException(sb.ToString());
-            }
-
             return ProfilerInterceptor.GuardInternal(() =>
             {
+                if (Mock.IsOnDemandEnabled)
+                {
+                    var sb = new StringBuilder();
+                    sb.AppendLine("ArrangeSet(Action) is not avaiable with OnDemand option enabled.");
+                    sb.AppendLine("Please use Mock.ArrangeSet<OwnerTypeOfProperty>(Action). Or Mock.Arrange with appropriate expression for property set.");
+                    sb.AppendLine("-------------");
+                    sb.AppendLine("Example 1:");
+                    sb.AppendLine("Mock.ArrangeSet<TypeOfMockObject>(() => mockObject.SomeProperty = 5);");
+                    sb.AppendLine("Example 2:");
+                    sb.AppendLine("Mock.Arrange(Expr.Property(() => mockObject.SomeProperty).Set(5));");
+
+                    throw new MockException(sb.ToString());
+                }
+
                 return MockingContext.CurrentRepository.Arrange(action, () => new ActionExpectation());
             });
         }
@@ -189,11 +189,11 @@ namespace Telerik.JustMock
         /// </returns>
         public static ActionExpectation ArrangeSet<T>(Action action)
         {
-            Mock.Intercept(typeof(T));
-
             return ProfilerInterceptor.GuardInternal(() =>
             {
-                return MockingContext.CurrentRepository.Arrange(action, () => new ActionExpectation());
+                var repo = MockingContext.CurrentRepository;
+                repo.EnableInterception(typeof(T));
+                return repo.Arrange(action, () => new ActionExpectation());
             });
         }
 
