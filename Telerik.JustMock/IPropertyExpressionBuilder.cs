@@ -20,9 +20,10 @@ using System.Linq.Expressions;
 
 namespace Telerik.JustMock
 {
+#if !PORTABLE
     /// <summary>
-	/// Defines methods for setting and getting property values through an expression.
-	/// </summary>
+    /// Defines methods for setting and getting property values through an expression.
+    /// </summary>
     public interface IPropertyExpressionBuilder<T>
     {
         /// <summary>
@@ -36,4 +37,5 @@ namespace Telerik.JustMock
         /// </summary>
         Expression<Func<T>> Get();
     }
+#endif
 }

@@ -22,15 +22,16 @@ using Telerik.JustMock.Core;
 
 namespace Telerik.JustMock
 {
+#if !PORTABLE
     /// <summary>
-	/// Defines helper methods used for easily building expressions.
-	/// </summary>
+    /// Defines helper methods used for easily building expressions.
+    /// </summary>
     public static class Expr
     {
         /// <summary>
-		/// Creates a <see cref="IPropertyExpressionBuilder<T>"/> from an expression.
+        /// Creates a <see cref="IPropertyExpressionBuilder<T>"/> from an expression.
         /// Commonly used to easily build an expression for a property set.
-		/// </summary>
+        /// </summary>
         /// <typeparam name="T">The type of the property.</typeparam>
         public static IPropertyExpressionBuilder<T> Property<T>(Expression<Func<T>> expression)
         {
@@ -71,4 +72,5 @@ namespace Telerik.JustMock
             });
         }
     }
+#endif
 }

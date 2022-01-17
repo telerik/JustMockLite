@@ -154,6 +154,7 @@ namespace Telerik.JustMock
         {
             return ProfilerInterceptor.GuardInternal(() =>
             {
+#if !PORTABLE
                 if (Mock.IsOnDemandEnabled)
                 {
                     var sb = new StringBuilder();
@@ -167,11 +168,13 @@ namespace Telerik.JustMock
 
                     throw new MockException(sb.ToString());
                 }
+#endif
 
                 return MockingContext.CurrentRepository.Arrange(action, () => new ActionExpectation());
             });
         }
 
+#if !PORTABLE
         /// <summary>
         /// Setups target property set operation to act in a specific way.  Use <see cref="Mock.ArrangeSet{T}(Action)"/>
         /// <example>
@@ -196,6 +199,7 @@ namespace Telerik.JustMock
                 return repo.Arrange(action, () => new ActionExpectation());
             });
         }
+#endif
 
         /// <summary>
         /// Arranges the return values of properties and methods according to the given functional specification.
