@@ -55,22 +55,23 @@ namespace Telerik.JustMock
 			}
 		}
 
-        /// <summary>
+#if !PORTABLE
+		/// <summary>
 		/// Gets a value indicating whether the on demand optimization is enabled.
 		/// </summary>
 		/// <returns>True if the On Demand optimization is enabled, otherwise false.</returns>
 		public static bool IsOnDemandEnabled
-        {
-            get
-            {
-                return ProfilerInterceptor.GuardInternal(() => ProfilerInterceptor.IsReJitEnabled);
-            }
-        }
+		{
+			get
+			{
+				return ProfilerInterceptor.GuardInternal(() => ProfilerInterceptor.IsReJitEnabled);
+			}
+		}
 
-        /// <summary>
-        /// Arrange and assert expectations on non-public members.
-        /// </summary>
-        public static INonPublicExpectation NonPublic
+		/// <summary>
+		/// Arrange and assert expectations on non-public members.
+		/// </summary>
+		public static INonPublicExpectation NonPublic
 		{
 			get
 			{
@@ -78,7 +79,6 @@ namespace Telerik.JustMock
 			}
 		}
 
-#if !PORTABLE
 		/// <summary>
 		/// Arrange and assert expectations on language features like C# 7 local functions.
 		/// </summary>

@@ -21,10 +21,11 @@ using Telerik.JustMock.Core;
 
 namespace Telerik.JustMock
 {
+#if !PORTABLE
     /// <summary>
     /// Defines methods for setting and getting property values through an expression.
     /// </summary>
-    public class PropertyExpressionBuilder<T> : IPropertyExpressionBuilder<T>
+    internal class PropertyExpressionBuilder<T> : IPropertyExpressionBuilder<T>
     {
         private Expression propertyExpression;
 
@@ -57,4 +58,5 @@ namespace Telerik.JustMock
             });
         }
     }
+#endif
 }
