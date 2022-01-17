@@ -348,7 +348,7 @@ namespace Telerik.JustMock.Tests
 		public void ShouldAssertEventHandlerAddingOccurrence()
 		{
 			var doc = Mock.Create<IDocument>();
-			Mock.ArrangeSet(() => doc.IsDirtyChanged += null).IgnoreArguments().OccursOnce();
+			Mock.ArrangeSet<IDocument>(() => doc.IsDirtyChanged += null).IgnoreArguments().OccursOnce();
 
 			Assert.Throws<AssertionException>(() => Mock.Assert(doc));
 

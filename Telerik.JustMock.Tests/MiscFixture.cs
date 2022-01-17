@@ -635,7 +635,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IFoo>();
 
-			Mock.ArrangeSet(() => foo.EffectiveFrom = DateTime.Now).IgnoreArguments();
+			Mock.ArrangeSet<IFoo>(() => foo.EffectiveFrom = DateTime.Now).IgnoreArguments();
 
 			foo.EffectiveFrom = DateTime.Now;
 

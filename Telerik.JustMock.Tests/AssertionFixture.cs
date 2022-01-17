@@ -155,7 +155,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<Foo>();
 
-			Mock.ArrangeSet(() => foo.Value = true);
+			Mock.ArrangeSet<Foo>(() => foo.Value = true);
 
 			foo.Value = true;
 
@@ -358,7 +358,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IFoo>();
 
-			Mock.ArrangeSet(() => { foo.Value = 1; }).DoNothing().MustBeCalled();
+			Mock.ArrangeSet<IFoo>(() => { foo.Value = 1; }).DoNothing().MustBeCalled();
 
 			Assert.Throws<AssertionException>(() => Mock.Assert(foo));
 
@@ -372,7 +372,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IFoo>();
 
-			Mock.ArrangeSet(() => { foo.Value = 1; });
+			Mock.ArrangeSet<IFoo>(() => { foo.Value = 1; });
 
 			Assert.Throws<AssertionException>(() => Mock.AssertSet(() => foo.Value = 1));
 
@@ -433,7 +433,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IFooIndexed>();
 
-			Mock.ArrangeSet(() => foo[0] = "ping");
+			Mock.ArrangeSet<IFooIndexed>(() => foo[0] = "ping");
 
 			Assert.Throws<AssertionException>(() => Mock.AssertSet(() => foo[0] = "ping"));
 		}
@@ -443,7 +443,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IFooIndexed>();
 
-			Mock.ArrangeSet(() => foo[0] = "ping");
+			Mock.ArrangeSet<IFooIndexed>(() => foo[0] = "ping");
 
 			foo[0] = "ping";
 
@@ -455,7 +455,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IFooIndexed>();
 
-			Mock.ArrangeSet(() => foo[0] = "ping");
+			Mock.ArrangeSet<IFooIndexed>(() => foo[0] = "ping");
 
 			foo[0] = "ping";
 
@@ -467,7 +467,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IFooIndexed>();
 
-			Mock.ArrangeSet(() => foo[0] = "ping");
+			Mock.ArrangeSet<IFooIndexed>(() => foo[0] = "ping");
 
 			Assert.Throws<AssertionException>(() =>
 			{
@@ -480,7 +480,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IFooIndexed>();
 
-			Mock.ArrangeSet(() => foo[0] = Arg.IsAny<string>());
+			Mock.ArrangeSet<IFooIndexed>(() => foo[0] = Arg.IsAny<string>());
 
 			foo[0] = "ping";
 

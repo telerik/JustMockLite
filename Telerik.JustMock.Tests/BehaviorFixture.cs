@@ -180,7 +180,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IFoo>();
 
-			Mock.ArrangeSet(() => { foo.StrValue = string.Empty; }).Throws(new ArgumentException());
+			Mock.ArrangeSet<IFoo>(() => { foo.StrValue = string.Empty; }).Throws(new ArgumentException());
 
 			foo.StrValue = "Should not Throw";
 
