@@ -37,7 +37,7 @@ namespace JustMock.NonElevatedExamples.BasicUsage.Mock_MustBeCalled
             var foo = Mock.Create<IFoo>();
 
             // Arranging: foo.Value should be set to 1 during the test.
-            Mock.ArrangeSet(() => { foo.Value = 1; }).MustBeCalled();
+            Mock.ArrangeSet<IFoo>(() => { foo.Value = 1; }).MustBeCalled();
             
             // ACT
             foo.Value = 1;
@@ -55,7 +55,7 @@ namespace JustMock.NonElevatedExamples.BasicUsage.Mock_MustBeCalled
             var foo = Mock.Create<IFoo>();
 
             // Arranging: foo.Value should be set to 1 during the test.
-            Mock.ArrangeSet(() => { foo.Value = 1; }).MustBeCalled();
+            Mock.ArrangeSet<IFoo>(() => { foo.Value = 1; }).MustBeCalled();
 
             // ACT
 
