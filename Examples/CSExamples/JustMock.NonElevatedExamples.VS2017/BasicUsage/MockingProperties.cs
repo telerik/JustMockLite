@@ -57,7 +57,7 @@ namespace JustMock.NonElevatedExamples.BasicUsage.MockingProperties
             var foo = Mock.Create<IFoo>();
 
             // Arranging: That foo.Value must be set to 1 during the test method.
-            Mock.ArrangeSet(() => foo.Value = 1).MustBeCalled();
+            Mock.ArrangeSet<IFoo>(() => foo.Value = 1).MustBeCalled();
 
             // ACT
             foo.Value = 1;
@@ -75,7 +75,7 @@ namespace JustMock.NonElevatedExamples.BasicUsage.MockingProperties
             var foo = Mock.Create<IFoo>(Behavior.Strict);
 
             // Arranging: That foo.Value should be set to an integer bigger than 3.
-            Mock.ArrangeSet(() => foo.Value = Arg.Matches<int>(x => x > 3));
+            Mock.ArrangeSet<IFoo>(() => foo.Value = Arg.Matches<int>(x => x > 3));
 
             // ACT - These lines will not trigger the Strict behavior, because they satisfy the expectations.
             foo.Value = 4;
@@ -115,7 +115,7 @@ namespace JustMock.NonElevatedExamples.BasicUsage.MockingProperties
             var foo = Mock.Create<IIndexedFoo>(Behavior.Strict);
 
             // Arranging: That the [0] element of foo should be set to "foo".
-            Mock.ArrangeSet(() => { foo[0] = "foo"; });
+            Mock.ArrangeSet<IIndexedFoo>(() => { foo[0] = "foo"; });
 
             // ACT - This meets the expectations.
             foo[0] = "foo";
@@ -133,9 +133,9 @@ namespace JustMock.NonElevatedExamples.BasicUsage.MockingProperties
             var foo = Mock.Create<IIndexedFoo>(Behavior.Strict);
 
             // Arranging: That the [0] element of foo should match a string "ping".
-            Mock.ArrangeSet(() => { foo[0] = Arg.Matches<string>(x => x.Equals("ping")); });
+            Mock.ArrangeSet<IIndexedFoo>(() => { foo[0] = Arg.Matches<string>(x => x.Equals("ping")); });
             // Arranging: That the [1] element of foo should be any string.
-            Mock.ArrangeSet(() => { foo[1] = Arg.IsAny<string>(); });
+            Mock.ArrangeSet<IIndexedFoo>(() => { foo[1] = Arg.IsAny<string>(); });
 
             // ACT - These lines will not trigger the Strict behavior, because they satisfy the expectations.
             foo[0] = "ping";

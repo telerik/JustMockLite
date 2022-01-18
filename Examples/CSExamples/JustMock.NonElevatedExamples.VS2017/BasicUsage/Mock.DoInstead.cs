@@ -80,7 +80,7 @@ namespace JustMock.NonElevatedExamples.BasicUsage.Mock_DoInstead
             bool isSetTo1 = false;
 
             // Arranging: When foo.Bar is set to 1 it should change "isSetTo1" to true.
-            Mock.ArrangeSet(() => { foo.Bar = 1; }).DoInstead(() => isSetTo1 = true);
+            Mock.ArrangeSet<IFoo>(() => { foo.Bar = 1; }).DoInstead(() => isSetTo1 = true);
 
             // Act
             foo.Bar = 1;

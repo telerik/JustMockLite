@@ -53,7 +53,7 @@ namespace JustMock.NonElevatedExamples.BasicUsage.Mock_DoNothing
             var foo = Mock.Create<IFoo>();
 
             // Arranging: foo.Bar should do nothing when set to 1, but must be called.
-            Mock.ArrangeSet(() => foo.Bar = 1).DoNothing().MustBeCalled();
+            Mock.ArrangeSet<IFoo>(() => foo.Bar = 1).DoNothing().MustBeCalled();
 
             // ACT
             foo.Bar = 1;
