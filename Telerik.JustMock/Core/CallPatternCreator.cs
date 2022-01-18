@@ -69,10 +69,12 @@ namespace Telerik.JustMock.Core
             }
             else if (expr is NewExpression)
             {
-                if (Mock.IsOnDemandEnabled)
+#if !PORTABLE
+                if (ProfilerInterceptor.IsReJitEnabled)
                 {
                     throw new MockException("Mocking the new operator is not avaiable with OnDemand option enabled. Please use .IgnoreInstance()");
                 }
+#endif
 
                 var newExpr = (NewExpression)expr;
 
