@@ -1096,7 +1096,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var b_object = Mock.Create<B>();
 
-			Mock.ArrangeSet(() => b_object.b_string_set_get = string.Empty).DoNothing().MustBeCalled();
+			Mock.ArrangeSet<B>(() => b_object.b_string_set_get = string.Empty).DoNothing().MustBeCalled();
 
 			b_object.b_string_set_get = string.Empty;
 

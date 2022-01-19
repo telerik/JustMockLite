@@ -90,7 +90,7 @@ namespace JustMock.NonElevatedExamples.BasicUsage.RecursiveMocking
 
             // Arranging: Setting foo.Bar.Value to 5, should do nothing. 
             //              This will automatically create mock of foo.Bar and a NullReferenceException will be avoided.
-            Mock.ArrangeSet(() => { foo.Bar.Value = 5; }).DoNothing().MustBeCalled();
+            Mock.ArrangeSet<IFoo>(() => { foo.Bar.Value = 5; }).DoNothing().MustBeCalled();
 
             // ACT
             foo.Bar.Value = 5;

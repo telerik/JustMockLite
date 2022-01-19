@@ -120,7 +120,7 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IFoo>(Behavior.Strict);
 
-			Mock.ArrangeSet(() => { foo.Bar.Value = 5; }).DoNothing();
+			Mock.ArrangeSet<IFoo>(() => { foo.Bar.Value = 5; }).DoNothing();
 
 			Assert.Throws<MockException>(() => foo.Bar.Value = 10);
 

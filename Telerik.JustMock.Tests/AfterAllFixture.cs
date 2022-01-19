@@ -57,7 +57,7 @@ namespace Telerik.JustMock.Tests
             var foo = Mock.Create<IFoo>();
 
             var init = Mock.Arrange(() => foo.Init());
-            Mock.ArrangeSet(() => foo.Value = Arg.AnyInt).AfterAll(init);
+            Mock.ArrangeSet<IFoo>(() => foo.Value = Arg.AnyInt).AfterAll(init);
             Mock.Arrange(() => foo.Save()).AfterAll(init);
 
             foo.Init();
@@ -73,7 +73,7 @@ namespace Telerik.JustMock.Tests
             var foo = Mock.Create<IFoo>();
 
             var init = Mock.Arrange(() => foo.Init());
-            Mock.ArrangeSet(() => foo.Value = Arg.AnyInt).AfterAll(init);
+            Mock.ArrangeSet<IFoo>(() => foo.Value = Arg.AnyInt).AfterAll(init);
             Mock.Arrange(() => foo.Save()).AfterAll(init);
 
             foo.Value = 5;
@@ -88,7 +88,7 @@ namespace Telerik.JustMock.Tests
             var foo = Mock.Create<IFoo>();
 
             var init = Mock.Arrange(() => foo.Init());
-            Mock.ArrangeSet(() => foo.Value = Arg.AnyInt).AfterAll(init).InOrder();
+            Mock.ArrangeSet<IFoo>(() => foo.Value = Arg.AnyInt).AfterAll(init).InOrder();
             Mock.Arrange(() => foo.Save()).AfterAll(init).InOrder();
 
             foo.Init();
@@ -104,7 +104,7 @@ namespace Telerik.JustMock.Tests
             var foo = Mock.Create<IFoo>();
 
             var init = Mock.Arrange(() => foo.Init());
-            Mock.ArrangeSet(() => foo.Value = Arg.AnyInt).AfterAll(init).InOrder();
+            Mock.ArrangeSet<IFoo>(() => foo.Value = Arg.AnyInt).AfterAll(init).InOrder();
             Mock.Arrange(() => foo.Save()).AfterAll(init).InOrder();
 
             foo.Value = 5;
@@ -123,7 +123,7 @@ namespace Telerik.JustMock.Tests
 
             var fooInit = Mock.Arrange(() => foo.Init());
             var barInit = Mock.Arrange(() => bar.Init());
-            Mock.ArrangeSet(() => bar.Foo = Arg.IsAny<IFoo>()).AfterAll(fooInit).AfterAll(barInit);
+            Mock.ArrangeSet<IBar>(() => bar.Foo = Arg.IsAny<IFoo>()).AfterAll(fooInit).AfterAll(barInit);
 
             foo.Init();
             bar.Init();
@@ -140,7 +140,7 @@ namespace Telerik.JustMock.Tests
 
             var fooInit = Mock.Arrange(() => foo.Init());
             var barInit = Mock.Arrange(() => bar.Init());
-            Mock.ArrangeSet(() => bar.Foo = Arg.IsAny<IFoo>()).AfterAll(fooInit).AfterAll(barInit);
+            Mock.ArrangeSet<IBar>(() => bar.Foo = Arg.IsAny<IFoo>()).AfterAll(fooInit).AfterAll(barInit);
 
             bar.Init();
             bar.Foo = foo;

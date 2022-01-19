@@ -109,8 +109,8 @@ namespace Telerik.JustMock.Tests
 		{
 			var foo = Mock.Create<IFoo>();
 
-			Mock.ArrangeSet(() => foo.Value = 10).InOrder();
-			Mock.ArrangeSet(() => foo.Value = 11).InOrder();
+			Mock.ArrangeSet<IFoo>(() => foo.Value = 10).InOrder();
+			Mock.ArrangeSet<IFoo>(() => foo.Value = 11).InOrder();
 
 			foo.Value = 10;
 			foo.Value = 11;
