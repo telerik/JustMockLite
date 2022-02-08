@@ -28,6 +28,7 @@ using Telerik.JustMock.Helpers;
 using Telerik.JustMock.Plugins;
 using Telerik.JustMock.AutoMock.Ninject.Parameters;
 #if NETCORE
+using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 #endif
 #endif
@@ -155,9 +156,13 @@ namespace Telerik.JustMock.Core.Context
 #if !PORTABLE
 		public static PluginsRegistry Plugins { get; private set; }
 		private static PluginLoadHelper pluginLoadHelper;
+#if NETCORE
+        private const string NET_CORE_DESC_PATTERN = @".NET(\sCore)?\s(\d+(\.)?)+";
+        private const string NET_CORE_SUBDIR = "netcoreapp2.1";
+#endif
 #endif
 
-		static MockingContext()
+        static MockingContext()
 		{
 #if !PORTABLE
 			MockingContext.Plugins = new PluginsRegistry();
@@ -165,8 +170,8 @@ namespace Telerik.JustMock.Core.Context
 
 			try
 			{
-				var clrVersion = Environment.Version;
 #if !NETCORE
+				var clrVersion = Environment.Version;
 				if (clrVersion.Major >= 4 && clrVersion.Minor >= 0
 					&& clrVersion.Build >= 30319 && clrVersion.Revision >= 42000)
 #endif
@@ -180,12 +185,12 @@ namespace Telerik.JustMock.Core.Context
 						&& debugWindowEnabledEnv == "1" && Directory.Exists(debugWindowAssemblyDirectoryEnv))
 					{
 #if NETCORE
-						if (RuntimeInformation.FrameworkDescription.Contains(".NET Core"))
+						if (Regex.IsMatch(RuntimeInformation.FrameworkDescription, NET_CORE_DESC_PATTERN))
 						{
-							// append 'netcoreapp2.1' suffix if necessary
-							if (string.Compare(Path.GetDirectoryName(debugWindowAssemblyDirectoryEnv), "netcoreapp2.1", StringComparison.InvariantCultureIgnoreCase) != 0)
+							// append .NET Core suffix if necessary
+							if (string.Compare(Path.GetDirectoryName(debugWindowAssemblyDirectoryEnv), NET_CORE_SUBDIR, StringComparison.InvariantCultureIgnoreCase) != 0)
 							{
-								debugWindowAssemblyDirectoryEnv = Path.Combine(debugWindowAssemblyDirectoryEnv, "netcoreapp2.1");
+								debugWindowAssemblyDirectoryEnv = Path.Combine(debugWindowAssemblyDirectoryEnv, NET_CORE_SUBDIR);
 							}
 						}
 #endif
