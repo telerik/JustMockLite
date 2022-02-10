@@ -133,7 +133,7 @@ namespace Telerik.JustMock.Core.Context
 					select method;
 
 			var allTestMethods = q.Distinct().ToArray();
-			if (allTestMethods.Length > 1)
+			if (allTestMethods.Length > 1 && allTestMethods.Where(m => m.IsConstructor).Count() != allTestMethods.Length)
 			{
 				string message = "Calling one test method from another could result in unexpected behavior and must be avoided. Extract common mocking logic to a non-test method. At:\n" + stackTrace;
 				DebugView.DebugTrace(message);
