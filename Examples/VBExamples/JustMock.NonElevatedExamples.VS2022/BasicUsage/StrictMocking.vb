@@ -1,5 +1,5 @@
 '  JustMock Lite
-'  Copyright © 2010-2014 Telerik EAD
+'  Copyright © 2010-2014,2022 Telerik EAD
 ' 
 '    Licensed under the Apache License, Version 2.0 (the "License");
 '    you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 Imports System.Text
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Imports Telerik.JustMock.Core
+Imports Telerik.JustMock
 
 
 Namespace JustMock.NonElevatedExamples.BasicUsage.StrictMocking

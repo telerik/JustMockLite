@@ -1,20 +1,23 @@
-'    limitations under the License.
-'    See the License for the specific language governing permissions and
-'    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-'    distributed under the License is distributed on an "AS IS" BASIS,
-'    Unless required by applicable law or agreed to in writing, software
+'  JustMock Lite
+'  Copyright © 2010-2014,2022 Telerik EAD
+' 
+'    Licensed under the Apache License, Version 2.0 (the "License");
+'    you may not use this file except in compliance with the License.
+'    You may obtain a copy of the License at
 ' 
 '      http://www.apache.org/licenses/LICENSE-2.0
 ' 
-'    You may obtain a copy of the License at
-'    you may not use this file except in compliance with the License.
-'    Licensed under the Apache License, Version 2.0 (the "License");
-' 
-'  Copyright © 2010-2014 Telerik EAD
-'  JustMock Lite
+'    Unless required by applicable law or agreed to in writing, software
+'    distributed under the License is distributed on an "AS IS" BASIS,
+'    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+'    See the License for the specific language governing permissions and
+'    limitations under the License.
+
+
 
 Imports System.Text
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
+Imports Telerik.JustMock
 Imports Telerik.JustMock.Helpers
 
 
@@ -23,9 +26,9 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.Mock_Returns
     ''' The Returns method is used with non void calls to ignore the actual call and return a custom value.
     ''' See http://www.telerik.com/help/justmock/basic-usage-mock-returns.html for full documentation of the feature.
     ''' </summary>
-    <TestClass> _
+    <TestClass>
     Public Class Mock_Returns_Tests
-        <TestMethod> _
+        <TestMethod>
         Public Sub ShouldAssertPropertyGetCall()
             Dim expected = 10
 
@@ -43,7 +46,7 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.Mock_Returns
             Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(expected, actual)
         End Sub
 
-        <TestMethod> _
+        <TestMethod>
         Public Sub ShouldAssertMethodCallWithMatcher1()
             ' ARRANGE
             ' Creating a mocked instance of the "IFoo" interface.
@@ -59,7 +62,7 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.Mock_Returns
             Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(11, actual)
         End Sub
 
-        <TestMethod> _
+        <TestMethod>
         Public Sub ShouldAssertMethodCallWithMatcher2()
             ' ARRANGE
             ' Creating a mocked instance of the "IFoo" interface.
@@ -76,7 +79,7 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.Mock_Returns
             Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(10, actual)
         End Sub
 
-        <TestMethod> _
+        <TestMethod>
         Public Sub ShouldReturnWhateverSecondArgIs()
             ' ARRANGE
             ' Creating a mocked instance of the "IFoo" interface.
@@ -93,7 +96,7 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.Mock_Returns
         End Sub
 
 
-        <TestMethod> _
+        <TestMethod>
         Public Sub ShouldReturnInSequence()
             ' ARRANGE
             ' Creating a mocked instance of the "IFoo" interface.

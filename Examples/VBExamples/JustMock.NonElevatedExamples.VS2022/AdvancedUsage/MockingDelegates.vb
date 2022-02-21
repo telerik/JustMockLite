@@ -1,5 +1,5 @@
 '  JustMock Lite
-'  Copyright © 2010-2014 Telerik EAD
+'  Copyright © 2010-2014,2022 Telerik EAD
 ' 
 '    Licensed under the Apache License, Version 2.0 (the "License");
 '    you may not use this file except in compliance with the License.
@@ -12,6 +12,11 @@
 '    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 '    See the License for the specific language governing permissions and
 '    limitations under the License.
+
+
+
+Imports Microsoft.VisualStudio.TestTools.UnitTesting
+Imports Telerik.JustMock
 
 Namespace JustMock.NonElevatedExamples.AdvancedUsage.MockingDelegates
 
@@ -122,7 +127,7 @@ Namespace JustMock.NonElevatedExamples.AdvancedUsage.MockingDelegates
                 Return m_FuncDelegate
             End Get
             Set(value As Func(Of Integer, Integer))
-                m_FuncDelegate = Value
+                m_FuncDelegate = value
             End Set
         End Property
         Private m_FuncDelegate As Func(Of Integer, Integer)

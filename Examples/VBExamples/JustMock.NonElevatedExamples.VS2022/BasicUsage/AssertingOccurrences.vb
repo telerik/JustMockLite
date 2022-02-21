@@ -1,21 +1,23 @@
-'    limitations under the License.
-'    See the License for the specific language governing permissions and
-'    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-'    distributed under the License is distributed on an "AS IS" BASIS,
-'    Unless required by applicable law or agreed to in writing, software
+'  JustMock Lite
+'  Copyright © 2010-2014,2022 Telerik EAD
+' 
+'    Licensed under the Apache License, Version 2.0 (the "License");
+'    you may not use this file except in compliance with the License.
+'    You may obtain a copy of the License at
 ' 
 '      http://www.apache.org/licenses/LICENSE-2.0
 ' 
-'    You may obtain a copy of the License at
-'    you may not use this file except in compliance with the License.
-'    Licensed under the Apache License, Version 2.0 (the "License");
-' 
-'  Copyright © 2010-2014 Telerik EAD
-'  JustMock Lite
+'    Unless required by applicable law or agreed to in writing, software
+'    distributed under the License is distributed on an "AS IS" BASIS,
+'    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+'    See the License for the specific language governing permissions and
+'    limitations under the License.
+
+
 
 Imports System.Text
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
+Imports Telerik.JustMock
 
 Namespace JustMock.NonElevatedExamples.BasicUsage.AssertingOccurrence
     ''' <summary>
@@ -36,9 +38,9 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.AssertingOccurrence
     '''    OccursAtLeast(numberOfTimes) - Specifies that a call should occur at least once on a mock.
     '''    OccursAtMost(numberOfTimes) - Specifies the number of times at most a call should occur on a mock. 
     ''' </summary>
-    <TestClass> _
+    <TestClass>
     Public Class AssertingOccurrence_Tests
-        <TestMethod> _
+        <TestMethod>
         Public Sub ShouldOccursNever()
             ' ARRANGE
             ' Creating a mocked instance of the "IFoo" interface.
@@ -48,7 +50,7 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.AssertingOccurrence
             Mock.Assert(Sub() foo.Submit(), Occurs.Never())
         End Sub
 
-        <TestMethod> _
+        <TestMethod>
         Public Sub ShouldOccursOnce()
             ' ARRANGE
             ' Creating a mocked instance of the "IFoo" interface.
@@ -61,7 +63,7 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.AssertingOccurrence
             Mock.Assert(Sub() foo.Submit(), Occurs.Once())
         End Sub
 
-        <TestMethod> _
+        <TestMethod>
         Public Sub ShouldOccursAtLeastOnce()
             ' ARRANGE
             ' Creating a mocked instance of the "IFoo" interface.
@@ -81,7 +83,7 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.AssertingOccurrence
             Mock.Assert(Sub() foo.Submit(), Occurs.AtLeastOnce())
         End Sub
 
-        <TestMethod> _
+        <TestMethod>
         Public Sub ShouldOccursAtLeastCertainNumberOfTimes()
             ' ARRANGE
             ' Creating a mocked instance of the "IFoo" interface.
@@ -102,8 +104,8 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.AssertingOccurrence
             Mock.Assert(Sub() foo.Submit(), Occurs.AtLeast(3))
         End Sub
 
-        <TestMethod> _
-        <ExpectedException(GetType(AssertFailedException))> _
+        <TestMethod>
+        <ExpectedException(GetType(AssertFailedException))>
         Public Sub ShouldOccursCertainNumberOfTimesAtMost()
             ' ARRANGE
             ' Creating a mocked instance of the "IFoo" interface.
@@ -123,8 +125,8 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.AssertingOccurrence
             Mock.Assert(Sub() foo.Submit(), Occurs.AtMost(2))
         End Sub
 
-        <TestMethod> _
-        <ExpectedException(GetType(AssertFailedException))> _
+        <TestMethod>
+        <ExpectedException(GetType(AssertFailedException))>
         Public Sub ShouldOccursExactly()
             ' ARRANGE
             ' Creating a mocked instance of the "IFoo" interface.
@@ -145,8 +147,8 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.AssertingOccurrence
             Mock.Assert(Sub() foo.Submit(), Occurs.Exactly(3))
         End Sub
 
-        <TestMethod> _
-        <ExpectedException(GetType(AssertFailedException))> _
+        <TestMethod>
+        <ExpectedException(GetType(AssertFailedException))>
         Public Sub ShouldFailOnAssertAllWhenExpectionIsNotMet()
             ' ARRANGE
             ' Creating a mocked instance of the "IFoo" interface.
@@ -161,7 +163,7 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.AssertingOccurrence
             Mock.Assert(foo)
         End Sub
 
-        <TestMethod> _
+        <TestMethod>
         Public Sub ShouldArrangeOccursOnce()
             ' ARRANGE
             ' Creating a mocked instance of the "IFoo" interface.
@@ -177,7 +179,7 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.AssertingOccurrence
             Mock.Assert(foo)
         End Sub
 
-        <TestMethod> _
+        <TestMethod>
         Public Sub ShouldArrangeOccursNever()
             ' ARRANGE
             ' Creating a mocked instance of the "IFoo" interface.
@@ -192,7 +194,7 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.AssertingOccurrence
             Mock.Assert(foo)
         End Sub
 
-        <TestMethod> _
+        <TestMethod>
         Public Sub ShouldArrangeOccursAtLeast()
             ' ARRANGE
             ' Creating a mocked instance of the "IFoo" interface.
@@ -210,8 +212,8 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.AssertingOccurrence
             Mock.Assert(foo)
         End Sub
 
-        <TestMethod> _
-        <ExpectedException(GetType(AssertFailedException))> _
+        <TestMethod>
+        <ExpectedException(GetType(AssertFailedException))>
         Public Sub ShouldFailWhenInvokedMoreThanRequried()
             ' ARRANGE
             ' Creating a mocked instance of the "IFoo" interface.
@@ -226,7 +228,7 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.AssertingOccurrence
             foo.Submit() ' This throws an exception because foo.Submit is being called more times than specified.
         End Sub
 
-        <TestMethod> _
+        <TestMethod>
         Public Sub ShouldBeAbleToAssertOccursUsingMatcherForSimilarCallAtOneShot()
             ' ARRANGE
             ' Creating a mocked instance of the "IFoo" interface.
@@ -246,7 +248,7 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.AssertingOccurrence
             Mock.Assert(Function() foo.Echo(Arg.AnyInt), Occurs.Exactly(3))
         End Sub
 
-        <TestMethod> _
+        <TestMethod>
         Public Sub ShouldVerifyCallsOrder()
             ' ARRANGE
             ' Creating a mocked instance of the "IFoo" interface.
@@ -264,14 +266,14 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.AssertingOccurrence
             Mock.Assert(foo)
         End Sub
 
-        <TestMethod> _
+        <TestMethod>
         Public Sub ShouldAssertInOrderForDifferentInstancesInTestMethodScope()
             Dim userName As String = "Bob"
             Dim password As String = "Password"
             Dim userID As Integer = 5
-            Dim cart = New List(Of String)() From { _
-                "Foo", _
-                "Bar" _
+            Dim cart = New List(Of String)() From {
+                "Foo",
+                "Bar"
             }
 
             ' ARRANGE
