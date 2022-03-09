@@ -240,15 +240,23 @@ namespace Telerik.JustMock.Core
 			{
 			}
 
-			public bool ShouldInterceptMethod(Type type, MethodInfo methodInfo)
-			{
-				if (Attribute.IsDefined(methodInfo.DeclaringType, typeof(MixinAttribute)))
-					return false;
+            public bool ShouldInterceptMethod(Type type, MethodInfo methodInfo)
+            {
+                if (Attribute.IsDefined(methodInfo.DeclaringType, typeof(MixinAttribute)))
+                {
+                    return false;
+                }
 
-				bool profilerCannotIntercept = methodInfo.IsAbstract || methodInfo.IsExtern() || !ProfilerInterceptor.TypeSupportsInstrumentation(methodInfo.DeclaringType);
+                bool profilerCannotIntercept = methodInfo.IsAbstract || methodInfo.IsExtern() || !ProfilerInterceptor.TypeSupportsInstrumentation(methodInfo.DeclaringType);
 
-				if (ProfilerInterceptor.IsProfilerAttached && !profilerCannotIntercept)
-					return false;
+                if (ProfilerInterceptor.IsProfilerAttached && !profilerCannotIntercept)
+                {
+                    bool isDefaultMethodImplementation = !methodInfo.IsAbstract && methodInfo.DeclaringType.IsInterface;
+                    if (type == methodInfo.DeclaringType && !isDefaultMethodImplementation)
+                    {
+                        return false;
+                    }
+                }
 
 				return myInterceptorFilterImpl != null ? myInterceptorFilterImpl(methodInfo) : true;
 			}
