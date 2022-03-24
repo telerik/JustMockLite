@@ -1,6 +1,6 @@
 ﻿/*
  JustMock Lite
- Copyright © 2020 Progress Software Corporation
+ Copyright © 2020,2022 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -26,6 +26,14 @@ namespace Telerik.JustMock.Core
             return ProfilerInterceptor.GuardInternal(() =>
             {
                 return ArgExpr.IsAny<T>();
+            });
+        }
+
+        public Expression IsAny(Type type, params object[] args)
+        {
+            return ProfilerInterceptor.GuardInternal(() =>
+            {
+                return ArgExpr.IsAny(type, args);
             });
         }
 

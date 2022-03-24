@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015,2019,2021 Progress Software Corporation
+ Copyright © 2010-2015,2019,2021-2022 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -163,6 +163,15 @@ namespace Telerik.JustMock.Core
 						continue;
 					}
 
+					if (Attribute.IsDefined(matcherMethod, typeof(ArgIgnoreTypeAttribute)))
+					{
+						var func = Expression.Lambda(methodCall).Compile();
+						var funcResult = func.DynamicInvoke();
+						var argType = funcResult.GetType();
+						result[i] = argType;
+						continue;
+					}
+
 					if (Attribute.IsDefined(matcherMethod, typeof(ArgMatcherAttribute)))
 					{
 						var argType = matcherMethod.ReturnType;
@@ -243,12 +252,12 @@ namespace Telerik.JustMock.Core
 			for (int i = 0; i < ctorParameters.Length; ++i)
 			{
 				var paramType = ctorParameters[i].ParameterType;
-                if (paramType.IsValueType && args[i] == null)
-                    args[i] = paramType.GetDefaultValue();
-                else if (args[i] != null && !paramType.IsAssignableFrom(args[i].GetType()))
-                {
-                        args[i] = Convert.ChangeType(args[i], paramType, System.Globalization.CultureInfo.CurrentCulture);
-                }
+				if (paramType.IsValueType && args[i] == null)
+					args[i] = paramType.GetDefaultValue();
+				else if (args[i] != null && !paramType.IsAssignableFrom(args[i].GetType()))
+				{
+						args[i] = Convert.ChangeType(args[i], paramType, System.Globalization.CultureInfo.CurrentCulture);
+				}
 			}
 
 #if !PORTABLE
@@ -906,15 +915,15 @@ namespace Telerik.JustMock.Core
 			return null;
 		}
 
-        internal static MethodInfo UnwrapDelegateTarget(ref object obj)
-        {
-            var delg = obj as Delegate;
-            obj = delg != null ? delg.Target : obj;
-            return delg != null ? delg.Method : null;
-        }
+		internal static MethodInfo UnwrapDelegateTarget(ref object obj)
+		{
+			var delg = obj as Delegate;
+			obj = delg != null ? delg.Target : obj;
+			return delg != null ? delg.Method : null;
+		}
 
 #if !COREFX
-        [DllImport("user32.dll")]
+		[DllImport("user32.dll")]
 		private static extern bool IsImmersiveProcess(IntPtr hProcess);
 		private static bool? isMetro;
 		public static bool IsMetro()
@@ -940,18 +949,18 @@ namespace Telerik.JustMock.Core
 #endif
 
 #if !PORTABLE
-        public static Task<T> TaskFromObject<T>(object o)
-        {
-            T value = (T)o;
+		public static Task<T> TaskFromObject<T>(object o)
+		{
+			T value = (T)o;
 
-            return Task.Run(() => value);
-        }
+			return Task.Run(() => value);
+		}
 #endif
 
-        public static bool TryGetAs<T>(object o, out T v) where T : class
-        {
-            v = o as T;
-            return v != null;
-        }
-    }
+		public static bool TryGetAs<T>(object o, out T v) where T : class
+		{
+			v = o as T;
+			return v != null;
+		}
+	}
 }
