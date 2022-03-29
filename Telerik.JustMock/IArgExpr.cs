@@ -1,6 +1,6 @@
 ﻿/*
  JustMock Lite
- Copyright © 2020 Progress Software Corporation
+ Copyright © 2020,2022 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -36,6 +36,14 @@ namespace Telerik.JustMock
         /// <typeparam name="T">Type for the argument</typeparam>
         /// <returns>Argument type</returns>
         Expression IsAny<T>();
+
+		/// <summary>
+		/// Matches argument for any value of a given type.
+		/// </summary>
+		/// <param name="type">Type for the argument</param>
+		/// <param name="args">Constructor arguments</param>
+		/// <returns>Argument type</returns>
+        Expression IsAny(Type type, params object[] args);
 
         /// <summary>
         /// Matches argument for the expected condition.

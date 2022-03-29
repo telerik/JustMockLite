@@ -133,7 +133,7 @@ namespace Telerik.JustMock.Core
                             var paramType = byref ? p.ParameterType.GetElementType() : p.ParameterType;
                             if (paramType.IsPointer)
                                 paramType = typeof(IntPtr);
-                            var isAny = (Expression)typeof(ArgExpr).GetMethod("IsAny").MakeGenericMethod(paramType).Invoke(null, null);
+                            var isAny = (Expression)typeof(ArgExpr).GetMethod("IsAny", new Type[] { }).MakeGenericMethod(paramType).Invoke(null, null);
                             if (byref)
                             {
                                 isAny = ArgExpr.Ref(isAny);
