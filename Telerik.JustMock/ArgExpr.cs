@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2022 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -23,24 +23,24 @@ using Telerik.JustMock.Core.MatcherTree;
 
 namespace Telerik.JustMock
 {
-    /// <summary>
-    /// Allows specification of a matching condition for an argument for a non-public method, rather
-    /// a specific value.
-    /// </summary>
+	/// <summary>
+	/// Allows specification of a matching condition for an argument for a non-public method, rather
+	/// a specific value.
+	/// </summary>
 #if !PORTABLE
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
+	[Browsable(false)]
+	[EditorBrowsable(EditorBrowsableState.Never)]
 #endif
-    public partial class ArgExpr
+	public partial class ArgExpr
 	{
 		internal ArgExpr() { }
 
-        /// <summary>
-        /// Matches argument for any value.
-        /// </summary>
-        /// <typeparam name="T">Type for the argument</typeparam>
-        /// <returns>Argument type</returns>
-        public static Expression IsAny<T>()
+		/// <summary>
+		/// Matches argument for any value.
+		/// </summary>
+		/// <typeparam name="T">Type for the argument</typeparam>
+		/// <returns>Argument type</returns>
+		public static Expression IsAny<T>()
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{
@@ -49,15 +49,30 @@ namespace Telerik.JustMock
 			});
 		}
 
-        /// <summary>
-        /// Matches argument for the expected condition.
-        /// </summary>
-        /// <typeparam name="T">
-        /// Contains the type of the argument.
-        /// </typeparam>
-        /// <param name="match">Matcher expression</param>
-        /// <returns>Argument type</returns>
-        public static Expression Matches<T>(Expression<Predicate<T>> match)
+		/// <summary>
+		/// Matches argument for any value of a given type.
+		/// </summary>
+		/// <param name="type">Type for the argument</param>
+		/// <param name="args">Constructor arguments</param>
+		/// <returns>Argument type</returns>
+		public static Expression IsAny(Type type, params object[] args)
+		{
+			return ProfilerInterceptor.GuardInternal(() =>
+			{
+				Expression<Func<object>> expr = () => Arg.IsAny(type, args);
+				return expr.Body;
+			});
+		}
+
+		/// <summary>
+		/// Matches argument for the expected condition.
+		/// </summary>
+		/// <typeparam name="T">
+		/// Contains the type of the argument.
+		/// </typeparam>
+		/// <param name="match">Matcher expression</param>
+		/// <returns>Argument type</returns>
+		public static Expression Matches<T>(Expression<Predicate<T>> match)
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 			{

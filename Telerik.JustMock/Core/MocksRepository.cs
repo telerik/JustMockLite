@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015,2018-2019,2021 Progress Software Corporation
+ Copyright © 2010-2015,2018-2019,2021-2022 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -1170,6 +1170,12 @@ namespace Telerik.JustMock.Core
                 if (argAttribute.GetType() == typeof(ArgIgnoreAttribute))
                 {
                     return new TypeMatcher(argExpr.Type);
+                }
+                else if (argAttribute.GetType() == typeof(ArgIgnoreTypeAttribute))
+                {
+                    var func = Expression.Lambda(argExpr).Compile();
+                    var funcResult = func.DynamicInvoke();
+                    return new TypeMatcher(funcResult.GetType());
                 }
                 else if (argAttribute.GetType() == typeof(RefArgAttribute) || argAttribute.GetType() == typeof(OutArgAttribute))
                 {

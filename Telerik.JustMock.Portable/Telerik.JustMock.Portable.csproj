@@ -49,6 +49,9 @@
     <Compile Include="..\Telerik.JustMock\Arg.cs">
       <Link>Arg.cs</Link>
     </Compile>
+    <Compile Include="..\Telerik.JustMock\Arg.Internal.cs">
+      <Link>Arg.Internal.cs</Link>
+    </Compile>
     <Compile Include="..\Telerik.JustMock\Arg.part.cs">
       <Link>Arg.part.cs</Link>
     </Compile>
@@ -249,6 +252,9 @@
     </Compile>
     <Compile Include="..\Telerik.JustMock\Core\MatcherTree\ArgIgnoreAttribute.cs">
       <Link>Core\MatcherTree\ArgIgnoreAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Telerik.JustMock\Core\MatcherTree\ArgIgnoreTypeAttribute.cs">
+      <Link>Core\MatcherTree\ArgIgnoreTypeAttribute.cs</Link>
     </Compile>
     <Compile Include="..\Telerik.JustMock\Core\MatcherTree\ArgMatcherAttribute.cs">
       <Link>Core\MatcherTree\ArgMatcherAttribute.cs</Link>
