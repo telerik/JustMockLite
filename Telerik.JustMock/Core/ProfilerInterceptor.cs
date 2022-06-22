@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015,2021 Progress Software Corporation
+ Copyright © 2010-2015,2021,2022 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -29,6 +29,9 @@ using Telerik.JustMock.Diagnostics;
 using Telerik.JustMock.Setup;
 #if DEBUG
 using Telerik.JustMock.Helpers;
+#endif
+#if NETCORE
+using System.Runtime.InteropServices;
 #endif
 
 namespace Telerik.JustMock.Core
@@ -160,6 +163,10 @@ namespace Telerik.JustMock.Core
 			{
 				bridge = bridge.MakeGenericType(typeof(object));
 
+#if !DEBUG
+				CheckProfilerCompatibility();
+#endif
+
 				CreateDelegateFromBridge("GetUninitializedObject", out GetUninitializedObjectImpl);
 				CreateDelegateFromBridge("CreateStrongNameAssemblyName", out CreateStrongNameAssemblyNameImpl);
 				CreateDelegateFromBridge("RunClassConstructor", out runClassConstructor);
@@ -180,26 +187,52 @@ namespace Telerik.JustMock.Core
 			Assembly justMockAssembly = Assembly.GetExecutingAssembly();
 			Version justMockAssemblyVersion = new AssemblyName(justMockAssembly.FullName).Version;
 
+			string profilerVersion = "0000.0.0.0";
 			MethodInfo getProfilerVersion = bridge.GetMethod("GetProfilerVersion");
-			if (getProfilerVersion == null)
-				throw new MockException("Telerik.CodeWeaver.Profiler.dll is old.\nRegister the updated version.");
-
-			string profilerVersion = (string)getProfilerVersion.Invoke(null, null);
+			if (getProfilerVersion != null)
+			{
+				profilerVersion = (string)getProfilerVersion.Invoke(null, null);
+			}
 			JMDebug.Assert(null != profilerVersion);
 			var codeWeaverAssemblyVersion = new Version(profilerVersion);
-			int comparison = justMockAssemblyVersion.CompareTo(codeWeaverAssemblyVersion);
 
-			if (comparison != 0)
+			if (justMockAssemblyVersion.CompareTo(codeWeaverAssemblyVersion) != 0)
 			{
-				string baseMessage = string.Format("Telerik.JustMock.dll version: {0}\nTelerik.CodeWeaver.Profiler.dll version: {1}\n",
+				string errorMessage = string.Format("JustMock is configured to use an incompatible profiler:" + Environment.NewLine
+					+ "\tTelerik.JustMock.dll version: {0}" + Environment.NewLine
+					+ "\tTelerik.CodeWeaver.Profiler{1} version: {2}" + Environment.NewLine
+					+ "If you are using JustMock inside Visual Studio, please verify that the version of the locally installed product and the referenced one via NuGet package or assembly are identical." + Environment.NewLine
+					+ "On the command line, ensure that the environment is configured to use the JustMock profiler with a version matching the referenced JustMock assembly." + Environment.NewLine,
 					justMockAssemblyVersion.ToString(),
+					GetProfilerExtension(),
 					codeWeaverAssemblyVersion.ToString());
 
-				if (comparison < 0)
-					throw new MockException(baseMessage + "Update Telerik.JustMock.dll references."); // Old Telerik.JustMock.dll.
-				else
-					throw new MockException(baseMessage + "Register the updated Telerik.CodeWeaver.Profiler.dll."); // Old Telerik.CodeWeaver.Profiler.dll registered.
+				throw new MockException(errorMessage);
 			}
+		}
+
+		private static string GetProfilerExtension()
+		{
+#if !NETCORE
+			return ".dll";
+#else
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				return ".dll";
+			}
+			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+			{
+				return ".so";
+			}
+			else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+			{
+				return ".dylib";
+			}
+			else
+			{
+				return string.Empty;
+			}
+#endif
 		}
 
 		public static void Initialize()
@@ -211,8 +244,6 @@ namespace Telerik.JustMock.Core
 			{
 				if (!IsInterceptionSetup)
 				{
-					//CheckProfilerCompatibility();
-
 					FinalizerThreadIdentifier.Identify();
 
 					var processInvocationType = typeof(object).Assembly.GetType("Telerik.JustMock.ProcessInvocationDelegate");
