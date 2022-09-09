@@ -53,6 +53,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)OutRefFixure.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertiesFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RecursiveFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ReturnAsyncFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ReturnsFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SequenceFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SerializableFixture.cs" />

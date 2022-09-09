@@ -131,6 +131,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>IWhen.tt</DependentUpon>
     </Compile>
+    <Compile Update="Expectations\AsyncExtensions.partial.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>AsyncExtensions.tt</DependentUpon>
+    </Compile>
     <Compile Update="IArgExpr.part.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -212,6 +217,10 @@
     <None Update="Core\ArgExprImplementation.part.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>ArgExprImplementation.part.cs</LastGenOutput>
+    </None>
+    <None Update="Expectations\AsyncExtensions.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>AsyncExtensions.partial.cs</LastGenOutput>
     </None>
     <None Update="IArgExpr.part.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
