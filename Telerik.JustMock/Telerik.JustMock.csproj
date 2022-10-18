@@ -10,7 +10,7 @@
     <Description></Description>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <CommonConstants>NO_EXCEPTION_SERIALIZATION</CommonConstants>
+    <CommonConstants>NO_EXCEPTION_SERIALIZATION;FEATURE_EMIT_CUSTOMMODIFIERS</CommonConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(PreviewTargetFramework)' != '' ">
     <NetCoreSupportedVersions>$(NetCoreSupportedVersions);$(PreviewTargetFramework)</NetCoreSupportedVersions>
