@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <NetCoreSupportedVersions>netcoreapp2.0</NetCoreSupportedVersions>
-    <TargetFrameworks>net45;$(NetCoreSupportedVersions)</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1</TargetFrameworks>
     <Configurations>Debug;Release;ReleaseFree;DebugFree</Configurations>
     <AssemblyName>Telerik.JustMock</AssemblyName>
     <RootNamespace>Telerik.JustMock</RootNamespace>
@@ -54,10 +53,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net45' ">
-    <DefineConstants>$(DefineConstants);FEATURE_REMOTING;FEATURE_APPDOMAIN;FEATURE_ASSEMBLYBUILDER_SAVE</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(NetCoreSupportedVersions.Contains('$(TargetFramework)'))">
+  <PropertyGroup>
     <DefineConstants>$(DefineConstants);NETCORE;NO_APPDOMAIN_ISOLATION</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
@@ -84,12 +80,6 @@
   <PropertyGroup>
     <PostBuildEvent />
   </PropertyGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.XML" />
-  </ItemGroup>
   <ItemGroup>
     <None Remove="Core\DynamicProxy\DynamicProxy.snk" />
   </ItemGroup>
@@ -199,12 +189,7 @@
     </None>
     <None Include="TextBuilder.include" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
-    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
-    <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
-    <PackageReference Include="System.Security.Permissions" Version="4.5.0" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0' Or '$(TargetFramework)' == 'net6.0' Or '$(TargetFramework)' == 'net7.0'">
+  <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
     <PackageReference Include="System.Security.Permissions" Version="5.0" />
