@@ -2,7 +2,7 @@
   <Import Project="..\..\JustMockLite\Build\Config.targets"></Import>
   
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <Configurations>Debug;Release;ReleaseFree;DebugFree</Configurations>
     <AssemblyName>Telerik.JustMock.MSTest.Tests</AssemblyName>
     <RootNamespace>Telerik.JustMock.Tests</RootNamespace>
@@ -73,7 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Dynamic.Runtime " Version="4.3.0" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">

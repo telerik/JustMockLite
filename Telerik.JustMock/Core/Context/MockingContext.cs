@@ -158,7 +158,7 @@ namespace Telerik.JustMock.Core.Context
 		private static PluginLoadHelper pluginLoadHelper;
 #if NETCORE
         private const string NET_CORE_DESC_PATTERN = @".NET(\sCore)?\s(\d+(\.)?)+";
-        private const string NET_CORE_SUBDIR = "netcoreapp2.1";
+        private const string NET_CORE_SUBDIR = "netcoreapp3.1";
 #endif
 #endif
 
