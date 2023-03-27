@@ -81,7 +81,18 @@ namespace Telerik.JustMock.Tests
 
 		public delegate void DoDelegate(ref IntPtr arg);
 
-		[TestMethod, TestCategory("Interop")]
+#if NET70
+#if XUNIT
+		[TestMethod(Skip = SkipReason.Value)]
+#elif NUNIT
+		[TestMethod, Ignore("")]
+#else
+		[TestMethod, Ignore]
+#endif
+#else
+        [TestMethod]
+#endif
+		[TestCategory("Interop")]
 		public void ShouldPassPointersByRef()
 		{
 			var mock = Mock.Create<UnsafeClassRef>();
