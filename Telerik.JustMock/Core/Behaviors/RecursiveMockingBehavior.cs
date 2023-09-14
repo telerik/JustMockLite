@@ -163,9 +163,9 @@ namespace Telerik.JustMock.Core.Behaviors
 					? CreateMock(elementType, repository, invocation)
 					: elementType.GetDefaultValue();
 
-				Expression<Func<Task<object>>> taskFromResult = () => MockingUtil.TaskFromResult((object)null);
-				mock = ((MethodCallExpression)taskFromResult.Body).Method
-					.GetGenericMethodDefinition()
+				var taskFromResultMethod = typeof(MockingUtil).GetMethod("TaskFromResult", BindingFlags.Static | BindingFlags.Public);
+
+				mock = taskFromResultMethod
 					.MakeGenericMethod(elementType)
 					.Invoke(null, new object[] { taskResultValue });
 			}
@@ -188,6 +188,10 @@ namespace Telerik.JustMock.Core.Behaviors
 				if (typeof(String) == returnType)
 				{
 					mock = String.Empty;
+				}
+				else if (returnType.IsValueType)
+				{
+					mock = returnType.GetDefaultValue();
 				}
 				else
 				{
