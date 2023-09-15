@@ -18,6 +18,7 @@
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 using Telerik.JustMock.Core.Context;
 using Telerik.JustMock.Setup;
@@ -49,13 +50,12 @@ namespace Telerik.JustMock.Core.Behaviors
 
             var elementType = returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>)
                     ? returnType.GetGenericArguments()[0] : typeof(object);
-            Expression<Func<Task<object>>> taskFromException =
-                () => MockingUtil.TaskFromException<object>((Exception)null);
-            var mock =
-                ((MethodCallExpression)taskFromException.Body).Method
-                    .GetGenericMethodDefinition()
-                    .MakeGenericMethod(elementType)
-                    .Invoke(null, new object[] { this.exception });
+
+            var taskFromException = typeof(MockingUtil).GetMethod("TaskFromException", BindingFlags.Static | BindingFlags.Public);
+
+            var mock = taskFromException
+                .MakeGenericMethod(elementType)
+                .Invoke(null, new object[] { this.exception });
 
             var parentMock = invocation.MockMixin;
             var mockMixin = MocksRepository.GetMockMixin(mock, null);
