@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015,2021,2022 Progress Software Corporation
+ Copyright © 2010-2015,2021-2023 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -161,6 +161,14 @@ namespace Telerik.JustMock.Core
 			}
 			else
 			{
+				var newObjInterceptionOnOverwriteEnabledEnv = Environment.GetEnvironmentVariable("JUSTMOCK_NEWOBJ_INTERCEPTION_ON_OVERWRITE_ENABLED");
+				NewObjInterceptionOnOverwriteEnabled =
+					!string.IsNullOrEmpty(newObjInterceptionOnOverwriteEnabledEnv)
+						?
+							newObjInterceptionOnOverwriteEnabledEnv == "1"
+							:
+							true;
+
 				bridge = bridge.MakeGenericType(typeof(object));
 
 #if !DEBUG
@@ -683,6 +691,8 @@ namespace Telerik.JustMock.Core
 		public static readonly Func<Type, object> GetUninitializedObjectImpl;
 		public static readonly Func<string, byte[], object> CreateStrongNameAssemblyNameImpl;
 		public static readonly Func<Type, object[], object> CreateInstanceWithArgsImpl;
+
+		public static bool NewObjInterceptionOnOverwriteEnabled { get; private set; }
 
 		private static readonly Type bridge;
 		private static readonly Func<string/*module mvid or name (SL)*/, int /*typedef token*/, int /*id*/> GetTypeIdImpl;
