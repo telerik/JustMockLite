@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015,2019,2021 Progress Software Corporation
+ Copyright © 2010-2015,2019,2021,2023 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -19,9 +19,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading;
 using Telerik.JustMock.Core;
 using Telerik.JustMock.Core.Behaviors;
+using Telerik.JustMock.Core.Context;
 using Telerik.JustMock.Core.MatcherTree;
 using Telerik.JustMock.Expectations.Abstraction;
 
@@ -41,8 +43,8 @@ namespace Telerik.JustMock.Expectations
 		IMockMixin IMethodMock.Mock { get; set; }
 
 		bool IMethodMock.IsSequential { get; set; }
-        bool IMethodMock.IsInOrder { get; set; }
-        bool IMethodMock.IsUsed { get; set; }
+		bool IMethodMock.IsInOrder { get; set; }
+		bool IMethodMock.IsUsed { get; set; }
 		CallPattern IMethodMock.CallPattern { get; set; }
 		ICollection<IBehavior> IMethodMock.Behaviors { get { return this.behaviors; } }
 		InvocationOccurrenceBehavior IMethodMock.OccurencesBehavior { get { return this.occurences; } }
@@ -91,6 +93,55 @@ namespace Telerik.JustMock.Expectations
 		/// <param name="ignoreDelegateReturnValue"></param>
 		protected void ProcessDoInstead(Delegate delg, bool ignoreDelegateReturnValue)
 		{
+
+#if !PORTABLE
+			// force interception of construcor declaring type used in each newobj IL instruction
+			// in elevated mode, this will allow those types to be successfully resolved by the
+			// profiler while instrumenting newobj instructions on the JIT phase
+			if (ProfilerInterceptor.IsProfilerAttached
+				&& ProfilerInterceptor.NewObjInterceptionOnOverwriteEnabled
+				&& !ProfilerInterceptor.IsReJitEnabled)
+			{
+				MockingUtil.MethodBodyDisassembler.DisassembleMethodInfo(this.CallPattern.Method)
+					.Where(instr => instr.OpCode == System.Reflection.Emit.OpCodes.Newobj)
+					.ToList()
+					.ForEach(instr =>
+						{
+							try
+							{
+								var objCtor = this.CallPattern.Method.DeclaringType.Module.ResolveMethod(instr.Operand.Int);
+								MockingContext.CurrentRepository.EnableInterception(objCtor.DeclaringType);
+							}
+							catch (ArgumentException)
+							{
+								// as a last shot, try to load referenced assemblies by the constructor declaring type
+								try
+								{
+									var notLoadedReferencedAssemblyNames = this.CallPattern.Method.DeclaringType.Assembly.GetReferencedAssemblies()
+										.Where(assemblyName =>
+											!AppDomain.CurrentDomain.GetAssemblies()
+												.Select(assembly => assembly.GetName())
+												.Contains(assemblyName));
+
+									foreach (var notLoadedReferencedAssemblyName in notLoadedReferencedAssemblyNames)
+									{
+										var manuallyLoadedReferencedAssembly = Assembly.Load(notLoadedReferencedAssemblyName.FullName);
+										if (manuallyLoadedReferencedAssembly.GetExportedTypes()
+												.SelectMany(type => type.GetConstructors())
+												.Select(ctor => ctor.MetadataToken)
+												.Contains(instr.Operand.Int))
+										{
+											break;
+										}
+									}
+								}
+								catch (Exception) { }
+							}
+							catch (Exception) { }
+						});
+			}
+#endif
+
 			if (delg == null)
 			{
 				var returnType = CallPattern.Method.GetReturnType();
@@ -442,8 +493,8 @@ namespace Telerik.JustMock.Expectations
 		{
 			return ProfilerInterceptor.GuardInternal(() =>
 				{
-                    (this as IMethodMock).IsInOrder = true;
-                    this.behaviors.Add(new InOrderBehavior(this.Repository, this.Mock, message));
+					(this as IMethodMock).IsInOrder = true;
+					this.behaviors.Add(new InOrderBehavior(this.Repository, this.Mock, message));
 					return this;
 				});
 		}
