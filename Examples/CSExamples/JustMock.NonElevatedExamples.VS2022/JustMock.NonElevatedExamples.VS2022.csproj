@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>JustMock.NonElevatedExamples.VS2022</RootNamespace>
-    <TargetFramework>net6</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -15,7 +15,7 @@
   
   <ItemGroup>
     <Reference Include="Telerik.JustMock">
-      <HintPath>$(registry:HKEY_LOCAL_MACHINE\Software\Telerik\JustMock@BinaryPath)netcoreapp2.0\Telerik.JustMock.dll</HintPath>
+      <HintPath>$(registry:HKEY_LOCAL_MACHINE\Software\Telerik\JustMock@BinaryPath)\netcoreapp2.0\Telerik.JustMock.dll</HintPath>
     </Reference>
   </ItemGroup>
 
