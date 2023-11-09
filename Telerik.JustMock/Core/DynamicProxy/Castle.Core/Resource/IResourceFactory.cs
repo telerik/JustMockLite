@@ -1,4 +1,4 @@
-// Copyright 2004-2009 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
 	using System;
 
-    /// <summary>
-    /// Depicts the contract for resource factories.
-    /// </summary>
-    internal interface IResourceFactory
+	/// <summary>
+	/// Depicts the contract for resource factories.
+	/// </summary>
+	internal interface IResourceFactory
 	{
 		/// <summary>
 		/// Used to check whether the resource factory
@@ -31,25 +31,18 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 		/// only if the given identifier is supported
 		/// by the resource factory
 		/// </remarks>
-		/// <param name="uri"></param>
-		/// <returns></returns>
 		bool Accept(CustomUri uri);
 
 		/// <summary>
 		/// Creates an <see cref="IResource"/> instance
 		/// for the given resource identifier
 		/// </summary>
-		/// <param name="uri"></param>
-		/// <returns></returns>
 		IResource Create(CustomUri uri);
 
 		/// <summary>
 		/// Creates an <see cref="IResource"/> instance
 		/// for the given resource identifier
 		/// </summary>
-		/// <param name="uri"></param>
-		/// <param name="basePath"></param>
-		/// <returns></returns>
-		IResource Create(CustomUri uri, String basePath);
+		IResource Create(CustomUri uri, string basePath);
 	}
 }

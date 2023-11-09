@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,32 +27,31 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 	using Telerik.JustMock.Core.Castle.Core.Logging;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.CodeBuilders;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
-    using Telerik.JustMock.Core.Castle.Core.Internal;
 
-#if NETCORE
-    using Debug = Telerik.JustMock.Diagnostics.JMDebug;
-#else
-using Debug = System.Diagnostics.Debug;
-#endif
-
-    /// <summary>
-    ///   Base class that exposes the common functionalities
-    ///   to proxy generation.
-    /// </summary>
-    internal abstract class BaseProxyGenerator
+	/// <summary>
+	///   Base class that exposes the common functionalities
+	///   to proxy generation.
+	/// </summary>
+	internal abstract class BaseProxyGenerator
 	{
 		protected readonly Type targetType;
+		protected readonly Type[] interfaces;
 		private readonly ModuleScope scope;
 		private ILogger logger = NullLogger.Instance;
 		private ProxyGenerationOptions proxyGenerationOptions;
 
-		protected BaseProxyGenerator(ModuleScope scope, Type targetType)
+		protected BaseProxyGenerator(ModuleScope scope, Type targetType, Type[] interfaces, ProxyGenerationOptions proxyGenerationOptions)
 		{
+			CheckNotGenericTypeDefinition(targetType, nameof(targetType));
+			CheckNotGenericTypeDefinitions(interfaces, nameof(interfaces));
+
 			this.scope = scope;
 			this.targetType = targetType;
+			this.interfaces = TypeUtil.GetAllInterfaces(interfaces);
+			this.proxyGenerationOptions = proxyGenerationOptions;
+			this.proxyGenerationOptions.Initialize();
 		}
 
 		public ILogger Logger
@@ -63,22 +62,7 @@ using Debug = System.Diagnostics.Debug;
 
 		protected ProxyGenerationOptions ProxyGenerationOptions
 		{
-			get
-			{
-				if (proxyGenerationOptions == null)
-				{
-					throw new InvalidOperationException("ProxyGenerationOptions must be set before being retrieved.");
-				}
-				return proxyGenerationOptions;
-			}
-			set
-			{
-				if (proxyGenerationOptions != null)
-				{
-					throw new InvalidOperationException("ProxyGenerationOptions can only be set once.");
-				}
-				proxyGenerationOptions = value;
-			}
+			get { return proxyGenerationOptions; }
 		}
 
 		protected ModuleScope Scope
@@ -86,11 +70,38 @@ using Debug = System.Diagnostics.Debug;
 			get { return scope; }
 		}
 
+		public Type GetProxyType()
+		{
+			bool notFoundInTypeCache = false;
+
+			var proxyType = Scope.TypeCache.GetOrAdd(GetCacheKey(), cacheKey =>
+			{
+				notFoundInTypeCache = true;
+				Logger.DebugFormat("No cached proxy type was found for target type {0}.", targetType.FullName);
+
+				EnsureOptionsOverrideEqualsAndGetHashCode();
+
+				var name = Scope.NamingScope.GetUniqueName("Castle.Proxies." + targetType.Name + "Proxy");
+				return GenerateType(name, Scope.NamingScope.SafeSubScope());
+			});
+
+			if (!notFoundInTypeCache)
+			{
+				Logger.DebugFormat("Found cached proxy type {0} for target type {1}.", proxyType.FullName, targetType.FullName);
+			}
+
+			return proxyType;
+		}
+
+		protected abstract CacheKey GetCacheKey();
+
+		protected abstract Type GenerateType(string name, INamingScope namingScope);
+
 		protected void AddMapping(Type @interface, ITypeContributor implementer, IDictionary<Type, ITypeContributor> mapping)
 		{
 			Debug.Assert(implementer != null, "implementer != null");
 			Debug.Assert(@interface != null, "@interface != null");
-			Debug.Assert(@interface.GetTypeInfo().IsInterface, "@interface.IsInterface");
+			Debug.Assert(@interface.IsInterface, "@interface.IsInterface");
 
 			if (!mapping.ContainsKey(@interface))
 			{
@@ -109,31 +120,23 @@ using Debug = System.Diagnostics.Debug;
 		/// <summary>
 		///   It is safe to add mapping (no mapping for the interface exists)
 		/// </summary>
-		/// <param name = "implementer"></param>
-		/// <param name = "interface"></param>
-		/// <param name = "mapping"></param>
 		protected void AddMappingNoCheck(Type @interface, ITypeContributor implementer,
 		                                 IDictionary<Type, ITypeContributor> mapping)
 		{
 			mapping.Add(@interface, implementer);
 		}
 
-		protected void AddToCache(CacheKey key, Type type)
-		{
-			scope.RegisterInCache(key, type);
-		}
-
 		protected virtual ClassEmitter BuildClassEmitter(string typeName, Type parentType, IEnumerable<Type> interfaces)
 		{
-			CheckNotGenericTypeDefinition(parentType, "parentType");
-			CheckNotGenericTypeDefinitions(interfaces, "interfaces");
+			CheckNotGenericTypeDefinition(parentType, nameof(parentType));
+			CheckNotGenericTypeDefinitions(interfaces, nameof(interfaces));
 
 			return new ClassEmitter(Scope, typeName, parentType, interfaces);
 		}
 
 		protected void CheckNotGenericTypeDefinition(Type type, string argumentName)
 		{
-			if (type != null && type.GetTypeInfo().IsGenericTypeDefinition)
+			if (type != null && type.IsGenericTypeDefinition)
 			{
 				throw new ArgumentException("Type cannot be a generic type definition. Type: " + type.FullName, argumentName);
 			}
@@ -151,7 +154,7 @@ using Debug = System.Diagnostics.Debug;
 			}
 		}
 
-		protected void CompleteInitCacheMethod(ConstructorCodeBuilder constCodeBuilder)
+		protected void CompleteInitCacheMethod(CodeBuilder constCodeBuilder)
 		{
 			constCodeBuilder.AddStatement(new ReturnStatement());
 		}
@@ -189,22 +192,22 @@ using Debug = System.Diagnostics.Debug;
 
 		protected virtual void CreateTypeAttributes(ClassEmitter emitter)
 		{
-			emitter.AddCustomAttributes(ProxyGenerationOptions);
+			emitter.AddCustomAttributes(ProxyGenerationOptions.AdditionalAttributes);
 #if FEATURE_SERIALIZATION
 			emitter.DefineCustomAttribute<XmlIncludeAttribute>(new object[] { targetType });
 #endif
 		}
 
-		protected void EnsureOptionsOverrideEqualsAndGetHashCode(ProxyGenerationOptions options)
+		protected void EnsureOptionsOverrideEqualsAndGetHashCode()
 		{
 			if (Logger.IsWarnEnabled)
 			{
 				// Check the proxy generation hook
-				if (!OverridesEqualsAndGetHashCode(options.Hook.GetType()))
+				if (!OverridesEqualsAndGetHashCode(ProxyGenerationOptions.Hook.GetType()))
 				{
 					Logger.WarnFormat("The IProxyGenerationHook type {0} does not override both Equals and GetHashCode. " +
 					                  "If these are not correctly overridden caching will fail to work causing performance problems.",
-					                  options.Hook.GetType().FullName);
+					                  ProxyGenerationOptions.Hook.GetType().FullName);
 				}
 
 				// Interceptor selectors no longer need to override Equals and GetHashCode
@@ -213,17 +216,17 @@ using Debug = System.Diagnostics.Debug;
 
 		protected void GenerateConstructor(ClassEmitter emitter, ConstructorInfo baseConstructor,
 		                                   params FieldReference[] fields)
-        {
-            GenerateConstructor(emitter, baseConstructor, ProxyConstructorImplementation.CallBase, fields);
-        }
+		{
+			GenerateConstructor(emitter, baseConstructor, ProxyConstructorImplementation.CallBase, fields);
+		}
 
-        protected void GenerateConstructor(ClassEmitter emitter, ConstructorInfo baseConstructor,
-                                           ProxyConstructorImplementation impl, params FieldReference[] fields)
-        {
-            if (impl == ProxyConstructorImplementation.SkipConstructor)
-                return;
+		protected void GenerateConstructor(ClassEmitter emitter, ConstructorInfo baseConstructor,
+		                                   ProxyConstructorImplementation impl, params FieldReference[] fields)
+		{
+			if (impl == ProxyConstructorImplementation.SkipConstructor)
+				return;
 
-            ArgumentReference[] args;
+			ArgumentReference[] args;
 			ParameterInfo[] baseConstructorParams = null;
 
 			if (baseConstructor != null)
@@ -239,8 +242,8 @@ using Debug = System.Diagnostics.Debug;
 				for (var i = offset; i < offset + baseConstructorParams.Length; i++)
 				{
 					var paramInfo = baseConstructorParams[i - offset];
-                    args[i] = new ArgumentReference(paramInfo.ParameterType, paramInfo.DefaultValue);
-                }
+					args[i] = new ArgumentReference(paramInfo.ParameterType, paramInfo.DefaultValue);
+				}
 			}
 			else
 			{
@@ -255,38 +258,38 @@ using Debug = System.Diagnostics.Debug;
 			var constructor = emitter.CreateConstructor(args);
 			if (baseConstructorParams != null && baseConstructorParams.Length != 0)
 			{
-                var last = baseConstructorParams.Last();
-                if (last.ParameterType.IsArray && last.IsDefined(typeof(ParamArrayAttribute)))
-                {
-                    var parameter = constructor.ConstructorBuilder.DefineParameter(args.Length, ParameterAttributes.None, last.Name);
-                    var builder = AttributeUtil.CreateBuilder<ParamArrayAttribute>();
-                    parameter.SetCustomAttribute(builder);
-                }
-            }
+				var last = baseConstructorParams.Last();
+				if (last.ParameterType.IsArray && last.IsDefined(typeof(ParamArrayAttribute)))
+				{
+					var parameter = constructor.ConstructorBuilder.DefineParameter(args.Length, ParameterAttributes.None, last.Name);
+					var builder = AttributeUtil.CreateBuilder<ParamArrayAttribute>();
+					parameter.SetCustomAttribute(builder);
+				}
+			}
 
 			for (var i = 0; i < fields.Length; i++)
 			{
-				constructor.CodeBuilder.AddStatement(new AssignStatement(fields[i], args[i].ToExpression()));
+				constructor.CodeBuilder.AddStatement(new AssignStatement(fields[i], args[i]));
 			}
 
-            // Invoke base constructor
+			// Invoke base constructor
 
-            if (impl == ProxyConstructorImplementation.CallBase)
-            {
-                if (baseConstructor != null)
-                {
-                    Debug.Assert(baseConstructorParams != null);
+			if (impl == ProxyConstructorImplementation.CallBase)
+			{
+			    if (baseConstructor != null)
+			    {
+			    	Debug.Assert(baseConstructorParams != null);
 
-                    var slice = new ArgumentReference[baseConstructorParams.Length];
-                    Array.Copy(args, fields.Length, slice, 0, baseConstructorParams.Length);
+			    	var slice = new ArgumentReference[baseConstructorParams.Length];
+			    	Array.Copy(args, fields.Length, slice, 0, baseConstructorParams.Length);
 
-                    constructor.CodeBuilder.InvokeBaseConstructor(baseConstructor, slice);
-                }
-                else
-                {
-                    constructor.CodeBuilder.InvokeBaseConstructor();
-                }
-            }
+			    	constructor.CodeBuilder.AddStatement(new ConstructorInvocationStatement(baseConstructor, slice));
+			    }
+			    else
+			    {
+				    constructor.CodeBuilder.AddStatement(new ConstructorInvocationStatement(emitter.BaseType));
+			    }
+			}
 
 			constructor.CodeBuilder.AddStatement(new ReturnStatement());
 		}
@@ -296,25 +299,25 @@ using Debug = System.Diagnostics.Debug;
 			var constructors =
 				baseType.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
-            var ctorGenerationHook = (ProxyGenerationOptions.Hook as IConstructorGenerationHook) ?? AllMethodsHook.Instance;
-            bool defaultCtorConsidered = false;
-            foreach (var constructor in constructors)
-            {
-                if (constructor.GetParameters().Length == 0)
-                    defaultCtorConsidered = true;
+			var ctorGenerationHook = (ProxyGenerationOptions.Hook as IConstructorGenerationHook) ?? AllMethodsHook.Instance;
+			bool defaultCtorConsidered = false;
+			foreach (var constructor in constructors)
+			{
+				if (constructor.GetParameters().Length == 0)
+					defaultCtorConsidered = true;
 
-                bool ctorVisible = IsConstructorVisible(constructor);
-                var analysis = new ConstructorImplementationAnalysis(ctorVisible);
-                var impl = ctorGenerationHook.GetConstructorImplementation(constructor, analysis);
+				bool ctorVisible = IsConstructorVisible(constructor);
+				var analysis = new ConstructorImplementationAnalysis(ctorVisible);
+				var impl = ctorGenerationHook.GetConstructorImplementation(constructor, analysis);
 
-                GenerateConstructor(emitter, constructor, impl, fields);
-            }
+				GenerateConstructor(emitter, constructor, impl, fields);
+			}
 
-            if (!defaultCtorConsidered)
-            {
-                GenerateConstructor(emitter, null, ctorGenerationHook.DefaultConstructorImplementation, fields);
-            }
-        }
+			if (!defaultCtorConsidered)
+			{
+				GenerateConstructor(emitter, null, ctorGenerationHook.DefaultConstructorImplementation, fields);
+			}
+		}
 
 		/// <summary>
 		///   Generates a parameters constructor that initializes the proxy
@@ -347,11 +350,11 @@ using Debug = System.Diagnostics.Debug;
 			constructor.CodeBuilder.AddStatement(new AssignStatement(interceptorField,
 			                                                         new NewArrayExpression(1, typeof(IInterceptor))));
 			constructor.CodeBuilder.AddStatement(
-				new AssignArrayStatement(interceptorField, 0, new NewInstanceExpression(typeof(StandardInterceptor), new Type[0])));
+				new AssignArrayStatement(interceptorField, 0, new NewInstanceExpression(typeof(StandardInterceptor))));
 
 			// Invoke base constructor
 
-			constructor.CodeBuilder.InvokeBaseConstructor(defaultConstructor);
+			constructor.CodeBuilder.AddStatement(new ConstructorInvocationStatement(defaultConstructor));
 
 			constructor.CodeBuilder.AddStatement(new ReturnStatement());
 		}
@@ -361,13 +364,7 @@ using Debug = System.Diagnostics.Debug;
 			return emitter.CreateTypeConstructor();
 		}
 
-		protected Type GetFromCache(CacheKey key)
-		{
-			return scope.GetFromCache(key);
-		}
-
-		protected void HandleExplicitlyPassedProxyTargetAccessor(ICollection<Type> targetInterfaces,
-		                                                         ICollection<Type> additionalInterfaces)
+		protected void HandleExplicitlyPassedProxyTargetAccessor(ICollection<Type> targetInterfaces)
 		{
 			var interfaceName = typeof(IProxyTargetAccessor).ToString();
 			//ok, let's determine who tried to sneak the IProxyTargetAccessor in...
@@ -378,6 +375,7 @@ using Debug = System.Diagnostics.Debug;
 					string.Format(
 						"Target type for the proxy implements {0} which is a DynamicProxy infrastructure interface and you should never implement it yourself. Are you trying to proxy an existing proxy?",
 						interfaceName);
+				throw new InvalidOperationException("This is a DynamicProxy2 error: " + message);
 			}
 			else if (ProxyGenerationOptions.MixinData.ContainsMixin(typeof(IProxyTargetAccessor)))
 			{
@@ -386,63 +384,28 @@ using Debug = System.Diagnostics.Debug;
 					string.Format(
 						"Mixin type {0} implements {1} which is a DynamicProxy infrastructure interface and you should never implement it yourself. Are you trying to mix in an existing proxy?",
 						mixinType.Name, interfaceName);
+				throw new InvalidOperationException("This is a DynamicProxy2 error: " + message);
 			}
-			else if (additionalInterfaces.Contains(typeof(IProxyTargetAccessor)))
+			else if (interfaces.Contains(typeof(IProxyTargetAccessor)))
 			{
 				message =
 					string.Format(
 						"You passed {0} as one of additional interfaces to proxy which is a DynamicProxy infrastructure interface and is implemented by every proxy anyway. Please remove it from the list of additional interfaces to proxy.",
 						interfaceName);
+				throw new InvalidOperationException("This is a DynamicProxy2 error: " + message);
 			}
 			else
 			{
 				// this can technically never happen
 				message = string.Format("It looks like we have a bug with regards to how we handle {0}. Please report it.",
 				                        interfaceName);
+				throw new DynamicProxyException(message);
 			}
-			throw new ProxyGenerationException("This is a DynamicProxy2 error: " + message);
 		}
 
 		protected void InitializeStaticFields(Type builtType)
 		{
 			builtType.SetStaticField("proxyGenerationOptions", BindingFlags.NonPublic, ProxyGenerationOptions);
-		}
-
-		protected Type ObtainProxyType(CacheKey cacheKey, Func<string, INamingScope, Type> factory)
-		{
-			Type cacheType;
-			using (var locker = Scope.Lock.ForReading())
-			{
-				cacheType = GetFromCache(cacheKey);
-				if (cacheType != null)
-				{
-					Logger.DebugFormat("Found cached proxy type {0} for target type {1}.", cacheType.FullName, targetType.FullName);
-					return cacheType;
-				}
-			}
-
-			// This is to avoid generating duplicate types under heavy multithreaded load.
-			using (var locker = Scope.Lock.ForWriting())
-			{
-				// Only one thread at a time may enter a write lock.
-				// See if an earlier lock holder populated the cache.
-				cacheType = GetFromCache(cacheKey);
-				if (cacheType != null)
-				{
-					Logger.DebugFormat("Found cached proxy type {0} for target type {1}.", cacheType.FullName, targetType.FullName);
-					return cacheType;
-				}
-
-				// Log details about the cache miss
-				Logger.DebugFormat("No cached proxy type was found for target type {0}.", targetType.FullName);
-				EnsureOptionsOverrideEqualsAndGetHashCode(ProxyGenerationOptions);
-
-				var name = Scope.NamingScope.GetUniqueName("Castle.Proxies." + targetType.Name + "Proxy");
-				var proxyType = factory.Invoke(name, Scope.NamingScope.SafeSubScope());
-
-				AddToCache(cacheKey, proxyType);
-				return proxyType;
-			}
 		}
 
 		private bool IsConstructorVisible(ConstructorInfo constructor)

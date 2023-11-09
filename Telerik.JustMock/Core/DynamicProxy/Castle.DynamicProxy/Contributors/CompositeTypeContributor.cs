@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,9 +31,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 		protected readonly ICollection<Type> interfaces = new HashSet<Type>();
 		
 		private ILogger logger = NullLogger.Instance;
-		private readonly ICollection<MetaProperty> properties = new TypeElementCollection<MetaProperty>();
-		private readonly ICollection<MetaEvent> events = new TypeElementCollection<MetaEvent>();
-		private readonly ICollection<MetaMethod> methods = new TypeElementCollection<MetaMethod>();
+		private readonly List<MetaProperty> properties = new List<MetaProperty>();
+		private readonly List<MetaEvent> events = new List<MetaEvent>();
+		private readonly List<MetaMethod> methods = new List<MetaMethod>();
 
 		protected CompositeTypeContributor(INamingScope namingScope)
 		{
@@ -48,29 +48,20 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 
 		public void CollectElementsToProxy(IProxyGenerationHook hook, MetaType model)
 		{
-			foreach (var collector in CollectElementsToProxyInternal(hook))
+			Debug.Assert(hook != null);
+			Debug.Assert(model != null);
+
+			var sink = new MembersCollectorSink(model, this);
+
+			foreach (var collector in GetCollectors())
 			{
-				foreach (var method in collector.Methods)
-				{
-					model.AddMethod(method);
-					methods.Add(method);
-				}
-				foreach (var @event in collector.Events)
-				{
-					model.AddEvent(@event);
-					events.Add(@event);
-				}
-				foreach (var property in collector.Properties)
-				{
-					model.AddProperty(property);
-					properties.Add(property);
-				}
+				collector.CollectMembersToProxy(hook, sink);
 			}
 		}
 
-		protected abstract IEnumerable<MembersCollector> CollectElementsToProxyInternal(IProxyGenerationHook hook);
+		protected abstract IEnumerable<MembersCollector> GetCollectors();
 
-		public virtual void Generate(ClassEmitter @class, ProxyGenerationOptions options)
+		public virtual void Generate(ClassEmitter @class)
 		{
 			foreach (var method in methods)
 			{
@@ -81,70 +72,112 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 
 				ImplementMethod(method,
 				                @class,
-				                options,
 				                @class.CreateMethod);
 			}
 
 			foreach (var property in properties)
 			{
-				ImplementProperty(@class, property, options);
+				ImplementProperty(@class, property);
 			}
 
 			foreach (var @event in events)
 			{
-				ImplementEvent(@class, @event, options);
+				ImplementEvent(@class, @event);
 			}
 		}
 
 		public void AddInterfaceToProxy(Type @interface)
 		{
 			Debug.Assert(@interface != null, "@interface == null", "Shouldn't be adding empty interfaces...");
-			Debug.Assert(@interface.GetTypeInfo().IsInterface, "@interface.IsInterface", "Should be adding interfaces only...");
+			Debug.Assert(@interface.IsInterface || @interface.IsDelegateType(), "@interface.IsInterface || @interface.IsDelegateType()", "Should be adding interfaces or delegate types only...");
 			Debug.Assert(!interfaces.Contains(@interface), "!interfaces.ContainsKey(@interface)",
 			             "Shouldn't be adding same interface twice...");
 
 			interfaces.Add(@interface);
 		}
 
-		private void ImplementEvent(ClassEmitter emitter, MetaEvent @event, ProxyGenerationOptions options)
+		private void ImplementEvent(ClassEmitter emitter, MetaEvent @event)
 		{
 			@event.BuildEventEmitter(emitter);
-			ImplementMethod(@event.Adder, emitter, options, @event.Emitter.CreateAddMethod);
-			ImplementMethod(@event.Remover, emitter, options, @event.Emitter.CreateRemoveMethod);
+			ImplementMethod(@event.Adder, emitter, @event.Emitter.CreateAddMethod);
+			ImplementMethod(@event.Remover, emitter, @event.Emitter.CreateRemoveMethod);
 		}
 
-		private void ImplementProperty(ClassEmitter emitter, MetaProperty property, ProxyGenerationOptions options)
+		private void ImplementProperty(ClassEmitter emitter, MetaProperty property)
 		{
 			property.BuildPropertyEmitter(emitter);
 			if (property.CanRead)
 			{
-				ImplementMethod(property.Getter, emitter, options, property.Emitter.CreateGetMethod);
+				ImplementMethod(property.Getter, emitter, property.Emitter.CreateGetMethod);
 			}
 
 			if (property.CanWrite)
 			{
-				ImplementMethod(property.Setter, emitter, options, property.Emitter.CreateSetMethod);
+				ImplementMethod(property.Setter, emitter, property.Emitter.CreateSetMethod);
 			}
 		}
 
 		protected abstract MethodGenerator GetMethodGenerator(MetaMethod method, ClassEmitter @class,
-		                                                      ProxyGenerationOptions options,
 		                                                      OverrideMethodDelegate overrideMethod);
 
-		private void ImplementMethod(MetaMethod method, ClassEmitter @class, ProxyGenerationOptions options,
+		private void ImplementMethod(MetaMethod method, ClassEmitter @class,
 		                             OverrideMethodDelegate overrideMethod)
 		{
 			{
-				var generator = GetMethodGenerator(method, @class, options, overrideMethod);
+				var generator = GetMethodGenerator(method, @class, overrideMethod);
 				if (generator == null)
 				{
 					return;
 				}
-				var proxyMethod = generator.Generate(@class, options, namingScope);
+				var proxyMethod = generator.Generate(@class, namingScope);
 				foreach (var attribute in method.Method.GetNonInheritableAttributes())
 				{
 					proxyMethod.DefineCustomAttribute(attribute.Builder);
 				}
+			}
+		}
+
+		private sealed class MembersCollectorSink : IMembersCollectorSink
+		{
+			private readonly MetaType model;
+			private readonly CompositeTypeContributor contributor;
+
+			public MembersCollectorSink(MetaType model, CompositeTypeContributor contributor)
+			{
+				this.model = model;
+				this.contributor = contributor;
+			}
+
+			// You may have noticed that most contributors do not query `MetaType` at all,
+			// but only their own collections. So perhaps you are wondering why collected
+			// type elements are added to `model` at all, and not just to `contributor`?
+			//
+			// TL;DR: This prevents member name collisions in the generated proxy type.
+			//
+			// `MetaType` uses `MetaTypeElementCollection`s internally, which switches members
+			// to explicit implementation whenever a name collision with a previously added
+			// member occurs.
+			//
+			// It would be pointless to do this at the level of the individual contributor,
+			// because name collisions could still occur across several contributors. This
+			// is why they all share the same `MetaType` instance.
+
+			public void Add(MetaEvent @event)
+			{
+				model.AddEvent(@event);
+				contributor.events.Add(@event);
+			}
+
+			public void Add(MetaMethod method)
+			{
+				model.AddMethod(method);
+				contributor.methods.Add(method);
+			}
+
+			public void Add(MetaProperty property)
+			{
+				model.AddProperty(property);
+				contributor.properties.Add(property);
 			}
 		}
 	}

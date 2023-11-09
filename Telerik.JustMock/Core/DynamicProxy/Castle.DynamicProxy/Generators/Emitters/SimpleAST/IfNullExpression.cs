@@ -1,10 +1,10 @@
-﻿// Copyright 2004-2012 Castle Project - http://www.castleproject.org/
+﻿// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,28 +17,28 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 	using System;
 	using System.Reflection.Emit;
 
-	internal class IfNullExpression : Expression
+	internal class IfNullExpression : IExpression, IStatement
 	{
-		private readonly IILEmitter ifNotNull;
-		private readonly IILEmitter ifNull;
+		private readonly IExpressionOrStatement ifNotNull;
+		private readonly IExpressionOrStatement ifNull;
 		private readonly Reference reference;
-		private readonly Expression expression;
+		private readonly IExpression expression;
 
-		public IfNullExpression(Reference reference, IILEmitter ifNull, IILEmitter ifNotNull = null)
+		public IfNullExpression(Reference reference, IExpressionOrStatement ifNull, IExpressionOrStatement ifNotNull = null)
 		{
 			this.reference = reference ?? throw new ArgumentNullException(nameof(reference));
 			this.ifNull = ifNull;
 			this.ifNotNull = ifNotNull;
 		}
 
-		public IfNullExpression(Expression expression, IILEmitter ifNull, IILEmitter ifNotNull = null)
+		public IfNullExpression(IExpression expression, IExpressionOrStatement ifNull, IExpressionOrStatement ifNotNull = null)
 		{
 			this.expression = expression ?? throw new ArgumentNullException(nameof(expression));
 			this.ifNull = ifNull;
 			this.ifNotNull = ifNotNull;
 		}
 
-		public override void Emit(IMemberEmitter member, ILGenerator gen)
+		public void Emit(ILGenerator gen)
 		{
 			if (reference != null)
 			{
@@ -46,16 +46,16 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 			}
 			else if (expression != null)
 			{
-				expression.Emit(member, gen);
+				expression.Emit(gen);
 			}
 
 			var notNull = gen.DefineLabel();
 			gen.Emit(OpCodes.Brtrue_S, notNull);
-			ifNull.Emit(member, gen);
+			ifNull.Emit(gen);
 			gen.MarkLabel(notNull);
 			if (ifNotNull != null) // yeah, I know that reads funny :)
 			{
-				ifNotNull.Emit(member, gen);
+				ifNotNull.Emit(gen);
 			}
 		}
 	}

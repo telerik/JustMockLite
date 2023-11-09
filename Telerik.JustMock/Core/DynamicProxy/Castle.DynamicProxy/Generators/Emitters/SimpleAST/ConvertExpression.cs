@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,34 +18,34 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 	using System.Reflection;
 	using System.Reflection.Emit;
 
-	internal class ConvertExpression : Expression
+	internal class ConvertExpression : IExpression
 	{
-		private readonly Expression right;
+		private readonly IExpression right;
 		private Type fromType;
 		private Type target;
 
-		public ConvertExpression(Type targetType, Expression right)
+		public ConvertExpression(Type targetType, IExpression right)
 			: this(targetType, typeof(object), right)
 		{
 		}
 
-		public ConvertExpression(Type targetType, Type fromType, Expression right)
+		public ConvertExpression(Type targetType, Type fromType, IExpression right)
 		{
 			target = targetType;
 			this.fromType = fromType;
 			this.right = right;
 		}
 
-		public override void Emit(IMemberEmitter member, ILGenerator gen)
+		public void Emit(ILGenerator gen)
 		{
-			right.Emit(member, gen);
+			right.Emit(gen);
 
 			if (fromType == target)
 			{
 				return;
 			}
 
-			if (fromType.GetTypeInfo().IsByRef)
+			if (fromType.IsByRef)
 			{
 				fromType = fromType.GetElementType();
 			}
@@ -55,19 +55,19 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 				target = target.GetElementType();
 			}
 
-            if (target.IsPointer && fromType == typeof(object))
-            {
-                gen.Emit(OpCodes.Unbox_Any, typeof(IntPtr));
-                gen.Emit(OpCodes.Call, ArgumentsUtil.PointerFromIntPtr());
-            }
-            else if (target == typeof(object) && fromType.IsPointer)
-            {
-                gen.Emit(OpCodes.Call, ArgumentsUtil.IntPtrFromPointer());
-                gen.Emit(OpCodes.Box, typeof(IntPtr));
-            }
-            else if (target.GetTypeInfo().IsValueType)
+			if (target.IsPointer && fromType == typeof(object))
 			{
-				if (fromType.GetTypeInfo().IsValueType)
+				gen.Emit(OpCodes.Unbox_Any, typeof(IntPtr));
+				gen.Emit(OpCodes.Call, ArgumentsUtil.PointerFromIntPtr());
+			}
+			else if (target == typeof(object) && fromType.IsPointer)
+			{
+				gen.Emit(OpCodes.Call, ArgumentsUtil.IntPtrFromPointer());
+				gen.Emit(OpCodes.Box, typeof(IntPtr));
+			}
+			else if (target.IsValueType)
+			{
+				if (fromType.IsValueType)
 				{
 					throw new NotImplementedException("Cannot convert between distinct value types");
 				}
@@ -89,7 +89,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 			}
 			else
 			{
-				if (fromType.GetTypeInfo().IsValueType)
+				if (fromType.IsValueType)
 				{
 					// Box conversion
 					gen.Emit(OpCodes.Box, fromType);
@@ -109,15 +109,15 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 			{
 				gen.Emit(OpCodes.Unbox_Any, target);
 			}
-			else if (from.GetTypeInfo().IsGenericParameter)
+			else if (from.IsGenericParameter)
 			{
 				gen.Emit(OpCodes.Box, from);
 			}
-			else if (target.GetTypeInfo().IsGenericType && target != from)
+			else if (target.IsGenericType && target != from)
 			{
 				gen.Emit(OpCodes.Castclass, target);
 			}
-			else if (target.GetTypeInfo().IsSubclassOf(from))
+			else if (target.IsSubclassOf(from))
 			{
 				gen.Emit(OpCodes.Castclass, target);
 			}

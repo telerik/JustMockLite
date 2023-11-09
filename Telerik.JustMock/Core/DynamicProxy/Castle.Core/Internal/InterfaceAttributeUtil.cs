@@ -1,4 +1,4 @@
-﻿// Copyright 2004-2012 Castle Project - http://www.castleproject.org/
+﻿// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,10 +45,10 @@ namespace Telerik.JustMock.Core.Castle.Core.Internal
 
 		public static object[] GetAttributes(Type type, bool inherit)
 		{
-			if (type.GetTypeInfo().IsInterface == false)
-				throw new ArgumentOutOfRangeException("type");
+			if (type.IsInterface == false)
+				throw new ArgumentOutOfRangeException(nameof(type));
 
-			var attributes = type.GetTypeInfo().GetCustomAttributes(false).ToArray();
+			var attributes = type.GetCustomAttributes(false).ToArray();
 			var baseTypes  = type.GetInterfaces();
 
 			if (baseTypes.Length == 0 || !inherit)
@@ -91,7 +91,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Internal
 		private object[] GetAttributes(object[] attributes)
 		{
 			for (index = types.Length - 1; index > 0; index--)
-				ProcessType(CurrentType.GetTypeInfo().GetCustomAttributes(false).ToArray());
+				ProcessType(CurrentType.GetCustomAttributes(false).ToArray());
 
 			ProcessType(attributes);
 

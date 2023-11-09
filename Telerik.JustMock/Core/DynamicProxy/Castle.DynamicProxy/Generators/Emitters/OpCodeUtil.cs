@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,21 +25,19 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 		///   Pops a pointer off the evaluation stack, dereferences it and loads
 		///   a value of the specified type.
 		/// </summary>
-		/// <param name = "gen"></param>
-		/// <param name = "type"></param>
 		public static void EmitLoadIndirectOpCodeForType(ILGenerator gen, Type type)
 		{
-			if (type.GetTypeInfo().IsEnum)
+			if (type.IsEnum)
 			{
 				EmitLoadIndirectOpCodeForType(gen, GetUnderlyingTypeOfEnum(type));
 				return;
 			}
 
-			if (type.GetTypeInfo().IsByRef)
+			if (type.IsByRef)
 			{
 				throw new NotSupportedException("Cannot load ByRef values");
 			}
-			else if (type.GetTypeInfo().IsPrimitive && type != typeof(IntPtr) && type != typeof(UIntPtr))
+			else if (type.IsPrimitive && type != typeof(IntPtr) && type != typeof(UIntPtr))
 			{
 				var opCode = LdindOpCodesDictionary.Instance[type];
 
@@ -50,11 +48,11 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 
 				gen.Emit(opCode);
 			}
-			else if (type.GetTypeInfo().IsValueType)
+			else if (type.IsValueType)
 			{
 				gen.Emit(OpCodes.Ldobj, type);
 			}
-			else if (type.GetTypeInfo().IsGenericParameter)
+			else if (type.IsGenericParameter)
 			{
 				gen.Emit(OpCodes.Ldobj, type);
 			}
@@ -65,40 +63,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 		}
 
 		/// <summary>
-		///   Emits a load opcode of the appropriate kind for a constant string or
-		///   primitive value.
-		/// </summary>
-		/// <param name = "gen"></param>
-		/// <param name = "value"></param>
-		public static void EmitLoadOpCodeForConstantValue(ILGenerator gen, object value)
-		{
-			if (value is String)
-			{
-				gen.Emit(OpCodes.Ldstr, value.ToString());
-			}
-			else if (value is Int32)
-			{
-				var code = LdcOpCodesDictionary.Instance[value.GetType()];
-				gen.Emit(code, (int)value);
-			}
-			else if (value is bool)
-			{
-				var code = LdcOpCodesDictionary.Instance[value.GetType()];
-				gen.Emit(code, Convert.ToInt32(value));
-			}
-			else
-			{
-				throw new NotSupportedException();
-			}
-		}
-
-		/// <summary>
 		///   Emits a load opcode of the appropriate kind for the constant default value of a
 		///   type, such as 0 for value types and null for reference types.
 		/// </summary>
 		public static void EmitLoadOpCodeForDefaultValueOfType(ILGenerator gen, Type type)
 		{
-			if (type.GetTypeInfo().IsPrimitive)
+			if (type.IsPrimitive)
 			{
 				var opCode = LdcOpCodesDictionary.Instance[type];
 				switch (opCode.StackBehaviourPush)
@@ -135,21 +105,19 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 		///   Pops a value of the specified type and a pointer off the evaluation stack, and
 		///   stores the value.
 		/// </summary>
-		/// <param name = "gen"></param>
-		/// <param name = "type"></param>
 		public static void EmitStoreIndirectOpCodeForType(ILGenerator gen, Type type)
 		{
-			if (type.GetTypeInfo().IsEnum)
+			if (type.IsEnum)
 			{
 				EmitStoreIndirectOpCodeForType(gen, GetUnderlyingTypeOfEnum(type));
 				return;
 			}
 
-			if (type.GetTypeInfo().IsByRef)
+			if (type.IsByRef)
 			{
 				throw new NotSupportedException("Cannot store ByRef values");
 			}
-			else if (type.GetTypeInfo().IsPrimitive && type != typeof(IntPtr) && type != typeof(UIntPtr))
+			else if (type.IsPrimitive && type != typeof(IntPtr) && type != typeof(UIntPtr))
 			{
 				var opCode = StindOpCodesDictionary.Instance[type];
 
@@ -160,11 +128,11 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 
 				gen.Emit(opCode);
 			}
-			else if (type.GetTypeInfo().IsValueType)
+			else if (type.IsValueType)
 			{
 				gen.Emit(OpCodes.Stobj, type);
 			}
-			else if (type.GetTypeInfo().IsGenericParameter)
+			else if (type.IsGenericParameter)
 			{
 				gen.Emit(OpCodes.Stobj, type);
 			}

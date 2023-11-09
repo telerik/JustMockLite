@@ -1,4 +1,4 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,11 +19,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 #if FEATURE_SERIALIZATION
 	[Serializable]
 #endif
-    internal class ConsoleFactory :
-#if FEATURE_REMOTING
-		MarshalByRefObject,
-#endif
-		ILoggerFactory
+    internal class ConsoleFactory : ILoggerFactory
 	{
 		private LoggerLevel? level;
 
@@ -41,7 +37,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 			return Create(type.FullName);
 		}
 
-		public ILogger Create(String name)
+		public ILogger Create(string name)
 		{
 			if (level.HasValue)
 			{
@@ -55,7 +51,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 			return new ConsoleLogger(type.Name, level);
 		}
 
-		public ILogger Create(String name, LoggerLevel level)
+		public ILogger Create(string name, LoggerLevel level)
 		{
 			return new ConsoleLogger(name, level);
 		}

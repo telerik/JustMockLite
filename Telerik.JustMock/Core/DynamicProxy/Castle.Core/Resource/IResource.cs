@@ -1,4 +1,4 @@
-// Copyright 2004-2009 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,20 +18,17 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 	using System.IO;
 	using System.Text;
 
-    /// <summary>
-    /// Represents a 'streamable' resource. Can
-    /// be a file, a resource in an assembly.
-    /// </summary>
-    internal interface IResource : IDisposable
+	/// <summary>
+	/// Represents a 'streamable' resource. Can
+	/// be a file, a resource in an assembly.
+	/// </summary>
+	internal interface IResource : IDisposable
 	{
-		/// <summary>
-		/// 
-		/// </summary>
 		/// <remarks>
 		/// Only valid for resources that
 		/// can be obtained through relative paths
 		/// </remarks>
-		String FileBasePath { get; }
+		string FileBasePath { get; }
 
 		/// <summary>
 		/// Returns a reader for the stream
@@ -39,7 +36,6 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 		/// <remarks>
 		/// It's up to the caller to dispose the reader.
 		/// </remarks>
-		/// <returns></returns>
 		TextReader GetStreamReader();
 
 		/// <summary>
@@ -48,8 +44,6 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 		/// <remarks>
 		/// It's up to the caller to dispose the reader.
 		/// </remarks>
-		/// <param name="encoding"></param>
-		/// <returns></returns>
 		TextReader GetStreamReader(Encoding encoding);
 
 		/// <summary>
@@ -57,8 +51,6 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 		/// created according to the <c>relativePath</c>
 		/// using itself as the root.
 		/// </summary>
-		/// <param name="relativePath"></param>
-		/// <returns></returns>
-		IResource CreateRelative(String relativePath);
+		IResource CreateRelative(string relativePath);
 	}
 }

@@ -1,4 +1,4 @@
-// Copyright 2004-2017 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 				"[assembly: InternalsVisibleTo({0})] attribute, because assembly {1} " +
 				"is{2} strong-named.";
 
-			var instructions = String.Format(instructionsFormat,
+			var instructions = string.Format(instructionsFormat,
 				assemblyToBeVisibleTo,
 				targetAssembly.GetName().Name,
 				strongNamedOrNotIndicator);
@@ -54,14 +54,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 
 			bool ReferencesCastleCore(Assembly ia)
 			{
-#if FEATURE_GET_REFERENCED_ASSEMBLIES
 				return ia.GetReferencedAssemblies()
 					.Any(r => r.FullName == Assembly.GetExecutingAssembly().FullName);
-#else
-				// .NET Core does not provide an API to do this, so we just fall back to the solution that will definitely work.
-				// After all it is just an exception message.
-				return false;
-#endif
 			}
 		}
 
@@ -73,7 +67,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		/// <param name="typeToProxy">the type that couldn't be proxied</param>
 		public static string CreateMessageForInaccessibleType(Type inaccessibleType, Type typeToProxy)
 		{
-			var targetAssembly = typeToProxy.GetTypeInfo().Assembly;
+			var targetAssembly = typeToProxy.Assembly;
 
 			string inaccessibleTypeDescription = inaccessibleType == typeToProxy
 				? "it"

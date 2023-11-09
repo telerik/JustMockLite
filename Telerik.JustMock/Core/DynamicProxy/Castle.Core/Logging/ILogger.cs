@@ -1,10 +1,10 @@
-// Copyright 2004-2010 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,6 +26,12 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 	/// </remarks>
 	internal interface ILogger
 	{
+		/// <summary>
+		///   Determines if messages of priority "trace" will be logged.
+		/// </summary>
+		/// <value>True if "trace" messages will be logged.</value>
+		bool IsTraceEnabled { get; }
+
 		/// <summary>
 		///   Determines if messages of priority "debug" will be logged.
 		/// </summary>
@@ -63,18 +69,67 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// <param name = "loggerName">The Subname of this logger.</param>
 		/// <returns>The New ILogger instance.</returns>
 		/// <exception cref = "System.ArgumentException">If the name has an empty element name.</exception>
-		ILogger CreateChildLogger(String loggerName);
+		ILogger CreateChildLogger(string loggerName);
+
+		/// <summary>
+		///   Logs a trace message.
+		/// </summary>
+		/// <param name = "message">The message to log</param>
+		void Trace(string message);
+
+		/// <summary>
+		///   Logs a trace message with lazily constructed message. The message will be constructed only if the <see cref = "IsTraceEnabled" /> is true.
+		/// </summary>
+		void Trace(Func<string> messageFactory);
+
+		/// <summary>
+		///   Logs a trace message.
+		/// </summary>
+		/// <param name = "exception">The exception to log</param>
+		/// <param name = "message">The message to log</param>
+		void Trace(string message, Exception exception);
+
+		/// <summary>
+		///   Logs a trace message.
+		/// </summary>
+		/// <param name = "format">Format string for the message to log</param>
+		/// <param name = "args">Format arguments for the message to log</param>
+		void TraceFormat(string format, params object[] args);
+
+		/// <summary>
+		///   Logs a trace message.
+		/// </summary>
+		/// <param name = "exception">The exception to log</param>
+		/// <param name = "format">Format string for the message to log</param>
+		/// <param name = "args">Format arguments for the message to log</param>
+		void TraceFormat(Exception exception, string format, params object[] args);
+
+		/// <summary>
+		///   Logs a trace message.
+		/// </summary>
+		/// <param name = "formatProvider">The format provider to use</param>
+		/// <param name = "format">Format string for the message to log</param>
+		/// <param name = "args">Format arguments for the message to log</param>
+		void TraceFormat(IFormatProvider formatProvider, string format, params object[] args);
+
+		/// <summary>
+		///   Logs a trace message.
+		/// </summary>
+		/// <param name = "exception">The exception to log</param>
+		/// <param name = "formatProvider">The format provider to use</param>
+		/// <param name = "format">Format string for the message to log</param>
+		/// <param name = "args">Format arguments for the message to log</param>
+		void TraceFormat(Exception exception, IFormatProvider formatProvider, string format, params object[] args);
 
 		/// <summary>
 		///   Logs a debug message.
 		/// </summary>
 		/// <param name = "message">The message to log</param>
-		void Debug(String message);
+		void Debug(string message);
 
 		/// <summary>
 		///   Logs a debug message with lazily constructed message. The message will be constructed only if the <see cref = "IsDebugEnabled" /> is true.
 		/// </summary>
-		/// <param name = "messageFactory"></param>
 		void Debug(Func<string> messageFactory);
 
 		/// <summary>
@@ -82,14 +137,14 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// </summary>
 		/// <param name = "exception">The exception to log</param>
 		/// <param name = "message">The message to log</param>
-		void Debug(String message, Exception exception);
+		void Debug(string message, Exception exception);
 
 		/// <summary>
 		///   Logs a debug message.
 		/// </summary>
 		/// <param name = "format">Format string for the message to log</param>
 		/// <param name = "args">Format arguments for the message to log</param>
-		void DebugFormat(String format, params Object[] args);
+		void DebugFormat(string format, params object[] args);
 
 		/// <summary>
 		///   Logs a debug message.
@@ -97,7 +152,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// <param name = "exception">The exception to log</param>
 		/// <param name = "format">Format string for the message to log</param>
 		/// <param name = "args">Format arguments for the message to log</param>
-		void DebugFormat(Exception exception, String format, params Object[] args);
+		void DebugFormat(Exception exception, string format, params object[] args);
 
 		/// <summary>
 		///   Logs a debug message.
@@ -105,7 +160,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// <param name = "formatProvider">The format provider to use</param>
 		/// <param name = "format">Format string for the message to log</param>
 		/// <param name = "args">Format arguments for the message to log</param>
-		void DebugFormat(IFormatProvider formatProvider, String format, params Object[] args);
+		void DebugFormat(IFormatProvider formatProvider, string format, params object[] args);
 
 		/// <summary>
 		///   Logs a debug message.
@@ -114,18 +169,17 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// <param name = "formatProvider">The format provider to use</param>
 		/// <param name = "format">Format string for the message to log</param>
 		/// <param name = "args">Format arguments for the message to log</param>
-		void DebugFormat(Exception exception, IFormatProvider formatProvider, String format, params Object[] args);
+		void DebugFormat(Exception exception, IFormatProvider formatProvider, string format, params object[] args);
 
 		/// <summary>
 		///   Logs an error message.
 		/// </summary>
 		/// <param name = "message">The message to log</param>
-		void Error(String message);
+		void Error(string message);
 
 		/// <summary>
 		///   Logs an error message with lazily constructed message. The message will be constructed only if the <see cref = "IsErrorEnabled" /> is true.
 		/// </summary>
-		/// <param name = "messageFactory"></param>
 		void Error(Func<string> messageFactory);
 
 		/// <summary>
@@ -133,14 +187,14 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// </summary>
 		/// <param name = "exception">The exception to log</param>
 		/// <param name = "message">The message to log</param>
-		void Error(String message, Exception exception);
+		void Error(string message, Exception exception);
 
 		/// <summary>
 		///   Logs an error message.
 		/// </summary>
 		/// <param name = "format">Format string for the message to log</param>
 		/// <param name = "args">Format arguments for the message to log</param>
-		void ErrorFormat(String format, params Object[] args);
+		void ErrorFormat(string format, params object[] args);
 
 		/// <summary>
 		///   Logs an error message.
@@ -148,7 +202,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// <param name = "exception">The exception to log</param>
 		/// <param name = "format">Format string for the message to log</param>
 		/// <param name = "args">Format arguments for the message to log</param>
-		void ErrorFormat(Exception exception, String format, params Object[] args);
+		void ErrorFormat(Exception exception, string format, params object[] args);
 
 		/// <summary>
 		///   Logs an error message.
@@ -156,7 +210,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// <param name = "formatProvider">The format provider to use</param>
 		/// <param name = "format">Format string for the message to log</param>
 		/// <param name = "args">Format arguments for the message to log</param>
-		void ErrorFormat(IFormatProvider formatProvider, String format, params Object[] args);
+		void ErrorFormat(IFormatProvider formatProvider, string format, params object[] args);
 
 		/// <summary>
 		///   Logs an error message.
@@ -165,18 +219,17 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// <param name = "formatProvider">The format provider to use</param>
 		/// <param name = "format">Format string for the message to log</param>
 		/// <param name = "args">Format arguments for the message to log</param>
-		void ErrorFormat(Exception exception, IFormatProvider formatProvider, String format, params Object[] args);
+		void ErrorFormat(Exception exception, IFormatProvider formatProvider, string format, params object[] args);
 
 		/// <summary>
 		///   Logs a fatal message.
 		/// </summary>
 		/// <param name = "message">The message to log</param>
-		void Fatal(String message);
+		void Fatal(string message);
 
 		/// <summary>
 		///   Logs a fatal message with lazily constructed message. The message will be constructed only if the <see cref = "IsFatalEnabled" /> is true.
 		/// </summary>
-		/// <param name = "messageFactory"></param>
 		void Fatal(Func<string> messageFactory);
 
 		/// <summary>
@@ -184,14 +237,14 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// </summary>
 		/// <param name = "exception">The exception to log</param>
 		/// <param name = "message">The message to log</param>
-		void Fatal(String message, Exception exception);
+		void Fatal(string message, Exception exception);
 
 		/// <summary>
 		///   Logs a fatal message.
 		/// </summary>
 		/// <param name = "format">Format string for the message to log</param>
 		/// <param name = "args">Format arguments for the message to log</param>
-		void FatalFormat(String format, params Object[] args);
+		void FatalFormat(string format, params object[] args);
 
 		/// <summary>
 		///   Logs a fatal message.
@@ -199,7 +252,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// <param name = "exception">The exception to log</param>
 		/// <param name = "format">Format string for the message to log</param>
 		/// <param name = "args">Format arguments for the message to log</param>
-		void FatalFormat(Exception exception, String format, params Object[] args);
+		void FatalFormat(Exception exception, string format, params object[] args);
 
 		/// <summary>
 		///   Logs a fatal message.
@@ -207,7 +260,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// <param name = "formatProvider">The format provider to use</param>
 		/// <param name = "format">Format string for the message to log</param>
 		/// <param name = "args">Format arguments for the message to log</param>
-		void FatalFormat(IFormatProvider formatProvider, String format, params Object[] args);
+		void FatalFormat(IFormatProvider formatProvider, string format, params object[] args);
 
 		/// <summary>
 		///   Logs a fatal message.
@@ -216,18 +269,17 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// <param name = "formatProvider">The format provider to use</param>
 		/// <param name = "format">Format string for the message to log</param>
 		/// <param name = "args">Format arguments for the message to log</param>
-		void FatalFormat(Exception exception, IFormatProvider formatProvider, String format, params Object[] args);
+		void FatalFormat(Exception exception, IFormatProvider formatProvider, string format, params object[] args);
 
 		/// <summary>
 		///   Logs an info message.
 		/// </summary>
 		/// <param name = "message">The message to log</param>
-		void Info(String message);
+		void Info(string message);
 
 		/// <summary>
 		///   Logs a info message with lazily constructed message. The message will be constructed only if the <see cref = "IsInfoEnabled" /> is true.
 		/// </summary>
-		/// <param name = "messageFactory"></param>
 		void Info(Func<string> messageFactory);
 
 		/// <summary>
@@ -235,14 +287,14 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// </summary>
 		/// <param name = "exception">The exception to log</param>
 		/// <param name = "message">The message to log</param>
-		void Info(String message, Exception exception);
+		void Info(string message, Exception exception);
 
 		/// <summary>
 		///   Logs an info message.
 		/// </summary>
 		/// <param name = "format">Format string for the message to log</param>
 		/// <param name = "args">Format arguments for the message to log</param>
-		void InfoFormat(String format, params Object[] args);
+		void InfoFormat(string format, params object[] args);
 
 		/// <summary>
 		///   Logs an info message.
@@ -250,7 +302,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// <param name = "exception">The exception to log</param>
 		/// <param name = "format">Format string for the message to log</param>
 		/// <param name = "args">Format arguments for the message to log</param>
-		void InfoFormat(Exception exception, String format, params Object[] args);
+		void InfoFormat(Exception exception, string format, params object[] args);
 
 		/// <summary>
 		///   Logs an info message.
@@ -258,7 +310,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// <param name = "formatProvider">The format provider to use</param>
 		/// <param name = "format">Format string for the message to log</param>
 		/// <param name = "args">Format arguments for the message to log</param>
-		void InfoFormat(IFormatProvider formatProvider, String format, params Object[] args);
+		void InfoFormat(IFormatProvider formatProvider, string format, params object[] args);
 
 		/// <summary>
 		///   Logs an info message.
@@ -267,18 +319,17 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// <param name = "formatProvider">The format provider to use</param>
 		/// <param name = "format">Format string for the message to log</param>
 		/// <param name = "args">Format arguments for the message to log</param>
-		void InfoFormat(Exception exception, IFormatProvider formatProvider, String format, params Object[] args);
+		void InfoFormat(Exception exception, IFormatProvider formatProvider, string format, params object[] args);
 
 		/// <summary>
 		///   Logs a warn message.
 		/// </summary>
 		/// <param name = "message">The message to log</param>
-		void Warn(String message);
+		void Warn(string message);
 
 		/// <summary>
 		///   Logs a warn message with lazily constructed message. The message will be constructed only if the <see cref = "IsWarnEnabled" /> is true.
 		/// </summary>
-		/// <param name = "messageFactory"></param>
 		void Warn(Func<string> messageFactory);
 
 		/// <summary>
@@ -286,14 +337,14 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// </summary>
 		/// <param name = "exception">The exception to log</param>
 		/// <param name = "message">The message to log</param>
-		void Warn(String message, Exception exception);
+		void Warn(string message, Exception exception);
 
 		/// <summary>
 		///   Logs a warn message.
 		/// </summary>
 		/// <param name = "format">Format string for the message to log</param>
 		/// <param name = "args">Format arguments for the message to log</param>
-		void WarnFormat(String format, params Object[] args);
+		void WarnFormat(string format, params object[] args);
 
 		/// <summary>
 		///   Logs a warn message.
@@ -301,7 +352,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// <param name = "exception">The exception to log</param>
 		/// <param name = "format">Format string for the message to log</param>
 		/// <param name = "args">Format arguments for the message to log</param>
-		void WarnFormat(Exception exception, String format, params Object[] args);
+		void WarnFormat(Exception exception, string format, params object[] args);
 
 		/// <summary>
 		///   Logs a warn message.
@@ -309,7 +360,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// <param name = "formatProvider">The format provider to use</param>
 		/// <param name = "format">Format string for the message to log</param>
 		/// <param name = "args">Format arguments for the message to log</param>
-		void WarnFormat(IFormatProvider formatProvider, String format, params Object[] args);
+		void WarnFormat(IFormatProvider formatProvider, string format, params object[] args);
 
 		/// <summary>
 		///   Logs a warn message.
@@ -318,6 +369,6 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// <param name = "formatProvider">The format provider to use</param>
 		/// <param name = "format">Format string for the message to log</param>
 		/// <param name = "args">Format arguments for the message to log</param>
-		void WarnFormat(Exception exception, IFormatProvider formatProvider, String format, params Object[] args);
+		void WarnFormat(Exception exception, IFormatProvider formatProvider, string format, params object[] args);
 	}
 }

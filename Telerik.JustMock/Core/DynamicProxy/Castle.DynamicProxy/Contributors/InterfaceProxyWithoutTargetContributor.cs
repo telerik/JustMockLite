@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +20,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
 
 	internal class InterfaceProxyWithoutTargetContributor : CompositeTypeContributor
 	{
@@ -32,27 +33,24 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 			getTargetExpression = getTarget;
 		}
 
-		protected override IEnumerable<MembersCollector> CollectElementsToProxyInternal(IProxyGenerationHook hook)
+		protected override IEnumerable<MembersCollector> GetCollectors()
 		{
-			Debug.Assert(hook != null, "hook != null");
 			foreach (var @interface in interfaces)
 			{
 				var item = new InterfaceMembersCollector(@interface);
-				item.CollectMembersToProxy(hook);
 				yield return item;
 			}
 		}
 
 		protected override MethodGenerator GetMethodGenerator(MetaMethod method, ClassEmitter @class,
-		                                                      ProxyGenerationOptions options,
 		                                                      OverrideMethodDelegate overrideMethod)
 		{
 			if (!method.Proxyable)
 			{
-				return new MinimialisticMethodGenerator(method, overrideMethod);
+				return new MinimalisticMethodGenerator(method, overrideMethod);
 			}
 
-			var invocation = GetInvocationType(method, @class, options);
+			var invocation = GetInvocationType(method, @class);
 			return new MethodWithInvocationGenerator(method,
 			                                         @class.GetField("__interceptors"),
 			                                         invocation,
@@ -61,8 +59,17 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 			                                         null);
 		}
 
-		private Type GetInvocationType(MetaMethod method, ClassEmitter emitter, ProxyGenerationOptions options)
+		private Type GetInvocationType(MetaMethod method, ClassEmitter emitter)
 		{
+			var methodInfo = method.Method;
+
+			if (canChangeTarget == false && methodInfo.IsAbstract)
+			{
+				// We do not need to generate a custom invocation type because no custom implementation
+				// for `InvokeMethodOnTarget` will be needed (proceeding to target isn't possible here):
+				return typeof(InterfaceMethodWithoutTargetInvocation);
+			}
+
 			var scope = emitter.ModuleScope;
 			Type[] invocationInterfaces;
 			if (canChangeTarget)
@@ -73,27 +80,18 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 			{
 				invocationInterfaces = new[] { typeof(IInvocation) };
 			}
-			var key = new CacheKey(method.Method, CompositionInvocationTypeGenerator.BaseType, invocationInterfaces, null);
+			var key = new CacheKey(methodInfo, CompositionInvocationTypeGenerator.BaseType, invocationInterfaces, null);
 
 			// no locking required as we're already within a lock
 
-			var invocation = scope.GetFromCache(key);
-			if (invocation != null)
-			{
-				return invocation;
-			}
-
-			invocation = new CompositionInvocationTypeGenerator(method.Method.DeclaringType,
-																method,
-																method.Method,
-																canChangeTarget,
-																null)
-				.Generate(emitter, options, namingScope)
-				.BuildType();
-
-			scope.RegisterInCache(key, invocation);
-
-			return invocation;
+			return scope.TypeCache.GetOrAddWithoutTakingLock(key, _ =>
+				new CompositionInvocationTypeGenerator(methodInfo.DeclaringType,
+				                                       method,
+				                                       methodInfo,
+				                                       canChangeTarget,
+				                                       null)
+				.Generate(emitter, namingScope)
+				.BuildType());
 		}
 	}
 }

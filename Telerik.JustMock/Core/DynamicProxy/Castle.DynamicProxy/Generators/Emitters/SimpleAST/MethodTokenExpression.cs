@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,30 +14,26 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST
 {
-	using System;
+	using System.Diagnostics;
 	using System.Reflection;
 	using System.Reflection.Emit;
-    using Telerik.JustMock.Core.Castle.DynamicProxy.Tokens;
 
-    internal class MethodTokenExpression : Expression
+	using Castle.DynamicProxy.Tokens;
+
+	internal class MethodTokenExpression : IExpression
 	{
 		private readonly MethodInfo method;
-		private readonly Type declaringType;
 
 		public MethodTokenExpression(MethodInfo method)
 		{
 			this.method = method;
-			declaringType = method.DeclaringType;
+			Debug.Assert(method.DeclaringType != null);  // DynamicProxy isn't using global methods nor `DynamicMethod`
 		}
 
-		public override void Emit(IMemberEmitter member, ILGenerator gen)
+		public void Emit(ILGenerator gen)
 		{
 			gen.Emit(OpCodes.Ldtoken, method);
-			if (declaringType == null)
-			{
-				throw new GeneratorException("declaringType can't be null for this situation");
-			}
-			gen.Emit(OpCodes.Ldtoken, declaringType);
+			gen.Emit(OpCodes.Ldtoken, method.DeclaringType);
 
 			var minfo = MethodBaseMethods.GetMethodFromHandle;
 			gen.Emit(OpCodes.Call, minfo);

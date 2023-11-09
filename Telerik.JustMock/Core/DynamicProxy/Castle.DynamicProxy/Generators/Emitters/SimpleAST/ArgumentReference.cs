@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,35 +16,37 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 {
 	using System;
 	using System.Diagnostics;
-    using System.Reflection;
-    using System.Reflection.Emit;
+	using System.Reflection;
+	using System.Reflection.Emit;
 
 	[DebuggerDisplay("argument {Type}")]
 	internal class ArgumentReference : TypeReference
 	{
-		public ArgumentReference(Type argumentType)
-            : this(argumentType, DBNull.Value)
-        { }
-
-        public ArgumentReference(Type argumentType, object defaultValue)
-            : base(argumentType)
-        {
-            this.DefaultValue = defaultValue;
-            ParameterAttributes = ParameterAttributes.None;
-            Position = -1;
-        }
-
-        public ArgumentReference(Type argumentType, int position, ParameterAttributes parameterAttributes)
+		private ArgumentReference(Type argumentType, object defaultValue, int position, ParameterAttributes parameterAttributes)
 			: base(argumentType)
 		{
-            Position = position;
+			DefaultValue = defaultValue;
+			Position = position;
+			ParameterAttributes = parameterAttributes;
 		}
 
-        internal object DefaultValue { get; private set; }
-        internal int Position { get; set; }
-        internal ParameterAttributes ParameterAttributes { get; set; }
+		public ArgumentReference(Type argumentType)
+			: this(argumentType, DBNull.Value, -1, ParameterAttributes.None)
+		{ }
 
-        public override void LoadAddressOfReference(ILGenerator gen)
+		public ArgumentReference(Type argumentType, object defaultValue)
+			: this(argumentType, defaultValue, -1, ParameterAttributes.None)
+		{ }
+
+		public ArgumentReference(Type argumentType, int position, ParameterAttributes parameterAttributes)
+			: this(argumentType, DBNull.Value, position, parameterAttributes)
+		{ }
+
+		internal object DefaultValue { get; private set; }
+		internal int Position { get; set; }
+		internal ParameterAttributes ParameterAttributes { get; set; }
+
+		public override void LoadAddressOfReference(ILGenerator gen)
 		{
 			throw new NotSupportedException();
 		}
@@ -53,7 +55,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 		{
 			if (Position == -1)
 			{
-				throw new ProxyGenerationException("ArgumentReference uninitialized");
+				throw new InvalidOperationException("ArgumentReference uninitialized");
 			}
 			switch (Position)
 			{
@@ -79,7 +81,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 		{
 			if (Position == -1)
 			{
-				throw new ProxyGenerationException("ArgumentReference uninitialized");
+				throw new InvalidOperationException("ArgumentReference uninitialized");
 			}
 			gen.Emit(OpCodes.Starg, Position);
 		}

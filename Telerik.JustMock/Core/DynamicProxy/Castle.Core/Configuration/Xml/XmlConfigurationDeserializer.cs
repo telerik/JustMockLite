@@ -1,4 +1,4 @@
-﻿// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+﻿// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ namespace Telerik.JustMock.Core.Castle.Core.Configuration.Xml
 		///   Deserializes the specified node into an abstract representation of configuration.
 		/// </summary>
 		/// <param name = "node">The node.</param>
-		/// <returns></returns>
 		public IConfiguration Deserialize(XmlNode node)
 		{
 			return GetDeserializedNode(node);

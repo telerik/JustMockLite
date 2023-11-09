@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,30 +16,19 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 {
 	using System;
 	using System.Globalization;
-#if FEATURE_SECURITY_PERMISSIONS
-#if DOTNET40
-	using System.Security;
-#else
-	using System.Security.Permissions;
-#endif
-#endif
 
-    /// <summary>
-    /// The Level Filtered Logger class.  This is a base class which
-    /// provides a LogLevel attribute and reroutes all functions into
-    /// one Log method.
-    /// </summary>
+	/// <summary>
+	/// The Level Filtered Logger class.  This is a base class which
+	/// provides a LogLevel attribute and reroutes all functions into
+	/// one Log method.
+	/// </summary>
 #if FEATURE_SERIALIZATION
 	[Serializable]
 #endif
-    internal abstract class LevelFilteredLogger :
-#if FEATURE_REMOTING
-		MarshalByRefObject,
-#endif
-		ILogger
+    internal abstract class LevelFilteredLogger : ILogger
 	{
 		private LoggerLevel level = LoggerLevel.Off;
-		private String name = "unnamed";
+		private string name = "unnamed";
 
 		/// <summary>
 		///   Creates a new <c>LevelFilteredLogger</c>.
@@ -48,7 +37,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		{
 		}
 
-		protected LevelFilteredLogger(String name)
+		protected LevelFilteredLogger(string name)
 		{
 			ChangeName(name);
 		}
@@ -58,28 +47,10 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 			level = loggerLevel;
 		}
 
-		protected LevelFilteredLogger(String loggerName, LoggerLevel loggerLevel) : this(loggerLevel)
+		protected LevelFilteredLogger(string loggerName, LoggerLevel loggerLevel) : this(loggerLevel)
 		{
 			ChangeName(loggerName);
 		}
-
-#if FEATURE_REMOTING
-		/// <summary>
-		/// Keep the instance alive in a remoting scenario
-		/// </summary>
-		/// <returns></returns>
-#if FEATURE_SECURITY_PERMISSIONS
-#if DOTNET40
-		[SecurityCritical]
-#else
-		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.Infrastructure)]
-#endif
-#endif
-		public override object InitializeLifetimeService()
-		{
-			return null;
-		}
-#endif
 
 		public abstract ILogger CreateChildLogger(string loggerName);
 
@@ -95,14 +66,111 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 
 		/// <value>
 		///   The name that this logger will be using. 
-		///   Defaults to <c>String.Empty</c>
+		///   Defaults to <c>string.Empty</c>
 		/// </value>
-		public String Name
+		public string Name
 		{
 			get { return name; }
 		}
 
 		#region ILogger implementation
+
+		#region Trace
+
+		/// <summary>
+		///   Logs a trace message.
+		/// </summary>
+		/// <param name = "message">The message to log</param>
+		public void Trace(string message)
+		{
+			if (IsTraceEnabled)
+			{
+				Log(LoggerLevel.Trace, message, null);
+			}
+		}
+
+		/// <summary>
+		///   Logs a trace message.
+		/// </summary>
+		/// <param name="messageFactory">A functor to create the message</param>
+		public void Trace(Func<string> messageFactory)
+		{
+			if (IsTraceEnabled)
+			{
+				Log(LoggerLevel.Trace, messageFactory.Invoke(), null);
+			}
+		}
+
+		/// <summary>
+		///   Logs a trace message.
+		/// </summary>
+		/// <param name = "exception">The exception to log</param>
+		/// <param name = "message">The message to log</param>
+		public void Trace(string message, Exception exception)
+		{
+			if (IsTraceEnabled)
+			{
+				Log(LoggerLevel.Trace, message, exception);
+			}
+		}
+
+		/// <summary>
+		///   Logs a trace message.
+		/// </summary>
+		/// <param name = "format">Format string for the message to log</param>
+		/// <param name = "args">Format arguments for the message to log</param>
+		public void TraceFormat(string format, params object[] args)
+		{
+			if (IsTraceEnabled)
+			{
+				Log(LoggerLevel.Trace, string.Format(CultureInfo.CurrentCulture, format, args), null);
+			}
+		}
+
+		/// <summary>
+		///   Logs a trace message.
+		/// </summary>
+		/// <param name = "exception">The exception to log</param>
+		/// <param name = "format">Format string for the message to log</param>
+		/// <param name = "args">Format arguments for the message to log</param>
+		public void TraceFormat(Exception exception, string format, params object[] args)
+		{
+			if (IsTraceEnabled)
+			{
+				Log(LoggerLevel.Trace, string.Format(CultureInfo.CurrentCulture, format, args), exception);
+			}
+		}
+
+		/// <summary>
+		///   Logs a trace message.
+		/// </summary>
+		/// <param name = "formatProvider">The format provider to use</param>
+		/// <param name = "format">Format string for the message to log</param>
+		/// <param name = "args">Format arguments for the message to log</param>
+		public void TraceFormat(IFormatProvider formatProvider, string format, params object[] args)
+		{
+			if (IsTraceEnabled)
+			{
+				Log(LoggerLevel.Trace, string.Format(formatProvider, format, args), null);
+			}
+		}
+
+		/// <summary>
+		///   Logs a trace message.
+		/// </summary>
+		/// <param name = "exception">The exception to log</param>
+		/// <param name = "formatProvider">The format provider to use</param>
+		/// <param name = "format">Format string for the message to log</param>
+		/// <param name = "args">Format arguments for the message to log</param>
+		public void TraceFormat(Exception exception, IFormatProvider formatProvider, string format, params object[] args)
+		{
+			if (IsTraceEnabled)
+			{
+				Log(LoggerLevel.Trace, string.Format(formatProvider, format, args), exception);
+			}
+		}
+
+		#endregion
 
 		#region Debug
 
@@ -157,7 +225,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 				return;
 			}
 
-			Log(LoggerLevel.Debug, String.Format(CultureInfo.CurrentCulture, format, args), null);
+			Log(LoggerLevel.Debug, string.Format(CultureInfo.CurrentCulture, format, args), null);
 		}
 
 		/// <summary>
@@ -173,7 +241,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 				return;
 			}
 
-			Log(LoggerLevel.Debug, String.Format(CultureInfo.CurrentCulture, format, args), exception);
+			Log(LoggerLevel.Debug, string.Format(CultureInfo.CurrentCulture, format, args), exception);
 		}
 
 		/// <summary>
@@ -189,7 +257,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 				return;
 			}
 
-			Log(LoggerLevel.Debug, String.Format(formatProvider, format, args), null);
+			Log(LoggerLevel.Debug, string.Format(formatProvider, format, args), null);
 		}
 
 		/// <summary>
@@ -206,7 +274,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 				return;
 			}
 
-			Log(LoggerLevel.Debug, String.Format(formatProvider, format, args), exception);
+			Log(LoggerLevel.Debug, string.Format(formatProvider, format, args), exception);
 		}
 
 		#endregion
@@ -264,7 +332,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 				return;
 			}
 
-			Log(LoggerLevel.Info, String.Format(CultureInfo.CurrentCulture, format, args), null);
+			Log(LoggerLevel.Info, string.Format(CultureInfo.CurrentCulture, format, args), null);
 		}
 
 		/// <summary>
@@ -280,7 +348,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 				return;
 			}
 
-			Log(LoggerLevel.Info, String.Format(CultureInfo.CurrentCulture, format, args), exception);
+			Log(LoggerLevel.Info, string.Format(CultureInfo.CurrentCulture, format, args), exception);
 		}
 
 		/// <summary>
@@ -296,7 +364,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 				return;
 			}
 
-			Log(LoggerLevel.Info, String.Format(formatProvider, format, args), null);
+			Log(LoggerLevel.Info, string.Format(formatProvider, format, args), null);
 		}
 
 		/// <summary>
@@ -313,7 +381,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 				return;
 			}
 
-			Log(LoggerLevel.Info, String.Format(formatProvider, format, args), exception);
+			Log(LoggerLevel.Info, string.Format(formatProvider, format, args), exception);
 		}
 
 		#endregion
@@ -371,7 +439,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 				return;
 			}
 
-			Log(LoggerLevel.Warn, String.Format(CultureInfo.CurrentCulture, format, args), null);
+			Log(LoggerLevel.Warn, string.Format(CultureInfo.CurrentCulture, format, args), null);
 		}
 
 		/// <summary>
@@ -387,7 +455,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 				return;
 			}
 
-			Log(LoggerLevel.Warn, String.Format(CultureInfo.CurrentCulture, format, args), exception);
+			Log(LoggerLevel.Warn, string.Format(CultureInfo.CurrentCulture, format, args), exception);
 		}
 
 		/// <summary>
@@ -403,7 +471,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 				return;
 			}
 
-			Log(LoggerLevel.Warn, String.Format(formatProvider, format, args), null);
+			Log(LoggerLevel.Warn, string.Format(formatProvider, format, args), null);
 		}
 
 		/// <summary>
@@ -420,7 +488,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 				return;
 			}
 
-			Log(LoggerLevel.Warn, String.Format(formatProvider, format, args), exception);
+			Log(LoggerLevel.Warn, string.Format(formatProvider, format, args), exception);
 		}
 
 		#endregion
@@ -478,7 +546,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 				return;
 			}
 
-			Log(LoggerLevel.Error, String.Format(CultureInfo.CurrentCulture, format, args), null);
+			Log(LoggerLevel.Error, string.Format(CultureInfo.CurrentCulture, format, args), null);
 		}
 
 		/// <summary>
@@ -494,7 +562,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 				return;
 			}
 
-			Log(LoggerLevel.Error, String.Format(CultureInfo.CurrentCulture, format, args), exception);
+			Log(LoggerLevel.Error, string.Format(CultureInfo.CurrentCulture, format, args), exception);
 		}
 
 		/// <summary>
@@ -510,7 +578,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 				return;
 			}
 
-			Log(LoggerLevel.Error, String.Format(formatProvider, format, args), null);
+			Log(LoggerLevel.Error, string.Format(formatProvider, format, args), null);
 		}
 
 		/// <summary>
@@ -527,7 +595,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 				return;
 			}
 
-			Log(LoggerLevel.Error, String.Format(formatProvider, format, args), exception);
+			Log(LoggerLevel.Error, string.Format(formatProvider, format, args), exception);
 		}
 
 		#endregion
@@ -585,7 +653,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 				return;
 			}
 
-			Log(LoggerLevel.Fatal, String.Format(CultureInfo.CurrentCulture, format, args), null);
+			Log(LoggerLevel.Fatal, string.Format(CultureInfo.CurrentCulture, format, args), null);
 		}
 
 		/// <summary>
@@ -601,7 +669,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 				return;
 			}
 
-			Log(LoggerLevel.Fatal, String.Format(CultureInfo.CurrentCulture, format, args), exception);
+			Log(LoggerLevel.Fatal, string.Format(CultureInfo.CurrentCulture, format, args), exception);
 		}
 
 		/// <summary>
@@ -617,7 +685,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 				return;
 			}
 
-			Log(LoggerLevel.Fatal, String.Format(formatProvider, format, args), null);
+			Log(LoggerLevel.Fatal, string.Format(formatProvider, format, args), null);
 		}
 
 		/// <summary>
@@ -634,10 +702,19 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 				return;
 			}
 
-			Log(LoggerLevel.Fatal, String.Format(formatProvider, format, args), exception);
+			Log(LoggerLevel.Fatal, string.Format(formatProvider, format, args), exception);
 		}
 
 		#endregion
+
+		/// <summary>
+		///   Determines if messages of priority "trace" will be logged.
+		/// </summary>
+		/// <value><c>true</c> if log level flags include the <see cref = "LoggerLevel.Trace" /> bit</value>
+		public bool IsTraceEnabled
+		{
+			get { return (Level >= LoggerLevel.Trace); }
+		}
 
 		/// <summary>
 		///   Determines if messages of priority "debug" will be logged.
@@ -690,23 +767,19 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		///   Implementors output the log content by implementing this method only.
 		///   Note that exception can be null
 		/// </summary>
-		/// <param name = "loggerLevel"></param>
-		/// <param name = "loggerName"></param>
-		/// <param name = "message"></param>
-		/// <param name = "exception"></param>
-		protected abstract void Log(LoggerLevel loggerLevel, String loggerName, String message, Exception exception);
+		protected abstract void Log(LoggerLevel loggerLevel, string loggerName, string message, Exception exception);
 
-		protected void ChangeName(String newName)
+		protected void ChangeName(string newName)
 		{
 			if (newName == null)
 			{
-				throw new ArgumentNullException("newName");
+				throw new ArgumentNullException(nameof(newName));
 			}
 
 			name = newName;
 		}
 
-		private void Log(LoggerLevel loggerLevel, String message, Exception exception)
+		private void Log(LoggerLevel loggerLevel, string message, Exception exception)
 		{
 			Log(loggerLevel, Name, message, exception);
 		}

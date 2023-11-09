@@ -1,4 +1,4 @@
-// Copyright 2004-2009 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,12 +17,12 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 	using System.IO;
 	using System.Text;
 
-    internal delegate Stream StreamFactory();
+	internal delegate Stream StreamFactory();
 
-    /// <summary>
-    /// 
-    /// </summary>
-    internal abstract class AbstractStreamResource : AbstractResource
+	/// <summary>
+	/// 
+	/// </summary>
+	internal abstract class AbstractStreamResource : AbstractResource
 	{
 		/// <summary>
 		/// This returns a new stream instance each time it is called.

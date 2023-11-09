@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,17 +34,17 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 		private readonly IInvocationCreationContributor contributor;
 		private readonly GetTargetExpressionDelegate getTargetExpression;
 		private readonly GetTargetExpressionDelegate getTargetTypeExpression;
-		private readonly Reference interceptors;
+		private readonly IExpression interceptors;
 		private readonly Type invocation;
 
-		public MethodWithInvocationGenerator(MetaMethod method, Reference interceptors, Type invocation,
+		public MethodWithInvocationGenerator(MetaMethod method, IExpression interceptors, Type invocation,
 		                                     GetTargetExpressionDelegate getTargetExpression,
 		                                     OverrideMethodDelegate createMethod, IInvocationCreationContributor contributor)
 			: this(method, interceptors, invocation, getTargetExpression, null, createMethod, contributor)
 		{
 		}
 
-		public MethodWithInvocationGenerator(MetaMethod method, Reference interceptors, Type invocation,
+		public MethodWithInvocationGenerator(MetaMethod method, IExpression interceptors, Type invocation,
 		                                     GetTargetExpressionDelegate getTargetExpression,
 		                                     GetTargetExpressionDelegate getTargetTypeExpression,
 		                                     OverrideMethodDelegate createMethod, IInvocationCreationContributor contributor)
@@ -69,32 +69,34 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			return methodInterceptors;
 		}
 
-		protected override MethodEmitter BuildProxiedMethodBody(MethodEmitter emitter, ClassEmitter @class, ProxyGenerationOptions options, INamingScope namingScope)
+		protected override MethodEmitter BuildProxiedMethodBody(MethodEmitter emitter, ClassEmitter @class, INamingScope namingScope)
 		{
 			var invocationType = invocation;
 
-			Trace.Assert(MethodToOverride.IsGenericMethod == invocationType.GetTypeInfo().IsGenericTypeDefinition);
 			var genericArguments = Type.EmptyTypes;
 
 			var constructor = invocation.GetConstructors()[0];
 
-			Expression proxiedMethodTokenExpression;
+			IExpression proxiedMethodTokenExpression;
 			if (MethodToOverride.IsGenericMethod)
 			{
-				// bind generic method arguments to invocation's type arguments
-				genericArguments = emitter.MethodBuilder.GetGenericArguments();
-				invocationType = invocationType.MakeGenericType(genericArguments);
-				constructor = TypeBuilder.GetConstructor(invocationType, constructor);
-
 				// Not in the cache: generic method
+				genericArguments = emitter.MethodBuilder.GetGenericArguments();
 				proxiedMethodTokenExpression = new MethodTokenExpression(MethodToOverride.MakeGenericMethod(genericArguments));
+
+				if (invocationType.IsGenericTypeDefinition)
+				{
+					// bind generic method arguments to invocation's type arguments
+					invocationType = invocationType.MakeGenericType(genericArguments);
+					constructor = TypeBuilder.GetConstructor(invocationType, constructor);
+				}
 			}
 			else
 			{
 				var proxiedMethodToken = @class.CreateStaticField(namingScope.GetUniqueName("token_" + MethodToOverride.Name), typeof(MethodInfo));
 				@class.ClassConstructor.CodeBuilder.AddStatement(new AssignStatement(proxiedMethodToken, new MethodTokenExpression(MethodToOverride)));
 
-				proxiedMethodTokenExpression = proxiedMethodToken.ToExpression();
+				proxiedMethodTokenExpression = proxiedMethodToken;
 			}
 
 			var methodInterceptors = SetMethodInterceptors(@class, namingScope, emitter, proxiedMethodTokenExpression);
@@ -111,7 +113,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 
 			if (MethodToOverride.ContainsGenericParameters)
 			{
-				EmitLoadGenricMethodArguments(emitter, MethodToOverride.MakeGenericMethod(genericArguments), invocationLocal);
+				EmitLoadGenericMethodArguments(emitter, MethodToOverride.MakeGenericMethod(genericArguments), invocationLocal);
 			}
 
 			if (hasByRefArguments)
@@ -119,7 +121,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 				emitter.CodeBuilder.AddStatement(new TryStatement());
 			}
 
-			var proceed = new ExpressionStatement(new MethodInvocationExpression(invocationLocal, InvocationMethods.Proceed));
+			var proceed = new MethodInvocationExpression(invocationLocal, InvocationMethods.Proceed);
 			emitter.CodeBuilder.AddStatement(proceed);
 
 			if (hasByRefArguments)
@@ -144,7 +146,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 					LocalReference returnValue = emitter.CodeBuilder.DeclareLocal(typeof(object));
 					emitter.CodeBuilder.AddStatement(new AssignStatement(returnValue, getRetVal));
 
-					emitter.CodeBuilder.AddExpression(new IfNullExpression(returnValue, new ThrowStatement(typeof(InvalidOperationException),
+					emitter.CodeBuilder.AddStatement(new IfNullExpression(returnValue, new ThrowStatement(typeof(InvalidOperationException),
 						"Interceptors failed to set a return value, or swallowed the exception thrown by the target")));
 				}
 
@@ -159,7 +161,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			return emitter;
 		}
 
-		private Expression SetMethodInterceptors(ClassEmitter @class, INamingScope namingScope, MethodEmitter emitter, Expression proxiedMethodTokenExpression)
+		private IExpression SetMethodInterceptors(ClassEmitter @class, INamingScope namingScope, MethodEmitter emitter, IExpression proxiedMethodTokenExpression)
 		{
 			var selector = @class.GetField("__selector");
 			if(selector == null)
@@ -169,7 +171,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 
 			var methodInterceptorsField = BuildMethodInterceptorsField(@class, MethodToOverride, namingScope);
 
-			Expression targetTypeExpression;
+			IExpression targetTypeExpression;
 			if (getTargetTypeExpression != null)
 			{
 				targetTypeExpression = getTargetTypeExpression(@class, MethodToOverride);
@@ -182,20 +184,20 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			var emptyInterceptors = new NewArrayExpression(0, typeof(IInterceptor));
 			var selectInterceptors = new MethodInvocationExpression(selector, InterceptorSelectorMethods.SelectInterceptors,
 			                                                        targetTypeExpression,
-			                                                        proxiedMethodTokenExpression, interceptors.ToExpression())
+			                                                        proxiedMethodTokenExpression, interceptors)
 			{ VirtualCall = true };
 
-			emitter.CodeBuilder.AddExpression(
+			emitter.CodeBuilder.AddStatement(
 				new IfNullExpression(methodInterceptorsField,
 				                     new AssignStatement(methodInterceptorsField,
 				                                         new NullCoalescingOperatorExpression(selectInterceptors, emptyInterceptors))));
 
-			return methodInterceptorsField.ToExpression();
+			return methodInterceptorsField;
 		}
 
-		private void EmitLoadGenricMethodArguments(MethodEmitter methodEmitter, MethodInfo method, Reference invocationLocal)
+		private void EmitLoadGenericMethodArguments(MethodEmitter methodEmitter, MethodInfo method, Reference invocationLocal)
 		{
-			var genericParameters = method.GetGenericArguments().FindAll(t => t.GetTypeInfo().IsGenericParameter);
+			var genericParameters = Array.FindAll(method.GetGenericArguments(), t => t.IsGenericParameter);
 			var genericParamsArrayLocal = methodEmitter.CodeBuilder.DeclareLocal(typeof(Type[]));
 			methodEmitter.CodeBuilder.AddStatement(
 				new AssignStatement(genericParamsArrayLocal, new NewArrayExpression(genericParameters.Length, typeof(Type))));
@@ -205,26 +207,25 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 				methodEmitter.CodeBuilder.AddStatement(
 					new AssignArrayStatement(genericParamsArrayLocal, i, new TypeTokenExpression(genericParameters[i])));
 			}
-			methodEmitter.CodeBuilder.AddExpression(
+			methodEmitter.CodeBuilder.AddStatement(
 				new MethodInvocationExpression(invocationLocal,
 				                               InvocationMethods.SetGenericMethodArguments,
-				                               new ReferenceExpression(
-					                               genericParamsArrayLocal)));
+				                               genericParamsArrayLocal));
 		}
 
-		private Expression[] GetCtorArguments(ClassEmitter @class, Expression proxiedMethodTokenExpression, TypeReference[] dereferencedArguments, Expression methodInterceptors)
+		private IExpression[] GetCtorArguments(ClassEmitter @class, IExpression proxiedMethodTokenExpression, TypeReference[] dereferencedArguments, IExpression methodInterceptors)
 		{
 			return new[]
 			{
 				getTargetExpression(@class, MethodToOverride),
-				SelfReference.Self.ToExpression(),
-				methodInterceptors ?? interceptors.ToExpression(),
+				SelfReference.Self,
+				methodInterceptors ?? interceptors,
 				proxiedMethodTokenExpression,
 				new ReferencesToObjectArrayExpression(dereferencedArguments)
 			};
 		}
 
-		private Expression[] ModifyArguments(ClassEmitter @class, Expression[] arguments)
+		private IExpression[] ModifyArguments(ClassEmitter @class, IExpression[] arguments)
 		{
 			if (contributor == null)
 			{
@@ -238,7 +239,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 		{
 			for (int i = 0; i < arguments.Length; i++ )
 			{
-				if (arguments[i].Type.GetTypeInfo().IsByRef)
+				if (arguments[i].Type.IsByRef)
 				{
 					return true;
 				}

@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,11 +18,11 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 	using System.Reflection;
 	using System.Reflection.Emit;
 
-	[DebuggerDisplay("{fieldbuilder.Name} ({fieldbuilder.FieldType})")]
+	[DebuggerDisplay("{fieldBuilder.Name} ({fieldBuilder.FieldType})")]
 	internal class FieldReference : Reference
 	{
 		private readonly FieldInfo field;
-		private readonly FieldBuilder fieldbuilder;
+		private readonly FieldBuilder fieldBuilder;
 		private readonly bool isStatic;
 
 		public FieldReference(FieldInfo field)
@@ -35,20 +35,20 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 			}
 		}
 
-		public FieldReference(FieldBuilder fieldbuilder)
+		public FieldReference(FieldBuilder fieldBuilder)
 		{
-			this.fieldbuilder = fieldbuilder;
-			field = fieldbuilder;
-			if ((fieldbuilder.Attributes & FieldAttributes.Static) != 0)
+			this.fieldBuilder = fieldBuilder;
+			field = fieldBuilder;
+			if ((fieldBuilder.Attributes & FieldAttributes.Static) != 0)
 			{
 				isStatic = true;
 				owner = null;
 			}
 		}
 
-		public FieldBuilder Fieldbuilder
+		public FieldBuilder FieldBuilder
 		{
-			get { return fieldbuilder; }
+			get { return fieldBuilder; }
 		}
 
 		public FieldInfo Reference

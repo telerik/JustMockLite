@@ -1,4 +1,4 @@
-// Copyright 2004-2009 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 	/// Enable access to files on network shares
 	/// </summary>
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Unc")]
-    internal class UncResource : AbstractStreamResource
+	internal class UncResource : AbstractStreamResource
 	{
 		private string basePath;
 		private string filePath;
@@ -35,7 +35,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 			};
 		}
 
-		public UncResource(CustomUri resource, String basePath)
+		public UncResource(CustomUri resource, string basePath)
 		{
 			CreateStream = delegate
 			{
@@ -43,39 +43,39 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 			};
 		}
 
-		public UncResource(String resourceName) : this(new CustomUri(resourceName))
+		public UncResource(string resourceName) : this(new CustomUri(resourceName))
 		{
 		}
 
-		public UncResource(String resourceName, String basePath) : this(new CustomUri(resourceName), basePath)
+		public UncResource(string resourceName, string basePath) : this(new CustomUri(resourceName), basePath)
 		{
 		}
 
-		public override String FileBasePath
+		public override string FileBasePath
 		{
 			get { return basePath; }
 		}
 
-		public override IResource CreateRelative(String relativePath)
+		public override IResource CreateRelative(string relativePath)
 		{
 			return new UncResource(Path.Combine(basePath, relativePath));
 		}
 
 		public override string ToString()
 		{
-			return String.Format(CultureInfo.CurrentCulture, "UncResource: [{0}] [{1}]", filePath, basePath);
+			return string.Format(CultureInfo.CurrentCulture, "UncResource: [{0}] [{1}]", filePath, basePath);
 		}
 
-		private Stream CreateStreamFromUri(CustomUri resource, String rootPath)
+		private Stream CreateStreamFromUri(CustomUri resource, string rootPath)
 		{
 			if (resource == null)
-				throw new ArgumentNullException("resource");
+				throw new ArgumentNullException(nameof(resource));
 			if (!resource.IsUnc)
-				throw new ArgumentException("Resource must be an Unc", "resource");
+				throw new ArgumentException("Resource must be an Unc", nameof(resource));
 			if (!resource.IsFile)
-				throw new ArgumentException("The specified resource is not a file", "resource");
+				throw new ArgumentException("The specified resource is not a file", nameof(resource));
 
-			String resourcePath = resource.Path;
+			string resourcePath = resource.Path;
 
 			if (!File.Exists(resourcePath) && rootPath != null)
 			{
@@ -90,11 +90,11 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 			return File.OpenRead(resourcePath);
 		}
 
-		private static void CheckFileExists(String path)
+		private static void CheckFileExists(string path)
 		{
 			if (!File.Exists(path))
 			{
-				String message = String.Format(CultureInfo.InvariantCulture, "File {0} could not be found", path);
+				string message = string.Format(CultureInfo.InvariantCulture, "File {0} could not be found", path);
 				throw new ResourceException(message);
 			}
 		}

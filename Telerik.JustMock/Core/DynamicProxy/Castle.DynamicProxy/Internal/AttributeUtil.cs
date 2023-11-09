@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,8 +19,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 	using System.Diagnostics;
 	using System.Linq;
 	using System.Reflection;
-    using System.Reflection.Emit;
-    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
+	using System.Reflection.Emit;
+	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
 
 	internal static class AttributeUtil
 	{
@@ -28,47 +28,22 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 		{
 			Debug.Assert(attribute != null, "attribute != null");
 
-			// .NET Core does not provide CustomAttributeData.Constructor, so we'll implement it
-			// by finding a constructor ourselves
-			Type[] constructorArgTypes;
-			object[] constructorArgs;
-			GetArguments(attribute.ConstructorArguments, out constructorArgTypes, out constructorArgs);
-#if FEATURE_LEGACY_REFLECTION_API
-			var constructor = attribute.Constructor;
-#else
-			var constructor = attribute.AttributeType.GetConstructor(constructorArgTypes);
-#endif
+			object[] constructorArgs = GetArguments(attribute.ConstructorArguments);
 
 			PropertyInfo[] properties;
 			object[] propertyValues;
 			FieldInfo[] fields;
 			object[] fieldValues;
 			GetSettersAndFields(
-#if FEATURE_LEGACY_REFLECTION_API
-				null,
-#else
 				attribute.AttributeType,
-#endif
 				attribute.NamedArguments, out properties, out propertyValues, out fields, out fieldValues);
 
-			return new CustomAttributeInfo(constructor,
+			return new CustomAttributeInfo(attribute.Constructor,
 			                               constructorArgs,
 			                               properties,
 			                               propertyValues,
 			                               fields,
 			                               fieldValues);
-		}
-
-		private static void GetArguments(IList<CustomAttributeTypedArgument> constructorArguments,
-			out Type[] constructorArgTypes, out object[] constructorArgs)
-		{
-			constructorArgTypes = new Type[constructorArguments.Count];
-			constructorArgs = new object[constructorArguments.Count];
-			for (var i = 0; i < constructorArguments.Count; i++)
-			{
-				constructorArgTypes[i] = constructorArguments[i].ArgumentType;
-				constructorArgs[i] = ReadAttributeValue(constructorArguments[i]);
-			}
 		}
 
 		private static object[] GetArguments(IList<CustomAttributeTypedArgument> constructorArguments)
@@ -85,15 +60,18 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 		private static object ReadAttributeValue(CustomAttributeTypedArgument argument)
 		{
 			var value = argument.Value;
-			if (argument.ArgumentType.GetTypeInfo().IsArray == false)
+
+			if (argument.ArgumentType.IsArray && value is IList<CustomAttributeTypedArgument> values)
 			{
-				return value;
+				// `CustomAttributeInfo` represents array values as `ReadOnlyCollection<CustomAttributeTypedArgument>`,
+				// but `CustomAttributeBuilder` will require plain arrays, so we need a (recursive) conversion:
+				var arguments = GetArguments(values);
+				var array = new object[arguments.Length];
+				arguments.CopyTo(array, 0);
+				return array;
 			}
-			//special case for handling arrays in attributes
-			var arguments = GetArguments((IList<CustomAttributeTypedArgument>)value);
-			var array = new object[arguments.Length];
-			arguments.CopyTo(array, 0);
-			return array;
+
+			return value;
 		}
 
 		private static void GetSettersAndFields(Type attributeType, IEnumerable<CustomAttributeNamedArgument> namedArguments,
@@ -106,18 +84,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 			var fieldValuesList = new List<object>();
 			foreach (var argument in namedArguments)
 			{
-#if FEATURE_LEGACY_REFLECTION_API
-				if (argument.MemberInfo.MemberType == MemberTypes.Field)
-				{
-					fieldList.Add(argument.MemberInfo as FieldInfo);
-					fieldValuesList.Add(ReadAttributeValue(argument.TypedValue));
-				}
-				else
-				{
-					propertyList.Add(argument.MemberInfo as PropertyInfo);
-					propertyValuesList.Add(ReadAttributeValue(argument.TypedValue));
-				}
-#else
 				if (argument.IsField)
 				{
 					fieldList.Add(attributeType.GetField(argument.MemberName));
@@ -128,7 +94,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 					propertyList.Add(attributeType.GetProperty(argument.MemberName));
 					propertyValuesList.Add(ReadAttributeValue(argument.TypedValue));
 				}
-#endif
 			}
 
 			properties = propertyList.ToArray();
@@ -140,19 +105,11 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 		public static IEnumerable<CustomAttributeInfo> GetNonInheritableAttributes(this MemberInfo member)
 		{
 			Debug.Assert(member != null, "member != null");
-#if FEATURE_LEGACY_REFLECTION_API
-			var attributes = CustomAttributeData.GetCustomAttributes(member);
-#else
 			var attributes = member.CustomAttributes;
-#endif
 
 			foreach (var attribute in attributes)
 			{
-#if FEATURE_LEGACY_REFLECTION_API
-				var attributeType = attribute.Constructor.DeclaringType;
-#else
 				var attributeType = attribute.AttributeType;
-#endif
 				if (ShouldSkipAttributeReplication(attributeType, ignoreInheritance: false))
 				{
 					continue;
@@ -171,13 +128,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 							"To avoid this error you can chose not to replicate this attribute type by calling '{3}.Add(typeof({0}))'.",
 							attributeType.FullName,
 							member.DeclaringType.FullName,
-#if FEATURE_LEGACY_REFLECTION_API
-							(member is Type) ? "" : ("." + member.Name),
-#else
 							(member is TypeInfo) ? "" : ("." + member.Name),
-#endif
 							typeof(AttributesToAvoidReplicating).FullName);
-					throw new ProxyGenerationException(message, e);
+					throw new NotSupportedException(message, e);
 				}
 				if (info != null)
 				{
@@ -190,21 +143,13 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 		{
 			Debug.Assert(parameter != null, "parameter != null");
 
-#if FEATURE_LEGACY_REFLECTION_API
-			var attributes = CustomAttributeData.GetCustomAttributes(parameter);
-#else
 			var attributes = parameter.CustomAttributes;
-#endif
 
 			var ignoreInheritance = parameter.Member is ConstructorInfo;
 
 			foreach (var attribute in attributes)
 			{
-#if FEATURE_LEGACY_REFLECTION_API
-				var attributeType = attribute.Constructor.DeclaringType;
-#else
 				var attributeType = attribute.AttributeType;
-#endif
 
 				if (ShouldSkipAttributeReplication(attributeType, ignoreInheritance))
 				{
@@ -226,7 +171,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 		/// </summary>
 		private static bool ShouldSkipAttributeReplication(Type attribute, bool ignoreInheritance)
 		{
-			if (attribute.GetTypeInfo().IsPublic == false)
+			if (attribute.IsPublic == false && attribute.IsNestedPublic == false)
 			{
 				return true;
 			}
@@ -247,7 +192,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 
 			if (!ignoreInheritance)
 			{
-				var attrs = attribute.GetTypeInfo().GetCustomAttributes<AttributeUsageAttribute>(true).ToArray();
+				var attrs = attribute.GetCustomAttributes<AttributeUsageAttribute>(true).ToArray();
 				if (attrs.Length != 0)
 				{
 					return attrs[0].Inherited;
@@ -289,12 +234,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 			return types;
 		}
 
-        public static CustomAttributeBuilder CreateBuilder<TAttribute>() where TAttribute : Attribute, new()
-        {
-            var constructor = typeof(TAttribute).GetConstructor(Type.EmptyTypes);
-            Debug.Assert(constructor != null, "constructor != null");
+		public static CustomAttributeBuilder CreateBuilder<TAttribute>() where TAttribute : Attribute, new()
+		{
+			var constructor = typeof(TAttribute).GetConstructor(Type.EmptyTypes);
+			Debug.Assert(constructor != null, "constructor != null");
 
-            return new CustomAttributeBuilder(constructor, new object[0]);
-        }
-    }
+			return new CustomAttributeBuilder(constructor, new object[0]);
+		}
+	}
 }

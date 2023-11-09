@@ -1,4 +1,4 @@
-// Copyright 2004-2009 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,14 +18,14 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 	using System.IO;
 	using System.Text;
 
-    /// <summary>
-    /// Adapts a static string content as an <see cref="IResource"/>
-    /// </summary>
-    internal class StaticContentResource : AbstractResource
+	/// <summary>
+	/// Adapts a static string content as an <see cref="IResource"/>
+	/// </summary>
+	internal class StaticContentResource : AbstractResource
 	{
 		private readonly string contents;
 
-		public StaticContentResource(String contents)
+		public StaticContentResource(string contents)
 		{
 			this.contents = contents;
 		}
@@ -40,7 +40,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 			throw new NotImplementedException();
 		}
 
-		public override IResource CreateRelative(String relativePath)
+		public override IResource CreateRelative(string relativePath)
 		{
 			throw new NotImplementedException();
 		}

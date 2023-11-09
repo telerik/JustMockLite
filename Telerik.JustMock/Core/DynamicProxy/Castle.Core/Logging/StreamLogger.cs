@@ -1,10 +1,10 @@
-// Copyright 2004-2010 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,14 +18,14 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 	using System.IO;
 	using System.Text;
 
-    /// <summary>
-    ///	The Stream Logger class.  This class can stream log information
-    ///	to any stream, it is suitable for storing a log file to disk,
-    ///	or to a <c>MemoryStream</c> for testing your components.
-    /// </summary>
-    /// <remarks>
-    /// This logger is not thread safe.
-    /// </remarks>
+	/// <summary>
+	///	The Stream Logger class.  This class can stream log information
+	///	to any stream, it is suitable for storing a log file to disk,
+	///	or to a <c>MemoryStream</c> for testing your components.
+	/// </summary>
+	/// <remarks>
+	/// This logger is not thread safe.
+	/// </remarks>
 #if FEATURE_SERIALIZATION
 	[Serializable]
 #endif
@@ -44,7 +44,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		///  The stream that will be used for logging,
 		///  seeking while the logger is alive 
 		///</param>
-		public StreamLogger(String name, Stream stream) : this(name, new StreamWriter(stream))
+		public StreamLogger(string name, Stream stream) : this(name, new StreamWriter(stream))
 		{
 		}
 
@@ -63,7 +63,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		///  The encoding that will be used for this stream.
 		///  <see cref = "StreamWriter" />
 		///</param>
-		public StreamLogger(String name, Stream stream, Encoding encoding) : this(name, new StreamWriter(stream, encoding))
+		public StreamLogger(string name, Stream stream, Encoding encoding) : this(name, new StreamWriter(stream, encoding))
 		{
 		}
 
@@ -86,7 +86,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		///  The buffer size that will be used for this stream.
 		///  <see cref = "StreamWriter" />
 		///</param>
-		public StreamLogger(String name, Stream stream, Encoding encoding, int bufferSize)
+		public StreamLogger(string name, Stream stream, Encoding encoding, int bufferSize)
 			: this(name, new StreamWriter(stream, encoding, bufferSize))
 		{
 		}
@@ -124,13 +124,13 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// </summary>
 		/// <param name = "name">The name of the log.</param>
 		/// <param name = "writer">The <c>StreamWriter</c> the log will write to.</param>
-		protected StreamLogger(String name, StreamWriter writer) : base(name, LoggerLevel.Debug)
+		protected StreamLogger(string name, StreamWriter writer) : base(name, LoggerLevel.Trace)
 		{
 			this.writer = writer;
 			writer.AutoFlush = true;
 		}
 
-		protected override void Log(LoggerLevel loggerLevel, String loggerName, String message, Exception exception)
+		protected override void Log(LoggerLevel loggerLevel, string loggerName, string message, Exception exception)
 		{
 			if (writer == null)
 			{

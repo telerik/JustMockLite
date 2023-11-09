@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,30 +28,28 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 		private const MethodAttributes defaultAttributes =
 			MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Public;
 
-		private readonly ConstructorCollection constructors;
-		private readonly EventCollection events;
+		private readonly List<ConstructorEmitter> constructors;
+		private readonly List<EventEmitter> events;
 
 		private readonly IDictionary<string, FieldReference> fields =
 			new Dictionary<string, FieldReference>(StringComparer.OrdinalIgnoreCase);
 
-		private readonly MethodCollection methods;
+		private readonly List<MethodEmitter> methods;
 
-		private readonly Dictionary<String, GenericTypeParameterBuilder> name2GenericType;
-		private readonly NestedClassCollection nested;
-		private readonly PropertiesCollection properties;
-		private readonly TypeBuilder typebuilder;
+		private readonly List<NestedClassEmitter> nested;
+		private readonly List<PropertyEmitter> properties;
+		private readonly TypeBuilder typeBuilder;
 
 		private GenericTypeParameterBuilder[] genericTypeParams;
 
 		protected AbstractTypeEmitter(TypeBuilder typeBuilder)
 		{
-			typebuilder = typeBuilder;
-			nested = new NestedClassCollection();
-			methods = new MethodCollection();
-			constructors = new ConstructorCollection();
-			properties = new PropertiesCollection();
-			events = new EventCollection();
-			name2GenericType = new Dictionary<String, GenericTypeParameterBuilder>();
+			this.typeBuilder = typeBuilder;
+			nested = new List<NestedClassEmitter>();
+			methods = new List<MethodEmitter>();
+			constructors = new List<ConstructorEmitter>();
+			properties = new List<PropertyEmitter>();
+			events = new List<EventEmitter>();
 		}
 
 		public Type BaseType
@@ -68,39 +66,34 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 
 		public TypeConstructorEmitter ClassConstructor { get; private set; }
 
-		public ConstructorCollection Constructors
-		{
-			get { return constructors; }
-		}
-
 		public GenericTypeParameterBuilder[] GenericTypeParams
 		{
 			get { return genericTypeParams; }
 		}
 
-		public NestedClassCollection Nested
-		{
-			get { return nested; }
-		}
-
 		public TypeBuilder TypeBuilder
 		{
-			get { return typebuilder; }
+			get { return typeBuilder; }
 		}
 
-		public void AddCustomAttributes(ProxyGenerationOptions proxyGenerationOptions)
+		public void AddCustomAttributes(IEnumerable<CustomAttributeInfo> additionalAttributes)
 		{
-            foreach (var attribute in proxyGenerationOptions.AdditionalAttributes)
+			foreach (var attribute in additionalAttributes)
 			{
-				typebuilder.SetCustomAttribute(attribute.Builder);
+				typeBuilder.SetCustomAttribute(attribute.Builder);
 			}
+		}
+
+		public void AddNestedClass(NestedClassEmitter nestedClass)
+		{
+			nested.Add(nestedClass);
 		}
 
 		public virtual Type BuildType()
 		{
 			EnsureBuildersAreInAValidState();
 
-			var type = CreateType(typebuilder);
+			var type = CreateType(typeBuilder);
 
 			foreach (var builder in nested)
 			{
@@ -115,10 +108,10 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 			// big sanity check
 			if (genericTypeParams != null)
 			{
-				throw new ProxyGenerationException("CopyGenericParametersFromMethod: cannot invoke me twice");
+				throw new InvalidOperationException("Cannot invoke me twice");
 			}
 
-			SetGenericTypeParameters(GenericUtil.CopyGenericArguments(methodToCopyGenericsFrom, typebuilder, name2GenericType));
+			SetGenericTypeParameters(GenericUtil.CopyGenericArguments(methodToCopyGenericsFrom, typeBuilder));
 		}
 
 		public ConstructorEmitter CreateConstructor(params ArgumentReference[] arguments)
@@ -169,7 +162,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 
 		public FieldReference CreateField(string name, Type fieldType, FieldAttributes atts)
 		{
-			var fieldBuilder = typebuilder.DefineField(name, fieldType, atts);
+			var fieldBuilder = typeBuilder.DefineField(name, fieldType, atts);
 			var reference = new FieldReference(fieldBuilder);
 			fields[name] = reference;
 			return reference;
@@ -227,31 +220,31 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 
 		public void DefineCustomAttribute(CustomAttributeBuilder attribute)
 		{
-			typebuilder.SetCustomAttribute(attribute);
+			typeBuilder.SetCustomAttribute(attribute);
 		}
 
 		public void DefineCustomAttribute<TAttribute>(object[] constructorArguments) where TAttribute : Attribute
 		{
 			var customAttributeInfo = AttributeUtil.CreateInfo(typeof(TAttribute), constructorArguments);
-			typebuilder.SetCustomAttribute(customAttributeInfo.Builder);
+			typeBuilder.SetCustomAttribute(customAttributeInfo.Builder);
 		}
 
 		public void DefineCustomAttribute<TAttribute>() where TAttribute : Attribute, new()
 		{
 			var customAttributeInfo = AttributeUtil.CreateInfo<TAttribute>();
-			typebuilder.SetCustomAttribute(customAttributeInfo.Builder);
+			typeBuilder.SetCustomAttribute(customAttributeInfo.Builder);
 		}
 
 		public void DefineCustomAttributeFor<TAttribute>(FieldReference field) where TAttribute : Attribute, new()
 		{
 			var customAttributeInfo = AttributeUtil.CreateInfo<TAttribute>();
-			var fieldbuilder = field.Fieldbuilder;
-			if (fieldbuilder == null)
+			var fieldBuilder = field.FieldBuilder;
+			if (fieldBuilder == null)
 			{
 				throw new ArgumentException(
-					"Invalid field reference.This reference does not point to field on type being generated", "field");
+					"Invalid field reference.This reference does not point to field on type being generated", nameof(field));
 			}
-			fieldbuilder.SetCustomAttribute(customAttributeInfo.Builder);
+			fieldBuilder.SetCustomAttribute(customAttributeInfo.Builder);
 		}
 
 		public IEnumerable<FieldReference> GetAllFields()
@@ -271,42 +264,72 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 			return value;
 		}
 
-		public Type GetGenericArgument(String genericArgumentName)
+		public Type GetClosedParameterType(Type parameter)
 		{
-			if (name2GenericType.ContainsKey(genericArgumentName))
-				return name2GenericType[genericArgumentName].AsType();
-
-			return null;
-		}
-
-		public Type[] GetGenericArgumentsFor(Type genericType)
-		{
-			var types = new List<Type>();
-
-			foreach (var genType in genericType.GetGenericArguments())
+			if (parameter.IsGenericType)
 			{
-				if (genType.GetTypeInfo().IsGenericParameter)
+				// ECMA-335 section II.9.4: "The CLI does not support partial instantiation
+				// of generic types. And generic types shall not appear uninstantiated any-
+				// where in metadata signature blobs." (And parameters are defined there!)
+				Debug.Assert(parameter.IsGenericTypeDefinition == false);
+
+				var arguments = parameter.GetGenericArguments();
+				if (CloseGenericParametersIfAny(arguments))
 				{
-					types.Add(name2GenericType[genType.Name].AsType());
-				}
-				else
-				{
-					types.Add(genType);
+					return parameter.GetGenericTypeDefinition().MakeGenericType(arguments);
 				}
 			}
 
-			return types.ToArray();
+			if (parameter.IsGenericParameter)
+			{
+				return GetGenericArgument(parameter.GenericParameterPosition);
+			}
+
+			if (parameter.IsArray)
+			{
+				var elementType = GetClosedParameterType(parameter.GetElementType());
+				int rank = parameter.GetArrayRank();
+				return rank == 1
+					? elementType.MakeArrayType()
+					: elementType.MakeArrayType(rank);
+			}
+
+			if (parameter.IsByRef)
+			{
+				var elementType = GetClosedParameterType(parameter.GetElementType());
+				return elementType.MakeByRefType();
+			}
+
+			return parameter;
+
+			bool CloseGenericParametersIfAny(Type[] arguments)
+			{
+				var hasAnyGenericParameters = false;
+				for (var i = 0; i < arguments.Length; i++)
+				{
+					var newType = GetClosedParameterType(arguments[i]);
+					if (newType != null && !ReferenceEquals(newType, arguments[i]))
+					{
+						arguments[i] = newType;
+						hasAnyGenericParameters = true;
+					}
+				}
+				return hasAnyGenericParameters;
+			}
+		}
+
+		public Type GetGenericArgument(int position)
+		{
+			Debug.Assert(0 <= position && position < genericTypeParams.Length);
+
+			return genericTypeParams[position];
 		}
 
 		public Type[] GetGenericArgumentsFor(MethodInfo genericMethod)
 		{
-			var types = new List<Type>();
-			foreach (var genType in genericMethod.GetGenericArguments())
-			{
-				types.Add(name2GenericType[genType.Name].AsType());
-			}
+			Debug.Assert(genericMethod.GetGenericArguments().Length == genericTypeParams.Length);
 
-			return types.ToArray();
+			return genericTypeParams;
 		}
 
 		public void SetGenericTypeParameters(GenericTypeParameterBuilder[] genericTypeParameterBuilders)
@@ -316,45 +339,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 
 		protected Type CreateType(TypeBuilder type)
 		{
-			try
-			{
-#if FEATURE_LEGACY_REFLECTION_API
-				return type.CreateType();
-#else
-				return type.CreateTypeInfo().AsType();
-#endif
-			}
-			catch (BadImageFormatException ex)
-			{
-				if (Debugger.IsAttached == false)
-				{
-					throw;
-				}
-
-				if (ex.Message.Contains(@"HRESULT: 0x8007000B") == false)
-				{
-					throw;
-				}
-
-				if (type.IsGenericTypeDefinition == false)
-				{
-					throw;
-				}
-
-				var message =
-					"This is a DynamicProxy2 error: It looks like you encountered a bug in Visual Studio debugger, " +
-					"which causes this exception when proxying types with generic methods having constraints on their generic arguments." +
-					"This code will work just fine without the debugger attached. " +
-					"If you wish to use debugger you may have to switch to Visual Studio 2010 where this bug was fixed.";
-				var exception = new ProxyGenerationException(message);
-				exception.Data.Add("ProxyType", type.ToString());
-				throw exception;
-			}
+			return type.CreateTypeInfo();
 		}
 
 		protected virtual void EnsureBuildersAreInAValidState()
 		{
-			if (!typebuilder.IsInterface && constructors.Count == 0)
+			if (!typeBuilder.IsInterface && constructors.Count == 0)
 			{
 				CreateDefaultConstructor();
 			}

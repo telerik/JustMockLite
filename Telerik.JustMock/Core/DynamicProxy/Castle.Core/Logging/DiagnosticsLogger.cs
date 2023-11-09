@@ -1,10 +1,10 @@
-// Copyright 2004-2010 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2022 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,6 +26,9 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 #if FEATURE_SERIALIZATION
 	[Serializable]
 #endif
+#if NET6_0_OR_GREATER
+	[System.Runtime.Versioning.SupportedOSPlatform("windows")]
+#endif
 	internal class DiagnosticsLogger : LevelFilteredLogger, IDisposable
 	{
 #if FEATURE_SERIALIZATION
@@ -46,7 +49,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		/// </summary>
 		/// <param name = "logName"><see cref = "EventLog.Log" /></param>
 		/// <param name = "source"><see cref = "EventLog.Source" /></param>
-		public DiagnosticsLogger(string logName, string source) : base(LoggerLevel.Debug)
+		public DiagnosticsLogger(string logName, string source) : base(LoggerLevel.Trace)
 		{
 			// Create the source, if it does not already exist.
 			if (!EventLog.SourceExists(source))
@@ -109,7 +112,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 
 			var type = TranslateLevel(loggerLevel);
 
-			String contentToLog;
+			string contentToLog;
 
 			if (exception == null)
 			{
