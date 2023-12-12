@@ -1,10 +1,10 @@
-﻿// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+﻿// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,29 +19,71 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 	using System.Linq;
 	using System.Reflection;
 	using System.Runtime.CompilerServices;
-
-#if FEATURE_REMOTING
-	using System.Runtime.Remoting;
-#endif
+	using System.Threading;
 
 	using Telerik.JustMock.Core.Castle.Core.Internal;
+	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
+	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
 
 	internal static class ProxyUtil
 	{
-		private static readonly IDictionary<Assembly, bool> internalsVisibleToDynamicProxy = new Dictionary<Assembly, bool>();
-		private static readonly Lock internalsVisibleToDynamicProxyLock = Lock.Create();
+		private static readonly SynchronizedDictionary<Assembly, bool> internalsVisibleToDynamicProxy = new SynchronizedDictionary<Assembly, bool>();
+
+		/// <summary>
+		///   Creates a delegate of the specified type to a suitable `Invoke` method
+		///   on the given <paramref name="proxy"/> instance.
+		/// </summary>
+		/// <param name="proxy">The proxy instance to which the delegate should be bound.</param>
+		/// <typeparam name="TDelegate">The type of delegate that should be created.</typeparam>
+		/// <exception cref="MissingMethodException">
+		///   The <paramref name="proxy"/> does not have an `Invoke` method that is compatible with
+		///   the requested <typeparamref name="TDelegate"/> type.
+		/// </exception>
+		public static TDelegate CreateDelegateToMixin<TDelegate>(object proxy)
+		{
+			return (TDelegate)(object)CreateDelegateToMixin(proxy, typeof(TDelegate));
+		}
+
+		/// <summary>
+		///   Creates a delegate of the specified type to a suitable `Invoke` method
+		///   on the given <paramref name="proxy"/> instance.
+		/// </summary>
+		/// <param name="proxy">The proxy instance to which the delegate should be bound.</param>
+		/// <param name="delegateType">The type of delegate that should be created.</param>
+		/// <exception cref="MissingMethodException">
+		///   The <paramref name="proxy"/> does not have an `Invoke` method that is compatible with
+		///   the requested <paramref name="delegateType"/>.
+		/// </exception>
+		public static Delegate CreateDelegateToMixin(object proxy, Type delegateType)
+		{
+			if (proxy == null) throw new ArgumentNullException(nameof(proxy));
+			if (delegateType == null) throw new ArgumentNullException(nameof(delegateType));
+			if (!delegateType.IsDelegateType()) throw new ArgumentException("Type is not a delegate type.", nameof(delegateType));
+
+			var invokeMethod = delegateType.GetMethod("Invoke");
+			var proxiedInvokeMethod =
+				proxy
+				.GetType()
+				.GetMember("Invoke", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+				.Cast<MethodInfo>()
+				.FirstOrDefault(m => MethodSignatureComparer.Instance.EqualParameters(m, invokeMethod));
+
+			if (proxiedInvokeMethod == null)
+			{
+				throw new MissingMethodException("The proxy does not have an Invoke method " +
+				                                 "that is compatible with the requested delegate type.");
+			}
+			else
+			{
+				return Delegate.CreateDelegate(delegateType, proxy, proxiedInvokeMethod);
+			}
+		}
 
 		public static object GetUnproxiedInstance(object instance)
 		{
-#if FEATURE_REMOTING
-			if (!RemotingServices.IsTransparentProxy(instance))
-#endif
+			if (instance is IProxyTargetAccessor accessor)
 			{
-				var accessor = instance as IProxyTargetAccessor;
-				if (accessor != null)
-				{
-					instance = accessor.DynProxyGetTarget();
-				}
+				instance = accessor.DynProxyGetTarget();
 			}
 
 			return instance;
@@ -49,25 +91,17 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 
 		public static Type GetUnproxiedType(object instance)
 		{
-#if FEATURE_REMOTING
-			if (!RemotingServices.IsTransparentProxy(instance))
-#endif
+			if (instance is IProxyTargetAccessor accessor)
 			{
-				var accessor = instance as IProxyTargetAccessor;
-
-				if (accessor != null)
+				var target = accessor.DynProxyGetTarget();
+				if (target != null)
 				{
-					var target = accessor.DynProxyGetTarget();
-
-					if (target != null)
+					if (ReferenceEquals(target, instance))
 					{
-						if (ReferenceEquals(target, instance))
-						{
-							return instance.GetType().GetTypeInfo().BaseType;
-						}
-
-						instance = target;
+						return instance.GetType().BaseType;
 					}
+
+					instance = target;
 				}
 			}
 
@@ -76,12 +110,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 
 		public static bool IsProxy(object instance)
 		{
-#if FEATURE_REMOTING
-			if (RemotingServices.IsTransparentProxy(instance))
-			{
-				return true;
-			}
-#endif
 			return instance is IProxyTargetAccessor;
 		}
 
@@ -131,47 +159,26 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		/// <param name="asm">The assembly to inspect.</param>
 		internal static bool AreInternalsVisibleToDynamicProxy(Assembly asm)
 		{
-			using (var locker = internalsVisibleToDynamicProxyLock.ForReading())
+			return internalsVisibleToDynamicProxy.GetOrAdd(asm, a =>
 			{
-				if (internalsVisibleToDynamicProxy.ContainsKey(asm))
-				{
-					return internalsVisibleToDynamicProxy[asm];
-				}
-			}
-
-			using (var locker = internalsVisibleToDynamicProxyLock.ForReadingUpgradeable())
-			{
-				if (internalsVisibleToDynamicProxy.ContainsKey(asm))
-				{
-					return internalsVisibleToDynamicProxy[asm];
-				}
-
-				// Upgrade the lock to a write lock.
-				using (locker.Upgrade())
-				{
-					var internalsVisibleTo = asm.GetCustomAttributes<InternalsVisibleToAttribute>();
-					var found = internalsVisibleTo.Any(attr => attr.AssemblyName.Contains(ModuleScope.DEFAULT_ASSEMBLY_NAME));
-					internalsVisibleToDynamicProxy.Add(asm, found);
-					return found;
-				}
-			}
+				var internalsVisibleTo = asm.GetCustomAttributes<InternalsVisibleToAttribute>();
+				return internalsVisibleTo.Any(attr => attr.AssemblyName.Contains(ModuleScope.DEFAULT_ASSEMBLY_NAME));
+			});
 		}
 
 		internal static bool IsAccessibleType(Type target)
 		{
-			var typeInfo = target.GetTypeInfo();
-
-			var isPublic = typeInfo.IsPublic || typeInfo.IsNestedPublic;
+			var isPublic = target.IsPublic || target.IsNestedPublic;
 			if (isPublic)
 			{
 				return true;
 			}
 
 			var isTargetNested = target.IsNested;
-			var isNestedAndInternal = isTargetNested && (typeInfo.IsNestedAssembly || typeInfo.IsNestedFamORAssem);
-			var isInternalNotNested = typeInfo.IsVisible == false && isTargetNested == false;
+			var isNestedAndInternal = isTargetNested && (target.IsNestedAssembly || target.IsNestedFamORAssem);
+			var isInternalNotNested = target.IsVisible == false && isTargetNested == false;
 			var isInternal = isInternalNotNested || isNestedAndInternal;
-			if (isInternal && AreInternalsVisibleToDynamicProxy(typeInfo.Assembly))
+			if (isInternal && AreInternalsVisibleToDynamicProxy(target.Assembly))
 			{
 				return true;
 			}
@@ -194,7 +201,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 
 			if (method.IsAssembly || method.IsFamilyAndAssembly)
 			{
-				return AreInternalsVisibleToDynamicProxy(method.DeclaringType.GetTypeInfo().Assembly);
+				return AreInternalsVisibleToDynamicProxy(method.DeclaringType.Assembly);
 			}
 
 			return false;
@@ -215,7 +222,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		private static string CreateMessageForInaccessibleMethod(MethodBase inaccessibleMethod)
 		{
 			var containingType = inaccessibleMethod.DeclaringType;
-			var targetAssembly = containingType.GetTypeInfo().Assembly;
+			var targetAssembly = containingType.Assembly;
 
 			var messageFormat = "Can not create proxy for method {0} because it or its declaring type is not accessible. ";
 

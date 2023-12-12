@@ -1,10 +1,10 @@
-// Copyright 2004-2014 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -61,83 +61,102 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 
 		public Type CreateClassProxyType(Type classToProxy, Type[] additionalInterfacesToProxy, ProxyGenerationOptions options)
 		{
-			AssertValidType(classToProxy);
-			AssertValidTypes(additionalInterfacesToProxy);
+			AssertValidType(classToProxy, nameof(classToProxy));
+			AssertValidTypes(additionalInterfacesToProxy, nameof(additionalInterfacesToProxy));
+			AssertValidMixins(options, nameof(options));
 
-			var generator = new ClassProxyGenerator(scope, classToProxy) { Logger = logger };
-			return generator.GenerateCode(additionalInterfacesToProxy, options);
+			var generator = new ClassProxyGenerator(scope, classToProxy, additionalInterfacesToProxy, options) { Logger = logger };
+			return generator.GetProxyType();
 		}
 
 		public Type CreateClassProxyTypeWithTarget(Type classToProxy, Type[] additionalInterfacesToProxy,
 		                                           ProxyGenerationOptions options)
 		{
-			AssertValidType(classToProxy);
-			AssertValidTypes(additionalInterfacesToProxy);
+			AssertValidType(classToProxy, nameof(classToProxy));
+			AssertValidTypes(additionalInterfacesToProxy, nameof(additionalInterfacesToProxy));
+			AssertValidMixins(options, nameof(options));
+
 			var generator = new ClassProxyWithTargetGenerator(scope, classToProxy, additionalInterfacesToProxy, options)
 			{ Logger = logger };
-			return generator.GetGeneratedType();
+			return generator.GetProxyType();
 		}
 
 		public Type CreateInterfaceProxyTypeWithTarget(Type interfaceToProxy, Type[] additionalInterfacesToProxy,
 		                                               Type targetType,
 		                                               ProxyGenerationOptions options)
 		{
-			AssertValidType(interfaceToProxy);
-			AssertValidTypes(additionalInterfacesToProxy);
+			AssertValidType(interfaceToProxy, nameof(interfaceToProxy));
+			AssertValidTypes(additionalInterfacesToProxy, nameof(additionalInterfacesToProxy));
+			AssertValidMixins(options, nameof(options));
 
-			var generator = new InterfaceProxyWithTargetGenerator(scope, interfaceToProxy) { Logger = logger };
-			return generator.GenerateCode(targetType, additionalInterfacesToProxy, options);
+			var generator = new InterfaceProxyWithTargetGenerator(scope, interfaceToProxy, additionalInterfacesToProxy, targetType, options) { Logger = logger };
+			return generator.GetProxyType();
 		}
 
 		public Type CreateInterfaceProxyTypeWithTargetInterface(Type interfaceToProxy, Type[] additionalInterfacesToProxy,
 		                                                        ProxyGenerationOptions options)
 		{
-			AssertValidType(interfaceToProxy);
-			AssertValidTypes(additionalInterfacesToProxy);
+			AssertValidType(interfaceToProxy, nameof(interfaceToProxy));
+			AssertValidTypes(additionalInterfacesToProxy, nameof(additionalInterfacesToProxy));
+			AssertValidMixins(options, nameof(options));
 
-			var generator = new InterfaceProxyWithTargetInterfaceGenerator(scope, interfaceToProxy) { Logger = logger };
-			return generator.GenerateCode(interfaceToProxy, additionalInterfacesToProxy, options);
+			var generator = new InterfaceProxyWithTargetInterfaceGenerator(scope, interfaceToProxy, additionalInterfacesToProxy, interfaceToProxy, options) { Logger = logger };
+			return generator.GetProxyType();
 		}
 
 		public Type CreateInterfaceProxyTypeWithoutTarget(Type interfaceToProxy, Type[] additionalInterfacesToProxy,
 		                                                  ProxyGenerationOptions options)
 		{
-			AssertValidType(interfaceToProxy);
-			AssertValidTypes(additionalInterfacesToProxy);
+			AssertValidType(interfaceToProxy, nameof(interfaceToProxy));
+			AssertValidTypes(additionalInterfacesToProxy, nameof(additionalInterfacesToProxy));
+			AssertValidMixins(options, nameof(options));
 
-			var generator = new InterfaceProxyWithoutTargetGenerator(scope, interfaceToProxy) { Logger = logger };
-			return generator.GenerateCode(typeof(object), additionalInterfacesToProxy, options);
+			var generator = new InterfaceProxyWithoutTargetGenerator(scope, interfaceToProxy, additionalInterfacesToProxy, typeof(object), options) { Logger = logger };
+			return generator.GetProxyType();
 		}
 
-		private void AssertValidType(Type target)
+		private void AssertValidMixins(ProxyGenerationOptions options, string paramName)
 		{
-			AssertValidTypeForTarget(target, target);
-		}
-
-		private void AssertValidTypeForTarget(Type type, Type target)
-		{
-			if (type.GetTypeInfo().IsGenericTypeDefinition)
+			try
 			{
-				throw new GeneratorException(string.Format("Can not create proxy for type {0} because type {1} is an open generic type.",
-															target.GetBestName(), type.GetBestName()));
+				options.Initialize();
+			}
+			catch (InvalidOperationException ex)
+			{
+				throw new ArgumentException(ex.Message, paramName, ex.InnerException);  // convert to more suitable exception type
+			}
+		}
+
+		private void AssertValidType(Type target, string paramName)
+		{
+			AssertValidTypeForTarget(target, target, paramName);
+		}
+
+		private void AssertValidTypeForTarget(Type type, Type target, string paramName)
+		{
+			if (type.IsGenericTypeDefinition)
+			{
+				throw new ArgumentException(
+					$"Can not create proxy for type {target.GetBestName()} because type {type.GetBestName()} is an open generic type.",
+					paramName);
 			}
 			if (ProxyUtil.IsAccessibleType(type) == false)
 			{
-				throw new GeneratorException(ExceptionMessageBuilder.CreateMessageForInaccessibleType(type, target));
+				throw new ArgumentException(ExceptionMessageBuilder.CreateMessageForInaccessibleType(type, target), paramName);
 			}
 			foreach (var typeArgument in type.GetGenericArguments())
 			{
-				AssertValidTypeForTarget(typeArgument, target);
+				AssertValidTypeForTarget(typeArgument, target, paramName);
 			}
 		}
 
-		private void AssertValidTypes(IEnumerable<Type> targetTypes)
+		private void AssertValidTypes(IEnumerable<Type> targetTypes, string paramName)
 		{
 			if (targetTypes != null)
 			{
 				foreach (var t in targetTypes)
 				{
-					AssertValidType(t);
+					AssertValidType(t, paramName);
 				}
 			}
 		}

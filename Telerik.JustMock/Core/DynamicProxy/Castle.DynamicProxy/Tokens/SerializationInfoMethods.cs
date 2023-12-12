@@ -1,4 +1,4 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,25 +29,25 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Tokens
 		///   <see cref = "SerializationInfo.AddValue(string,bool)" />
 		/// </summary>
 		public static readonly MethodInfo AddValue_Bool =
-			typeof(SerializationInfo).GetMethod("AddValue", new[] { typeof(String), typeof(bool) });
+			typeof(SerializationInfo).GetMethod("AddValue", new[] { typeof(string), typeof(bool) });
 
 		/// <summary>
 		///   <see cref = "SerializationInfo.AddValue(string,int)" />
 		/// </summary>
 		public static readonly MethodInfo AddValue_Int32 =
-			typeof(SerializationInfo).GetMethod("AddValue", new[] { typeof(String), typeof(int) });
+			typeof(SerializationInfo).GetMethod("AddValue", new[] { typeof(string), typeof(int) });
 
 		/// <summary>
 		///   <see cref = "SerializationInfo.AddValue(string,object)" />
 		/// </summary>
 		public static readonly MethodInfo AddValue_Object =
-			typeof(SerializationInfo).GetMethod("AddValue", new[] { typeof(String), typeof(Object) });
+			typeof(SerializationInfo).GetMethod("AddValue", new[] { typeof(string), typeof(object) });
 
 		/// <summary>
 		///   <see cref = "SerializationInfo.GetValue" />
 		/// </summary>
 		public static readonly MethodInfo GetValue =
-			typeof(SerializationInfo).GetMethod("GetValue", new[] { typeof(String), typeof(Type) });
+			typeof(SerializationInfo).GetMethod("GetValue", new[] { typeof(string), typeof(Type) });
 
 		/// <summary>
 		///   <see cref = "SerializationInfo.SetType" />

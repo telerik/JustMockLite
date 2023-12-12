@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,9 +14,9 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 {
-	using System;
 	using System.Linq;
 	using System.Reflection;
+	using System.Runtime.InteropServices;
 
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
@@ -28,24 +28,26 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 		                                           MethodInfo method, MethodEmitter emitter)
 		{
 			var parameters = method.GetParameters();
-			if (!parameters.Any(IsByRef))
-			{
-				return; //saving the need to create locals if there is no need
-			}
 
-			var arguments = StoreInvocationArgumentsInLocal(emitter, invocation);
+			// Create it only if there are byref writable arguments.
+			LocalReference arguments = null;
 
 			for (var i = 0; i < parameters.Length; i++)
 			{
 				if (IsByRef(parameters[i]) && !IsReadOnly(parameters[i]))
 				{
+					if (arguments == null)
+					{
+						arguments = StoreInvocationArgumentsInLocal(emitter, invocation);
+					}
+
 					emitter.CodeBuilder.AddStatement(AssignArgument(dereferencedArguments, i, arguments));
 				}
 			}
 
 			bool IsByRef(ParameterInfo parameter)
 			{
-				return parameter.ParameterType.GetTypeInfo().IsByRef;
+				return parameter.ParameterType.IsByRef;
 			}
 
 			bool IsReadOnly(ParameterInfo parameter)
@@ -74,25 +76,32 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 				//
 				// The above points inform the following detection logic: First, we rely on an IL
 				// `[in]` modifier being present. This is a "fast guard" against non-`in` parameters:
-				if ((parameter.Attributes & (ParameterAttributes.In | ParameterAttributes.Out)) == ParameterAttributes.In)
+				if ((parameter.Attributes & (ParameterAttributes.In | ParameterAttributes.Out)) != ParameterAttributes.In)
 				{
-					// Here we perform the actual check. We don't rely on cmods because support
-					// for them is at current too unreliable in general, and because we wouldn't
-					// be saving much time anyway.
-					if (parameter.GetCustomAttributes(false).Any(IsIsReadOnlyAttribute))
-					{
-						return true;
-					}
+					return false;
+				}
+
+				// This check allows to make the detection logic more robust on the platforms which support custom modifiers.
+				// The robustness is achieved by the fact, that usually the `IsReadOnlyAttribute` emitted by the compiler is internal to the assembly.
+				// Therefore, if clients use Reflection.Emit to create "a copy" of the methods with read-only members, they cannot re-use the existing attribute.
+				// Instead, they are forced to emit their own `IsReadOnlyAttribute` to mark some argument as immutable.
+				// The `InAttribute` type OTOH was always available in BCL. Therefore, it's much easier to copy the modreq and be recognized by Castle.
+				//
+				// If check fails, resort to the IsReadOnlyAttribute check.
+				// Check for the required modifiers first, as it's faster.
+				if (parameter.GetRequiredCustomModifiers().Any(x => x == typeof(InAttribute)))
+				{
+					return true;
+				}
+
+				// The comparison by name is intentional; any assembly could define that attribute.
+				// See explanation in comment above.
+				if (parameter.GetCustomAttributes(false).Any(x => x.GetType().FullName == "System.Runtime.CompilerServices.IsReadOnlyAttribute"))
+				{
+					return true;
 				}
 
 				return false;
-
-				bool IsIsReadOnlyAttribute(object attribute)
-				{
-					// The comparison by name is intentional; any assembly could define that attribute.
-					// See explanation in comment above.
-					return attribute.GetType().FullName == "System.Runtime.CompilerServices.IsReadOnlyAttribute";
-				}
 			}
 		}
 

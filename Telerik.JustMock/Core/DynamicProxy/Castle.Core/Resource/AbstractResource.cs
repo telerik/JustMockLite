@@ -1,4 +1,4 @@
-// Copyright 2004-2009 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 
 		public abstract TextReader GetStreamReader(Encoding encoding);
 
-		public abstract IResource CreateRelative(String relativePath);
+		public abstract IResource CreateRelative(string relativePath);
 
 		public void Dispose()
 		{

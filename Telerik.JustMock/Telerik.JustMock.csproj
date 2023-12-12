@@ -10,7 +10,12 @@
     <Description></Description>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <CommonConstants>NO_EXCEPTION_SERIALIZATION;FEATURE_EMIT_CUSTOMMODIFIERS</CommonConstants>
+    <CommonConstants>NO_EXCEPTION_SERIALIZATION</CommonConstants>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0749EBC2-4E83-4960-BF28-1FF5C2DEB2B9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(PreviewTargetFramework)' != '' ">
     <NetCoreSupportedVersions>$(NetCoreSupportedVersions);$(PreviewTargetFramework)</NetCoreSupportedVersions>
@@ -55,34 +60,10 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net45' Or '$(TargetFramework)' == 'net472'">
-    <DefineConstants>$(DefineConstants);FEATURE_REMOTING;FEATURE_APPDOMAIN;FEATURE_ASSEMBLYBUILDER_SAVE</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_APPDOMAIN;FEATURE_ASSEMBLYBUILDER_SAVE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="$(NetCoreSupportedVersions.Contains('$(TargetFramework)'))">
     <DefineConstants>$(DefineConstants);NETCORE;NO_APPDOMAIN_ISOLATION</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SccProjectName />
-    <SccLocalPath />
-    <SccAuxPath />
-    <SccProvider />
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{0749EBC2-4E83-4960-BF28-1FF5C2DEB2B9}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <FileAlignment>512</FileAlignment>
-    <SccProjectName />
-    <SccLocalPath />
-    <SccAuxPath />
-    <SccProvider />
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Solution Items\snkey_lite.snk</AssemblyOriginatorKeyFile>
-    <PostBuildEvent />
-  </PropertyGroup>
-  <PropertyGroup>
-    <PostBuildEvent />
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net45' Or '$(TargetFramework)' == 'net472'">
     <Reference Include="Microsoft.CSharp" />
@@ -173,7 +154,6 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Args.Matching.cs</LastGenOutput>
     </None>
-    <None Include="Core\DynamicProxy\Castle.DynamicProxy\DynProxy.snk" />
     <None Include="Expectations\Abstraction\IReturns.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>IReturns.cs</LastGenOutput>

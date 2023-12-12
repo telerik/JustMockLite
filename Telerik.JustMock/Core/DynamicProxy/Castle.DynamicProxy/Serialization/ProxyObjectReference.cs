@@ -1,4 +1,4 @@
-// Copyright 2004-2012 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,9 +21,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Serialization
 	using System.Diagnostics;
 	using System.Reflection;
 	using System.Runtime.Serialization;
-#if DOTNET40
-	using System.Security;
-#endif
 
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
@@ -70,7 +67,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Serialization
 		{
 			if (scope == null)
 			{
-				throw new ArgumentNullException("scope");
+				throw new ArgumentNullException(nameof(scope));
 			}
 			ProxyObjectReference.scope = scope;
 		}
@@ -86,9 +83,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Serialization
 			get { return scope; }
 		}
 
-#if FEATURE_SECURITY_PERMISSIONS && DOTNET40
-		[SecurityCritical]
-#endif
 		protected ProxyObjectReference(SerializationInfo info, StreamingContext context)
 		{
 			this.info = info;
@@ -96,7 +90,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Serialization
 
 			baseType = DeserializeTypeFromString("__baseType");
 
-			var _interfaceNames = (String[])info.GetValue("__interfaces", typeof(String[]));
+			var _interfaceNames = (string[])info.GetValue("__interfaces", typeof(string[]));
 			interfaces = new Type[_interfaceNames.Length];
 
 			for (var i = 0; i < _interfaceNames.Length; i++)
@@ -118,9 +112,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Serialization
 			return Type.GetType(info.GetString(key), true, false);
 		}
 
-#if FEATURE_SECURITY_PERMISSIONS && DOTNET40
-		[SecurityCritical]
-#endif
 		protected virtual object RecreateProxy()
 		{
 			var generatorType = GetValue<string>("__proxyTypeId");
@@ -138,36 +129,30 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Serialization
 			return RecreateInterfaceProxy(generatorType);
 		}
 
-#if FEATURE_SECURITY_PERMISSIONS && DOTNET40
-		[SecurityCritical]
-#endif
 		private object RecreateClassProxyWithTarget()
 		{
 			var generator = new ClassProxyWithTargetGenerator(scope, baseType, interfaces, proxyGenerationOptions);
-			var proxyType = generator.GetGeneratedType();
+			var proxyType = generator.GetProxyType();
 			return InstantiateClassProxy(proxyType);
 		}
 
-#if FEATURE_SECURITY_PERMISSIONS && DOTNET40
-		[SecurityCritical]
-#endif
 		public object RecreateInterfaceProxy(string generatorType)
 		{
 			var @interface = DeserializeTypeFromString("__theInterface");
 			var targetType = DeserializeTypeFromString("__targetFieldType");
 
-			InterfaceProxyWithTargetGenerator generator;
+			BaseInterfaceProxyGenerator generator;
 			if (generatorType == ProxyTypeConstants.InterfaceWithTarget)
 			{
-				generator = new InterfaceProxyWithTargetGenerator(scope, @interface);
+				generator = new InterfaceProxyWithTargetGenerator(scope, @interface, interfaces, targetType, proxyGenerationOptions);
 			}
 			else if (generatorType == ProxyTypeConstants.InterfaceWithoutTarget)
 			{
-				generator = new InterfaceProxyWithoutTargetGenerator(scope, @interface);
+				generator = new InterfaceProxyWithoutTargetGenerator(scope, @interface, interfaces, targetType, proxyGenerationOptions);
 			}
 			else if (generatorType == ProxyTypeConstants.InterfaceWithTargetInterface)
 			{
-				generator = new InterfaceProxyWithTargetInterfaceGenerator(scope, @interface);
+				generator = new InterfaceProxyWithTargetInterfaceGenerator(scope, @interface, interfaces, targetType, proxyGenerationOptions);
 			}
 			else
 			{
@@ -177,23 +162,17 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Serialization
 						generatorType));
 			}
 
-			var proxyType = generator.GenerateCode(targetType, interfaces, proxyGenerationOptions);
+			var proxyType = generator.GetProxyType();
 			return FormatterServices.GetSafeUninitializedObject(proxyType);
 		}
 
-#if FEATURE_SECURITY_PERMISSIONS && DOTNET40
-		[SecurityCritical]
-#endif
 		public object RecreateClassProxy()
 		{
-			var generator = new ClassProxyGenerator(scope, baseType);
-			var proxyType = generator.GenerateCode(interfaces, proxyGenerationOptions);
+			var generator = new ClassProxyGenerator(scope, baseType, interfaces, proxyGenerationOptions);
+			var proxyType = generator.GetProxyType();
 			return InstantiateClassProxy(proxyType);
 		}
 
-#if FEATURE_SECURITY_PERMISSIONS && DOTNET40
-		[SecurityCritical]
-#endif
 		private object InstantiateClassProxy(Type proxy_type)
 		{
 			delegateToBase = GetValue<bool>("__delegateToBase");
@@ -215,26 +194,17 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Serialization
 			}
 		}
 
-#if FEATURE_SECURITY_PERMISSIONS && DOTNET40
-		[SecurityCritical]
-#endif
 		public object GetRealObject(StreamingContext context)
 		{
 			return proxy;
 		}
 
-#if FEATURE_SECURITY_PERMISSIONS && DOTNET40
-		[SecurityCritical]
-#endif
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			// There is no need to implement this method as 
 			// this class would never be serialized.
 		}
 
-#if FEATURE_SECURITY_PERMISSIONS && DOTNET40
-		[SecuritySafeCritical]
-#endif
 		public void OnDeserialization(object sender)
 		{
 			var interceptors = GetValue<IInterceptor[]>("__interceptors");
@@ -247,16 +217,13 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Serialization
 			InvokeCallback(proxy);
 		}
 
-#if FEATURE_SECURITY_PERMISSIONS && DOTNET40
-		[SecurityCritical]
-#endif
 		private void DeserializeProxyMembers()
 		{
 			var proxyType = proxy.GetType();
 			var members = FormatterServices.GetSerializableMembers(proxyType);
 
 			var deserializedMembers = new List<MemberInfo>();
-			var deserializedValues = new List<Object>();
+			var deserializedValues = new List<object>();
 			for (var i = 0; i < members.Length; i++)
 			{
 				var member = members[i] as FieldInfo;
@@ -274,9 +241,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Serialization
 			FormatterServices.PopulateObjectMembers(proxy, deserializedMembers.ToArray(), deserializedValues.ToArray());
 		}
 
-#if FEATURE_SECURITY_PERMISSIONS && DOTNET40
-		[SecurityCritical]
-#endif
 		private void DeserializeProxyState()
 		{
 			if (isInterfaceProxy)

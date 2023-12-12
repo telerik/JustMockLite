@@ -1,10 +1,10 @@
-﻿// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+﻿// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,7 +33,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 
 		public InvocationWithGenericDelegateContributor(Type delegateType, MetaMethod method, Reference targetReference)
 		{
-			Debug.Assert(delegateType.GetTypeInfo().IsGenericType, "delegateType.IsGenericType");
+			Debug.Assert(delegateType.IsGenericType, "delegateType.IsGenericType");
 			this.delegateType = delegateType;
 			this.method = method;
 			this.targetReference = targetReference;
@@ -49,7 +49,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 			return delegateType.GetMethod("Invoke");
 		}
 
-		public MethodInvocationExpression GetCallbackMethodInvocation(AbstractTypeEmitter invocation, Expression[] args,
+		public MethodInvocationExpression GetCallbackMethodInvocation(AbstractTypeEmitter invocation, IExpression[] args,
 		                                                              Reference targetField,
 		                                                              MethodEmitter invokeMethodOnTarget)
 		{
@@ -57,7 +57,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 			return new MethodInvocationExpression(@delegate, GetCallbackMethod(), args);
 		}
 
-		public Expression[] GetConstructorInvocationArguments(Expression[] arguments, ClassEmitter proxy)
+		public IExpression[] GetConstructorInvocationArguments(IExpression[] arguments, ClassEmitter proxy)
 		{
 			return arguments;
 		}
@@ -68,13 +68,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 			var closedDelegateType = delegateType.MakeGenericType(genericTypeParameters);
 			var localReference = invokeMethodOnTarget.CodeBuilder.DeclareLocal(closedDelegateType);
 			var closedMethodOnTarget = method.MethodOnTarget.MakeGenericMethod(genericTypeParameters);
-			var localTarget = new ReferenceExpression(targetReference);
 			invokeMethodOnTarget.CodeBuilder.AddStatement(
-				SetDelegate(localReference, localTarget, closedDelegateType, closedMethodOnTarget));
+				SetDelegate(localReference, targetReference, closedDelegateType, closedMethodOnTarget));
 			return localReference;
 		}
 
-		private AssignStatement SetDelegate(LocalReference localDelegate, ReferenceExpression localTarget,
+		private AssignStatement SetDelegate(LocalReference localDelegate, Reference localTarget,
 		                                    Type closedDelegateType, MethodInfo closedMethodOnTarget)
 		{
 			var delegateCreateDelegate = new MethodInvocationExpression(

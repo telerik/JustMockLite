@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,7 +21,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 	[DebuggerDisplay("local {Type}")]
 	internal class LocalReference : TypeReference
 	{
-		private LocalBuilder localbuilder;
+		private LocalBuilder localBuilder;
 
 		public LocalReference(Type type) : base(type)
 		{
@@ -29,22 +29,22 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 
 		public override void Generate(ILGenerator gen)
 		{
-			localbuilder = gen.DeclareLocal(base.Type);
+			localBuilder = gen.DeclareLocal(base.Type);
 		}
 
 		public override void LoadAddressOfReference(ILGenerator gen)
 		{
-			gen.Emit(OpCodes.Ldloca, localbuilder);
+			gen.Emit(OpCodes.Ldloca, localBuilder);
 		}
 
 		public override void LoadReference(ILGenerator gen)
 		{
-			gen.Emit(OpCodes.Ldloc, localbuilder);
+			gen.Emit(OpCodes.Ldloc, localBuilder);
 		}
 
 		public override void StoreReference(ILGenerator gen)
 		{
-			gen.Emit(OpCodes.Stloc, localbuilder);
+			gen.Emit(OpCodes.Stloc, localBuilder);
 		}
 	}
 }

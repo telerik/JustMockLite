@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,28 +17,28 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 	using System.Reflection;
 	using System.Reflection.Emit;
 
-	internal class MethodInvocationExpression : Expression
+	internal class MethodInvocationExpression : IExpression, IStatement
 	{
-		protected readonly Expression[] args;
+		protected readonly IExpression[] args;
 		protected readonly MethodInfo method;
 		protected readonly Reference owner;
 
-		public MethodInvocationExpression(MethodInfo method, params Expression[] args) :
+		public MethodInvocationExpression(MethodInfo method, params IExpression[] args) :
 			this(SelfReference.Self, method, args)
 		{
 		}
 
-		public MethodInvocationExpression(MethodEmitter method, params Expression[] args) :
+		public MethodInvocationExpression(MethodEmitter method, params IExpression[] args) :
 			this(SelfReference.Self, method.MethodBuilder, args)
 		{
 		}
 
-		public MethodInvocationExpression(Reference owner, MethodEmitter method, params Expression[] args) :
+		public MethodInvocationExpression(Reference owner, MethodEmitter method, params IExpression[] args) :
 			this(owner, method.MethodBuilder, args)
 		{
 		}
 
-		public MethodInvocationExpression(Reference owner, MethodInfo method, params Expression[] args)
+		public MethodInvocationExpression(Reference owner, MethodInfo method, params IExpression[] args)
 		{
 			this.owner = owner;
 			this.method = method;
@@ -47,13 +47,13 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 
 		public bool VirtualCall { get; set; }
 
-		public override void Emit(IMemberEmitter member, ILGenerator gen)
+		public void Emit(ILGenerator gen)
 		{
 			ArgumentsUtil.EmitLoadOwnerAndReference(owner, gen);
 
 			foreach (var exp in args)
 			{
-				exp.Emit(member, gen);
+				exp.Emit(gen);
 			}
 
 			if (VirtualCall)

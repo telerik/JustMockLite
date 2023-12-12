@@ -1,4 +1,4 @@
-﻿// Copyright 2004-2017 Castle Project - http://www.castleproject.org/
+﻿// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 				throw new ArgumentNullException(nameof(y));
 			}
 
-			return String.CompareOrdinal(x.FullName, y.FullName);
+			return string.CompareOrdinal(x.FullName, y.FullName);
 		}
 	}
 }

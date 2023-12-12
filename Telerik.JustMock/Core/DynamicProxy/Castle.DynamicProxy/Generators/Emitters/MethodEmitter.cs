@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,13 +15,13 @@
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Diagnostics;
 	using System.Globalization;
 	using System.Linq;
 	using System.Reflection;
 	using System.Reflection.Emit;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.CodeBuilders;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
 
@@ -29,23 +29,23 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 	internal class MethodEmitter : IMemberEmitter
 	{
 		private readonly MethodBuilder builder;
+		private readonly CodeBuilder codeBuilder;
 		private readonly GenericTypeParameterBuilder[] genericTypeParams;
 
 		private ArgumentReference[] arguments;
 
-		private MethodCodeBuilder codebuilder;
-
 		protected internal MethodEmitter(MethodBuilder builder)
 		{
 			this.builder = builder;
+			codeBuilder = new CodeBuilder();
 		}
 
-		internal MethodEmitter(AbstractTypeEmitter owner, String name, MethodAttributes attributes)
+		internal MethodEmitter(AbstractTypeEmitter owner, string name, MethodAttributes attributes)
 			: this(owner.TypeBuilder.DefineMethod(name, attributes))
 		{
 		}
 
-		internal MethodEmitter(AbstractTypeEmitter owner, String name,
+		internal MethodEmitter(AbstractTypeEmitter owner, string name,
 		                       MethodAttributes attributes, Type returnType,
 		                       params Type[] argumentTypes)
 			: this(owner, name, attributes)
@@ -54,17 +54,19 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 			SetReturnType(returnType);
 		}
 
-		internal MethodEmitter(AbstractTypeEmitter owner, String name,
+		internal MethodEmitter(AbstractTypeEmitter owner, string name,
 		                       MethodAttributes attributes, MethodInfo methodToUseAsATemplate)
 			: this(owner, name, attributes)
 		{
-			var name2GenericType = GenericUtil.GetGenericArgumentsMap(owner);
+			// All code paths leading up to this constructor can be traced back to
+			// proxy type generation code. At present, proxy types are never generic.
+			Debug.Assert(owner.GenericTypeParams == null || owner.GenericTypeParams.Length == 0);
 
-			var returnType = GenericUtil.ExtractCorrectType(methodToUseAsATemplate.ReturnType, name2GenericType);
+			var returnType = methodToUseAsATemplate.ReturnType;
 			var baseMethodParameters = methodToUseAsATemplate.GetParameters();
-			var parameters = GenericUtil.ExtractParametersTypes(baseMethodParameters, name2GenericType);
+			var parameters = ArgumentsUtil.GetTypes(baseMethodParameters);
 
-			genericTypeParams = GenericUtil.CopyGenericArguments(methodToUseAsATemplate, builder, name2GenericType);
+			genericTypeParams = GenericUtil.CopyGenericArguments(methodToUseAsATemplate, builder);
 			SetParameters(parameters);
 			SetReturnType(returnType);
 			SetSignature(returnType, methodToUseAsATemplate.ReturnParameter, parameters, baseMethodParameters);
@@ -76,16 +78,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 			get { return arguments; }
 		}
 
-		public virtual MethodCodeBuilder CodeBuilder
+		public CodeBuilder CodeBuilder
 		{
-			get
-			{
-				if (codebuilder == null)
-				{
-					codebuilder = new MethodCodeBuilder(builder.GetILGenerator());
-				}
-				return codebuilder;
-			}
+			get { return codeBuilder; }
 		}
 
 		public GenericTypeParameterBuilder[] GenericTypeParams
@@ -112,11 +107,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 		{
 			get
 			{
-#if FEATURE_LEGACY_REFLECTION_API
-				var attributes = builder.GetMethodImplementationFlags();
-#else
 				var attributes = builder.MethodImplementationFlags;
-#endif
 				return (attributes & MethodImplAttributes.Runtime) != 0;
 			}
 		}
@@ -137,8 +128,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 		{
 			if (ImplementedByRuntime == false && CodeBuilder.IsEmpty)
 			{
-				CodeBuilder.AddStatement(new NopStatement());
-				CodeBuilder.AddStatement(new ReturnStatement());
+				if (ReturnType == typeof(void))
+				{
+					CodeBuilder.AddStatement(new ReturnStatement());
+				}
+				else
+				{
+					CodeBuilder.AddStatement(new ReturnStatement(new DefaultValueExpression(ReturnType)));
+				}
 			}
 		}
 
@@ -149,7 +146,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 				return;
 			}
 
-			codebuilder.Generate(this, builder.GetILGenerator());
+			codeBuilder.Generate(builder.GetILGenerator());
 		}
 
 		private void DefineParameters(ParameterInfo[] parameters)
@@ -209,7 +206,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 				// If this bug is present, it is caused by a `null` default value:
 				defaultValue = null;
 			}
-			catch (FormatException) when (from.ParameterType.GetTypeInfo().IsEnum)
+			catch (FormatException) when (from.ParameterType.IsEnum)
 			{
 				// This catch clause guards against a CLR bug that makes it impossible to query
 				// the default value of a (closed generic) enum parameter. For the CoreCLR, see
@@ -253,7 +250,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 						// would "produce" a default value of `Missing.Value` in this situation).
 						return;
 					}
-					else if (parameterType.GetTypeInfo().IsValueType)
+					else if (parameterType.IsValueType)
 					{
 						// This guards against a CLR bug that prohibits replicating `null` default
 						// values for non-nullable value types (which, despite the apparent type
@@ -269,7 +266,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 				else if (parameterType.IsNullableType())
 				{
 					parameterNonNullableType = from.ParameterType.GetGenericArguments()[0];
-					if (parameterNonNullableType.GetTypeInfo().IsEnum || parameterNonNullableType.IsAssignableFrom(defaultValue.GetType()))
+					if (parameterNonNullableType.IsEnum || parameterNonNullableType.IsAssignableFrom(defaultValue.GetType()))
 					{
 						// This guards against two bugs:
 						//
@@ -323,7 +320,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 			Type[][] parametersRequiredCustomModifiers;
 			Type[][] parametersOptionalCustomModifiers;
 
-#if FEATURE_EMIT_CUSTOMMODIFIERS
 			returnRequiredCustomModifiers = returnParameter.GetRequiredCustomModifiers();
 			Array.Reverse(returnRequiredCustomModifiers);
 
@@ -341,12 +337,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 				parametersOptionalCustomModifiers[i] = baseMethodParameters[i].GetOptionalCustomModifiers();
 				Array.Reverse(parametersOptionalCustomModifiers[i]);
 			}
-#else
-			returnRequiredCustomModifiers = null;
-			returnOptionalCustomModifiers = null;
-			parametersRequiredCustomModifiers = null;
-			parametersOptionalCustomModifiers = null;
-#endif
 
 			builder.SetSignature(
 				returnType,

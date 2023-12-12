@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,13 +27,10 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 		                                                                  MethodAttributes.NewSlot |
 		                                                                  MethodAttributes.Final;
 
-		private string name;
-
 		public MetaMethod(MethodInfo method, MethodInfo methodOnTarget, bool standalone, bool proxyable, bool hasTarget)
-			: base(method.DeclaringType)
+			: base(method)
 		{
 			Method = method;
-			name = method.Name;
 			MethodOnTarget = methodOnTarget;
 			Standalone = standalone;
 			Proxyable = proxyable;
@@ -47,10 +44,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 
 		public MethodInfo MethodOnTarget { get; private set; }
 
-		public string Name
-		{
-			get { return name; }
-		}
+		public bool Ignore { get; internal set; }
 
 		public bool Proxyable { get; private set; }
 
@@ -67,13 +61,13 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 				return true;
 			}
 
-			if (!StringComparer.OrdinalIgnoreCase.Equals(name, other.name))
+			if (!StringComparer.OrdinalIgnoreCase.Equals(Name, other.Name))
 			{
 				return false;
 			}
 
 			var comparer = MethodSignatureComparer.Instance;
-			if (!comparer.EqualSignatureTypes(Method.ReturnType, other.Method.ReturnType))
+			if (!comparer.EqualReturnTypes(Method, other.Method))
 			{
 				return false;
 			}
@@ -91,7 +85,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			return true;
 		}
 
-		internal override void SwitchToExplicitImplementation()
+		public override void SwitchToExplicitImplementation()
 		{
 			Attributes = ExplicitImplementationAttributes;
 			if (Standalone == false)
@@ -99,7 +93,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 				Attributes |= MethodAttributes.SpecialName;
 			}
 
-			name = MetaTypeElementUtil.CreateNameForExplicitImplementation(sourceType, Method.Name);
+			SwitchToExplicitImplementationName();
 		}
 
 		private MethodAttributes ObtainAttributes()
@@ -107,7 +101,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			var methodInfo = Method;
 			var attributes = MethodAttributes.Virtual;
 
-			if (methodInfo.IsFinal || Method.DeclaringType.GetTypeInfo().IsInterface)
+			if (methodInfo.IsFinal || Method.DeclaringType.IsInterface)
 			{
 				attributes |= MethodAttributes.NewSlot;
 			}
@@ -122,7 +116,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 				attributes |= MethodAttributes.HideBySig;
 			}
 			if (ProxyUtil.IsInternal(methodInfo) &&
-			    ProxyUtil.AreInternalsVisibleToDynamicProxy(methodInfo.DeclaringType.GetTypeInfo().Assembly))
+			    ProxyUtil.AreInternalsVisibleToDynamicProxy(methodInfo.DeclaringType.Assembly))
 			{
 				attributes |= MethodAttributes.Assembly;
 			}

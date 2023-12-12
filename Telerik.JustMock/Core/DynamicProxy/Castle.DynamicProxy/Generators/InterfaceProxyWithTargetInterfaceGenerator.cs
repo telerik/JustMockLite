@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,38 +24,34 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Serialization;
 
-	internal class InterfaceProxyWithTargetInterfaceGenerator : InterfaceProxyWithTargetGenerator
+	internal sealed class InterfaceProxyWithTargetInterfaceGenerator : BaseInterfaceProxyGenerator
 	{
-		public InterfaceProxyWithTargetInterfaceGenerator(ModuleScope scope, Type @interface)
-			: base(scope, @interface)
+		public InterfaceProxyWithTargetInterfaceGenerator(ModuleScope scope, Type targetType, Type[] interfaces,
+		                                                  Type proxyTargetType, ProxyGenerationOptions options)
+			: base(scope, targetType, interfaces, proxyTargetType, options)
 		{
 		}
 
-		protected override bool AllowChangeTarget
+		protected override bool AllowChangeTarget => true;
+
+		protected override string GeneratorType => ProxyTypeConstants.InterfaceWithTargetInterface;
+
+		protected override CompositeTypeContributor GetProxyTargetContributor(Type proxyTargetType, INamingScope namingScope)
 		{
-			get { return true; }
+			return new InterfaceProxyWithTargetInterfaceTargetContributor(proxyTargetType, AllowChangeTarget, namingScope) { Logger = Logger };
 		}
 
-		protected override string GeneratorType
+		protected override ProxyTargetAccessorContributor GetProxyTargetAccessorContributor()
 		{
-			get { return ProxyTypeConstants.InterfaceWithTargetInterface; }
+			return new ProxyTargetAccessorContributor(
+				getTargetReference: () => targetField,
+				proxyTargetType);
 		}
 
-		protected override ITypeContributor AddMappingForTargetType(
-			IDictionary<Type, ITypeContributor> typeImplementerMapping, Type proxyTargetType, ICollection<Type> targetInterfaces,
-			ICollection<Type> additionalInterfaces, INamingScope namingScope)
+		protected override void AddMappingForAdditionalInterfaces(CompositeTypeContributor contributor, Type[] proxiedInterfaces,
+		                                                          IDictionary<Type, ITypeContributor> typeImplementerMapping,
+		                                                          ICollection<Type> targetInterfaces)
 		{
-			var contributor = new InterfaceProxyWithTargetInterfaceTargetContributor(
-				proxyTargetType,
-				AllowChangeTarget,
-				namingScope) { Logger = Logger };
-			foreach (var @interface in targetType.GetAllInterfaces())
-			{
-				contributor.AddInterfaceToProxy(@interface);
-				AddMappingNoCheck(@interface, contributor, typeImplementerMapping);
-			}
-
-			return contributor;
 		}
 
 		protected override InterfaceProxyWithoutTargetContributor GetContributorForAdditionalInterfaces(
@@ -70,9 +66,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			return new AsTypeReference(@class.GetField("__target"), method.DeclaringType);
 		}
 
-		private Expression GetTargetExpression(ClassEmitter @class, MethodInfo method)
+		private IExpression GetTargetExpression(ClassEmitter @class, MethodInfo method)
 		{
-			return GetTarget(@class, method).ToExpression();
+			return GetTarget(@class, method);
 		}
 	}
 }

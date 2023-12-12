@@ -1,10 +1,10 @@
-// Copyright 2004-2016 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,14 +14,11 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy
 {
-    /// <summary>
-    /// An implementation detail interface. Not intended for external usage. Provides the main DynamicProxy extension point that allows member interception.
-    /// </summary>
-    public interface IInterceptor
+	/// <summary>
+	///   Provides the main DynamicProxy extension point that allows member interception.
+	/// </summary>
+	public interface IInterceptor
 	{
-        /// <summary>
-        /// An implementation detail. Not intended for external usage.
-        /// </summary>
-        void Intercept(IInvocation invocation);
+		void Intercept(IInvocation invocation);
 	}
 }

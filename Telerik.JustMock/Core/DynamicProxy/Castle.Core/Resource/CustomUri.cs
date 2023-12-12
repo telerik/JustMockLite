@@ -1,4 +1,4 @@
-// Copyright 2004-2009 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,28 +20,28 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 #if FEATURE_SERIALIZATION
 	[Serializable]
 #endif
-    internal sealed class CustomUri
+	internal sealed class CustomUri
 	{
-		public static readonly String SchemeDelimiter = "://";
-		public static readonly String UriSchemeFile = "file";
-		public static readonly String UriSchemeAssembly = "assembly";
+		public static readonly string SchemeDelimiter = "://";
+		public static readonly string UriSchemeFile = "file";
+		public static readonly string UriSchemeAssembly = "assembly";
 
-		private String scheme;
-		private String host;
-		private String path;
+		private string scheme;
+		private string host;
+		private string path;
 		private bool isUnc;
 		private bool isFile;
 		private bool isAssembly;
 
-		public CustomUri(String resourceIdentifier)
+		public CustomUri(string resourceIdentifier)
 		{
 			if (resourceIdentifier == null)
 			{
-				throw new ArgumentNullException("resourceIdentifier");
+				throw new ArgumentNullException(nameof(resourceIdentifier));
 			}
-			if (resourceIdentifier == String.Empty)
+			if (resourceIdentifier == string.Empty)
 			{
-				throw new ArgumentException("Empty resource identifier is not allowed", "resourceIdentifier");
+				throw new ArgumentException("Empty resource identifier is not allowed", nameof(resourceIdentifier));
 			}
 
 			ParseIdentifier(resourceIdentifier);
@@ -72,12 +72,12 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 			get { return host; }
 		}
 
-		public String Path
+		public string Path
 		{
 			get { return path; }
 		}
 
-		private void ParseIdentifier(String identifier)
+		private void ParseIdentifier(string identifier)
 		{
 			int comma = identifier.IndexOf(':');
 

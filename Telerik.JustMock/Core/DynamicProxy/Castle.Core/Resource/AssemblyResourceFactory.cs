@@ -1,4 +1,4 @@
-// Copyright 2004-2010 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
 	using System;
 
-    internal class AssemblyResourceFactory : IResourceFactory
+	internal class AssemblyResourceFactory : IResourceFactory
 	{
 		public bool Accept(CustomUri uri)
 		{
@@ -28,7 +28,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 			return Create(uri, null);
 		}
 
-		public IResource Create(CustomUri uri, String basePath)
+		public IResource Create(CustomUri uri, string basePath)
 		{
 			if (basePath == null)
 			{

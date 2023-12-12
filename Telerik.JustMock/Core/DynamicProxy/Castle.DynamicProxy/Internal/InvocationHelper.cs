@@ -1,10 +1,10 @@
-﻿// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+﻿// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,22 +16,17 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Diagnostics;
 	using System.Reflection;
-#if NETCORE
-    using Debug = Telerik.JustMock.Diagnostics.JMDebug;
-#else
-using Debug = System.Diagnostics.Debug;
-#endif
+	using System.Threading;
 
-    using Telerik.JustMock.Core.Castle.Core.Internal;
+	using Telerik.JustMock.Core.Castle.Core.Internal;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
 
 	internal static class InvocationHelper
 	{
-		private static readonly Dictionary<CacheKey, MethodInfo> cache =
-			new Dictionary<CacheKey, MethodInfo>();
-
-		private static readonly Lock @lock = Lock.Create();
+		private static readonly SynchronizedDictionary<CacheKey, MethodInfo> cache =
+			new SynchronizedDictionary<CacheKey, MethodInfo>();
 
 		public static MethodInfo GetMethodOnObject(object target, MethodInfo proxiedMethod)
 		{
@@ -47,44 +42,15 @@ using Debug = System.Diagnostics.Debug;
 		{
 			if (type == null)
 			{
-				throw new ArgumentNullException("type");
+				throw new ArgumentNullException(nameof(type));
 			}
 
 			Debug.Assert(proxiedMethod.DeclaringType.IsAssignableFrom(type),
 						 "proxiedMethod.DeclaringType.IsAssignableFrom(type)");
-			using (var locker = @lock.ForReading())
-			{
-				var methodOnTarget = GetFromCache(proxiedMethod, type);
-				if (methodOnTarget != null)
-				{
-					return methodOnTarget;
-				}
-			}
 
-			using (var locker = @lock.ForReadingUpgradeable())
-			{
-				var methodOnTarget = GetFromCache(proxiedMethod, type);
-				if (methodOnTarget != null)
-				{
-					return methodOnTarget;
-				}
+			var cacheKey = new CacheKey(proxiedMethod, type);
 
-				// Upgrade the lock to a write lock. 
-				using (locker.Upgrade())
-				{
-					methodOnTarget = ObtainMethod(proxiedMethod, type);
-					PutToCache(proxiedMethod, type, methodOnTarget);
-				}
-				return methodOnTarget;
-			}
-		}
-
-		private static MethodInfo GetFromCache(MethodInfo methodInfo, Type type)
-		{
-			var key = new CacheKey(methodInfo, type);
-			MethodInfo method;
-			cache.TryGetValue(key, out method);
-			return method;
+			return cache.GetOrAdd(cacheKey, ck => ObtainMethod(proxiedMethod, type));
 		}
 
 		private static MethodInfo ObtainMethod(MethodInfo proxiedMethod, Type type)
@@ -97,11 +63,11 @@ using Debug = System.Diagnostics.Debug;
 			}
 			var declaringType = proxiedMethod.DeclaringType;
 			MethodInfo methodOnTarget = null;
-			if (declaringType.GetTypeInfo().IsInterface)
+			if (declaringType.IsInterface)
 			{
-				var mapping = type.GetTypeInfo().GetRuntimeInterfaceMap(declaringType);
+				var mapping = type.GetInterfaceMap(declaringType);
 				var index = Array.IndexOf(mapping.InterfaceMethods, proxiedMethod);
-                Debug.Assert(index != -1);
+				Debug.Assert(index != -1);
 				methodOnTarget = mapping.TargetMethods[index];
 			}
 			else
@@ -129,12 +95,6 @@ using Debug = System.Diagnostics.Debug;
 				return methodOnTarget;
 			}
 			return methodOnTarget.MakeGenericMethod(genericArguments);
-		}
-
-		private static void PutToCache(MethodInfo methodInfo, Type type, MethodInfo value)
-		{
-			var key = new CacheKey(methodInfo, type);
-			cache.Add(key, value);
 		}
 
 		private struct CacheKey : IEquatable<CacheKey>

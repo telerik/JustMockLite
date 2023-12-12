@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,8 +18,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 	using System.Collections.Generic;
 	using System.Reflection;
 
+	using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.CodeBuilders;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Tokens;
@@ -46,18 +46,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 		///   Generates the constructor for the class that extends
 		///   <see cref = "AbstractInvocation" />
 		/// </summary>
-		/// <param name = "targetFieldType"></param>
-		/// <param name = "proxyGenerationOptions"></param>
-		/// <param name = "baseConstructor"></param>
 		protected abstract ArgumentReference[] GetBaseCtorArguments(Type targetFieldType,
-		                                                            ProxyGenerationOptions proxyGenerationOptions,
 		                                                            out ConstructorInfo baseConstructor);
 
 		protected abstract Type GetBaseType();
 
 		protected abstract FieldReference GetTargetReference();
 
-		public AbstractTypeEmitter Generate(ClassEmitter @class, ProxyGenerationOptions options, INamingScope namingScope)
+		public AbstractTypeEmitter Generate(ClassEmitter @class, INamingScope namingScope)
 		{
 			var methodInfo = method.Method;
 
@@ -73,7 +69,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			// targetType cannot be a generic type definition (YET!)
 			invocation.CopyGenericParametersFromMethod(methodInfo);
 
-			CreateConstructor(invocation, options);
+			CreateConstructor(invocation);
 
 			var targetField = GetTargetReference();
 			if (canChangeTarget)
@@ -81,7 +77,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 				ImplementChangeProxyTargetInterface(@class, invocation, targetField);
 			}
 
-			ImplemementInvokeMethodOnTarget(invocation, methodInfo.GetParameters(), targetField, callback);
+			ImplementInvokeMethodOnTarget(invocation, methodInfo.GetParameters(), targetField, callback);
 
 #if FEATURE_SERIALIZATION
 			invocation.DefineCustomAttribute<SerializableAttribute>();
@@ -91,7 +87,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 		}
 
 		protected virtual MethodInvocationExpression GetCallbackMethodInvocation(AbstractTypeEmitter invocation,
-		                                                                         Expression[] args, MethodInfo callbackMethod,
+		                                                                         IExpression[] args, MethodInfo callbackMethod,
 		                                                                         Reference targetField,
 		                                                                         MethodEmitter invokeMethodOnTarget)
 		{
@@ -117,12 +113,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 				return;
 			}
 
-			if (canChangeTarget)
-			{
-				EmitCallEnsureValidTarget(invokeMethodOnTarget);
-			}
-
-			var args = new Expression[parameters.Length];
+			var args = new IExpression[parameters.Length];
 
 			// Idea: instead of grab parameters one by one
 			// we should grab an array
@@ -144,7 +135,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 							                                                                         InvocationMethods.GetArgumentValue,
 							                                                                         new LiteralIntExpression(i)))));
 					var byRefReference = new ByRefReference(localReference);
-					args[i] = new ReferenceExpression(byRefReference);
+					args[i] = byRefReference;
 					byRefArguments[i] = localReference;
 				}
 				else
@@ -173,7 +164,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			}
 			else
 			{
-				invokeMethodOnTarget.CodeBuilder.AddStatement(new ExpressionStatement(methodOnTargetInvocationExpression));
+				invokeMethodOnTarget.CodeBuilder.AddStatement(methodOnTargetInvocationExpression);
 			}
 
 			AssignBackByRefArguments(invokeMethodOnTarget, byRefArguments);
@@ -183,9 +174,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 				var setRetVal =
 					new MethodInvocationExpression(SelfReference.Self,
 					                               InvocationMethods.SetReturnValue,
-					                               new ConvertExpression(typeof(object), returnValue.Type, returnValue.ToExpression()));
+					                               new ConvertExpression(typeof(object), returnValue.Type, returnValue));
 
-				invokeMethodOnTarget.CodeBuilder.AddStatement(new ExpressionStatement(setRetVal));
+				invokeMethodOnTarget.CodeBuilder.AddStatement(setRetVal);
 			}
 
 			invokeMethodOnTarget.CodeBuilder.AddStatement(new ReturnStatement());
@@ -204,27 +195,25 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 				var index = byRefArgument.Key;
 				var localReference = byRefArgument.Value;
 				invokeMethodOnTarget.CodeBuilder.AddStatement(
-					new ExpressionStatement(
-						new MethodInvocationExpression(
-							SelfReference.Self,
-							InvocationMethods.SetArgumentValue,
-							new LiteralIntExpression(index),
-							new ConvertExpression(
-								typeof(object),
-								localReference.Type,
-								new ReferenceExpression(localReference)))
-						));
+					new MethodInvocationExpression(
+						SelfReference.Self,
+						InvocationMethods.SetArgumentValue,
+						new LiteralIntExpression(index),
+						new ConvertExpression(
+							typeof(object),
+							localReference.Type,
+							localReference)));
 			}
 			invokeMethodOnTarget.CodeBuilder.AddStatement(new EndExceptionBlockStatement());
 		}
 
-		private void CreateConstructor(AbstractTypeEmitter invocation, ProxyGenerationOptions options)
+		private void CreateConstructor(AbstractTypeEmitter invocation)
 		{
 			ConstructorInfo baseConstructor;
-			var baseCtorArguments = GetBaseCtorArguments(targetType, options, out baseConstructor);
+			var baseCtorArguments = GetBaseCtorArguments(targetType, out baseConstructor);
 
 			var constructor = CreateConstructor(invocation, baseCtorArguments);
-			constructor.CodeBuilder.InvokeBaseConstructor(baseConstructor, baseCtorArguments);
+			constructor.CodeBuilder.AddStatement(new ConstructorInvocationStatement(baseConstructor, baseCtorArguments));
 			constructor.CodeBuilder.AddStatement(new ReturnStatement());
 		}
 
@@ -237,16 +226,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			return contributor.CreateConstructor(baseCtorArguments, invocation);
 		}
 
-		private AbstractCodeBuilder EmitCallEnsureValidTarget(MethodEmitter invokeMethodOnTarget)
-		{
-			return invokeMethodOnTarget.CodeBuilder.AddStatement(
-				new ExpressionStatement(
-					new MethodInvocationExpression(SelfReference.Self, InvocationMethods.EnsureValidTarget)));
-		}
-
 		private void EmitCallThrowOnNoTarget(MethodEmitter invokeMethodOnTarget)
 		{
-			var throwOnNoTarget = new ExpressionStatement(new MethodInvocationExpression(InvocationMethods.ThrowOnNoTarget));
+			var throwOnNoTarget = new MethodInvocationExpression(InvocationMethods.ThrowOnNoTarget);
 
 			invokeMethodOnTarget.CodeBuilder.AddStatement(throwOnNoTarget);
 			invokeMethodOnTarget.CodeBuilder.AddStatement(new ReturnStatement());
@@ -281,8 +263,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			return new ClassEmitter(@class.ModuleScope, uniqueName, GetBaseType(), interfaces, ClassEmitter.DefaultAttributes, forceUnsigned: @class.InStrongNamedModule == false);
 		}
 
-		private void ImplemementInvokeMethodOnTarget(AbstractTypeEmitter invocation, ParameterInfo[] parameters,
-		                                             FieldReference targetField, MethodInfo callbackMethod)
+		private void ImplementInvokeMethodOnTarget(AbstractTypeEmitter invocation, ParameterInfo[] parameters,
+		                                           FieldReference targetField, MethodInfo callbackMethod)
 		{
 			var invokeMethodOnTarget = invocation.CreateMethod("InvokeMethodOnTarget", typeof(void));
 			ImplementInvokeMethodOnTarget(invocation, parameters, invokeMethodOnTarget, targetField);
@@ -293,7 +275,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			var changeInvocationTarget = invocation.CreateMethod("ChangeInvocationTarget", typeof(void), new[] { typeof(object) });
 			changeInvocationTarget.CodeBuilder.AddStatement(
 				new AssignStatement(targetField,
-				                    new ConvertExpression(targetType, changeInvocationTarget.Arguments[0].ToExpression())));
+				                    new ConvertExpression(targetType, changeInvocationTarget.Arguments[0])));
 			changeInvocationTarget.CodeBuilder.AddStatement(new ReturnStatement());
 		}
 
@@ -305,16 +287,15 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			var localProxy = changeProxyTarget.CodeBuilder.DeclareLocal(typeof(IProxyTargetAccessor));
 			changeProxyTarget.CodeBuilder.AddStatement(
 				new AssignStatement(localProxy,
-					new ConvertExpression(localProxy.Type, proxyObject.ToExpression())));
+					new ConvertExpression(localProxy.Type, proxyObject)));
 
 			var dynSetProxy = typeof(IProxyTargetAccessor).GetMethod(nameof(IProxyTargetAccessor.DynProxySetTarget));
 
 			changeProxyTarget.CodeBuilder.AddStatement(
-				new ExpressionStatement(
-					new MethodInvocationExpression(localProxy, dynSetProxy, changeProxyTarget.Arguments[0].ToExpression())
-					{
-						VirtualCall = true
-					}));
+				new MethodInvocationExpression(localProxy, dynSetProxy, changeProxyTarget.Arguments[0])
+				{
+					VirtualCall = true
+				});
 
 			changeProxyTarget.CodeBuilder.AddStatement(new ReturnStatement());
 		}

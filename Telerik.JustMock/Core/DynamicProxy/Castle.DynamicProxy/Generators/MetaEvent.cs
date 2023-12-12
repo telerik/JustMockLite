@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,33 +23,26 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 	{
 		private readonly MetaMethod adder;
 		private readonly MetaMethod remover;
-		private readonly Type type;
 		private EventEmitter emitter;
-		private string name;
 
 		/// <summary>
 		///   Initializes a new instance of the <see cref = "MetaEvent" /> class.
 		/// </summary>
-		/// <param name = "name">The name.</param>
-		/// <param name = "declaringType">Type declaring the original event being overridden, or null.</param>
-		/// <param name = "eventDelegateType"></param>
+		/// <param name = "event">The event.</param>
 		/// <param name = "adder">The add method.</param>
 		/// <param name = "remover">The remove method.</param>
 		/// <param name = "attributes">The attributes.</param>
-		public MetaEvent(string name, Type declaringType, Type eventDelegateType, MetaMethod adder, MetaMethod remover,
-		                 EventAttributes attributes)
-			: base(declaringType)
+		public MetaEvent(EventInfo @event, MetaMethod adder, MetaMethod remover, EventAttributes attributes)
+			: base(@event)
 		{
 			if (adder == null)
 			{
-				throw new ArgumentNullException("adder");
+				throw new ArgumentNullException(nameof(adder));
 			}
 			if (remover == null)
 			{
-				throw new ArgumentNullException("remover");
+				throw new ArgumentNullException(nameof(remover));
 			}
-			this.name = name;
-			type = eventDelegateType;
 			this.adder = adder;
 			this.remover = remover;
 			Attributes = attributes;
@@ -81,13 +74,18 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			get { return remover; }
 		}
 
+		private Type Type
+		{
+			get { return ((EventInfo)Member).EventHandlerType; }
+		}
+
 		public void BuildEventEmitter(ClassEmitter classEmitter)
 		{
 			if (emitter != null)
 			{
 				throw new InvalidOperationException();
 			}
-			emitter = classEmitter.CreateEvent(name, Attributes, type);
+			emitter = classEmitter.CreateEvent(Name, Attributes, Type);
 		}
 
 		public override bool Equals(object obj)
@@ -130,12 +128,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 				return true;
 			}
 
-			if (!type.Equals(other.type))
-			{
-				return false;
-			}
-
-			if (!StringComparer.OrdinalIgnoreCase.Equals(name, other.name))
+			if (!StringComparer.OrdinalIgnoreCase.Equals(Name, other.Name))
 			{
 				return false;
 			}
@@ -143,9 +136,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			return true;
 		}
 
-		internal override void SwitchToExplicitImplementation()
+		public override void SwitchToExplicitImplementation()
 		{
-			name = MetaTypeElementUtil.CreateNameForExplicitImplementation(sourceType, name);
+			SwitchToExplicitImplementationName();
 			adder.SwitchToExplicitImplementation();
 			remover.SwitchToExplicitImplementation();
 		}

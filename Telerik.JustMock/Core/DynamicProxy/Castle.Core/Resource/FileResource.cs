@@ -1,4 +1,4 @@
-// Copyright 2004-2009 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 	using System.Globalization;
 	using System.IO;
 
-    /// <summary>
-    /// 
-    /// </summary>
-    internal class FileResource : AbstractStreamResource
+	/// <summary>
+	/// 
+	/// </summary>
+	internal class FileResource : AbstractStreamResource
 	{
 		private string filePath;
-		private String basePath;
+		private string basePath;
 
 		public FileResource(CustomUri resource)
 		{
@@ -34,7 +34,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 			};
 		}
 
-		public FileResource(CustomUri resource, String basePath)
+		public FileResource(CustomUri resource, string basePath)
 		{
 			CreateStream = delegate
 			{
@@ -42,7 +42,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 			};
 		}
 
-		public FileResource(String resourceName)
+		public FileResource(string resourceName)
 		{
 			CreateStream = delegate
 			{
@@ -50,7 +50,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 			};
 		}
 
-		public FileResource(String resourceName, String basePath)
+		public FileResource(string resourceName, string basePath)
 		{
 			CreateStream = delegate
 			{
@@ -60,36 +60,36 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 
 		public override string ToString()
 		{
-			return String.Format(CultureInfo.CurrentCulture, "FileResource: [{0}] [{1}]", filePath, basePath);
+			return string.Format(CultureInfo.CurrentCulture, "FileResource: [{0}] [{1}]", filePath, basePath);
 		}
 
-		public override String FileBasePath
+		public override string FileBasePath
 		{
 			get { return basePath; }
 		}
 
-		public override IResource CreateRelative(String relativePath)
+		public override IResource CreateRelative(string relativePath)
 		{
 			return new FileResource(relativePath, basePath);
 		}
 
-		private Stream CreateStreamFromUri(CustomUri resource, String rootPath)
+		private Stream CreateStreamFromUri(CustomUri resource, string rootPath)
 		{
-			if (resource == null) throw new ArgumentNullException("resource");
-			if (rootPath == null) throw new ArgumentNullException("rootPath");
+			if (resource == null) throw new ArgumentNullException(nameof(resource));
+			if (rootPath == null) throw new ArgumentNullException(nameof(rootPath));
 
 			if (!resource.IsFile)
-				throw new ArgumentException("The specified resource is not a file", "resource");
+				throw new ArgumentException("The specified resource is not a file", nameof(resource));
 
 			return CreateStreamFromPath(resource.Path, rootPath);
 		}
 
-		private Stream CreateStreamFromPath(String resourcePath, String rootPath)
+		private Stream CreateStreamFromPath(string resourcePath, string rootPath)
 		{
 			if (resourcePath == null)
-				throw new ArgumentNullException("resourcePath");
+				throw new ArgumentNullException(nameof(resourcePath));
 			if (rootPath == null)
-				throw new ArgumentNullException("rootPath");
+				throw new ArgumentNullException(nameof(rootPath));
 
 			if (!Path.IsPathRooted(resourcePath) || !File.Exists(resourcePath))
 			{
@@ -107,11 +107,11 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 			return File.OpenRead(resourcePath);
 		}
 
-		private static void CheckFileExists(String path)
+		private static void CheckFileExists(string path)
 		{
 			if (!File.Exists(path))
 			{
-				String message = String.Format(CultureInfo.InvariantCulture, "File {0} could not be found", new FileInfo(path).FullName);
+				string message = string.Format(CultureInfo.InvariantCulture, "File {0} could not be found", new FileInfo(path).FullName);
 				throw new ResourceException(message);
 			}
 		}

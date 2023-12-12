@@ -1,10 +1,10 @@
-﻿// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+﻿// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,9 +17,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 	using System;
 	using System.Reflection;
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-    public abstract class CompositionInvocation : AbstractInvocation
-    {
+	public abstract class CompositionInvocation : AbstractInvocation
+	{
 		protected object target;
 
 		protected CompositionInvocation(
@@ -52,7 +51,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 		{
 			if (newTarget == null)
 			{
-				throw new ArgumentNullException("newTarget");
+				throw new ArgumentNullException(nameof(newTarget));
 			}
 
 			if (!ReferenceEquals(newTarget, proxyObject))
@@ -84,5 +83,4 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 			throw new InvalidOperationException(message);
 		}
 	}
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }

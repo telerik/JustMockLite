@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,56 +27,48 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Tokens;
 
-    internal class ClassProxyTargetContributor : CompositeTypeContributor
+	internal class ClassProxyTargetContributor : CompositeTypeContributor
 	{
-		private readonly IList<MethodInfo> methodsToSkip;
 		private readonly Type targetType;
 
-		public ClassProxyTargetContributor(Type targetType, IList<MethodInfo> methodsToSkip, INamingScope namingScope)
+		public ClassProxyTargetContributor(Type targetType, INamingScope namingScope)
 			: base(namingScope)
 		{
 			this.targetType = targetType;
-			this.methodsToSkip = methodsToSkip;
 		}
 
-		protected override IEnumerable<MembersCollector> CollectElementsToProxyInternal(IProxyGenerationHook hook)
+		protected override IEnumerable<MembersCollector> GetCollectors()
 		{
-			Debug.Assert(hook != null, "hook != null");
-
 			var targetItem = new ClassMembersCollector(targetType) { Logger = Logger };
-			targetItem.CollectMembersToProxy(hook);
 			yield return targetItem;
 
 			foreach (var @interface in interfaces)
 			{
 				var item = new InterfaceMembersOnClassCollector(@interface, true,
-					targetType.GetTypeInfo().GetRuntimeInterfaceMap(@interface)) { Logger = Logger };
-				item.CollectMembersToProxy(hook);
+					targetType.GetInterfaceMap(@interface)) { Logger = Logger };
 				yield return item;
 			}
 		}
 
 		protected override MethodGenerator GetMethodGenerator(MetaMethod method, ClassEmitter @class,
-		                                                      ProxyGenerationOptions options,
 		                                                      OverrideMethodDelegate overrideMethod)
 		{
-			if (methodsToSkip.Contains(method.Method))
+			if (method.Ignore)
 			{
 				return null;
 			}
 
 			if (!method.Proxyable)
 			{
-				return new MinimialisticMethodGenerator(method,
-				                                        overrideMethod);
+				return new MinimalisticMethodGenerator(method, overrideMethod);
 			}
 
 			if (ExplicitlyImplementedInterfaceMethod(method))
 			{
-				return ExplicitlyImplementedInterfaceMethodGenerator(method, @class, options, overrideMethod);
+				return ExplicitlyImplementedInterfaceMethodGenerator(method, @class, overrideMethod);
 			}
 
-			var invocation = GetInvocationType(method, @class, options);
+			var invocation = GetInvocationType(method, @class);
 
 			GetTargetExpressionDelegate getTargetTypeExpression = (c, m) => new TypeTokenExpression(targetType);
 
@@ -89,7 +81,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 			                                         null);
 		}
 
-		private Type BuildInvocationType(MetaMethod method, ClassEmitter @class, ProxyGenerationOptions options)
+		private Type BuildInvocationType(MetaMethod method, ClassEmitter @class)
 		{
 			var methodInfo = method.Method;
 			if (!method.HasTarget)
@@ -97,14 +89,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 				return new InheritanceInvocationTypeGenerator(targetType,
 				                                              method,
 				                                              null, null)
-					.Generate(@class, options, namingScope)
+					.Generate(@class, namingScope)
 					.BuildType();
 			}
 			var callback = CreateCallbackMethod(@class, methodInfo, method.MethodOnTarget);
 			return new InheritanceInvocationTypeGenerator(callback.DeclaringType,
 			                                              method,
 			                                              callback, null)
-				.Generate(@class, options, namingScope)
+				.Generate(@class, namingScope)
 				.BuildType();
 		}
 
@@ -118,19 +110,13 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 				targetMethod = targetMethod.MakeGenericMethod(callBackMethod.GenericTypeParams.AsTypeArray());
 			}
 
-			var exps = new Expression[callBackMethod.Arguments.Length];
-			for (var i = 0; i < callBackMethod.Arguments.Length; i++)
-			{
-				exps[i] = callBackMethod.Arguments[i].ToExpression();
-			}
-
 			// invocation on base class
 
 			callBackMethod.CodeBuilder.AddStatement(
 				new ReturnStatement(
 					new MethodInvocationExpression(SelfReference.Self,
 					                               targetMethod,
-					                               exps)));
+					                               callBackMethod.Arguments)));
 
 			return callBackMethod.MethodBuilder;
 		}
@@ -141,13 +127,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 		}
 
 		private MethodGenerator ExplicitlyImplementedInterfaceMethodGenerator(MetaMethod method, ClassEmitter @class,
-		                                                                      ProxyGenerationOptions options,
 		                                                                      OverrideMethodDelegate overrideMethod)
 		{
-			var @delegate = GetDelegateType(method, @class, options);
+			var @delegate = GetDelegateType(method, @class);
 			var contributor = GetContributor(@delegate, method);
 			var invocation = new InheritanceInvocationTypeGenerator(targetType, method, null, contributor)
-				.Generate(@class, options, namingScope)
+				.Generate(@class, namingScope)
 				.BuildType();
 			return new MethodWithInvocationGenerator(method,
 			                                         @class.GetField("__interceptors"),
@@ -159,7 +144,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 
 		private IInvocationCreationContributor GetContributor(Type @delegate, MetaMethod method)
 		{
-			if (@delegate.GetTypeInfo().IsGenericType == false)
+			if (@delegate.IsGenericType == false)
 			{
 				return new InvocationWithDelegateContributor(@delegate, targetType, method, namingScope);
 			}
@@ -168,36 +153,34 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 			                                                    new FieldReference(InvocationMethods.ProxyObject));
 		}
 
-		private Type GetDelegateType(MetaMethod method, ClassEmitter @class, ProxyGenerationOptions options)
+		private Type GetDelegateType(MetaMethod method, ClassEmitter @class)
 		{
 			var scope = @class.ModuleScope;
 			var key = new CacheKey(
-				typeof(Delegate).GetTypeInfo(),
+				typeof(Delegate),
 				targetType,
 				new[] { method.MethodOnTarget.ReturnType }
 					.Concat(ArgumentsUtil.GetTypes(method.MethodOnTarget.GetParameters())).
 					ToArray(),
 				null);
 
-			var type = scope.GetFromCache(key);
-			if (type != null)
-			{
-				return type;
-			}
-
-			type = new DelegateTypeGenerator(method, targetType)
-				.Generate(@class, options, namingScope)
-				.BuildType();
-
-			scope.RegisterInCache(key, type);
-
-			return type;
+			return scope.TypeCache.GetOrAddWithoutTakingLock(key, _ =>
+				new DelegateTypeGenerator(method, targetType)
+				.Generate(@class, namingScope)
+				.BuildType());
 		}
 
-		private Type GetInvocationType(MetaMethod method, ClassEmitter @class, ProxyGenerationOptions options)
+		private Type GetInvocationType(MetaMethod method, ClassEmitter @class)
 		{
+			if (!method.HasTarget)
+			{
+				// We do not need to generate a custom invocation type because no custom implementation
+				// for `InvokeMethodOnTarget` will be needed (proceeding to target isn't possible here):
+				return typeof(InheritanceInvocationWithoutTarget);
+			}
+
 			// NOTE: No caching since invocation is tied to this specific proxy type via its invocation method
-			return BuildInvocationType(method, @class, options);
+			return BuildInvocationType(method, @class);
 		}
 	}
 }

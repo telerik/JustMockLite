@@ -1,10 +1,10 @@
-// Copyright 2004-2010 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,11 +17,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 	using System;
 	using System.IO;
 
-    internal abstract class AbstractExtendedLoggerFactory :
-#if FEATURE_REMOTING
-		MarshalByRefObject,
-#endif
-		IExtendedLoggerFactory
+	internal abstract class AbstractExtendedLoggerFactory : IExtendedLoggerFactory
 	{
 		/// <summary>
 		///   Creates a new extended logger, getting the logger name from the specified type.
@@ -30,7 +26,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		{
 			if (type == null)
 			{
-				throw new ArgumentNullException("type");
+				throw new ArgumentNullException(nameof(type));
 			}
 
 			return Create(type.FullName);
@@ -48,7 +44,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		{
 			if (type == null)
 			{
-				throw new ArgumentNullException("type");
+				throw new ArgumentNullException(nameof(type));
 			}
 
 			return Create(type.FullName, level);
@@ -95,7 +91,6 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 		///   Gets the configuration file.
 		/// </summary>
 		/// <param name = "fileName">i.e. log4net.config</param>
-		/// <returns></returns>
 		protected static FileInfo GetConfigFile(string fileName)
 		{
 			FileInfo result;
@@ -106,13 +101,10 @@ namespace Telerik.JustMock.Core.Castle.Core.Logging
 			}
 			else
 			{
-#if FEATURE_APPDOMAIN
 				string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-#else
-				string baseDirectory = AppContext.BaseDirectory;
-#endif
 				result = new FileInfo(Path.Combine(baseDirectory, fileName));
 			}
+
 
 			return result;
 		}

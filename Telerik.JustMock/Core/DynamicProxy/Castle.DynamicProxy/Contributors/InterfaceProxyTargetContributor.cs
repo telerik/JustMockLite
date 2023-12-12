@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,15 +34,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 			this.canChangeTarget = canChangeTarget;
 		}
 
-		protected override IEnumerable<MembersCollector> CollectElementsToProxyInternal(IProxyGenerationHook hook)
+		protected override IEnumerable<MembersCollector> GetCollectors()
 		{
-			Debug.Assert(hook != null, "hook != null");
-
 			foreach (var @interface in interfaces)
 			{
 				var item = GetCollectorForInterface(@interface);
 				item.Logger = Logger;
-				item.CollectMembersToProxy(hook);
 				yield return item;
 			}
 		}
@@ -54,7 +51,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 		}
 
 		protected override MethodGenerator GetMethodGenerator(MetaMethod method, ClassEmitter @class,
-		                                                      ProxyGenerationOptions options,
 		                                                      OverrideMethodDelegate overrideMethod)
 		{
 			if (!method.Proxyable)
@@ -64,17 +60,17 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 				                                     (c, m) => c.GetField("__target"));
 			}
 
-			var invocation = GetInvocationType(method, @class, options);
+			var invocation = GetInvocationType(method, @class);
 
 			return new MethodWithInvocationGenerator(method,
 			                                         @class.GetField("__interceptors"),
 			                                         invocation,
-			                                         (c, m) => c.GetField("__target").ToExpression(),
+			                                         (c, m) => c.GetField("__target"),
 			                                         overrideMethod,
 			                                         null);
 		}
 
-		private Type GetInvocationType(MetaMethod method, ClassEmitter @class, ProxyGenerationOptions options)
+		private Type GetInvocationType(MetaMethod method, ClassEmitter @class)
 		{
 			var scope = @class.ModuleScope;
 
@@ -92,22 +88,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 
 			// no locking required as we're already within a lock
 
-			var invocation = scope.GetFromCache(key);
-			if (invocation != null)
-			{
-				return invocation;
-			}
-
-			invocation = new CompositionInvocationTypeGenerator(method.Method.DeclaringType,
-			                                                    method,
-			                                                    method.Method,
-			                                                    canChangeTarget,
-			                                                    null)
-				.Generate(@class, options, namingScope).BuildType();
-
-			scope.RegisterInCache(key, invocation);
-
-			return invocation;
+			return scope.TypeCache.GetOrAddWithoutTakingLock(key, _ =>
+				new CompositionInvocationTypeGenerator(method.Method.DeclaringType,
+				                                       method,
+				                                       method.Method,
+				                                       canChangeTarget,
+				                                       null)
+				.Generate(@class, namingScope)
+				.BuildType());
 		}
 	}
 }

@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,16 +28,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 		private readonly IEnumerable<CustomAttributeBuilder> customAttributes;
 		private readonly MetaMethod getter;
 		private readonly MetaMethod setter;
-		private readonly Type type;
 		private PropertyEmitter emitter;
-		private string name;
 
-		public MetaProperty(string name, Type propertyType, Type declaringType, MetaMethod getter, MetaMethod setter,
+		public MetaProperty(PropertyInfo property, MetaMethod getter, MetaMethod setter,
 		                    IEnumerable<CustomAttributeBuilder> customAttributes, Type[] arguments)
-			: base(declaringType)
+			: base(property)
 		{
-			this.name = name;
-			type = propertyType;
 			this.getter = getter;
 			this.setter = setter;
 			attributes = PropertyAttributes.None;
@@ -107,6 +103,11 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			get { return setter; }
 		}
 
+		private Type Type
+		{
+			get { return ((PropertyInfo)Member).PropertyType; }
+		}
+
 		public void BuildPropertyEmitter(ClassEmitter classEmitter)
 		{
 			if (emitter != null)
@@ -114,7 +115,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 				throw new InvalidOperationException("Emitter is already created. It is illegal to invoke this method twice.");
 			}
 
-			emitter = classEmitter.CreateProperty(name, attributes, type, arguments);
+			emitter = classEmitter.CreateProperty(Name, attributes, Type, arguments);
 			foreach (var attribute in customAttributes)
 			{
 				emitter.DefineCustomAttribute(attribute);
@@ -158,12 +159,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 				return true;
 			}
 
-			if (!type.Equals(other.type))
-			{
-				return false;
-			}
-
-			if (!StringComparer.OrdinalIgnoreCase.Equals(name, other.name))
+			if (!StringComparer.OrdinalIgnoreCase.Equals(Name, other.Name))
 			{
 				return false;
 			}
@@ -182,9 +178,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			return true;
 		}
 
-		internal override void SwitchToExplicitImplementation()
+		public override void SwitchToExplicitImplementation()
 		{
-			name = MetaTypeElementUtil.CreateNameForExplicitImplementation(sourceType, name);
+			SwitchToExplicitImplementationName();
 			if (setter != null)
 			{
 				setter.SwitchToExplicitImplementation();

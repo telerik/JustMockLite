@@ -1,10 +1,10 @@
-﻿// Copyright 2004-2012 Castle Project - http://www.castleproject.org/
+﻿// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,9 +28,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 		{
 		}
 
-		public override void CollectMembersToProxy(IProxyGenerationHook hook)
+		public override void CollectMembersToProxy(IProxyGenerationHook hook, IMembersCollectorSink sink)
 		{
-			base.CollectMembersToProxy(hook);
+			base.CollectMembersToProxy(hook, sink);
 			CollectFields(hook);
 			// TODO: perhaps we should also look for nested classes...
 		}
@@ -42,12 +42,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 				return null;
 			}
 
-			var accepted = AcceptMethod(method, true, hook);
-			if (!accepted && !method.IsAbstract)
+			var interceptable = AcceptMethodPreScreen(method, true, hook);
+			if (!interceptable)
 			{
 				//we don't need to do anything...
 				return null;
 			}
+
+			var accepted = hook.ShouldInterceptMethod(type, method);
 
 			return new MetaMethod(method, method, isStandalone, accepted, hasTarget: true);
 		}

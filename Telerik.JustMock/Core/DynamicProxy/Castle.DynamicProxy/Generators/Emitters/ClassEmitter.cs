@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,8 +16,11 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Diagnostics;
 	using System.Reflection;
 	using System.Reflection.Emit;
+
+	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
 
 	internal class ClassEmitter : AbstractTypeEmitter
 	{
@@ -26,21 +29,15 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 
 		private readonly ModuleScope moduleScope;
 
-		public ClassEmitter(ModuleScope modulescope, String name, Type baseType, IEnumerable<Type> interfaces)
-			: this(modulescope, name, baseType, interfaces, DefaultAttributes, ShouldForceUnsigned())
+		public ClassEmitter(ModuleScope moduleScope, string name, Type baseType, IEnumerable<Type> interfaces)
+			: this(moduleScope, name, baseType, interfaces, DefaultAttributes, forceUnsigned: false)
 		{
 		}
 
-		public ClassEmitter(ModuleScope modulescope, String name, Type baseType, IEnumerable<Type> interfaces,
-		                    TypeAttributes flags)
-			: this(modulescope, name, baseType, interfaces, flags, ShouldForceUnsigned())
-		{
-		}
-
-		public ClassEmitter(ModuleScope modulescope, String name, Type baseType, IEnumerable<Type> interfaces,
+		public ClassEmitter(ModuleScope moduleScope, string name, Type baseType, IEnumerable<Type> interfaces,
 		                    TypeAttributes flags,
 		                    bool forceUnsigned)
-			: this(CreateTypeBuilder(modulescope, name, baseType, interfaces, flags, forceUnsigned))
+			: this(CreateTypeBuilder(moduleScope, name, baseType, interfaces, flags, forceUnsigned))
 		{
 			interfaces = InitializeGenericArgumentsFromBases(ref baseType, interfaces);
 
@@ -48,12 +45,19 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 			{
 				foreach (var inter in interfaces)
 				{
-					TypeBuilder.AddInterfaceImplementation(inter);
+					if (inter.IsInterface)
+					{
+						TypeBuilder.AddInterfaceImplementation(inter);
+					}
+					else
+					{
+						Debug.Assert(inter.IsDelegateType());
+					}
 				}
 			}
 
 			TypeBuilder.SetParent(baseType);
-			moduleScope = modulescope;
+			this.moduleScope = moduleScope;
 		}
 
 		public ClassEmitter(TypeBuilder typeBuilder)
@@ -74,7 +78,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 		protected virtual IEnumerable<Type> InitializeGenericArgumentsFromBases(ref Type baseType,
 		                                                                        IEnumerable<Type> interfaces)
 		{
-			if (baseType != null && baseType.GetTypeInfo().IsGenericTypeDefinition)
+			if (baseType != null && baseType.IsGenericTypeDefinition)
 			{
 				throw new NotSupportedException("ClassEmitter does not support open generic base types. Type: " + baseType.FullName);
 			}
@@ -86,7 +90,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 
 			foreach (var inter in interfaces)
 			{
-				if (inter.GetTypeInfo().IsGenericTypeDefinition)
+				if (inter.IsGenericTypeDefinition)
 				{
 					throw new NotSupportedException("ClassEmitter does not support open generic interfaces. Type: " + inter.FullName);
 				}
@@ -94,17 +98,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 			return interfaces;
 		}
 
-		private static TypeBuilder CreateTypeBuilder(ModuleScope modulescope, string name, Type baseType,
+		private static TypeBuilder CreateTypeBuilder(ModuleScope moduleScope, string name, Type baseType,
 		                                             IEnumerable<Type> interfaces,
 		                                             TypeAttributes flags, bool forceUnsigned)
 		{
 			var isAssemblySigned = !forceUnsigned && !StrongNameUtil.IsAnyTypeFromUnsignedAssembly(baseType, interfaces);
-			return modulescope.DefineType(isAssemblySigned, name, flags);
-		}
-
-		private static bool ShouldForceUnsigned()
-		{
-			return StrongNameUtil.CanStrongNameAssembly == false;
+			return moduleScope.DefineType(isAssemblySigned, name, flags);
 		}
 	}
 }

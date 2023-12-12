@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,26 +16,26 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 {
 	using System.Reflection.Emit;
 
-	internal class AssignArrayStatement : Statement
+	internal class AssignArrayStatement : IStatement
 	{
 		private readonly Reference targetArray;
 		private readonly int targetPosition;
-		private readonly Expression value;
+		private readonly IExpression value;
 
-		public AssignArrayStatement(Reference targetArray, int targetPosition, Expression value)
+		public AssignArrayStatement(Reference targetArray, int targetPosition, IExpression value)
 		{
 			this.targetArray = targetArray;
 			this.targetPosition = targetPosition;
 			this.value = value;
 		}
 
-		public override void Emit(IMemberEmitter member, ILGenerator il)
+		public void Emit(ILGenerator il)
 		{
 			ArgumentsUtil.EmitLoadOwnerAndReference(targetArray, il);
 
 			il.Emit(OpCodes.Ldc_I4, targetPosition);
 
-			value.Emit(member, il);
+			value.Emit(il);
 
 			il.Emit(OpCodes.Stelem_Ref);
 		}

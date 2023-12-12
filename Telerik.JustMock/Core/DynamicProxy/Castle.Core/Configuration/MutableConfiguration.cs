@@ -1,4 +1,4 @@
-// Copyright 2004-2009 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,6 @@ namespace Telerik.JustMock.Core.Castle.Core.Configuration
 {
 	using System;
 
-	/// <summary>
-	/// Summary description for MutableConfiguration.
-	/// </summary>
 #if FEATURE_SERIALIZATION
 	[Serializable]
 #endif
@@ -28,11 +25,11 @@ namespace Telerik.JustMock.Core.Castle.Core.Configuration
 		/// Initializes a new instance of the <see cref="MutableConfiguration"/> class.
 		/// </summary>
 		/// <param name="name">The name.</param>
-		public MutableConfiguration(String name) : this(name, null)
+		public MutableConfiguration(string name) : this(name, null)
 		{
 		}
 
-		public MutableConfiguration(String name, String value)
+		public MutableConfiguration(string name, string value)
 		{
 			Name = name;
 			Value = value;
