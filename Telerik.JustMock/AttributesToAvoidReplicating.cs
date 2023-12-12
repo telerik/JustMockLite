@@ -17,7 +17,7 @@
 
 using System;
 
-namespace Telerik.JustMock.Core
+namespace Telerik.JustMock
 {
     /// <summary>
     /// A list of attributes that must not be replicated when building a proxy. JustMock
@@ -26,16 +26,16 @@ namespace Telerik.JustMock.Core
     /// to this list that prevent the proxy from working correctly.
     /// </summary>
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-    public class AttributesToAvoidReplicating
+    public static class AttributesToAvoidReplicating
     {
         public static void Add(Type attribute)
         {
-            ProfilerInterceptor.GuardInternal(() => Castle.DynamicProxy.Generators.AttributesToAvoidReplicating.Add(attribute));
+            Core.ProfilerInterceptor.GuardInternal(() => Core.Castle.DynamicProxy.Generators.AttributesToAvoidReplicating.Add(attribute));
         }
 
         public static void Add<T>()
         {
-            ProfilerInterceptor.GuardInternal(() => Castle.DynamicProxy.Generators.AttributesToAvoidReplicating.Add<T>());
+            Core.ProfilerInterceptor.GuardInternal(() => Core.Castle.DynamicProxy.Generators.AttributesToAvoidReplicating.Add<T>());
         }
     }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
