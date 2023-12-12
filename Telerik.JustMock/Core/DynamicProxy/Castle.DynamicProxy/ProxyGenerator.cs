@@ -1,10 +1,10 @@
-// Copyright 2004-2016 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2022 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,21 +16,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 {
 	using System;
 	using System.Collections.Generic;
-	using System.Diagnostics;
 	using System.Reflection;
 	using System.Runtime.InteropServices;
-#if FEATURE_REMOTING
-	using System.Runtime.Remoting;
-#endif
-#if FEATURE_SECURITY_PERMISSIONS
-	using System.Security;
-	using System.Security.Permissions;
-#endif
 	using System.Text;
 
-	using Castle.Core.Internal;
-	using Castle.Core.Logging;
-	using Castle.DynamicProxy.Generators;
+	using Telerik.JustMock.Core.Castle.Core.Internal;
+	using Telerik.JustMock.Core.Castle.Core.Logging;
 
 	/// <summary>
 	///   Provides proxy objects for classes and interfaces.
@@ -49,21 +40,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		{
 			proxyBuilder = builder;
 
-#if FEATURE_SECURITY_PERMISSIONS
-			if (HasSecurityPermission())
-#endif
-			{
-				Logger = new TraceLogger("Castle.DynamicProxy", LoggerLevel.Warn);
-			}
+			Logger = new TraceLogger("Castle.DynamicProxy", LoggerLevel.Warn);
 		}
-
-#if FEATURE_SECURITY_PERMISSIONS
-		private bool HasSecurityPermission()
-		{
-			const SecurityPermissionFlag flag = SecurityPermissionFlag.ControlEvidence | SecurityPermissionFlag.ControlPolicy;
-			return new SecurityPermission(flag).IsGranted();
-		}
-#endif
 
 		/// <summary>
 		///   Initializes a new instance of the <see cref = "ProxyGenerator" /> class.
@@ -309,30 +287,30 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		{
 			if (interfaceToProxy == null)
 			{
-				throw new ArgumentNullException("interfaceToProxy");
+				throw new ArgumentNullException(nameof(interfaceToProxy));
 			}
 			if (target == null)
 			{
-				throw new ArgumentNullException("target");
+				throw new ArgumentNullException(nameof(target));
 			}
 			if (interceptors == null)
 			{
-				throw new ArgumentNullException("interceptors");
+				throw new ArgumentNullException(nameof(interceptors));
 			}
 
-			if (!interfaceToProxy.GetTypeInfo().IsInterface)
+			if (!interfaceToProxy.IsInterface)
 			{
-				throw new ArgumentException("Specified type is not an interface", "interfaceToProxy");
+				throw new ArgumentException("Specified type is not an interface", nameof(interfaceToProxy));
 			}
 
 			var targetType = target.GetType();
 			if (!interfaceToProxy.IsAssignableFrom(targetType))
 			{
-				throw new ArgumentException("Target does not implement interface " + interfaceToProxy.FullName, "target");
+				throw new ArgumentException("Target does not implement interface " + interfaceToProxy.FullName, nameof(target));
 			}
 
-			CheckNotGenericTypeDefinition(interfaceToProxy, "interfaceToProxy");
-			CheckNotGenericTypeDefinitions(additionalInterfacesToProxy, "additionalInterfacesToProxy");
+			CheckNotGenericTypeDefinition(interfaceToProxy, nameof(interfaceToProxy));
+			CheckNotGenericTypeDefinitions(additionalInterfacesToProxy, nameof(additionalInterfacesToProxy));
 
 			var generatedType = CreateInterfaceProxyTypeWithTarget(interfaceToProxy, additionalInterfacesToProxy, targetType,
 			                                                       options);
@@ -550,9 +528,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   This method uses <see cref = "IProxyBuilder" /> implementation to generate a proxy type.
 		///   As such caller should expect any type of exception that given <see cref = "IProxyBuilder" /> implementation may throw.
 		/// </remarks>
-#if FEATURE_SECURITY_PERMISSIONS && DOTNET40
-		[SecuritySafeCritical]
-#endif
 		public virtual object CreateInterfaceProxyWithTargetInterface(Type interfaceToProxy,
 		                                                              Type[] additionalInterfacesToProxy,
 		                                                              object target, ProxyGenerationOptions options,
@@ -562,30 +537,32 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 
 			if (interfaceToProxy == null)
 			{
-				throw new ArgumentNullException("interfaceToProxy");
+				throw new ArgumentNullException(nameof(interfaceToProxy));
 			}
 			// In the case of a transparent proxy, the call to IsInstanceOfType was executed on the real object.
 			if (target != null && interfaceToProxy.IsInstanceOfType(target) == false)
 			{
-				throw new ArgumentException("Target does not implement interface " + interfaceToProxy.FullName, "target");
+				throw new ArgumentException("Target does not implement interface " + interfaceToProxy.FullName, nameof(target));
 			}
 			if (interceptors == null)
 			{
-				throw new ArgumentNullException("interceptors");
+				throw new ArgumentNullException(nameof(interceptors));
 			}
 
-			if (!interfaceToProxy.GetTypeInfo().IsInterface)
+			if (!interfaceToProxy.IsInterface)
 			{
-				throw new ArgumentException("Specified type is not an interface", "interfaceToProxy");
+				throw new ArgumentException("Specified type is not an interface", nameof(interfaceToProxy));
 			}
 
-			var isRemotingProxy = false;
-#if FEATURE_REMOTING
 			if (target != null)
 			{
-				isRemotingProxy = RemotingServices.IsTransparentProxy(target);
+#if NET6_0_OR_GREATER
+				bool doComHandling = OperatingSystem.IsWindows();
+#else
+				bool doComHandling = true;
+#endif
 
-				if (!isRemotingProxy && Marshal.IsComObject(target))
+				if (doComHandling && Marshal.IsComObject(target))
 				{
 					var interfaceId = interfaceToProxy.GUID;
 					if (interfaceId != Guid.Empty)
@@ -603,27 +580,18 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 						if (result == 0 && isInterfacePointerNull)
 						{
 							throw new ArgumentException("Target COM object does not implement interface " + interfaceToProxy.FullName,
-														"target");
+														nameof(target));
 						}
 					}
 				}
 			}
-#endif
 
-			CheckNotGenericTypeDefinition(interfaceToProxy, "interfaceToProxy");
-			CheckNotGenericTypeDefinitions(additionalInterfacesToProxy, "additionalInterfacesToProxy");
+			CheckNotGenericTypeDefinition(interfaceToProxy, nameof(interfaceToProxy));
+			CheckNotGenericTypeDefinitions(additionalInterfacesToProxy, nameof(additionalInterfacesToProxy));
 
 			var generatedType = CreateInterfaceProxyTypeWithTargetInterface(interfaceToProxy, additionalInterfacesToProxy,
 			                                                                options);
 			var arguments = GetConstructorArguments(target, interceptors, options);
-			if (isRemotingProxy)
-			{
-				var constructors = generatedType.GetConstructors();
-
-				// one .ctor to rule them all
-				Debug.Assert(constructors.Length == 1, "constructors.Length == 1");
-				return constructors[0].Invoke(arguments.ToArray());
-			}
 			return Activator.CreateInstance(generatedType, arguments.ToArray());
 		}
 
@@ -849,20 +817,20 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		{
 			if (interfaceToProxy == null)
 			{
-				throw new ArgumentNullException("interfaceToProxy");
+				throw new ArgumentNullException(nameof(interfaceToProxy));
 			}
 			if (interceptors == null)
 			{
-				throw new ArgumentNullException("interceptors");
+				throw new ArgumentNullException(nameof(interceptors));
 			}
 
-			if (!interfaceToProxy.GetTypeInfo().IsInterface)
+			if (!interfaceToProxy.IsInterface)
 			{
-				throw new ArgumentException("Specified type is not an interface", "interfaceToProxy");
+				throw new ArgumentException("Specified type is not an interface", nameof(interfaceToProxy));
 			}
 
-			CheckNotGenericTypeDefinition(interfaceToProxy, "interfaceToProxy");
-			CheckNotGenericTypeDefinitions(additionalInterfacesToProxy, "additionalInterfacesToProxy");
+			CheckNotGenericTypeDefinition(interfaceToProxy, nameof(interfaceToProxy));
+			CheckNotGenericTypeDefinitions(additionalInterfacesToProxy, nameof(additionalInterfacesToProxy));
 
 			var generatedType = CreateInterfaceProxyTypeWithoutTarget(interfaceToProxy, additionalInterfacesToProxy, options);
 			var arguments = GetConstructorArguments(null, interceptors, options);
@@ -1159,19 +1127,19 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		{
 			if (classToProxy == null)
 			{
-				throw new ArgumentNullException("classToProxy");
+				throw new ArgumentNullException(nameof(classToProxy));
 			}
 			if (options == null)
 			{
-				throw new ArgumentNullException("options");
+				throw new ArgumentNullException(nameof(options));
 			}
-			if (!classToProxy.GetTypeInfo().IsClass)
+			if (!classToProxy.IsClass)
 			{
-				throw new ArgumentException("'classToProxy' must be a class", "classToProxy");
+				throw new ArgumentException("'classToProxy' must be a class", nameof(classToProxy));
 			}
 
-			CheckNotGenericTypeDefinition(classToProxy, "classToProxy");
-			CheckNotGenericTypeDefinitions(additionalInterfacesToProxy, "additionalInterfacesToProxy");
+			CheckNotGenericTypeDefinition(classToProxy, nameof(classToProxy));
+			CheckNotGenericTypeDefinitions(additionalInterfacesToProxy, nameof(additionalInterfacesToProxy));
 
 			var proxyType = CreateClassProxyTypeWithTarget(classToProxy, additionalInterfacesToProxy, options);
 
@@ -1423,19 +1391,19 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		{
 			if (classToProxy == null)
 			{
-				throw new ArgumentNullException("classToProxy");
+				throw new ArgumentNullException(nameof(classToProxy));
 			}
 			if (options == null)
 			{
-				throw new ArgumentNullException("options");
+				throw new ArgumentNullException(nameof(options));
 			}
-			if (!classToProxy.GetTypeInfo().IsClass)
+			if (!classToProxy.IsClass)
 			{
-				throw new ArgumentException("'classToProxy' must be a class", "classToProxy");
+				throw new ArgumentException("'classToProxy' must be a class", nameof(classToProxy));
 			}
 
-			CheckNotGenericTypeDefinition(classToProxy, "classToProxy");
-			CheckNotGenericTypeDefinitions(additionalInterfacesToProxy, "additionalInterfacesToProxy");
+			CheckNotGenericTypeDefinition(classToProxy, nameof(classToProxy));
+			CheckNotGenericTypeDefinitions(additionalInterfacesToProxy, nameof(additionalInterfacesToProxy));
 
 			var proxyType = CreateClassProxyType(classToProxy, additionalInterfacesToProxy, options);
 
@@ -1453,9 +1421,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		{
 			try
 			{
-                return proxyType.CreateObject(proxyArguments.ToArray());
-            }
-			catch (MissingMethodException)
+				return CreateObjectInstance(proxyType, proxyArguments.ToArray());
+			}
+			catch (MissingMethodException ex)
 			{
 				var message = new StringBuilder();
 				message.AppendFormat("Can not instantiate proxy of class: {0}.", classToProxy.FullName);
@@ -1474,16 +1442,17 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 					}
 				}
 
-				throw new InvalidProxyConstructorArgumentsException(message.ToString(),proxyType,classToProxy);
+				throw new ArgumentException(message.ToString(), nameof(constructorArguments), ex);
 			}
 		}
 
 		protected void CheckNotGenericTypeDefinition(Type type, string argumentName)
 		{
-			if (type != null && type.GetTypeInfo().IsGenericTypeDefinition)
+			if (type != null && type.IsGenericTypeDefinition)
 			{
-				throw new GeneratorException(string.Format("Can not create proxy for type {0} because it is an open generic type.",
-														   type.GetBestName()));
+				throw new ArgumentException(
+					$"Can not create proxy for type {type.GetBestName()} because it is an open generic type.",
+					argumentName);
 			}
 		}
 
@@ -1594,6 +1563,15 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		{
 			// create proxy
 			return ProxyBuilder.CreateClassProxyTypeWithTarget(classToProxy, additionalInterfacesToProxy, options);
+		}
+
+		private static object CreateObjectInstance(Type type, object[] arguments)
+		{
+#if FEATURE_DEFAULT_ACTIVATOR
+			return Activator.CreateInstance(type, arguments);
+#else
+			return type.CreateObject(arguments);
+#endif
 		}
 	}
 }

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net451;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net451;netcoreapp3.1</TargetFrameworks>
     <Configurations>Debug;Release;DebugFree;ReleaseFree</Configurations>
     <AssemblyName>Telerik.JustMock.NUnit.Tests</AssemblyName>
     <RootNamespace>Telerik.JustMock.Tests</RootNamespace>
@@ -69,10 +69,10 @@
     <ProjectReference Include="..\Telerik.JustMock\Telerik.JustMock.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NUnit" Version="3.9.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.9.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+    <PackageReference Include="NUnit" Version="3.14.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="System.Dynamic.Runtime " Version="4.3.0" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
   </ItemGroup>
 </Project>

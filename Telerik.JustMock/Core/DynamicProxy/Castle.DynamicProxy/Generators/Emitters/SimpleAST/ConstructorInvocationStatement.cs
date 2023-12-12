@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,36 +18,54 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 	using System.Reflection;
 	using System.Reflection.Emit;
 
-	internal class ConstructorInvocationStatement : Statement
+	internal class ConstructorInvocationStatement : IStatement
 	{
-		private readonly Expression[] args;
+		private readonly IExpression[] args;
 		private readonly ConstructorInfo cmethod;
 
-		public ConstructorInvocationStatement(ConstructorInfo method, params Expression[] args)
+		public ConstructorInvocationStatement(Type baseType)
+			: this(GetDefaultConstructor(baseType))
+		{
+		}
+
+		public ConstructorInvocationStatement(ConstructorInfo method, params IExpression[] args)
 		{
 			if (method == null)
 			{
-				throw new ArgumentNullException("method");
+				throw new ArgumentNullException(nameof(method));
 			}
 			if (args == null)
 			{
-				throw new ArgumentNullException("args");
+				throw new ArgumentNullException(nameof(args));
 			}
 
 			cmethod = method;
 			this.args = args;
 		}
 
-		public override void Emit(IMemberEmitter member, ILGenerator gen)
+		public void Emit(ILGenerator gen)
 		{
 			gen.Emit(OpCodes.Ldarg_0);
 
 			foreach (var exp in args)
 			{
-				exp.Emit(member, gen);
+				exp.Emit(gen);
 			}
 
 			gen.Emit(OpCodes.Call, cmethod);
+		}
+
+		private static ConstructorInfo GetDefaultConstructor(Type baseType)
+		{
+			var type = baseType;
+			if (type.ContainsGenericParameters)
+			{
+				type = type.GetGenericTypeDefinition();
+				// need to get generic type definition, otherwise the GetConstructor method might throw NotSupportedException
+			}
+
+			var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+			return type.GetConstructor(flags, null, Type.EmptyTypes, null);
 		}
 	}
 }

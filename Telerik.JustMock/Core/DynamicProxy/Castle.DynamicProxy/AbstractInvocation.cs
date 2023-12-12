@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,11 +17,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 	using System;
 	using System.Diagnostics;
 	using System.Reflection;
-    using Telerik.JustMock.Diagnostics;
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-    public abstract class AbstractInvocation : IInvocation
-    {
+	public abstract class AbstractInvocation : IInvocation
+	{
 		private readonly IInterceptor[] interceptors;
 		private readonly object[] arguments;
 		private int currentInterceptorIndex = -1;
@@ -35,7 +33,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 			MethodInfo proxiedMethod,
 			object[] arguments)
 		{
-            Debug.Assert(proxiedMethod != null);
+			Debug.Assert(proxiedMethod != null);
 			proxyObject = proxy;
 			this.interceptors = interceptors;
 			this.proxiedMethod = proxiedMethod;
@@ -117,21 +115,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 				}
 				else if (currentInterceptorIndex > interceptors.Length)
 				{
-					string interceptorsCount;
-					if (interceptors.Length > 1)
-					{
-						interceptorsCount = " each one of " + interceptors.Length + " interceptors";
-					}
-					else
-					{
-						interceptorsCount = " interceptor";
-					}
-
-					var message = "This is a DynamicProxy2 error: invocation.Proceed() has been called more times than expected." +
-					              "This usually signifies a bug in the calling code. Make sure that" + interceptorsCount +
-					              " selected for the method '" + Method + "'" +
-					              "calls invocation.Proceed() at most once.";
-					throw new InvalidOperationException(message);
+					throw new InvalidOperationException(
+						"Cannot proceed past the end of the interception pipeline. " +
+						"This likely signifies a bug in the calling code.");
 				}
 				else
 				{
@@ -142,6 +128,11 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 			{
 				currentInterceptorIndex--;
 			}
+		}
+
+		public IInvocationProceedInfo CaptureProceedInfo()
+		{
+			return new ProceedInfo(this);
 		}
 
 		protected abstract void InvokeMethodOnTarget();
@@ -161,7 +152,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 
 			string methodKindIs;
 			string methodKindDescription;
-			if (Method.DeclaringType.GetTypeInfo().IsClass && Method.IsAbstract)
+			if (Method.DeclaringType.IsClass && Method.IsAbstract)
 			{
 				methodKindIs = "is abstract";
 				methodKindDescription = "an abstract method";
@@ -185,11 +176,36 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		{
 			if (method.ContainsGenericParameters)
 			{
-                JMDebug.Assert(genericMethodArguments != null);
+				Debug.Assert(genericMethodArguments != null);
 				return method.GetGenericMethodDefinition().MakeGenericMethod(genericMethodArguments);
 			}
 			return method;
 		}
+
+		private sealed class ProceedInfo : IInvocationProceedInfo
+		{
+			private readonly AbstractInvocation invocation;
+			private readonly int interceptorIndex;
+
+			public ProceedInfo(AbstractInvocation invocation)
+			{
+				this.invocation = invocation;
+				this.interceptorIndex = invocation.currentInterceptorIndex;
+			}
+
+			public void Invoke()
+			{
+				var previousInterceptorIndex = invocation.currentInterceptorIndex;
+				try
+				{
+					invocation.currentInterceptorIndex = interceptorIndex;
+					invocation.Proceed();
+				}
+				finally
+				{
+					invocation.currentInterceptorIndex = previousInterceptorIndex;
+				}
+			}
+		}
 	}
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }

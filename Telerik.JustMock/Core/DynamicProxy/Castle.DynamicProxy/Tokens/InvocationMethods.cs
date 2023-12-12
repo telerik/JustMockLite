@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,7 +36,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Tokens
 			                                             },
 			                                             null);
 
-		public static readonly MethodInfo EnsureValidTarget =
+		public static readonly MethodInfo CompositionInvocationEnsureValidTarget =
 			typeof(CompositionInvocation).GetMethod("EnsureValidTarget", BindingFlags.Instance | BindingFlags.NonPublic);
 
 		public static readonly MethodInfo GetArgumentValue =
@@ -89,10 +89,15 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Tokens
 		public static readonly MethodInfo SetReturnValue =
 			typeof(AbstractInvocation).GetMethod("set_ReturnValue");
 
-		public static readonly FieldInfo Target =
+		public static readonly FieldInfo CompositionInvocationTarget =
 			typeof(CompositionInvocation).GetField("target", BindingFlags.Instance | BindingFlags.NonPublic);
 
 		public static readonly MethodInfo ThrowOnNoTarget =
 			typeof(AbstractInvocation).GetMethod("ThrowOnNoTarget", BindingFlags.Instance | BindingFlags.NonPublic);
+
+		// The following two fields are not used internally, but kept for back-compatibility
+		// because we renamed the public fields `EnsureValidTarget` and `Target`:
+		public static readonly MethodInfo EnsureValidTarget = CompositionInvocationEnsureValidTarget;
+		public static readonly FieldInfo Target = CompositionInvocationTarget;
 	}
 }

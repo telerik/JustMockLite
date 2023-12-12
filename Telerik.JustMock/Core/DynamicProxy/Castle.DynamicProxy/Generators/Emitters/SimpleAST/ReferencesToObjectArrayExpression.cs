@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,9 +18,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 	using System.Reflection;
 	using System.Reflection.Emit;
 
-	/// <summary>
-	/// </summary>
-	internal class ReferencesToObjectArrayExpression : Expression
+	internal class ReferencesToObjectArrayExpression : IExpression
 	{
 		private readonly TypeReference[] args;
 
@@ -29,7 +27,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 			this.args = args;
 		}
 
-		public override void Emit(IMemberEmitter member, ILGenerator gen)
+		public void Emit(ILGenerator gen)
 		{
 			var local = gen.DeclareLocal(typeof(object[]));
 
@@ -46,20 +44,22 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 
 				ArgumentsUtil.EmitLoadOwnerAndReference(reference, gen);
 
-				if (reference.Type.GetTypeInfo().IsByRef)
+				if (reference.Type.IsByRef)
 				{
 					throw new NotSupportedException();
 				}
-                if (reference.Type.GetTypeInfo().IsPointer)
-                {
-                    gen.Emit(OpCodes.Call, ArgumentsUtil.IntPtrFromPointer());
-                    gen.Emit(OpCodes.Box, typeof(IntPtr));
-                }
-                if (reference.Type.GetTypeInfo().IsValueType)
+
+				if (reference.Type.GetTypeInfo().IsPointer)
+				{
+					gen.Emit(OpCodes.Call, ArgumentsUtil.IntPtrFromPointer());
+					gen.Emit(OpCodes.Box, typeof(IntPtr));
+				}
+
+				if (reference.Type.IsValueType)
 				{
 					gen.Emit(OpCodes.Box, reference.Type);
 				}
-				else if (reference.Type.GetTypeInfo().IsGenericParameter)
+				else if (reference.Type.IsGenericParameter)
 				{
 					gen.Emit(OpCodes.Box, reference.Type);
 				}

@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -49,9 +49,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   Additional interfaces should be only 'mark' interfaces, that is, they should work like interface proxy without target. (See <see
 		///    cref = "CreateInterfaceProxyTypeWithoutTarget" /> method.)
 		/// </remarks>
-		/// <exception cref = "GeneratorException">Thrown when <paramref name = "classToProxy" /> or any of <paramref
+		/// <exception cref = "ArgumentException">Thrown when <paramref name = "classToProxy" /> or any of <paramref
 		///    name = "additionalInterfacesToProxy" /> is a generic type definition.</exception>
-		/// <exception cref = "GeneratorException">Thrown when <paramref name = "classToProxy" /> or any of <paramref
+		/// <exception cref = "ArgumentException">Thrown when <paramref name = "classToProxy" /> or any of <paramref
 		///    name = "additionalInterfacesToProxy" /> is not public.
 		///   Note that to avoid this exception, you can mark offending type internal, and define <see
 		///    cref = "InternalsVisibleToAttribute" /> 
@@ -77,9 +77,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///   Additional interfaces should be only 'mark' interfaces, that is, they should work like interface proxy without target. (See <see
 		///    cref = "CreateInterfaceProxyTypeWithoutTarget" /> method.)
 		/// </remarks>
-		/// <exception cref = "GeneratorException">Thrown when <paramref name = "interfaceToProxy" /> or any of <paramref
+		/// <exception cref = "ArgumentException">Thrown when <paramref name = "interfaceToProxy" /> or any of <paramref
 		///    name = "additionalInterfacesToProxy" /> is a generic type definition.</exception>
-		/// <exception cref = "GeneratorException">Thrown when <paramref name = "interfaceToProxy" /> or any of <paramref
+		/// <exception cref = "ArgumentException">Thrown when <paramref name = "interfaceToProxy" /> or any of <paramref
 		///    name = "additionalInterfacesToProxy" /> is not public.
 		///   Note that to avoid this exception, you can mark offending type internal, and define <see
 		///    cref = "InternalsVisibleToAttribute" /> 
@@ -102,9 +102,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		///    cref = "IInvocation" /> classes should then implement <see cref = "IChangeProxyTarget" /> interface,
 		///   to allow interceptors to switch invocation target with instance of another type implementing called interface.
 		/// </remarks>
-		/// <exception cref = "GeneratorException">Thrown when <paramref name = "interfaceToProxy" /> or any of <paramref
+		/// <exception cref = "ArgumentException">Thrown when <paramref name = "interfaceToProxy" /> or any of <paramref
 		///    name = "additionalInterfacesToProxy" /> is a generic type definition.</exception>
-		/// <exception cref = "GeneratorException">Thrown when <paramref name = "interfaceToProxy" /> or any of <paramref
+		/// <exception cref = "ArgumentException">Thrown when <paramref name = "interfaceToProxy" /> or any of <paramref
 		///    name = "additionalInterfacesToProxy" /> is not public.
 		///   Note that to avoid this exception, you can mark offending type internal, and define <see
 		///    cref = "InternalsVisibleToAttribute" /> 
@@ -123,9 +123,9 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		/// <remarks>
 		///   Implementers should return a proxy type for the specified interface and additional interfaces that delegate all executions to the specified interceptors.
 		/// </remarks>
-		/// <exception cref = "GeneratorException">Thrown when <paramref name = "interfaceToProxy" /> or any of <paramref
+		/// <exception cref = "ArgumentException">Thrown when <paramref name = "interfaceToProxy" /> or any of <paramref
 		///    name = "additionalInterfacesToProxy" /> is a generic type definition.</exception>
-		/// <exception cref = "GeneratorException">Thrown when <paramref name = "interfaceToProxy" /> or any of <paramref
+		/// <exception cref = "ArgumentException">Thrown when <paramref name = "interfaceToProxy" /> or any of <paramref
 		///    name = "additionalInterfacesToProxy" /> is not public.
 		///   Note that to avoid this exception, you can mark offending type internal, and define <see
 		///    cref = "InternalsVisibleToAttribute" /> 

@@ -1,4 +1,4 @@
-// Copyright 2004-2009 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,14 +15,10 @@
 namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
 	using System;
-#if FEATURE_SERIALIZATION
 	using System.Runtime.Serialization;
-#endif
 
-#if FEATURE_SERIALIZATION
 	[Serializable]
-#endif
-    internal class ResourceException : Exception
+	internal class ResourceException : Exception
 	{
 		public ResourceException()
 		{
@@ -35,10 +31,10 @@ namespace Telerik.JustMock.Core.Castle.Core.Resource
 		public ResourceException(string message, Exception innerException) : base(message, innerException)
 		{
 		}
-#if FEATURE_SERIALIZATION
+
 		protected ResourceException(SerializationInfo info, StreamingContext context) : base(info, context)
 		{
 		}
-#endif
+
 	}
 }

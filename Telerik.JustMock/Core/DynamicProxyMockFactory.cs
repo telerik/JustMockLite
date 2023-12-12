@@ -50,8 +50,8 @@ namespace Telerik.JustMock.Core
 
 		public bool IsAccessible(Type type)
 		{
-            return ProxyUtil.IsAccessibleType(type);
-        }
+			return ProxyUtil.IsAccessibleType(type);
+		}
 
 		public object Create(Type type, MocksRepository repository, IMockMixin mockMixinImpl, MockCreationSettings settings, bool createTransparentProxy)
 		{
@@ -90,7 +90,7 @@ namespace Telerik.JustMock.Core
 				{
 					proxyFailure = ex;
 				}
-				catch (GeneratorException ex)
+				catch (ArgumentException ex)
 				{
 					proxyFailure = ex;
 				}
@@ -129,15 +129,15 @@ namespace Telerik.JustMock.Core
 				{
 					proxyFailure = ex;
 				}
-				catch (GeneratorException ex)
+				catch (ArgumentException ex)
 				{
 					proxyFailure = ex;
-				}
-				catch (InvalidProxyConstructorArgumentsException ex)
-				{
-					proxyFailure = ex;
-					if (!settings.MockConstructorCall)
+					if (ex.InnerException != null
+						&& ex.InnerException is MissingMethodException
+						&& !settings.MockConstructorCall)
+					{
 						throw new MockException(ex.Message);
+					}
 				}
 			}
 			if (proxyFailure != null)
@@ -240,23 +240,23 @@ namespace Telerik.JustMock.Core
 			{
 			}
 
-            public bool ShouldInterceptMethod(Type type, MethodInfo methodInfo)
-            {
-                if (Attribute.IsDefined(methodInfo.DeclaringType, typeof(MixinAttribute)))
-                {
-                    return false;
-                }
+			public bool ShouldInterceptMethod(Type type, MethodInfo methodInfo)
+			{
+				if (Attribute.IsDefined(methodInfo.DeclaringType, typeof(MixinAttribute)))
+				{
+					return false;
+				}
 
-                bool profilerCannotIntercept = methodInfo.IsAbstract || methodInfo.IsExtern() || !ProfilerInterceptor.TypeSupportsInstrumentation(methodInfo.DeclaringType);
+				bool profilerCannotIntercept = methodInfo.IsAbstract || methodInfo.IsExtern() || !ProfilerInterceptor.TypeSupportsInstrumentation(methodInfo.DeclaringType);
 
-                if (ProfilerInterceptor.IsProfilerAttached && !profilerCannotIntercept)
-                {
-                    bool isDefaultMethodImplementation = !methodInfo.IsAbstract && methodInfo.DeclaringType.IsInterface;
-                    if (type == methodInfo.DeclaringType && !isDefaultMethodImplementation)
-                    {
-                        return false;
-                    }
-                }
+				if (ProfilerInterceptor.IsProfilerAttached && !profilerCannotIntercept)
+				{
+					bool isDefaultMethodImplementation = !methodInfo.IsAbstract && methodInfo.DeclaringType.IsInterface;
+					if (type == methodInfo.DeclaringType && !isDefaultMethodImplementation)
+					{
+						return false;
+					}
+				}
 
 				return myInterceptorFilterImpl != null ? myInterceptorFilterImpl(methodInfo) : true;
 			}

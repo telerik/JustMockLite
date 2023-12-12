@@ -1,10 +1,10 @@
-// Copyright 2004-2012 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,47 +18,22 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Reflection;
-#if FEATURE_SECURITY_PERMISSIONS
-	using System.Security;
-	using System.Security.Permissions;
-#endif
 
 	internal static class StrongNameUtil
 	{
 		private static readonly IDictionary<Assembly, bool> signedAssemblyCache = new Dictionary<Assembly, bool>();
 		private static readonly object lockObject = new object();
 
-#if FEATURE_SECURITY_PERMISSIONS && DOTNET40
-		[SecuritySafeCritical]
-#endif
-		static StrongNameUtil()
-		{
-#if FEATURE_SECURITY_PERMISSIONS
-			//idea after http://blogs.msdn.com/dmitryr/archive/2007/01/23/finding-out-the-current-trust-level-in-asp-net.aspx
-			try
-			{
-				new SecurityPermission(SecurityPermissionFlag.UnmanagedCode).Demand();
-				CanStrongNameAssembly = true;
-			}
-			catch (SecurityException)
-			{
-				CanStrongNameAssembly = false;
-			}
-#else
-			CanStrongNameAssembly = true;
-#endif
-		}
-
 		public static bool IsAssemblySigned(this Assembly assembly)
 		{
 			lock (lockObject)
 			{
-				if (signedAssemblyCache.ContainsKey(assembly) == false)
+				if (signedAssemblyCache.TryGetValue(assembly, out var isSigned) == false)
 				{
-					var isSigned = assembly.ContainsPublicKey();
+					isSigned = assembly.ContainsPublicKey();
 					signedAssemblyCache.Add(assembly, isSigned);
 				}
-				return signedAssemblyCache[assembly];
+				return isSigned;
 			}
 		}
 
@@ -70,19 +45,17 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 
 		public static bool IsAnyTypeFromUnsignedAssembly(IEnumerable<Type> types)
 		{
-			return types.Any(t => t.GetTypeInfo().Assembly.IsAssemblySigned() == false);
+			return types.Any(t => t.Assembly.IsAssemblySigned() == false);
 		}
 
 		public static bool IsAnyTypeFromUnsignedAssembly(Type baseType, IEnumerable<Type> interfaces)
 		{
-			if (baseType != null && baseType.GetTypeInfo().Assembly.IsAssemblySigned() == false)
+			if (baseType != null && baseType.Assembly.IsAssemblySigned() == false)
 			{
 				return true;
 			}
 
 			return IsAnyTypeFromUnsignedAssembly(interfaces);
 		}
-
-		public static bool CanStrongNameAssembly { get; set; }
 	}
 }

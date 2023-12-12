@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +21,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 	internal class MethodSignatureComparer : IEqualityComparer<MethodInfo>
 	{
 		public static readonly MethodSignatureComparer Instance = new MethodSignatureComparer();
+
+		private static readonly Type preserveBaseOverridesAttribute = Type.GetType("System.Runtime.CompilerServices.PreserveBaseOverridesAttribute", throwOnError: false);
 
 		public bool EqualGenericParameters(MethodInfo x, MethodInfo y)
 		{
@@ -41,12 +43,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 
 				for (var i = 0; i < xArgs.Length; ++i)
 				{
-					if (xArgs[i].GetTypeInfo().IsGenericParameter != yArgs[i].GetTypeInfo().IsGenericParameter)
+					if (xArgs[i].IsGenericParameter != yArgs[i].IsGenericParameter)
 					{
 						return false;
 					}
 
-					if (!xArgs[i].GetTypeInfo().IsGenericParameter && !xArgs[i].Equals(yArgs[i]))
+					if (!xArgs[i].IsGenericParameter && !xArgs[i].Equals(yArgs[i]))
 					{
 						return false;
 					}
@@ -77,31 +79,50 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 			return true;
 		}
 
-		public bool EqualSignatureTypes(Type x, Type y)
+		public bool EqualReturnTypes(MethodInfo x, MethodInfo y)
 		{
-			var xti = x.GetTypeInfo();
-			var yti = y.GetTypeInfo();
+			var xr = x.ReturnType;
+			var yr = y.ReturnType;
 
-			if (xti.IsGenericParameter != yti.IsGenericParameter)
+			if (EqualSignatureTypes(xr, yr))
+			{
+				return true;
+			}
+
+			// This enables covariant method returns for .NET 5 and newer.
+			// No need to check for runtime support, since such methods are marked with a custom attribute;
+			// see https://github.com/dotnet/runtime/blob/main/docs/design/features/covariant-return-methods.md.
+			if (preserveBaseOverridesAttribute != null)
+			{
+				return (x.IsDefined(preserveBaseOverridesAttribute, inherit: false) && yr.IsAssignableFrom(xr))
+				    || (y.IsDefined(preserveBaseOverridesAttribute, inherit: false) && xr.IsAssignableFrom(yr));
+			}
+
+			return false;
+		}
+
+		private bool EqualSignatureTypes(Type x, Type y)
+		{
+			if (x.IsGenericParameter != y.IsGenericParameter)
 			{
 				return false;
 			}
-			else if (xti.IsGenericType != yti.IsGenericType)
+			else if (x.IsGenericType != y.IsGenericType)
 			{
 				return false;
 			}
 
-			if (xti.IsGenericParameter)
+			if (x.IsGenericParameter)
 			{
-				if (xti.GenericParameterPosition != yti.GenericParameterPosition)
+				if (x.GenericParameterPosition != y.GenericParameterPosition)
 				{
 					return false;
 				}
 			}
-			else if (xti.IsGenericType)
+			else if (x.IsGenericType)
 			{
-				var xGenericTypeDef = xti.GetGenericTypeDefinition();
-				var yGenericTypeDef = yti.GetGenericTypeDefinition();
+				var xGenericTypeDef = x.GetGenericTypeDefinition();
+				var yGenericTypeDef = y.GetGenericTypeDefinition();
 
 				if (xGenericTypeDef != yGenericTypeDef)
 				{
@@ -118,7 +139,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 
 				for (var i = 0; i < xArgs.Length; ++i)
 				{
-					 if(!EqualSignatureTypes(xArgs[i], yArgs[i])) return false;
+					if(!EqualSignatureTypes(xArgs[i], yArgs[i])) return false;
 				}
 			}
 			else
@@ -145,7 +166,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 
 			return EqualNames(x, y) &&
 				   EqualGenericParameters(x, y) &&
-				   EqualSignatureTypes(x.ReturnType, y.ReturnType) &&
+				   EqualReturnTypes(x, y) &&
 				   EqualParameters(x, y);
 		}
 

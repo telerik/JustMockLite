@@ -142,7 +142,7 @@ namespace Telerik.JustMock.Core
             };
 
             foreach (var unmockableAttr in badApples.Where(t => t != null))
-                AttributesToAvoidReplicating.Add(unmockableAttr);
+                Castle.DynamicProxy.Generators.AttributesToAvoidReplicating.Add(unmockableAttr);
 #endif
 
 #if !PORTABLE

@@ -117,7 +117,12 @@ namespace Telerik.JustMock.Core.TransparentProxy
 			throw new NotSupportedException();
 		}
 
-		public Type TargetType
+        public IInvocationProceedInfo CaptureProceedInfo()
+        {
+            throw new NotSupportedException();
+        }
+
+        public Type TargetType
 		{
 			get { throw new NotSupportedException(); }
 		}

@@ -1,10 +1,10 @@
-// Copyright 2004-2010 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,31 +15,25 @@
 namespace Telerik.JustMock.Core.Castle.Core.Logging
 {
 	using System;
-#if FEATURE_SERIALIZATION
 	using System.Runtime.Serialization;
-#endif
 
-#if FEATURE_SERIALIZATION
 	[Serializable]
-#endif
     internal class LoggerException : Exception
 	{
 		public LoggerException()
 		{
 		}
 
-		public LoggerException(String message) : base(message)
+		public LoggerException(string message) : base(message)
 		{
 		}
 
-		public LoggerException(String message, Exception innerException) : base(message, innerException)
+		public LoggerException(string message, Exception innerException) : base(message, innerException)
 		{
 		}
 
-#if FEATURE_SERIALIZATION
 		protected LoggerException(SerializationInfo info, StreamingContext context) : base(info, context)
 		{
 		}
-#endif
 	}
 }

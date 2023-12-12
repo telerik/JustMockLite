@@ -1,4 +1,4 @@
-// Copyright 2004-2016 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 	using System.Linq.Expressions;
 	using System.Reflection;
 	using System.Reflection.Emit;
+	using System.Runtime.CompilerServices;
 
 	/// <summary>
 	/// Encapsulates the information needed to build an attribute.
@@ -43,10 +44,10 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 		private readonly IDictionary<string, object> properties;
 		private readonly IDictionary<string, object> fields;
 
-        public CustomAttributeInfo(CustomAttributeBuilder builder)
-        {
-            this.builder = builder;
-        }
+		public CustomAttributeInfo(CustomAttributeBuilder builder)
+		{
+			this.builder = builder;
+		}
 
 		public CustomAttributeInfo(
 			ConstructorInfo constructor,
@@ -174,14 +175,26 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 
 		private static object GetAttributeArgumentValue(Expression arg, bool allowArray)
 		{
-			var constant = arg as ConstantExpression;
-			if (constant == null)
+			switch (arg.NodeType)
 			{
-				if (allowArray)
-				{
-					var newArrayExpr = arg as NewArrayExpression;
-					if (newArrayExpr != null)
+				case ExpressionType.Constant:
+					return ((ConstantExpression)arg).Value;
+				case ExpressionType.MemberAccess:
+					var memberExpr = (MemberExpression) arg;
+					if (memberExpr.Member is FieldInfo field)
 					{
+						if (memberExpr.Expression is ConstantExpression constant &&
+						    IsCompilerGenerated(constant.Type) &&
+						    constant.Value != null)
+						{
+							return field.GetValue(constant.Value);
+						}
+					}
+					break;
+				case ExpressionType.NewArrayInit:
+					if (allowArray)
+					{
+						var newArrayExpr = (NewArrayExpression) arg;
 						var array = Array.CreateInstance(newArrayExpr.Type.GetElementType(), newArrayExpr.Expressions.Count);
 						int index = 0;
 						foreach (var expr in newArrayExpr.Expressions)
@@ -192,10 +205,15 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 						}
 						return array;
 					}
-				}
-				throw new ArgumentException("Only constant and single-dimensional array expressions are supported");
+					break;
 			}
-			return constant.Value;
+			
+			throw new ArgumentException("Only constant, local variables, method parameters and single-dimensional array expressions are supported");
+		}
+
+		private static bool IsCompilerGenerated(Type type)
+		{
+			return type.IsDefined(typeof(CompilerGeneratedAttribute));
 		}
 
 		internal CustomAttributeBuilder Builder
@@ -324,7 +342,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 			private static IEnumerable<object> AsObjectEnumerable(object array)
 			{
 				// Covariance doesn't work for value types
-				if (array.GetType().GetElementType().GetTypeInfo().IsValueType)
+				if (array.GetType().GetElementType().IsValueType)
 					return ((Array)array).Cast<object>();
 
 				return (IEnumerable<object>)array;

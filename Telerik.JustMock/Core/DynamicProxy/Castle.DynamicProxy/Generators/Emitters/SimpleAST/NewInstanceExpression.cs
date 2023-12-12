@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,41 +18,31 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 	using System.Reflection;
 	using System.Reflection.Emit;
 
-	internal class NewInstanceExpression : Expression
+	internal class NewInstanceExpression : IExpression
 	{
-		private readonly Expression[] arguments;
-		private readonly Type[] constructorArgs;
-		private readonly Type type;
+		private readonly IExpression[] arguments;
 		private ConstructorInfo constructor;
 
-		public NewInstanceExpression(ConstructorInfo constructor, params Expression[] args)
+		public NewInstanceExpression(ConstructorInfo constructor, params IExpression[] args)
 		{
-			this.constructor = constructor;
+			this.constructor = constructor ?? throw new ArgumentNullException(nameof(constructor));
 			arguments = args;
 		}
 
-		public NewInstanceExpression(Type target, Type[] constructor_args, params Expression[] args)
+		public NewInstanceExpression(Type target)
 		{
-			type = target;
-			constructorArgs = constructor_args;
-			arguments = args;
+			constructor = target.GetConstructor(Type.EmptyTypes) ?? throw new MissingMethodException("Could not find default constructor.");
+			arguments = null;
 		}
 
-		public override void Emit(IMemberEmitter member, ILGenerator gen)
+		public void Emit(ILGenerator gen)
 		{
-			foreach (var exp in arguments)
+			if (arguments != null)
 			{
-				exp.Emit(member, gen);
-			}
-
-			if (constructor == null)
-			{
-				constructor = type.GetConstructor(constructorArgs);
-			}
-
-			if (constructor == null)
-			{
-				throw new ProxyGenerationException("Could not find constructor matching specified arguments");
+				foreach (var exp in arguments)
+				{
+					exp.Emit(gen);
+				}
 			}
 
 			gen.Emit(OpCodes.Newobj, constructor);

@@ -1,10 +1,10 @@
-﻿// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+﻿// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 	using System.Reflection;
 	using System.Reflection.Emit;
 
-	internal class DefaultValueExpression : Expression
+	internal class DefaultValueExpression : IExpression
 	{
 		private readonly Type type;
 
@@ -27,14 +27,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 			this.type = type;
 		}
 
-		public override void Emit(IMemberEmitter member, ILGenerator gen)
+		public void Emit(ILGenerator gen)
 		{
 			// TODO: check if this can be simplified by using more of OpCodeUtil and other existing types
 			if (IsPrimitiveOrClass(type))
 			{
 				OpCodeUtil.EmitLoadOpCodeForDefaultValueOfType(gen, type);
 			}
-			else if (type.GetTypeInfo().IsValueType || type.GetTypeInfo().IsGenericParameter)
+			else if (type.IsValueType || type.IsGenericParameter)
 			{
 				// TODO: handle decimal explicitly
 				var local = gen.DeclareLocal(type);
@@ -42,13 +42,13 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 				gen.Emit(OpCodes.Initobj, type);
 				gen.Emit(OpCodes.Ldloc, local);
 			}
-			else if (type.GetTypeInfo().IsByRef)
+			else if (type.IsByRef)
 			{
 				EmitByRef(gen);
 			}
 			else
 			{
-				throw new ProxyGenerationException("Can't emit default value for type " + type);
+				throw new NotImplementedException("Can't emit default value for type " + type);
 			}
 		}
 
@@ -60,25 +60,25 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 				OpCodeUtil.EmitLoadOpCodeForDefaultValueOfType(gen, elementType);
 				OpCodeUtil.EmitStoreIndirectOpCodeForType(gen, elementType);
 			}
-			else if (elementType.GetTypeInfo().IsGenericParameter || elementType.GetTypeInfo().IsValueType)
+			else if (elementType.IsGenericParameter || elementType.IsValueType)
 			{
 				gen.Emit(OpCodes.Initobj, elementType);
 			}
 			else
 			{
-				throw new ProxyGenerationException("Can't emit default value for reference of type " + elementType);
+				throw new NotImplementedException("Can't emit default value for reference of type " + elementType);
 			}
 		}
 
 		private bool IsPrimitiveOrClass(Type type)
 		{
-			if ((type.GetTypeInfo().IsPrimitive && type != typeof(IntPtr)))
+			if (type.IsPrimitive && type != typeof(IntPtr) && type != typeof(UIntPtr))
 			{
 				return true;
 			}
-			return ((type.GetTypeInfo().IsClass || type.GetTypeInfo().IsInterface) &&
-			        type.GetTypeInfo().IsGenericParameter == false &&
-			        type.GetTypeInfo().IsByRef == false);
+			return ((type.IsClass || type.IsInterface) &&
+			        type.IsGenericParameter == false &&
+			        type.IsByRef == false);
 		}
 	}
 }

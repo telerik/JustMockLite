@@ -1,10 +1,10 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
-//   http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,6 +22,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
 
 	internal class MixinContributor : CompositeTypeContributor
 	{
@@ -45,7 +46,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 		public void AddEmptyInterface(Type @interface)
 		{
 			Debug.Assert(@interface != null, "@interface == null", "Shouldn't be adding empty interfaces...");
-			Debug.Assert(@interface.GetTypeInfo().IsInterface, "@interface.IsInterface", "Should be adding interfaces only...");
+			Debug.Assert(@interface.IsInterface, "@interface.IsInterface", "Should be adding interfaces only...");
 			Debug.Assert(!interfaces.Contains(@interface), "!interfaces.Contains(@interface)",
 			             "Shouldn't be adding same interface twice...");
 			Debug.Assert(!empty.Contains(@interface), "!empty.Contains(@interface)",
@@ -53,7 +54,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 			empty.Add(@interface);
 		}
 
-		public override void Generate(ClassEmitter @class, ProxyGenerationOptions options)
+		public override void Generate(ClassEmitter @class)
 		{
 			foreach (var @interface in interfaces)
 			{
@@ -65,21 +66,28 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 				fields[emptyInterface] = BuildTargetField(@class, emptyInterface);
 			}
 
-			base.Generate(@class, options);
+			base.Generate(@class);
 		}
 
-		protected override IEnumerable<MembersCollector> CollectElementsToProxyInternal(IProxyGenerationHook hook)
+		protected override IEnumerable<MembersCollector> GetCollectors()
 		{
 			foreach (var @interface in interfaces)
 			{
-				var item = new InterfaceMembersCollector(@interface);
-				item.CollectMembersToProxy(hook);
+				MembersCollector item;
+				if (@interface.IsInterface)
+				{
+					item = new InterfaceMembersCollector(@interface);
+				}
+				else
+				{
+					Debug.Assert(@interface.IsDelegateType());
+					item = new DelegateTypeMembersCollector(@interface);
+				}
 				yield return item;
 			}
 		}
 
 		protected override MethodGenerator GetMethodGenerator(MetaMethod method, ClassEmitter @class,
-		                                                      ProxyGenerationOptions options,
 		                                                      OverrideMethodDelegate overrideMethod)
 		{
 			if (!method.Proxyable)
@@ -89,7 +97,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 				                                     (c, i) => fields[i.DeclaringType]);
 			}
 
-			var invocation = GetInvocationType(method, @class, options);
+			var invocation = GetInvocationType(method, @class);
 			return new MethodWithInvocationGenerator(method,
 			                                         @class.GetField("__interceptors"),
 			                                         invocation,
@@ -102,12 +110,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 		{
 			if (!canChangeTarget)
 			{
-				return (c, m) => fields[m.DeclaringType].ToExpression();
+				return (c, m) => fields[m.DeclaringType];
 			}
 
 			return (c, m) => new NullCoalescingOperatorExpression(
-			                 	new AsTypeReference(c.GetField("__target"), m.DeclaringType).ToExpression(),
-			                 	fields[m.DeclaringType].ToExpression());
+			                 	new AsTypeReference(c.GetField("__target"), m.DeclaringType),
+			                 	fields[m.DeclaringType]);
 		}
 
 		private FieldReference BuildTargetField(ClassEmitter @class, Type type)
@@ -116,7 +124,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 			return @class.CreateField(namingScope.GetUniqueName(name), type);
 		}
 
-		private Type GetInvocationType(MetaMethod method, ClassEmitter emitter, ProxyGenerationOptions options)
+		private Type GetInvocationType(MetaMethod method, ClassEmitter emitter)
 		{
 			var scope = emitter.ModuleScope;
 			Type[] invocationInterfaces;
@@ -132,23 +140,14 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 
 			// no locking required as we're already within a lock
 
-			var invocation = scope.GetFromCache(key);
-			if (invocation != null)
-			{
-				return invocation;
-			}
-
-			invocation = new CompositionInvocationTypeGenerator(method.Method.DeclaringType,
-			                                                    method,
-			                                                    method.Method,
-			                                                    canChangeTarget,
-			                                                    null)
-				.Generate(emitter, options, namingScope)
-				.BuildType();
-
-			scope.RegisterInCache(key, invocation);
-
-			return invocation;
+			return scope.TypeCache.GetOrAddWithoutTakingLock(key, _ =>
+				new CompositionInvocationTypeGenerator(method.Method.DeclaringType,
+				                                       method,
+				                                       method.Method,
+				                                       canChangeTarget,
+				                                       null)
+				.Generate(emitter, namingScope)
+				.BuildType());
 		}
 	}
 }

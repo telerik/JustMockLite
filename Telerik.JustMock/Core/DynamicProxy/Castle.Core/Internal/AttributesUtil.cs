@@ -1,4 +1,4 @@
-// Copyright 2004-2012 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2021 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Internal
 		/// <returns>The type attributes.</returns>
 		public static IEnumerable<T> GetAttributes<T>(this Type type) where T : Attribute
 		{
-			foreach (T a in type.GetTypeInfo().GetCustomAttributes(typeof(T), false))
+			foreach (T a in type.GetCustomAttributes(typeof(T), false))
 			{
 				yield return a;
 			}
@@ -121,7 +121,7 @@ namespace Telerik.JustMock.Core.Castle.Core.Internal
 
 		public static AttributeUsageAttribute GetAttributeUsage(this Type attributeType)
 		{
-			var attributes = attributeType.GetTypeInfo().GetCustomAttributes<AttributeUsageAttribute>(true).ToArray();
+			var attributes = attributeType.GetCustomAttributes<AttributeUsageAttribute>(true).ToArray();
 			return attributes.Length != 0 ? attributes[0] : DefaultAttributeUsage;
 		}
 
@@ -131,7 +131,6 @@ namespace Telerik.JustMock.Core.Castle.Core.Internal
 		/// Gets the type converter.
 		/// </summary>
 		/// <param name="member">The member.</param>
-		/// <returns></returns>
 		public static Type GetTypeConverter(MemberInfo member)
 		{
 			var attrib = GetAttribute<TypeConverterAttribute>(member);
@@ -143,5 +142,5 @@ namespace Telerik.JustMock.Core.Castle.Core.Internal
 
 			return null;
 		}
-    }
+	}
 }

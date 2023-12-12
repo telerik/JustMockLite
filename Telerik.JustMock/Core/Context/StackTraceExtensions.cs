@@ -21,7 +21,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Telerik.JustMock.Core.Castle.Core.Internal;
+using Telerik.JustMock.Core.Internal;
 
 namespace Telerik.JustMock.Core.Context
 {
