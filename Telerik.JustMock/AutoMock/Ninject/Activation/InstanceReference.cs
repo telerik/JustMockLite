@@ -1,22 +1,29 @@
-#region License
-// 
-// Author: Nate Kohari <nate@enkari.com>
-// Copyright (c) 2007-2010, Enkari, Ltd.
-// 
-// Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
-// See the file LICENSE.txt for details.
-// 
-#endregion
-#region Using Directives
-using System;
-using System.Collections.Generic;
-using Telerik.JustMock.AutoMock.Ninject.Parameters;
-using Telerik.JustMock.AutoMock.Ninject.Planning;
-using Telerik.JustMock.AutoMock.Ninject.Planning.Bindings;
-#endregion
+// -------------------------------------------------------------------------------------------------
+// <copyright file="InstanceReference.cs" company="Ninject Project Contributors">
+//   Copyright (c) 2007-2010 Enkari, Ltd. All rights reserved.
+//   Copyright (c) 2010-2017 Ninject Project Contributors. All rights reserved.
+//
+//   Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
+//   You may not use this file except in compliance with one of the Licenses.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//   or
+//       http://www.microsoft.com/opensource/licenses.mspx
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+// </copyright>
+// -------------------------------------------------------------------------------------------------
 
 namespace Telerik.JustMock.AutoMock.Ninject.Activation
 {
+    using System;
+    using System.Security;
+
     /// <summary>
     /// Holds an instance during activation or after it has been cached.
     /// </summary>
@@ -32,9 +39,17 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation
         /// </summary>
         /// <typeparam name="T">The type in question.</typeparam>
         /// <returns><see langword="True"/> if the instance is of the specified type, otherwise <see langword="false"/>.</returns>
+        [SecuritySafeCritical]
         public bool Is<T>()
         {
-            return Instance is T;
+#if !NO_REMOTING
+            if (System.Runtime.Remoting.RemotingServices.IsTransparentProxy(this.Instance)
+                && System.Runtime.Remoting.RemotingServices.GetRealProxy(this.Instance).GetType().Name == "RemotingProxy")
+            {
+                return typeof(T).IsAssignableFrom(this.Instance.GetType());
+            }
+#endif
+            return this.Instance is T;
         }
 
         /// <summary>
@@ -44,7 +59,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation
         /// <returns>The instance.</returns>
         public T As<T>()
         {
-            return (T)Instance;
+            return (T)this.Instance;
         }
 
         /// <summary>
@@ -54,8 +69,10 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation
         /// <param name="action">The action to execute.</param>
         public void IfInstanceIs<T>(Action<T> action)
         {
-            if (Instance is T)
-                action((T)Instance);
+            if (this.Is<T>())
+            {
+                action((T)this.Instance);
+            }
         }
     }
 }

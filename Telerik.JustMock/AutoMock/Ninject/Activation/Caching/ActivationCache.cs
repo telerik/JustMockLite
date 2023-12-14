@@ -1,8 +1,28 @@
+// -------------------------------------------------------------------------------------------------
+// <copyright file="ActivationCache.cs" company="Ninject Project Contributors">
+//   Copyright (c) 2007-2010 Enkari, Ltd. All rights reserved.
+//   Copyright (c) 2010-2017 Ninject Project Contributors. All rights reserved.
+//
+//   Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
+//   You may not use this file except in compliance with one of the Licenses.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//   or
+//       http://www.microsoft.com/opensource/licenses.mspx
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+// </copyright>
+// -------------------------------------------------------------------------------------------------
+
 namespace Telerik.JustMock.AutoMock.Ninject.Activation.Caching
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
+
     using Telerik.JustMock.AutoMock.Ninject.Components;
     using Telerik.JustMock.AutoMock.Ninject.Infrastructure;
 
@@ -11,17 +31,6 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Caching
     /// </summary>
     public class ActivationCache : NinjectComponent, IActivationCache, IPruneable
     {
-#if SILVERLIGHT_20 || SILVERLIGHT_30 || WINDOWS_PHONE || NETCF || MONO
-        /// <summary>
-        /// The objects that were activated as reference equal weak references.
-        /// </summary>
-        private readonly IDictionary<object, bool> activatedObjects = new Dictionary<object, bool>(new WeakReferenceEqualityComparer());
-
-        /// <summary>
-        /// The objects that were activated as reference equal weak references.
-        /// </summary>
-        private readonly IDictionary<object, bool> deactivatedObjects = new Dictionary<object, bool>(new WeakReferenceEqualityComparer());
-#else
         /// <summary>
         /// The objects that were activated as reference equal weak references.
         /// </summary>
@@ -31,7 +40,6 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Caching
         /// The objects that were activated as reference equal weak references.
         /// </summary>
         private readonly HashSet<object> deactivatedObjects = new HashSet<object>(new WeakReferenceEqualityComparer());
-#endif
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ActivationCache"/> class.
@@ -39,9 +47,10 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Caching
         /// <param name="cachePruner">The cache pruner.</param>
         public ActivationCache(ICachePruner cachePruner)
         {
+            Ensure.ArgumentNotNull(cachePruner, "cachePruner");
             cachePruner.Start(this);
         }
-        
+
         /// <summary>
         /// Gets the activated object count.
         /// </summary>
@@ -65,7 +74,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Caching
                 return this.deactivatedObjects.Count;
             }
         }
-        
+
         /// <summary>
         /// Clears the cache.
         /// </summary>
@@ -90,11 +99,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Caching
         {
             lock (this.activatedObjects)
             {
-#if SILVERLIGHT_20 || SILVERLIGHT_30 || WINDOWS_PHONE || NETCF || MONO
-                this.activatedObjects.Add(new ReferenceEqualWeakReference(instance), true);
-#else
                 this.activatedObjects.Add(new ReferenceEqualWeakReference(instance));
-#endif
             }
         }
 
@@ -106,11 +111,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Caching
         {
             lock (this.deactivatedObjects)
             {
-#if SILVERLIGHT_20 || SILVERLIGHT_30 || WINDOWS_PHONE || NETCF || MONO
-                this.deactivatedObjects.Add(new ReferenceEqualWeakReference(instance), true);
-#else
                 this.deactivatedObjects.Add(new ReferenceEqualWeakReference(instance));
-#endif
             }
         }
 
@@ -123,11 +124,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Caching
         /// </returns>
         public bool IsActivated(object instance)
         {
-#if SILVERLIGHT_20 || SILVERLIGHT_30 || WINDOWS_PHONE || NETCF || MONO
-            return this.activatedObjects.ContainsKey(instance);
-#else
             return this.activatedObjects.Contains(instance);
-#endif
         }
 
         /// <summary>
@@ -139,11 +136,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Caching
         /// </returns>
         public bool IsDeactivated(object instance)
         {
-#if SILVERLIGHT_20 || SILVERLIGHT_30 || WINDOWS_PHONE || NETCF || MONO
-            return this.deactivatedObjects.ContainsKey(instance);
-#else
             return this.deactivatedObjects.Contains(instance);
-#endif        
         }
 
         /// <summary>
@@ -162,20 +155,6 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Caching
             }
         }
 
-#if SILVERLIGHT_20 || SILVERLIGHT_30 || WINDOWS_PHONE || NETCF || MONO
-        /// <summary>
-        /// Removes all dead objects.
-        /// </summary>
-        /// <param name="objects">The objects collection to be freed of dead objects.</param>
-        private static void RemoveDeadObjects(IDictionary<object, bool> objects)
-        {
-            var deadObjects = objects.Where(entry => !((ReferenceEqualWeakReference)entry.Key).IsAlive).ToList();
-            foreach (var deadObject in deadObjects)
-            {
-                objects.Remove(deadObject.Key);
-            }
-        }
-#else
         /// <summary>
         /// Removes all dead objects.
         /// </summary>
@@ -184,6 +163,5 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Caching
         {
             objects.RemoveWhere(reference => !((ReferenceEqualWeakReference)reference).IsAlive);
         }
-#endif
     }
 }

@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <NetFxSupportedVersions>net45;net472</NetFxSupportedVersions>
     <NetCoreSupportedVersions>netcoreapp2.0</NetCoreSupportedVersions>
-    <TargetFrameworks>net45;net472;$(NetCoreSupportedVersions)</TargetFrameworks>
+    <TargetFrameworks>$(NetFxSupportedVersions);$(NetCoreSupportedVersions)</TargetFrameworks>
     <Configurations>Debug;Release;ReleaseFree;DebugFree</Configurations>
     <AssemblyName>Telerik.JustMock</AssemblyName>
     <RootNamespace>Telerik.JustMock</RootNamespace>
@@ -10,7 +11,6 @@
     <Description></Description>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <CommonConstants>NO_EXCEPTION_SERIALIZATION</CommonConstants>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{0749EBC2-4E83-4960-BF28-1FF5C2DEB2B9}</ProjectGuid>
@@ -26,7 +26,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\..\Binaries\Debug\</OutputPath>
-    <DefineConstants>$(CommonConstants);TRACE;DEBUG</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -34,14 +34,14 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\..\Binaries\Release\</OutputPath>
-    <DefineConstants>$(CommonConstants);TRACE</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>..\..\..\Binaries\Release\Telerik.JustMock.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseFree|AnyCPU'">
     <OutputPath>..\..\..\Binaries\ReleaseFree\</OutputPath>
-    <DefineConstants>$(CommonConstants);TRACE;LITE_EDITION</DefineConstants>
+    <DefineConstants>TRACE;LITE_EDITION</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -53,19 +53,19 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugFree|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\..\..\Binaries\DebugFree\</OutputPath>
-    <DefineConstants>$(CommonConstants);TRACE;DEBUG;LITE_EDITION</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;LITE_EDITION</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net45' Or '$(TargetFramework)' == 'net472'">
+  <PropertyGroup Condition="$(NetFxSupportedVersions.Contains('$(TargetFramework)'))">
     <DefineConstants>$(DefineConstants);FEATURE_APPDOMAIN;FEATURE_ASSEMBLYBUILDER_SAVE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="$(NetCoreSupportedVersions.Contains('$(TargetFramework)'))">
-    <DefineConstants>$(DefineConstants);NETCORE;NO_APPDOMAIN_ISOLATION</DefineConstants>
+    <DefineConstants>$(DefineConstants);NETCORE;NO_ASSEMBLY_SCANNING;NO_REMOTING</DefineConstants>
   </PropertyGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net45' Or '$(TargetFramework)' == 'net472'">
+  <ItemGroup Condition="$(NetFxSupportedVersions.Contains('$(TargetFramework)'))">
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Core" />

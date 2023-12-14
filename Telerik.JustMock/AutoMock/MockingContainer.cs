@@ -54,23 +54,23 @@ namespace Telerik.JustMock.AutoMock
 		{
 		}
 
-		/// <summary>
-		/// Implementation detail.
-		/// </summary>
-		protected override bool ShouldAddComponent(Type component, Type implementation)
-		{
-			if (implementation == typeof(SelfBindingResolver))
-			{
-				return false;
-			}
+        /// <summary>
+        /// Implementation detail.
+        /// </summary>
+        protected override bool ShouldAddComponent(Type component, Type implementation)
+        {
+            if (implementation == typeof(SelfBindingResolver))
+            {
+                return false;
+            }
 
-			return base.ShouldAddComponent(component, implementation);
-		}
+            return base.ShouldAddComponent(component, implementation);
+        }
 
-		/// <summary>
-		/// Implementation detail.
-		/// </summary>
-		protected override void AddComponents()
+        /// <summary>
+        /// Implementation detail.
+        /// </summary>
+        protected override void AddComponents()
 		{
 			base.AddComponents();
 

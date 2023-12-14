@@ -1,12 +1,10 @@
-//-------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // <copyright file="ExceptionFormatter.cs" company="Ninject Project Contributors">
-//   Copyright (c) 2007-2009, Enkari, Ltd.
-//   Copyright (c) 2009-2011 Ninject Project Contributors
-//   Authors: Nate Kohari (nate@enkari.com)
-//            Remo Gloor (remo.gloor@gmail.com)
-//           
+//   Copyright (c) 2007-2010 Enkari, Ltd. All rights reserved.
+//   Copyright (c) 2010-2017 Ninject Project Contributors. All rights reserved.
+//
 //   Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
-//   you may not use this file except in compliance with one of the Licenses.
+//   You may not use this file except in compliance with one of the Licenses.
 //   You may obtain a copy of the License at
 //
 //       http://www.apache.org/licenses/LICENSE-2.0
@@ -19,7 +17,7 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 // </copyright>
-//-------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 namespace Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection
 {
@@ -50,6 +48,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection
         /// <summary>
         /// Generates a message saying that modules without names are not supported.
         /// </summary>
+        /// <param name="target">The target.</param>
         /// <returns>The exception message.</returns>
         public static string TargetDoesNotHaveADefaultValue(ITarget target)
         {
@@ -71,10 +70,10 @@ namespace Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection
 
                 sw.WriteLine("Suggestions:");
                 sw.WriteLine("  1) Ensure that you have not accidentally loaded the same module twice.");
-                #if !SILVERLIGHT
+#if !NO_ASSEMBLY_SCANNING
                 sw.WriteLine("  2) If you are using automatic module loading, ensure you have not manually loaded a module");
                 sw.WriteLine("     that may be found by the module loader.");
-                #endif
+#endif
 
                 return sw.ToString();
             }
@@ -117,6 +116,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection
                 {
                     sw.WriteLine("  {0}) {1}", i + 1, formattedMatchingBindings[i]);
                 }
+
                 sw.WriteLine("Activation path:");
                 sw.WriteLine(request.FormatActivationPath());
 
@@ -147,9 +147,9 @@ namespace Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection
                 sw.WriteLine("  2) If the binding was defined in a module, ensure that the module has been loaded into the kernel.");
                 sw.WriteLine("  3) Ensure you have not accidentally created more than one kernel.");
                 sw.WriteLine("  4) If you are using constructor arguments, ensure that the parameter name matches the constructors parameter name.");
-                #if !SILVERLIGHT
+#if !NO_ASSEMBLY_SCANNING
                 sw.WriteLine("  5) If you are using automatic module loading, ensure the search path and filters are correct.");
-                #endif
+#endif
 
                 return sw.ToString();
             }
@@ -229,7 +229,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection
                 return sw.ToString();
             }
         }
-        
+
         /// <summary>
         /// Generates a message saying that no constructors are available for the given component.
         /// </summary>
@@ -298,6 +298,28 @@ namespace Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection
         }
 
         /// <summary>
+        /// Generates a message saying that the provider callback on the specified context is null.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <returns>The exception message.</returns>
+        public static string ProviderCallbackIsNull(IContext context)
+        {
+            using (var sw = new StringWriter())
+            {
+                sw.WriteLine("Error activating {0}", context.Request.Service.Format());
+                sw.WriteLine("Provider callback is null.");
+
+                sw.WriteLine("Activation path:");
+                sw.WriteLine(context.Request.FormatActivationPath());
+
+                sw.WriteLine("Suggestions:");
+                sw.WriteLine("  1) Ensure that one of the 'To' methods is called after 'Bind' methond.");
+
+                return sw.ToString();
+            }
+        }
+
+        /// <summary>
         /// Generates a message saying that the provider on the specified context returned null.
         /// </summary>
         /// <param name="context">The context.</param>
@@ -308,13 +330,13 @@ namespace Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection
             {
                 sw.WriteLine("Error activating {0} using {1}", context.Request.Service.Format(), context.Binding.Format(context));
                 sw.WriteLine("Provider returned null.");
-                
+
                 sw.WriteLine("Activation path:");
                 sw.WriteLine(context.Request.FormatActivationPath());
 
                 sw.WriteLine("Suggestions:");
                 sw.WriteLine("  1) Ensure that the provider handles creation requests properly.");
-                
+
                 return sw.ToString();
             }
         }
@@ -332,7 +354,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection
                 sw.WriteLine("Error activating {0} using {1}", context.Request.Service.Format(), context.Binding.Format(context));
                 sw.WriteLine("Several constructors have the same priority. Please specify the constructor using ToConstructor syntax or add an Inject attribute.");
                 sw.WriteLine();
-                
+
                 sw.WriteLine("Constructors:");
                 foreach (var constructorInjectionDirective in bestDirectives)
                 {
@@ -340,7 +362,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection
                 }
 
                 sw.WriteLine();
-                
+
                 sw.WriteLine("Activation path:");
                 sw.WriteLine(context.Request.FormatActivationPath());
 

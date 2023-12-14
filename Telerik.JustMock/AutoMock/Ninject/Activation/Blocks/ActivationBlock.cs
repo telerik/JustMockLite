@@ -1,24 +1,35 @@
-#region License
-// 
-// Author: Nate Kohari <nate@enkari.com>
-// Copyright (c) 2007-2010, Enkari, Ltd.
-// 
-// Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
-// See the file LICENSE.txt for details.
-// 
-#endregion
-#region Using Directives
-using System;
-using System.Collections.Generic;
-using Telerik.JustMock.AutoMock.Ninject.Infrastructure;
-using Telerik.JustMock.AutoMock.Ninject.Infrastructure.Disposal;
-using Telerik.JustMock.AutoMock.Ninject.Parameters;
-using Telerik.JustMock.AutoMock.Ninject.Planning.Bindings;
-using Telerik.JustMock.AutoMock.Ninject.Syntax;
-#endregion
+// -------------------------------------------------------------------------------------------------
+// <copyright file="ActivationBlock.cs" company="Ninject Project Contributors">
+//   Copyright (c) 2007-2010 Enkari, Ltd. All rights reserved.
+//   Copyright (c) 2010-2017 Ninject Project Contributors. All rights reserved.
+//
+//   Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
+//   You may not use this file except in compliance with one of the Licenses.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//   or
+//       http://www.microsoft.com/opensource/licenses.mspx
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+// </copyright>
+// -------------------------------------------------------------------------------------------------
 
 namespace Telerik.JustMock.AutoMock.Ninject.Activation.Blocks
 {
+    using System;
+    using System.Collections.Generic;
+
+    using Telerik.JustMock.AutoMock.Ninject.Infrastructure;
+    using Telerik.JustMock.AutoMock.Ninject.Infrastructure.Disposal;
+    using Telerik.JustMock.AutoMock.Ninject.Parameters;
+    using Telerik.JustMock.AutoMock.Ninject.Planning.Bindings;
+    using Telerik.JustMock.AutoMock.Ninject.Syntax;
+
     /// <summary>
     /// A block used for deterministic disposal of activated instances. When the block is
     /// disposed, all instances activated via it will be deactivated.
@@ -26,41 +37,29 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Blocks
     public class ActivationBlock : DisposableObject, IActivationBlock
     {
         /// <summary>
-        /// Gets or sets the parent resolution root (usually the kernel).
-        /// </summary>
-        public IResolutionRoot Parent { get; private set; }
-
-        /// <summary>
-        /// Occurs when the object is disposed.
-        /// </summary>
-        public event EventHandler Disposed;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ActivationBlock"/> class.
         /// </summary>
         /// <param name="parent">The parent resolution root.</param>
         public ActivationBlock(IResolutionRoot parent)
         {
             Ensure.ArgumentNotNull(parent, "parent");
-            Parent = parent;
+
+            this.Parent = parent;
         }
 
         /// <summary>
-        /// Releases resources held by the object.
+        /// Gets the parent resolution root (usually the kernel).
         /// </summary>
-        public override void Dispose(bool disposing)
-        {
-            lock (this)
-            {
-                if (disposing && !IsDisposed)
-                {
-                    var evt = Disposed;
-                    if (evt != null) evt(this, EventArgs.Empty);
-                    Disposed = null;
-                }
+        public IResolutionRoot Parent { get; private set; }
 
-                base.Dispose(disposing);
-            }
+        /// <summary>
+        /// Injects the specified existing instance, without managing its lifecycle.
+        /// </summary>
+        /// <param name="instance">The instance to inject.</param>
+        /// <param name="parameters">The parameters to pass to the request.</param>
+        public void Inject(object instance, params IParameter[] parameters)
+        {
+            this.Parent.Inject(instance, parameters);
         }
 
         /// <summary>
@@ -71,6 +70,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Blocks
         public bool CanResolve(IRequest request)
         {
             Ensure.ArgumentNotNull(request, "request");
+
             return this.Parent.CanResolve(request);
         }
 
@@ -85,6 +85,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Blocks
         public bool CanResolve(IRequest request, bool ignoreImplicitBindings)
         {
             Ensure.ArgumentNotNull(request, "request");
+
             return this.Parent.CanResolve(request, ignoreImplicitBindings);
         }
 
@@ -97,7 +98,8 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Blocks
         public IEnumerable<object> Resolve(IRequest request)
         {
             Ensure.ArgumentNotNull(request, "request");
-            return Parent.Resolve(request);
+
+            return this.Parent.Resolve(request);
         }
 
         /// <summary>
@@ -113,6 +115,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Blocks
         {
             Ensure.ArgumentNotNull(service, "service");
             Ensure.ArgumentNotNull(parameters, "parameters");
+
             return new Request(service, constraint, parameters, () => this, isOptional, isUnique);
         }
 
@@ -121,10 +124,9 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Blocks
         /// </summary>
         /// <param name="instance">The instance to release.</param>
         /// <returns><see langword="True"/> if the instance was found and released; otherwise <see langword="false"/>.</returns>
-        /// <remarks></remarks>
         public bool Release(object instance)
         {
-            return Parent.Release(instance);
+            return this.Parent.Release(instance);
         }
     }
 }

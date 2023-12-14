@@ -1,12 +1,10 @@
-//-------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // <copyright file="CompiledModuleLoaderPlugin.cs" company="Ninject Project Contributors">
-//   Copyright (c) 2007-2009, Enkari, Ltd.
-//   Copyright (c) 2009-2011 Ninject Project Contributors
-//   Authors: Nate Kohari (nate@enkari.com)
-//            Remo Gloor (remo.gloor@gmail.com)
-//           
+//   Copyright (c) 2007-2010 Enkari, Ltd. All rights reserved.
+//   Copyright (c) 2010-2017 Ninject Project Contributors. All rights reserved.
+//
 //   Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
-//   you may not use this file except in compliance with one of the Licenses.
+//   You may not use this file except in compliance with one of the Licenses.
 //   You may obtain a copy of the License at
 //
 //       http://www.apache.org/licenses/LICENSE-2.0
@@ -19,9 +17,8 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 // </copyright>
-//-------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
-#if !NO_ASSEMBLY_SCANNING
 namespace Telerik.JustMock.AutoMock.Ninject.Modules
 {
     using System.Collections.Generic;
@@ -31,21 +28,21 @@ namespace Telerik.JustMock.AutoMock.Ninject.Modules
     using Telerik.JustMock.AutoMock.Ninject.Components;
     using Telerik.JustMock.AutoMock.Ninject.Infrastructure;
     using Telerik.JustMock.AutoMock.Ninject.Infrastructure.Language;
-    
+
     /// <summary>
     /// Loads modules from compiled assemblies.
     /// </summary>
     public class CompiledModuleLoaderPlugin : NinjectComponent, IModuleLoaderPlugin
     {
         /// <summary>
+        /// The file extensions that are supported.
+        /// </summary>
+        private static readonly string[] Extensions = { ".dll" };
+
+        /// <summary>
         /// The assembly name retriever.
         /// </summary>
         private readonly IAssemblyNameRetriever assemblyNameRetriever;
-
-        /// <summary>
-        /// The file extensions that are supported.
-        /// </summary>
-        private static readonly string[] Extensions = new[] { ".dll" };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CompiledModuleLoaderPlugin"/> class.
@@ -55,6 +52,8 @@ namespace Telerik.JustMock.AutoMock.Ninject.Modules
         public CompiledModuleLoaderPlugin(IKernel kernel, IAssemblyNameRetriever assemblyNameRetriever)
         {
             Ensure.ArgumentNotNull(kernel, "kernel");
+            Ensure.ArgumentNotNull(assemblyNameRetriever, "assemblyNameRetriever");
+
             this.Kernel = kernel;
             this.assemblyNameRetriever = assemblyNameRetriever;
         }
@@ -83,4 +82,3 @@ namespace Telerik.JustMock.AutoMock.Ninject.Modules
         }
     }
 }
-#endif

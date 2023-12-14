@@ -1,12 +1,10 @@
-﻿//-------------------------------------------------------------------------------
+﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="BindingBuilder.cs" company="Ninject Project Contributors">
-//   Copyright (c) 2007-2009, Enkari, Ltd.
-//   Copyright (c) 2009-2011 Ninject Project Contributors
-//   Authors: Nate Kohari (nate@enkari.com)
-//            Remo Gloor (remo.gloor@gmail.com)
-//           
+//   Copyright (c) 2007-2010 Enkari, Ltd. All rights reserved.
+//   Copyright (c) 2010-2017 Ninject Project Contributors. All rights reserved.
+//
 //   Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
-//   you may not use this file except in compliance with one of the Licenses.
+//   You may not use this file except in compliance with one of the Licenses.
 //   You may obtain a copy of the License at
 //
 //       http://www.apache.org/licenses/LICENSE-2.0
@@ -19,14 +17,13 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 // </copyright>
-//-------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 namespace Telerik.JustMock.AutoMock.Ninject.Planning.Bindings
 {
     using System;
-#if !NETCF
     using System.Linq.Expressions;
-#endif
+
     using Telerik.JustMock.AutoMock.Ninject.Activation;
     using Telerik.JustMock.AutoMock.Ninject.Activation.Providers;
     using Telerik.JustMock.AutoMock.Ninject.Infrastructure;
@@ -93,14 +90,14 @@ namespace Telerik.JustMock.AutoMock.Ninject.Planning.Bindings
 
             return new BindingConfigurationBuilder<T>(this.BindingConfiguration, this.ServiceNames, this.Kernel);
         }
-        
+
         /// <summary>
         /// Indicates that the service should be bound to the specified constant value.
         /// </summary>
         /// <typeparam name="TImplementation">The type of the implementation.</typeparam>
         /// <param name="value">The constant value.</param>
         /// <returns>The fluent syntax.</returns>
-        protected IBindingWhenInNamedWithOrOnSyntax<TImplementation> InternalToConfiguration<TImplementation>(TImplementation value) 
+        protected IBindingWhenInNamedWithOrOnSyntax<TImplementation> InternalToConfiguration<TImplementation>(TImplementation value)
         {
             this.BindingConfiguration.ProviderCallback = ctx => new ConstantProvider<TImplementation>(value);
             this.BindingConfiguration.Target = BindingTarget.Constant;
@@ -157,7 +154,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Planning.Bindings
         /// Indicates that the service should be bound to an instance of the specified provider type.
         /// The instance will be activated via the kernel when an instance of the service is activated.
         /// </summary>
-        /// <typeparam name="T">The type of the returned fleunt syntax</typeparam>
+        /// <typeparam name="T">The type of the returned fluent syntax</typeparam>
         /// <param name="providerType">The type of provider to activate.</param>
         /// <returns>The fluent syntax.</returns>
         protected IBindingWhenInNamedWithOrOnSyntax<T> ToProviderInternal<T>(Type providerType)
@@ -168,9 +165,8 @@ namespace Telerik.JustMock.AutoMock.Ninject.Planning.Bindings
             return new BindingConfigurationBuilder<T>(this.BindingConfiguration, this.ServiceNames, this.Kernel);
         }
 
-#if !NETCF
         /// <summary>
-        /// Indicates that the service should be bound to the speecified constructor.
+        /// Indicates that the service should be bound to the specified constructor.
         /// </summary>
         /// <typeparam name="TImplementation">The type of the implementation.</typeparam>
         /// <param name="newExpression">The expression that specifies the constructor.</param>
@@ -263,6 +259,5 @@ namespace Telerik.JustMock.AutoMock.Ninject.Planning.Bindings
                 throw new InvalidOperationException("This method is for declaration that a parameter shall be injected only! Never call it directly.");
             }
         }
-#endif
     }
 }
