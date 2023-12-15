@@ -1,32 +1,43 @@
-#region License
-// 
-// Author: Nate Kohari <nate@enkari.com>
-// Copyright (c) 2007-2010, Enkari, Ltd.
-// 
-// Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
-// See the file LICENSE.txt for details.
-// 
-#endregion
-#region Using Directives
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Telerik.JustMock.AutoMock.Ninject.Infrastructure;
-using Telerik.JustMock.AutoMock.Ninject.Infrastructure.Disposal;
-using Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection;
-using Telerik.JustMock.AutoMock.Ninject.Infrastructure.Language;
-#endregion
+// -------------------------------------------------------------------------------------------------
+// <copyright file="ComponentContainer.cs" company="Ninject Project Contributors">
+//   Copyright (c) 2007-2010 Enkari, Ltd. All rights reserved.
+//   Copyright (c) 2010-2017 Ninject Project Contributors. All rights reserved.
+//
+//   Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
+//   You may not use this file except in compliance with one of the Licenses.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//   or
+//       http://www.microsoft.com/opensource/licenses.mspx
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+// </copyright>
+// -------------------------------------------------------------------------------------------------
 
 namespace Telerik.JustMock.AutoMock.Ninject.Components
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+
+    using Telerik.JustMock.AutoMock.Ninject.Infrastructure;
+    using Telerik.JustMock.AutoMock.Ninject.Infrastructure.Disposal;
+    using Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection;
+    using Telerik.JustMock.AutoMock.Ninject.Infrastructure.Language;
+
     /// <summary>
     /// An internal container that manages and resolves components that contribute to Ninject.
     /// </summary>
     public class ComponentContainer : DisposableObject, IComponentContainer
     {
-        private readonly Multimap<Type, Type> _mappings = new Multimap<Type, Type>();
-        private readonly Dictionary<Type, INinjectComponent> _instances = new Dictionary<Type, INinjectComponent>();
+        private readonly Multimap<Type, Type> mappings = new Multimap<Type, Type>();
+        private readonly Dictionary<Type, INinjectComponent> instances = new Dictionary<Type, INinjectComponent>();
         private readonly HashSet<KeyValuePair<Type, Type>> transients = new HashSet<KeyValuePair<Type, Type>>();
 
         /// <summary>
@@ -37,15 +48,18 @@ namespace Telerik.JustMock.AutoMock.Ninject.Components
         /// <summary>
         /// Releases resources held by the object.
         /// </summary>
+        /// <param name="disposing"><c>True</c> if called manually, otherwise by GC.</param>
         public override void Dispose(bool disposing)
         {
-            if (disposing && !IsDisposed)
+            if (disposing && !this.IsDisposed)
             {
-                foreach (INinjectComponent instance in _instances.Values)
+                foreach (INinjectComponent instance in this.instances.Values)
+                {
                     instance.Dispose();
+                }
 
-                _mappings.Clear();
-                _instances.Clear();
+                this.mappings.Clear();
+                this.instances.Clear();
             }
 
             base.Dispose(disposing);
@@ -60,7 +74,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Components
             where TComponent : INinjectComponent
             where TImplementation : TComponent, INinjectComponent
         {
-            _mappings.Add(typeof(TComponent), typeof(TImplementation));
+            this.mappings.Add(typeof(TComponent), typeof(TImplementation));
         }
 
         /// <summary>
@@ -75,7 +89,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Components
             this.Add<TComponent, TImplementation>();
             this.transients.Add(new KeyValuePair<Type, Type>(typeof(TComponent), typeof(TImplementation)));
         }
-        
+
         /// <summary>
         /// Removes all registrations for the specified component.
         /// </summary>
@@ -83,7 +97,27 @@ namespace Telerik.JustMock.AutoMock.Ninject.Components
         public void RemoveAll<T>()
             where T : INinjectComponent
         {
-            RemoveAll(typeof(T));
+            this.RemoveAll(typeof(T));
+        }
+
+        /// <summary>
+        /// Removes the specified registration.
+        /// </summary>
+        /// <typeparam name="T">The component type.</typeparam>
+        /// <typeparam name="TImplementation">The implementation type.</typeparam>
+        public void Remove<T, TImplementation>()
+            where T : INinjectComponent
+            where TImplementation : T
+        {
+            var implementation = typeof(TImplementation);
+            if (this.instances.ContainsKey(implementation))
+            {
+                this.instances[implementation].Dispose();
+            }
+
+            this.instances.Remove(implementation);
+
+            this.mappings.Remove(typeof(T), typeof(TImplementation));
         }
 
         /// <summary>
@@ -94,15 +128,17 @@ namespace Telerik.JustMock.AutoMock.Ninject.Components
         {
             Ensure.ArgumentNotNull(component, "component");
 
-            foreach (Type implementation in _mappings[component])
+            foreach (Type implementation in this.mappings[component])
             {
-                if (_instances.ContainsKey(implementation))
-                    _instances[implementation].Dispose();
+                if (this.instances.ContainsKey(implementation))
+                {
+                    this.instances[implementation].Dispose();
+                }
 
-                _instances.Remove(implementation);
+                this.instances.Remove(implementation);
             }
 
-            _mappings.RemoveAll(component);
+            this.mappings.RemoveAll(component);
         }
 
         /// <summary>
@@ -113,7 +149,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Components
         public T Get<T>()
             where T : INinjectComponent
         {
-            return (T) Get(typeof(T));
+            return (T)this.Get(typeof(T));
         }
 
         /// <summary>
@@ -124,7 +160,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Components
         public IEnumerable<T> GetAll<T>()
             where T : INinjectComponent
         {
-            return GetAll(typeof(T)).Cast<T>();
+            return this.GetAll(typeof(T)).Cast<T>();
         }
 
         /// <summary>
@@ -137,29 +173,29 @@ namespace Telerik.JustMock.AutoMock.Ninject.Components
             Ensure.ArgumentNotNull(component, "component");
 
             if (component == typeof(IKernel))
-                return Kernel;
+            {
+                return this.Kernel;
+            }
 
             if (component.IsGenericType)
             {
-                Type gtd = component.GetGenericTypeDefinition();
-                Type argument = component.GetGenericArguments()[0];
+                var gtd = component.GetGenericTypeDefinition();
+                var argument = component.GenericTypeArguments[0];
 
-#if WINDOWS_PHONE
-                Type discreteGenericType =
-                    typeof (IEnumerable<>).MakeGenericType(argument);
-                if (gtd.IsInterface && discreteGenericType.IsAssignableFrom(component))
-                    return GetAll(argument).CastSlow(argument);
-#else
-                if (gtd.IsInterface && typeof (IEnumerable<>).IsAssignableFrom(gtd))
-                    return GetAll(argument).CastSlow(argument);
-#endif
+                if (gtd.IsInterface && typeof(IEnumerable<>).IsAssignableFrom(gtd))
+                {
+                    return this.GetAll(argument).CastSlow(argument);
+                }
             }
-            Type implementation = _mappings[component].FirstOrDefault();
+
+            var implementation = this.mappings[component].FirstOrDefault();
 
             if (implementation == null)
+            {
                 throw new InvalidOperationException(ExceptionFormatter.NoSuchComponentRegistered(component));
+            }
 
-            return ResolveInstance(component, implementation);
+            return this.ResolveInstance(component, implementation);
         }
 
         /// <summary>
@@ -171,29 +207,44 @@ namespace Telerik.JustMock.AutoMock.Ninject.Components
         {
             Ensure.ArgumentNotNull(component, "component");
 
-            return _mappings[component]
-                .Select(implementation => ResolveInstance(component, implementation));
+            return this.mappings[component]
+                .Select(implementation => this.ResolveInstance(component, implementation));
+        }
+
+        private static ConstructorInfo SelectConstructor(Type component, Type implementation)
+        {
+            var constructor = implementation.GetConstructors().OrderByDescending(c => c.GetParameters().Length).FirstOrDefault();
+
+            if (constructor == null)
+            {
+                throw new InvalidOperationException(ExceptionFormatter.NoConstructorsAvailableForComponent(component, implementation));
+            }
+
+            return constructor;
         }
 
         private object ResolveInstance(Type component, Type implementation)
         {
-            lock (_instances)
-                return _instances.ContainsKey(implementation) ? _instances[implementation] : CreateNewInstance(component, implementation);
+            lock (this.instances)
+            {
+                return this.instances.ContainsKey(implementation) ? this.instances[implementation] : this.CreateNewInstance(component, implementation);
+            }
         }
 
         private object CreateNewInstance(Type component, Type implementation)
         {
-            ConstructorInfo constructor = SelectConstructor(component, implementation);
-            var arguments = constructor.GetParameters().Select(parameter => Get(parameter.ParameterType)).ToArray();
+            var constructor = SelectConstructor(component, implementation);
+            var arguments = constructor.GetParameters().Select(parameter => this.Get(parameter.ParameterType)).ToArray();
 
             try
             {
                 var instance = constructor.Invoke(arguments) as INinjectComponent;
-                instance.Settings = Kernel.Settings;
+
+                instance.Settings = this.Kernel.Settings;
 
                 if (!this.transients.Contains(new KeyValuePair<Type, Type>(component, implementation)))
                 {
-                    _instances.Add(implementation, instance);                    
+                    this.instances.Add(implementation, instance);
                 }
 
                 return instance;
@@ -204,32 +255,5 @@ namespace Telerik.JustMock.AutoMock.Ninject.Components
                 return null;
             }
         }
-
-        private static ConstructorInfo SelectConstructor(Type component, Type implementation)
-        {
-            var constructor = implementation.GetConstructors().OrderByDescending(c => c.GetParameters().Length).FirstOrDefault();
-
-            if (constructor == null)
-                throw new InvalidOperationException(ExceptionFormatter.NoConstructorsAvailableForComponent(component, implementation));
-
-            return constructor;
-        }
-
-#if SILVERLIGHT_30 || SILVERLIGHT_20 || WINDOWS_PHONE || NETCF_35
-        private class HashSet<T>
-        {
-            private IDictionary<T, object> data = new Dictionary<T,object>();
- 
-            public void Add(T o)
-            {
-                this.data.Add(o, null);
-            }
-
-            public bool Contains(T o)
-            {
-                return this.data.ContainsKey(o);
-            }
-        }
-#endif
     }
 }

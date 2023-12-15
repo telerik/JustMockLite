@@ -1,30 +1,40 @@
-#region License
-// 
-// Author: Nate Kohari <nate@enkari.com>
-// Copyright (c) 2007-2010, Enkari, Ltd.
-// 
-// Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
-// See the file LICENSE.txt for details.
-// 
-#endregion
-#region Using Directives
-using System;
-using System.Linq;
-using Telerik.JustMock.AutoMock.Ninject.Infrastructure;
-using Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection;
-using Telerik.JustMock.AutoMock.Ninject.Parameters;
-using Telerik.JustMock.AutoMock.Ninject.Planning;
-using Telerik.JustMock.AutoMock.Ninject.Planning.Directives;
-using Telerik.JustMock.AutoMock.Ninject.Planning.Targets;
-using Telerik.JustMock.AutoMock.Ninject.Selection;
-
-#endregion
+// -------------------------------------------------------------------------------------------------
+// <copyright file="StandardProvider.cs" company="Ninject Project Contributors">
+//   Copyright (c) 2007-2010 Enkari, Ltd. All rights reserved.
+//   Copyright (c) 2010-2017 Ninject Project Contributors. All rights reserved.
+//
+//   Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
+//   You may not use this file except in compliance with one of the Licenses.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//   or
+//       http://www.microsoft.com/opensource/licenses.mspx
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+// </copyright>
+// -------------------------------------------------------------------------------------------------
 
 namespace Telerik.JustMock.AutoMock.Ninject.Activation.Providers
 {
+    using System;
+    using System.Linq;
     using System.Reflection;
+
+    using Telerik.JustMock.AutoMock.Ninject.Infrastructure;
+    using Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection;
+    using Telerik.JustMock.AutoMock.Ninject.Infrastructure.Language;
+    using Telerik.JustMock.AutoMock.Ninject.Parameters;
+    using Telerik.JustMock.AutoMock.Ninject.Planning;
+    using Telerik.JustMock.AutoMock.Ninject.Planning.Directives;
+    using Telerik.JustMock.AutoMock.Ninject.Planning.Targets;
+    using Telerik.JustMock.AutoMock.Ninject.Selection;
     using Telerik.JustMock.AutoMock.Ninject.Selection.Heuristics;
-	using Telerik.JustMock.Core;
+    using Telerik.JustMock.Core;
 
     /// <summary>
     /// The standard provider for types, which activates instances via a <see cref="IPipeline"/>.
@@ -32,36 +42,62 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Providers
     public class StandardProvider : IProvider
     {
         /// <summary>
-        /// Gets the type (or prototype) of instances the provider creates.
-        /// </summary>
-        public Type Type { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the planner component.
-        /// </summary>
-        public IPlanner Planner { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the selector component.
-        /// </summary>
-        public IConstructorScorer ConstructorScorer { get; private set; }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="StandardProvider"/> class.
         /// </summary>
         /// <param name="type">The type (or prototype) of instances the provider creates.</param>
         /// <param name="planner">The planner component.</param>
         /// <param name="constructorScorer">The constructor scorer component.</param>
-        public StandardProvider(Type type, IPlanner planner, IConstructorScorer constructorScorer
-            )
+        public StandardProvider(Type type, IPlanner planner, IConstructorScorer constructorScorer)
         {
             Ensure.ArgumentNotNull(type, "type");
             Ensure.ArgumentNotNull(planner, "planner");
             Ensure.ArgumentNotNull(constructorScorer, "constructorScorer");
 
-            Type = type;
-            Planner = planner;
-            ConstructorScorer = constructorScorer;
+            this.Type = type;
+            this.Planner = planner;
+            this.ConstructorScorer = constructorScorer;
+        }
+
+        /// <summary>
+        /// Gets the type (or prototype) of instances the provider creates.
+        /// </summary>
+        public Type Type { get; private set; }
+
+        /// <summary>
+        /// Gets the planner component.
+        /// </summary>
+        public IPlanner Planner { get; private set; }
+
+        /// <summary>
+        /// Gets the constructor scorer component.
+        /// </summary>
+        public IConstructorScorer ConstructorScorer { get; private set; }
+
+        /// <summary>
+        /// Gets a callback that creates an instance of the <see cref="StandardProvider"/>
+        /// for the specified type.
+        /// </summary>
+        /// <param name="prototype">The prototype the provider instance will create.</param>
+        /// <returns>The created callback.</returns>
+        public static Func<IContext, IProvider> GetCreationCallback(Type prototype)
+        {
+            Ensure.ArgumentNotNull(prototype, "prototype");
+
+            return ctx => new StandardProvider(prototype, ctx.Kernel.Components.Get<IPlanner>(), ctx.Kernel.Components.Get<ISelector>().ConstructorScorer);
+        }
+
+        /// <summary>
+        /// Gets a callback that creates an instance of the <see cref="StandardProvider"/>
+        /// for the specified type and constructor.
+        /// </summary>
+        /// <param name="prototype">The prototype the provider instance will create.</param>
+        /// <param name="constructor">The constructor.</param>
+        /// <returns>The created callback.</returns>
+        public static Func<IContext, IProvider> GetCreationCallback(Type prototype, ConstructorInfo constructor)
+        {
+            Ensure.ArgumentNotNull(prototype, "prototype");
+
+            return ctx => new StandardProvider(prototype, ctx.Kernel.Components.Get<IPlanner>(), new SpecificConstructorSelector(constructor));
         }
 
         /// <summary>
@@ -78,25 +114,18 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Providers
                 context.Plan = this.Planner.GetPlan(this.GetImplementationType(context.Request.Service));
             }
 
-            if (!context.Plan.Has<ConstructorInjectionDirective>())
-            {
-                throw new ActivationException(ExceptionFormatter.NoConstructorsAvailable(context));
-            }
+            var directive = this.DetermineConstructorInjectionDirective(context);
 
-            var directives = context.Plan.GetAll<ConstructorInjectionDirective>();
-            var bestDirectives = directives
-                .GroupBy(option => this.ConstructorScorer.Score(context, option))
-                .OrderByDescending(g => g.Key)
-                .First();
-            if (bestDirectives.Skip(1).Any())
-            {
-                throw new ActivationException(ExceptionFormatter.ConstructorsAmbiguous(context, bestDirectives));
-            }
-
-            var directive = bestDirectives.Single();
             var arguments = directive.Targets.Select(target => this.GetValue(context, target)).ToArray();
-            var injector = directive.Injector;
-            return ProfilerInterceptor.GuardExternal(() => injector(arguments));
+
+            var cachedInstance = context.Cache.TryGet(context);
+
+            if (cachedInstance != null)
+            {
+                return cachedInstance;
+            }
+
+            return ProfilerInterceptor.GuardExternal(() => directive.Injector(arguments));
         }
 
         /// <summary>
@@ -112,7 +141,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Providers
 
             var parameter = context
                 .Parameters.OfType<IConstructorArgument>()
-                .Where(p => p.AppliesToTarget(context, target)).SingleOrDefault();
+                .SingleOrDefault(p => p.AppliesToTarget(context, target));
             return parameter != null ? parameter.GetValue(context, target) : target.ResolveWithin(context);
         }
 
@@ -125,32 +154,30 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Providers
         public Type GetImplementationType(Type service)
         {
             Ensure.ArgumentNotNull(service, "service");
-            return Type.ContainsGenericParameters ? Type.MakeGenericType(service.GetGenericArguments()) : Type;
+
+            return this.Type.ContainsGenericParameters ? this.Type.MakeGenericType(service.GetGenericArguments()) : this.Type;
         }
 
-        /// <summary>
-        /// Gets a callback that creates an instance of the <see cref="StandardProvider"/>
-        /// for the specified type.
-        /// </summary>
-        /// <param name="prototype">The prototype the provider instance will create.</param>
-        /// <returns>The created callback.</returns>
-        public static Func<IContext, IProvider> GetCreationCallback(Type prototype)
+        private ConstructorInjectionDirective DetermineConstructorInjectionDirective(IContext context)
         {
-            Ensure.ArgumentNotNull(prototype, "prototype");
-            return ctx => new StandardProvider(prototype, ctx.Kernel.Components.Get<IPlanner>(), ctx.Kernel.Components.Get<ISelector>().ConstructorScorer);
-        }
+            var directives = context.Plan.ConstructorInjectionDirectives;
+            if (directives.Count == 1)
+            {
+                return directives[0];
+            }
 
-        /// <summary>
-        /// Gets a callback that creates an instance of the <see cref="StandardProvider"/>
-        /// for the specified type and constructor.
-        /// </summary>
-        /// <param name="prototype">The prototype the provider instance will create.</param>
-        /// <param name="constructor">The constructor.</param>
-        /// <returns>The created callback.</returns>
-        public static Func<IContext, IProvider> GetCreationCallback(Type prototype, ConstructorInfo constructor)
-        {
-            Ensure.ArgumentNotNull(prototype, "prototype");
-            return ctx => new StandardProvider(prototype, ctx.Kernel.Components.Get<IPlanner>(), new SpecificConstructorSelector(constructor));
+            var bestDirectives =
+                directives
+                    .GroupBy(option => this.ConstructorScorer.Score(context, option))
+                    .OrderByDescending(g => g.Key)
+                    .FirstOrDefault();
+            if (bestDirectives == null)
+            {
+                throw new ActivationException(ExceptionFormatter.NoConstructorsAvailable(context));
+            }
+
+            return bestDirectives.SingleOrThrowException(
+                () => new ActivationException(ExceptionFormatter.ConstructorsAmbiguous(context, bestDirectives)));
         }
     }
 }

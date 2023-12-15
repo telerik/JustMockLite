@@ -1,10 +1,23 @@
-// 
-// Author: Nate Kohari <nate@enkari.com>
-// Copyright (c) 2007-2010, Enkari, Ltd.
-// 
-// Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
-// See the file LICENSE.txt for details.
-// 
+// -------------------------------------------------------------------------------------------------
+// <copyright file="KernelBase.cs" company="Ninject Project Contributors">
+//   Copyright (c) 2007-2010 Enkari, Ltd. All rights reserved.
+//   Copyright (c) 2010-2017 Ninject Project Contributors. All rights reserved.
+//
+//   Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
+//   You may not use this file except in compliance with one of the Licenses.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//   or
+//       http://www.microsoft.com/opensource/licenses.mspx
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+// </copyright>
+// -------------------------------------------------------------------------------------------------
 
 namespace Telerik.JustMock.AutoMock.Ninject
 {
@@ -12,6 +25,7 @@ namespace Telerik.JustMock.AutoMock.Ninject
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+
     using Telerik.JustMock.AutoMock.Ninject.Activation;
     using Telerik.JustMock.AutoMock.Ninject.Activation.Blocks;
     using Telerik.JustMock.AutoMock.Ninject.Activation.Caching;
@@ -31,16 +45,15 @@ namespace Telerik.JustMock.AutoMock.Ninject
     /// </summary>
     public abstract class KernelBase : BindingRoot, IKernel
     {
-        /// <summary>
-        /// Lock used when adding missing bindings.
-        /// </summary>
-        protected readonly object HandleMissingBindingLockObject = new object();        
-        
+        private readonly object handleMissingBindingLockObject = new object();
+
         private readonly Multimap<Type, IBinding> bindings = new Multimap<Type, IBinding>();
 
-        private readonly Multimap<Type, IBinding> bindingCache = new Multimap<Type, IBinding>();
+        private readonly Dictionary<Type, List<IBinding>> bindingCache = new Dictionary<Type, List<IBinding>>();
 
         private readonly Dictionary<string, INinjectModule> modules = new Dictionary<string, INinjectModule>();
+
+        private readonly IBindingPrecedenceComparer bindingPrecedenceComparer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="KernelBase"/> class.
@@ -88,15 +101,16 @@ namespace Telerik.JustMock.AutoMock.Ninject
 
             this.AddComponents();
 
+            this.bindingPrecedenceComparer = this.Components.Get<IBindingPrecedenceComparer>();
+
             this.Bind<IKernel>().ToConstant(this).InTransientScope();
             this.Bind<IResolutionRoot>().ToConstant(this).InTransientScope();
 
-#if !NO_ASSEMBLY_SCANNING
             if (this.Settings.LoadExtensions)
             {
                 this.Load(this.Settings.ExtensionSearchPatterns);
             }
-#endif
+
             this.Load(modules);
         }
 
@@ -113,9 +127,10 @@ namespace Telerik.JustMock.AutoMock.Ninject
         /// <summary>
         /// Releases resources held by the object.
         /// </summary>
+        /// <param name="disposing"><c>True</c> if called manually, otherwise by GC.</param>
         public override void Dispose(bool disposing)
         {
-            if (disposing && !IsDisposed)
+            if (disposing && !this.IsDisposed)
             {
                 if (this.Components != null)
                 {
@@ -168,7 +183,9 @@ namespace Telerik.JustMock.AutoMock.Ninject
             this.bindings.Remove(binding.Service, binding);
 
             lock (this.bindingCache)
+            {
                 this.bindingCache.Clear();
+            }
         }
 
         /// <summary>
@@ -206,10 +223,8 @@ namespace Telerik.JustMock.AutoMock.Ninject
                 {
                     throw new NotSupportedException(ExceptionFormatter.ModulesWithNullOrEmptyNamesAreNotSupported());
                 }
-                
-                INinjectModule existingModule;
 
-                if (this.modules.TryGetValue(module.Name, out existingModule))
+                if (this.modules.TryGetValue(module.Name, out INinjectModule existingModule))
                 {
                     throw new NotSupportedException(ExceptionFormatter.ModuleWithSameNameIsAlreadyLoaded(module, existingModule));
                 }
@@ -225,7 +240,6 @@ namespace Telerik.JustMock.AutoMock.Ninject
             }
         }
 
-#if !NO_ASSEMBLY_SCANNING
         /// <summary>
         /// Loads modules from the files that match the specified pattern(s).
         /// </summary>
@@ -244,7 +258,6 @@ namespace Telerik.JustMock.AutoMock.Ninject
         {
             this.Load(assemblies.SelectMany(asm => asm.GetNinjectModules()));
         }
-#endif //!NO_ASSEMBLY_SCANNING
 
         /// <summary>
         /// Unloads the plugin with the specified name.
@@ -254,9 +267,7 @@ namespace Telerik.JustMock.AutoMock.Ninject
         {
             Ensure.ArgumentNotNullOrEmpty(name, "name");
 
-            INinjectModule module;
-
-            if (!this.modules.TryGetValue(name, out module))
+            if (!this.modules.TryGetValue(name, out INinjectModule module))
             {
                 throw new NotSupportedException(ExceptionFormatter.NoModuleLoadedWithTheSpecifiedName(name));
             }
@@ -337,57 +348,7 @@ namespace Telerik.JustMock.AutoMock.Ninject
         /// <returns>An enumerator of instances that match the request.</returns>
         public virtual IEnumerable<object> Resolve(IRequest request)
         {
-            Ensure.ArgumentNotNull(request, "request");
-
-            var bindingPrecedenceComparer = this.GetBindingPrecedenceComparer();
-            var resolveBindings = Enumerable.Empty<IBinding>();
-
-            if (this.CanResolve(request) || this.HandleMissingBinding(request))
-            {
-                resolveBindings = this.GetBindings(request.Service)
-                                      .Where(this.SatifiesRequest(request));
-
-            }
-
-            if (!resolveBindings.Any())
-            {
-                if (request.IsOptional)
-                {
-                    return Enumerable.Empty<object>();
-                }
-
-                throw new ActivationException(ExceptionFormatter.CouldNotResolveBinding(request));
-            }
-
-            if (request.IsUnique)
-            {
-                resolveBindings = resolveBindings.OrderByDescending(b => b, bindingPrecedenceComparer).ToList();
-                var model = resolveBindings.First(); // the type (conditonal, implicit, etc) of binding we'll return
-                resolveBindings =
-                    resolveBindings.TakeWhile(binding => bindingPrecedenceComparer.Compare(binding, model) == 0);
-
-                if (resolveBindings.Count() > 1)
-                {
-                    if (request.IsOptional)
-                    {
-                        return Enumerable.Empty<object>();
-                    }
-
-                    var formattedBindings =
-                        from binding in resolveBindings
-                        let context = this.CreateContext(request, binding)
-                        select binding.Format(context);
-                    throw new ActivationException(ExceptionFormatter.CouldNotUniquelyResolveBinding(request, formattedBindings.ToArray()));
-                }
-            }
-
-            if(resolveBindings.Any(binding => !binding.IsImplicit))
-            {
-                resolveBindings = resolveBindings.Where(binding => !binding.IsImplicit);
-            }
-
-            return resolveBindings
-                .Select(binding => this.CreateContext(request, binding).Resolve());
+            return this.Resolve(request, true, false);
         }
 
         /// <summary>
@@ -431,9 +392,12 @@ namespace Telerik.JustMock.AutoMock.Ninject
                 {
                     var resolvers = this.Components.GetAll<IBindingResolver>();
 
-                    resolvers
+                    var compiledBindings = resolvers
                         .SelectMany(resolver => resolver.Resolve(this.bindings, service))
-                        .Map(binding => this.bindingCache.Add(service, binding));
+                        .OrderByDescending(b => b, this.bindingPrecedenceComparer).ToList();
+                    this.bindingCache.Add(service, compiledBindings);
+
+                    return compiledBindings;
                 }
 
                 return this.bindingCache[service];
@@ -441,12 +405,15 @@ namespace Telerik.JustMock.AutoMock.Ninject
         }
 
         /// <summary>
-        /// Returns an IComparer that is used to determine resolution precedence.
+        /// Gets the service object of the specified type.
         /// </summary>
-        /// <returns>An IComparer that is used to determine resolution precedence.</returns>
-        protected virtual IComparer<IBinding> GetBindingPrecedenceComparer()
+        /// <param name="service">The service type.</param>
+        /// <returns>The service object</returns>
+        object IServiceProvider.GetService(Type service)
         {
-            return new BindingPrecedenceComparer();
+            return this.Settings.ThrowOnGetServiceNotFound
+               ? this.Get(service)
+               : this.TryGet(service);
         }
 
         /// <summary>
@@ -465,17 +432,6 @@ namespace Telerik.JustMock.AutoMock.Ninject
         protected abstract void AddComponents();
 
         /// <summary>
-        /// Attempts to handle a missing binding for a service.
-        /// </summary>
-        /// <param name="service">The service.</param>
-        /// <returns><c>True</c> if the missing binding can be handled; otherwise <c>false</c>.</returns>
-        [Obsolete]
-        protected virtual bool HandleMissingBinding(Type service)
-        {
-            return false;
-        }
-
-        /// <summary>
         /// Attempts to handle a missing binding for a request.
         /// </summary>
         /// <param name="request">The request.</param>
@@ -484,15 +440,8 @@ namespace Telerik.JustMock.AutoMock.Ninject
         {
             Ensure.ArgumentNotNull(request, "request");
 
-#pragma warning disable 612,618
-            if (this.HandleMissingBinding(request.Service))
-            {
-                return true;
-            }
-#pragma warning restore 612,618
-
             var components = this.Components.GetAll<IMissingBindingResolver>();
-            
+
             // Take the first set of bindings that resolve.
             var bindings = components
                 .Select(c => c.Resolve(this.bindings, request).ToList())
@@ -503,7 +452,7 @@ namespace Telerik.JustMock.AutoMock.Ninject
                 return false;
             }
 
-            lock (this.HandleMissingBindingLockObject)
+            lock (this.handleMissingBindingLockObject)
             {
                 if (!this.CanResolve(request))
                 {
@@ -513,21 +462,6 @@ namespace Telerik.JustMock.AutoMock.Ninject
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Returns a value indicating whether the specified service is self-bindable.
-        /// </summary>
-        /// <param name="service">The service.</param>
-        /// <returns><see langword="True"/> if the type is self-bindable; otherwise <see langword="false"/>.</returns>
-        [Obsolete]
-        protected virtual bool TypeIsSelfBindable(Type service)
-        {
-            return !service.IsInterface
-                && !service.IsAbstract
-                && !service.IsValueType
-                && service != typeof(string)
-                && !service.ContainsGenericParameters;
         }
 
         /// <summary>
@@ -544,45 +478,121 @@ namespace Telerik.JustMock.AutoMock.Ninject
             return new Context(this, request, binding, this.Components.Get<ICache>(), this.Components.Get<IPlanner>(), this.Components.Get<IPipeline>());
         }
 
+        private IEnumerable<object> Resolve(IRequest request, bool handleMissingBindings, bool filterImplicitBindings)
+        {
+            void UpdateRequest(Type service)
+            {
+                if (request.ParentRequest == null)
+                {
+                    request = this.CreateRequest(service, null, request.Parameters.Where(p => p.ShouldInherit), true, false);
+                }
+                else
+                {
+                    request = request.ParentRequest.CreateChild(service, request.ParentContext, request.Target);
+                    request.IsOptional = true;
+                }
+            }
+
+            if (request.Service.IsArray)
+            {
+                var service = request.Service.GetElementType();
+
+                UpdateRequest(service);
+
+                return new[] { this.Resolve(request, false, true).CastSlow(service).ToArraySlow(service) };
+            }
+
+            if (request.Service.IsGenericType)
+            {
+                var gtd = request.Service.GetGenericTypeDefinition();
+
+                if (gtd == typeof(List<>) || gtd == typeof(IList<>) || gtd == typeof(ICollection<>))
+                {
+                    var service = request.Service.GenericTypeArguments[0];
+
+                    UpdateRequest(service);
+
+                    return new[] { this.Resolve(request, false, true).CastSlow(service).ToListSlow(service) };
+                }
+
+                if (gtd == typeof(IEnumerable<>))
+                {
+                    var service = request.Service.GenericTypeArguments[0];
+
+                    UpdateRequest(service);
+
+                    return new[] { this.Resolve(request, false, true).CastSlow(service) };
+                }
+            }
+
+            var satisfiedBindings = this.GetBindings(request.Service)
+                                        .Where(this.SatifiesRequest(request));
+
+            if (filterImplicitBindings)
+            {
+                satisfiedBindings = satisfiedBindings.Where(binding => binding.IsImplicit == false);
+            }
+
+            var satisfiedBindingEnumerator = satisfiedBindings.GetEnumerator();
+
+            if (!satisfiedBindingEnumerator.MoveNext())
+            {
+                if (handleMissingBindings && this.HandleMissingBinding(request))
+                {
+                    return this.Resolve(request, false, false);
+                }
+
+                if (request.IsOptional)
+                {
+                    return Enumerable.Empty<object>();
+                }
+
+                throw new ActivationException(ExceptionFormatter.CouldNotResolveBinding(request));
+            }
+
+            if (request.IsUnique)
+            {
+                var selectedBinding = satisfiedBindingEnumerator.Current;
+
+                if (satisfiedBindingEnumerator.MoveNext() &&
+                    this.bindingPrecedenceComparer.Compare(selectedBinding, satisfiedBindingEnumerator.Current) == 0)
+                {
+                    if (request.IsOptional && !request.ForceUnique)
+                    {
+                        return Enumerable.Empty<object>();
+                    }
+
+                    var formattedBindings =
+                        from binding in satisfiedBindings
+                        let context = this.CreateContext(request, binding)
+                        select binding.Format(context);
+
+                    throw new ActivationException(ExceptionFormatter.CouldNotUniquelyResolveBinding(
+                        request,
+                        formattedBindings.ToArray()));
+                }
+
+                return new[] { this.CreateContext(request, selectedBinding).Resolve() };
+            }
+            else
+            {
+                if (satisfiedBindings.Any(binding => !binding.IsImplicit))
+                {
+                    satisfiedBindings = satisfiedBindings.Where(binding => !binding.IsImplicit);
+                }
+
+                return satisfiedBindings
+                    .Select(binding => this.CreateContext(request, binding).Resolve());
+            }
+        }
+
         private void AddBindings(IEnumerable<IBinding> bindings)
         {
             bindings.Map(binding => this.bindings.Add(binding.Service, binding));
 
             lock (this.bindingCache)
-                this.bindingCache.Clear();
-        }
-
-        object IServiceProvider.GetService(Type service)
-        {
-            return this.Get(service);
-        }
-
-        private class BindingPrecedenceComparer : IComparer<IBinding>
-        {
-            public int Compare(IBinding x, IBinding y)
             {
-                if (x == y)
-                {
-                    return 0;
-                }
-
-                // Each function represents a level of precedence.
-                var funcs = new List<Func<IBinding, bool>>
-                            {
-                                b => b != null,       // null bindings should never happen, but just in case
-                                b => b.IsConditional, // conditional bindings > unconditional
-                                b => !b.Service.ContainsGenericParameters, // closed generics > open generics
-                                b => !b.IsImplicit,   // explicit bindings > implicit
-                            };
-
-                var q = from func in funcs
-                        let xVal = func(x)
-                        where xVal != func(y) 
-                        select xVal ? 1 : -1;
-
-                // returns the value of the first function that represents a difference
-                // between the bindings, or else returns 0 (equal)
-                return q.FirstOrDefault();
+                this.bindingCache.Clear();
             }
         }
     }

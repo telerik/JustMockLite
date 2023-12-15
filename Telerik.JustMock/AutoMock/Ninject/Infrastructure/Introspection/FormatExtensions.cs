@@ -1,25 +1,34 @@
-﻿#region License
-// 
-// Author: Nate Kohari <nate@enkari.com>
-// Copyright (c) 2007-2010, Enkari, Ltd.
-// 
-// Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
-// See the file LICENSE.txt for details.
-// 
-#endregion
-#region Using Directives
-using System;
-using System.IO;
-using System.Reflection;
-using System.Text;
-using Telerik.JustMock.AutoMock.Ninject.Activation;
-using Telerik.JustMock.AutoMock.Ninject.Planning.Bindings;
-using Telerik.JustMock.AutoMock.Ninject.Planning.Targets;
-#endregion
+﻿// -------------------------------------------------------------------------------------------------
+// <copyright file="FormatExtensions.cs" company="Ninject Project Contributors">
+//   Copyright (c) 2007-2010 Enkari, Ltd. All rights reserved.
+//   Copyright (c) 2010-2017 Ninject Project Contributors. All rights reserved.
+//
+//   Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
+//   You may not use this file except in compliance with one of the Licenses.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//   or
+//       http://www.microsoft.com/opensource/licenses.mspx
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+// </copyright>
+// -------------------------------------------------------------------------------------------------
 
 namespace Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection
 {
-    using System.Globalization;
+    using System;
+    using System.IO;
+    using System.Reflection;
+    using System.Text;
+
+    using Telerik.JustMock.AutoMock.Ninject.Activation;
+    using Telerik.JustMock.AutoMock.Ninject.Planning.Bindings;
+    using Telerik.JustMock.AutoMock.Ninject.Planning.Targets;
 
     /// <summary>
     /// Provides extension methods for string formatting
@@ -35,7 +44,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection
         {
             using (var sw = new StringWriter())
             {
-                IRequest current = request;
+                var current = request;
 
                 while (current != null)
                 {
@@ -48,7 +57,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection
         }
 
         /// <summary>
-        /// Formats the given binding into a meaningful string representation. 
+        /// Formats the given binding into a meaningful string representation.
         /// </summary>
         /// <param name="binding">The binding to be formatted.</param>
         /// <param name="context">The context.</param>
@@ -58,12 +67,16 @@ namespace Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection
             using (var sw = new StringWriter())
             {
                 if (binding.Condition != null)
+                {
                     sw.Write("conditional ");
+                }
 
                 if (binding.IsImplicit)
+                {
                     sw.Write("implicit ");
+                }
 
-                IProvider provider = binding.GetProvider(context);
+                var provider = binding.GetProvider(context);
 
                 switch (binding.Target)
                 {
@@ -76,8 +89,11 @@ namespace Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection
                         break;
 
                     case BindingTarget.Provider:
-                        sw.Write("provider binding from {0} to {1} (via {2})", binding.Service.Format(),
-                            provider.Type.Format(), provider.GetType().Format());
+                        sw.Write(
+                            "provider binding from {0} to {1} (via {2})",
+                            binding.Service.Format(),
+                            provider.Type.Format(),
+                            provider.GetType().Format());
                         break;
 
                     case BindingTarget.Method:
@@ -106,9 +122,13 @@ namespace Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection
             using (var sw = new StringWriter())
             {
                 if (request.Target == null)
+                {
                     sw.Write("Request for {0}", request.Service.Format());
+                }
                 else
+                {
                     sw.Write("Injection of dependency {0} into {1}", request.Service.Format(), request.Target.Format());
+                }
 
                 return sw.ToString();
             }
@@ -156,16 +176,12 @@ namespace Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection
         {
             var friendlyName = GetFriendlyName(type);
 
-#if !MONO
             if (friendlyName.Contains("AnonymousType"))
+            {
                 return "AnonymousType";
-#else
+            }
 
-            if (friendlyName.Contains("__AnonType"))
-                return "AnonymousType";
-#endif
-
-            switch (friendlyName.ToLower(CultureInfo.InvariantCulture))
+            switch (friendlyName.ToLowerInvariant())
             {
                 case "int16": return "short";
                 case "int32": return "int";
@@ -186,9 +202,12 @@ namespace Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection
             }
 
             var genericArguments = type.GetGenericArguments();
-            if(genericArguments.Length > 0)
+
+            if (genericArguments.Length > 0)
+            {
                 return FormatGenericType(friendlyName, genericArguments);
-            
+            }
+
             return friendlyName;
         }
 
@@ -199,30 +218,29 @@ namespace Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection
             // remove generic arguments
             var firstBracket = friendlyName.IndexOf('[');
             if (firstBracket > 0)
+            {
                 friendlyName = friendlyName.Substring(0, firstBracket);
+            }
 
             // remove assembly info
             var firstComma = friendlyName.IndexOf(',');
             if (firstComma > 0)
+            {
                 friendlyName = friendlyName.Substring(0, firstComma);
+            }
 
             // remove namespace
             var lastPeriod = friendlyName.LastIndexOf('.');
             if (lastPeriod >= 0)
+            {
                 friendlyName = friendlyName.Substring(lastPeriod + 1);
+            }
 
             return friendlyName;
         }
 
         private static string FormatGenericType(string friendlyName, Type[] genericArguments)
         {
-            //var genericTag = "`" + genericArguments.Length;
-            //var genericArgumentNames = new string[genericArguments.Length];
-            //for (int i = 0; i < genericArguments.Length; i++)
-            //    genericArgumentNames[i] = genericArguments[i].Format();
-
-            //return friendlyName.Replace(genericTag, string.Join(", ", genericArgumentNames));
-
             var sb = new StringBuilder(friendlyName.Length + 10);
 
             var genericArgumentIndex = 0;
@@ -231,8 +249,8 @@ namespace Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection
             {
                 if (friendlyName[index] == '`')
                 {
-                    var numArguments = friendlyName[index+1] - 48;
-                    
+                    var numArguments = friendlyName[index + 1] - 48;
+
                     sb.Append(friendlyName.Substring(startIndex, index - startIndex));
                     AppendGenericArguments(sb, genericArguments, genericArgumentIndex, numArguments);
                     genericArgumentIndex += numArguments;
@@ -240,8 +258,11 @@ namespace Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection
                     startIndex = index + 2;
                 }
             }
+
             if (startIndex < friendlyName.Length)
+            {
                 sb.Append(friendlyName.Substring(startIndex));
+            }
 
             return sb.ToString();
         }
@@ -250,14 +271,16 @@ namespace Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection
         {
             sb.Append("{");
 
-            for(int i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 if (i != 0)
+                {
                     sb.Append(", ");
+                }
 
                 sb.Append(genericArguments[start + i].Format());
             }
-            
+
             sb.Append("}");
         }
     }

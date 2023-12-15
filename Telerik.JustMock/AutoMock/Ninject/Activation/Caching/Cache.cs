@@ -1,12 +1,23 @@
-#region License
-// 
-// Author: Nate Kohari <nate@enkari.com>
-// Copyright (c) 2007-2010, Enkari, Ltd.
-// 
-// Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
-// See the file LICENSE.txt for details.
-// 
-#endregion
+// -------------------------------------------------------------------------------------------------
+// <copyright file="Cache.cs" company="Ninject Project Contributors">
+//   Copyright (c) 2007-2010 Enkari, Ltd. All rights reserved.
+//   Copyright (c) 2010-2017 Ninject Project Contributors. All rights reserved.
+//
+//   Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
+//   You may not use this file except in compliance with one of the Licenses.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//   or
+//       http://www.microsoft.com/opensource/licenses.mspx
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+// </copyright>
+// -------------------------------------------------------------------------------------------------
 
 namespace Telerik.JustMock.AutoMock.Ninject.Activation.Caching
 {
@@ -60,10 +71,10 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Caching
         /// <summary>
         /// Releases resources held by the object.
         /// </summary>
-        /// <param name="disposing"></param>
+        /// <param name="disposing"><c>True</c> if called manually, otherwise by GC.</param>
         public override void Dispose(bool disposing)
         {
-            if (disposing && !IsDisposed)
+            if (disposing && !this.IsDisposed)
             {
                 this.Clear();
             }
@@ -89,8 +100,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Caching
                 if (!this.entries.ContainsKey(weakScopeReference))
                 {
                     this.entries[weakScopeReference] = new Multimap<IBindingConfiguration, CacheEntry>();
-                    var notifyScope = scope as INotifyWhenDisposed;
-                    if (notifyScope != null)
+                    if (scope is INotifyWhenDisposed notifyScope)
                     {
                         notifyScope.Disposed += (o, e) => this.Clear(weakScopeReference);
                     }
@@ -108,6 +118,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Caching
         public object TryGet(IContext context)
         {
             Ensure.ArgumentNotNull(context, "context");
+
             var scope = context.GetScope();
             if (scope == null)
             {
@@ -116,8 +127,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Caching
 
             lock (this.entries)
             {
-                Multimap<IBindingConfiguration, CacheEntry> bindings;
-                if (!this.entries.TryGetValue(scope, out bindings))
+                if (!this.entries.TryGetValue(scope, out Multimap<IBindingConfiguration, CacheEntry> bindings))
                 {
                     return null;
                 }
@@ -149,7 +159,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Caching
         /// <returns><see langword="True"/> if the instance was found and released; otherwise <see langword="false"/>.</returns>
         public bool Release(object instance)
         {
-            lock(this.entries)
+            lock (this.entries)
             {
                 var instanceFound = false;
                 foreach (var bindingEntry in this.entries.Values.SelectMany(bindingEntries => bindingEntries.Values).ToList())
@@ -177,8 +187,8 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Caching
                 var disposedScopes = this.entries.Where(scope => !((ReferenceEqualWeakReference)scope.Key).IsAlive).Select(scope => scope).ToList();
                 foreach (var disposedScope in disposedScopes)
                 {
-                    this.Forget(GetAllBindingEntries(disposedScope.Value));
                     this.entries.Remove(disposedScope.Key);
+                    this.Forget(GetAllBindingEntries(disposedScope.Value));
                 }
             }
         }
@@ -192,11 +202,10 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Caching
         {
             lock (this.entries)
             {
-                Multimap<IBindingConfiguration, CacheEntry> bindings;
-                if (this.entries.TryGetValue(scope, out bindings))
+                if (this.entries.TryGetValue(scope, out Multimap<IBindingConfiguration, CacheEntry> bindings))
                 {
-                    this.Forget(GetAllBindingEntries(bindings));
                     this.entries.Remove(scope);
+                    this.Forget(GetAllBindingEntries(bindings));
                 }
             }
         }
@@ -214,13 +223,13 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Caching
         }
 
         /// <summary>
-        /// Gets all entries for a binding withing the selected scope.
+        /// Gets all entries for a binding within the selected scope.
         /// </summary>
         /// <param name="bindings">The bindings.</param>
         /// <returns>All bindings of a binding.</returns>
-        private static IEnumerable<CacheEntry> GetAllBindingEntries(IEnumerable<KeyValuePair<IBindingConfiguration, ICollection<CacheEntry>>> bindings)
+        private static IEnumerable<CacheEntry> GetAllBindingEntries(Multimap<IBindingConfiguration, CacheEntry> bindings)
         {
-            return bindings.SelectMany(bindingEntries => bindingEntries.Value);
+            return bindings.Values.SelectMany(bindingEntries => bindingEntries);
         }
 
         /// <summary>

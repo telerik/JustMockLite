@@ -1,19 +1,30 @@
-#region License
-// 
-// Author: Nate Kohari <nate@enkari.com>
-// Copyright (c) 2007-2010, Enkari, Ltd.
-// 
-// Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
-// See the file LICENSE.txt for details.
-// 
-#endregion
-#region Using Directives
-using System;
-using Telerik.JustMock.AutoMock.Ninject.Infrastructure;
-#endregion
+// -------------------------------------------------------------------------------------------------
+// <copyright file="CallbackProvider.cs" company="Ninject Project Contributors">
+//   Copyright (c) 2007-2010 Enkari, Ltd. All rights reserved.
+//   Copyright (c) 2010-2017 Ninject Project Contributors. All rights reserved.
+//
+//   Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
+//   You may not use this file except in compliance with one of the Licenses.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//   or
+//       http://www.microsoft.com/opensource/licenses.mspx
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+// </copyright>
+// -------------------------------------------------------------------------------------------------
 
 namespace Telerik.JustMock.AutoMock.Ninject.Activation.Providers
 {
+    using System;
+
+    using Telerik.JustMock.AutoMock.Ninject.Infrastructure;
+
     /// <summary>
     /// A provider that delegates to a callback method to create instances.
     /// </summary>
@@ -21,19 +32,20 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Providers
     public class CallbackProvider<T> : Provider<T>
     {
         /// <summary>
-        /// Gets the callback method used by the provider.
-        /// </summary>
-        public Func<IContext, T> Method { get; private set; }
-
-        /// <summary>
-        /// Initializes a new instance of the CallbackProvider&lt;T&gt; class.
+        /// Initializes a new instance of the <see cref="CallbackProvider{T}"/> class.
         /// </summary>
         /// <param name="method">The callback method that will be called to create instances.</param>
         public CallbackProvider(Func<IContext, T> method)
         {
             Ensure.ArgumentNotNull(method, "method");
-            Method = method;
+
+            this.Method = method;
         }
+
+        /// <summary>
+        /// Gets the callback method used by the provider.
+        /// </summary>
+        public Func<IContext, T> Method { get; private set; }
 
         /// <summary>
         /// Invokes the callback method to create an instance.
@@ -42,7 +54,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Activation.Providers
         /// <returns>The created instance.</returns>
         protected override T CreateInstance(IContext context)
         {
-            return Method(context);
+            return this.Method(context);
         }
     }
 }

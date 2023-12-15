@@ -1,10 +1,10 @@
-//-------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // <copyright file="BindingConfiguration.cs" company="Ninject Project Contributors">
-//   Copyright (c) 2009-2011 Ninject Project Contributors
-//   Authors: Remo Gloor (remo.gloor@gmail.com)
-//           
+//   Copyright (c) 2007-2010 Enkari, Ltd. All rights reserved.
+//   Copyright (c) 2010-2017 Ninject Project Contributors. All rights reserved.
+//
 //   Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
-//   you may not use this file except in compliance with one of the Licenses.
+//   You may not use this file except in compliance with one of the Licenses.
 //   You may obtain a copy of the License at
 //
 //       http://www.apache.org/licenses/LICENSE-2.0
@@ -17,14 +17,16 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 // </copyright>
-//-------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 namespace Telerik.JustMock.AutoMock.Ninject.Planning.Bindings
 {
     using System;
     using System.Collections.Generic;
+
     using Telerik.JustMock.AutoMock.Ninject.Activation;
     using Telerik.JustMock.AutoMock.Ninject.Infrastructure;
+    using Telerik.JustMock.AutoMock.Ninject.Infrastructure.Introspection;
     using Telerik.JustMock.AutoMock.Ninject.Parameters;
 
     /// <summary>
@@ -32,8 +34,6 @@ namespace Telerik.JustMock.AutoMock.Ninject.Planning.Bindings
     /// </summary>
     public class BindingConfiguration : IBindingConfiguration
     {
-        private IBindingMetadata metadata;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="BindingConfiguration"/> class.
         /// </summary>
@@ -49,17 +49,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Planning.Bindings
         /// <summary>
         /// Gets the binding's metadata.
         /// </summary>
-        public IBindingMetadata Metadata
-        {
-            get
-            {
-                return this.metadata;
-            }
-            private set
-            {
-                this.metadata = value;
-            }
-        }
+        public IBindingMetadata Metadata { get; private set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the binding was implicitly registered.
@@ -117,6 +107,12 @@ namespace Telerik.JustMock.AutoMock.Ninject.Planning.Bindings
         public IProvider GetProvider(IContext context)
         {
             Ensure.ArgumentNotNull(context, "context");
+
+            if (this.ProviderCallback == null)
+            {
+                throw new ActivationException(ExceptionFormatter.ProviderCallbackIsNull(context));
+            }
+
             return this.ProviderCallback(context);
         }
 
@@ -128,6 +124,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Planning.Bindings
         public object GetScope(IContext context)
         {
             Ensure.ArgumentNotNull(context, "context");
+
             return this.ScopeCallback(context);
         }
 
@@ -139,7 +136,8 @@ namespace Telerik.JustMock.AutoMock.Ninject.Planning.Bindings
         public bool Matches(IRequest request)
         {
             Ensure.ArgumentNotNull(request, "request");
+
             return this.Condition == null || this.Condition(request);
-        }    
+        }
     }
 }
