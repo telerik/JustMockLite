@@ -1,12 +1,10 @@
-//-------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // <copyright file="NinjectModule.cs" company="Ninject Project Contributors">
-//   Copyright (c) 2007-2009, Enkari, Ltd.
-//   Copyright (c) 2009-2011 Ninject Project Contributors
-//   Authors: Nate Kohari (nate@enkari.com)
-//            Remo Gloor (remo.gloor@gmail.com)
-//           
+//   Copyright (c) 2007-2010 Enkari, Ltd. All rights reserved.
+//   Copyright (c) 2010-2017 Ninject Project Contributors. All rights reserved.
+//
 //   Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
-//   you may not use this file except in compliance with one of the Licenses.
+//   You may not use this file except in compliance with one of the Licenses.
 //   You may obtain a copy of the License at
 //
 //       http://www.apache.org/licenses/LICENSE-2.0
@@ -19,7 +17,7 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 // </copyright>
-//-------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 namespace Telerik.JustMock.AutoMock.Ninject.Modules
 {
@@ -54,7 +52,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Modules
         /// </summary>
         public virtual string Name
         {
-            get { return GetType().FullName; }
+            get { return this.GetType().FullName; }
         }
 
         /// <summary>
@@ -73,7 +71,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Modules
                 return this.Kernel;
             }
         }
-        
+
         /// <summary>
         /// Called when the module is loaded into a kernel.
         /// </summary>
@@ -81,6 +79,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Modules
         public void OnLoad(IKernel kernel)
         {
             Ensure.ArgumentNotNull(kernel, "kernel");
+
             this.Kernel = kernel;
             this.Load();
         }
@@ -92,6 +91,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Modules
         public void OnUnload(IKernel kernel)
         {
             Ensure.ArgumentNotNull(kernel, "kernel");
+
             this.Unload();
             this.Bindings.Map(this.Kernel.RemoveBinding);
             this.Kernel = null;

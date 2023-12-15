@@ -1,31 +1,41 @@
-#region License
-// 
-// Author: Nate Kohari <nate@enkari.com>
-// Copyright (c) 2007-2010, Enkari, Ltd.
-// 
-// Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
-// See the file LICENSE.txt for details.
-// 
-#endregion
-#region Using Directives
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using Telerik.JustMock.AutoMock.Ninject.Activation.Blocks;
-using Telerik.JustMock.AutoMock.Ninject.Components;
-using Telerik.JustMock.AutoMock.Ninject.Infrastructure.Disposal;
-using Telerik.JustMock.AutoMock.Ninject.Modules;
-using Telerik.JustMock.AutoMock.Ninject.Parameters;
-using Telerik.JustMock.AutoMock.Ninject.Planning.Bindings;
-using Telerik.JustMock.AutoMock.Ninject.Syntax;
-#endregion
+// -------------------------------------------------------------------------------------------------
+// <copyright file="IKernel.cs" company="Ninject Project Contributors">
+//   Copyright (c) 2007-2010 Enkari, Ltd. All rights reserved.
+//   Copyright (c) 2010-2017 Ninject Project Contributors. All rights reserved.
+//
+//   Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
+//   You may not use this file except in compliance with one of the Licenses.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//   or
+//       http://www.microsoft.com/opensource/licenses.mspx
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+// </copyright>
+// -------------------------------------------------------------------------------------------------
 
 namespace Telerik.JustMock.AutoMock.Ninject
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Reflection;
+
+    using Telerik.JustMock.AutoMock.Ninject.Activation.Blocks;
+    using Telerik.JustMock.AutoMock.Ninject.Components;
+    using Telerik.JustMock.AutoMock.Ninject.Infrastructure.Disposal;
+    using Telerik.JustMock.AutoMock.Ninject.Modules;
+    using Telerik.JustMock.AutoMock.Ninject.Planning.Bindings;
+    using Telerik.JustMock.AutoMock.Ninject.Syntax;
+
     /// <summary>
     /// A super-factory that can create objects of all kinds, following hints provided by <see cref="IBinding"/>s.
     /// </summary>
-    public interface IKernel : IBindingRoot, IResolutionRoot, IServiceProvider, IDisposableObject
+    public interface IKernel : IBindingRoot, IResolutionRoot, IServiceProvider, IDisposableObject, INotifyWhenDisposed
     {
         /// <summary>
         /// Gets the kernel settings.
@@ -56,7 +66,6 @@ namespace Telerik.JustMock.AutoMock.Ninject
         /// <param name="m">The modules to load.</param>
         void Load(IEnumerable<INinjectModule> m);
 
-        #if !NO_ASSEMBLY_SCANNING
         /// <summary>
         /// Loads modules from the files that match the specified pattern(s).
         /// </summary>
@@ -68,20 +77,12 @@ namespace Telerik.JustMock.AutoMock.Ninject
         /// </summary>
         /// <param name="assemblies">The assemblies to search.</param>
         void Load(IEnumerable<Assembly> assemblies);
-        #endif
 
         /// <summary>
         /// Unloads the plugin with the specified name.
         /// </summary>
         /// <param name="name">The plugin's name.</param>
         void Unload(string name);
-
-        /// <summary>
-        /// Injects the specified existing instance, without managing its lifecycle.
-        /// </summary>
-        /// <param name="instance">The instance to inject.</param>
-        /// <param name="parameters">The parameters to pass to the request.</param>
-        void Inject(object instance, params IParameter[] parameters);
 
         /// <summary>
         /// Gets the bindings registered for the specified service.

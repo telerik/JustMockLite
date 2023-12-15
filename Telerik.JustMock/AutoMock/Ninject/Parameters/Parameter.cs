@@ -1,20 +1,30 @@
-#region License
-// 
-// Author: Nate Kohari <nate@enkari.com>
-// Copyright (c) 2007-2010, Enkari, Ltd.
-// 
-// Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
-// See the file LICENSE.txt for details.
-// 
-#endregion
-#region Using Directives
-using System;
-using Telerik.JustMock.AutoMock.Ninject.Activation;
-using Telerik.JustMock.AutoMock.Ninject.Infrastructure;
-#endregion
+// -------------------------------------------------------------------------------------------------
+// <copyright file="Parameter.cs" company="Ninject Project Contributors">
+//   Copyright (c) 2007-2010 Enkari, Ltd. All rights reserved.
+//   Copyright (c) 2010-2017 Ninject Project Contributors. All rights reserved.
+//
+//   Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
+//   You may not use this file except in compliance with one of the Licenses.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//   or
+//       http://www.microsoft.com/opensource/licenses.mspx
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+// </copyright>
+// -------------------------------------------------------------------------------------------------
 
 namespace Telerik.JustMock.AutoMock.Ninject.Parameters
 {
+    using System;
+
+    using Telerik.JustMock.AutoMock.Ninject.Activation;
+    using Telerik.JustMock.AutoMock.Ninject.Infrastructure;
     using Telerik.JustMock.AutoMock.Ninject.Planning.Targets;
 
     /// <summary>
@@ -23,27 +33,15 @@ namespace Telerik.JustMock.AutoMock.Ninject.Parameters
     public class Parameter : IParameter
     {
         /// <summary>
-        /// Gets the name of the parameter.
-        /// </summary>
-        public string Name { get; private set; }
-
-        /// <summary>
-        /// Gets a value indicating whether the parameter should be inherited into child requests.
-        /// </summary>
-        public bool ShouldInherit { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the callback that will be triggered to get the parameter's value.
-        /// </summary>
-        public Func<IContext, ITarget, object> ValueCallback { get; internal set; }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="Parameter"/> class.
         /// </summary>
         /// <param name="name">The name of the parameter.</param>
         /// <param name="value">The value of the parameter.</param>
         /// <param name="shouldInherit">Whether the parameter should be inherited into child requests.</param>
-        public Parameter(string name, object value, bool shouldInherit) : this(name, (ctx, target) => value, shouldInherit) { }
+        public Parameter(string name, object value, bool shouldInherit)
+            : this(name, (ctx, target) => value, shouldInherit)
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Parameter"/> class.
@@ -56,9 +54,9 @@ namespace Telerik.JustMock.AutoMock.Ninject.Parameters
             Ensure.ArgumentNotNullOrEmpty(name, "name");
             Ensure.ArgumentNotNull(valueCallback, "valueCallback");
 
-            Name = name;
-            ValueCallback = (ctx, target) => valueCallback(ctx);
-            ShouldInherit = shouldInherit;
+            this.Name = name;
+            this.ValueCallback = (ctx, target) => valueCallback(ctx);
+            this.ShouldInherit = shouldInherit;
         }
 
         /// <summary>
@@ -72,11 +70,26 @@ namespace Telerik.JustMock.AutoMock.Ninject.Parameters
             Ensure.ArgumentNotNullOrEmpty(name, "name");
             Ensure.ArgumentNotNull(valueCallback, "valueCallback");
 
-            Name = name;
-            ValueCallback = valueCallback;
-            ShouldInherit = shouldInherit;
+            this.Name = name;
+            this.ValueCallback = valueCallback;
+            this.ShouldInherit = shouldInherit;
         }
-        
+
+        /// <summary>
+        /// Gets the name of the parameter.
+        /// </summary>
+        public string Name { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the parameter should be inherited into child requests.
+        /// </summary>
+        public bool ShouldInherit { get; private set; }
+
+        /// <summary>
+        /// Gets the callback that will be triggered to get the parameter's value.
+        /// </summary>
+        public Func<IContext, ITarget, object> ValueCallback { get; internal set; }
+
         /// <summary>
         /// Gets the value for the parameter within the specified context.
         /// </summary>
@@ -86,7 +99,8 @@ namespace Telerik.JustMock.AutoMock.Ninject.Parameters
         public object GetValue(IContext context, ITarget target)
         {
             Ensure.ArgumentNotNull(context, "context");
-            return ValueCallback(context, target);
+
+            return this.ValueCallback(context, target);
         }
 
         /// <summary>
@@ -97,7 +111,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Parameters
         public override bool Equals(object obj)
         {
             var parameter = obj as IParameter;
-            return parameter != null ? Equals(parameter) : base.Equals(obj);
+            return parameter != null ? this.Equals(parameter) : base.Equals(obj);
         }
 
         /// <summary>
@@ -106,7 +120,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Parameters
         /// <returns>A hash code for the object.</returns>
         public override int GetHashCode()
         {
-            return GetType().GetHashCode() ^ Name.GetHashCode();
+            return this.GetType().GetHashCode() ^ this.Name.GetHashCode();
         }
 
         /// <summary>
@@ -116,7 +130,7 @@ namespace Telerik.JustMock.AutoMock.Ninject.Parameters
         /// <returns><c>True</c> if the objects are equal; otherwise <c>false</c></returns>
         public bool Equals(IParameter other)
         {
-            return other.GetType() == GetType() && other.Name.Equals(Name);
+            return other.GetType() == this.GetType() && other.Name.Equals(this.Name);
         }
     }
 }

@@ -1,36 +1,46 @@
-#region License
-// 
-// Author: Nate Kohari <nate@enkari.com>
-// Copyright (c) 2007-2010, Enkari, Ltd.
-// 
-// Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
-// See the file LICENSE.txt for details.
-// 
-#endregion
-#region Using Directives
-using System;
-using System.Collections.Generic;
-using Telerik.JustMock.AutoMock.Ninject.Activation;
-using Telerik.JustMock.AutoMock.Ninject.Infrastructure;
-
-#endregion
+// -------------------------------------------------------------------------------------------------
+// <copyright file="NinjectSettings.cs" company="Ninject Project Contributors">
+//   Copyright (c) 2007-2010 Enkari, Ltd. All rights reserved.
+//   Copyright (c) 2010-2017 Ninject Project Contributors. All rights reserved.
+//
+//   Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
+//   You may not use this file except in compliance with one of the Licenses.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//   or
+//       http://www.microsoft.com/opensource/licenses.mspx
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+// </copyright>
+// -------------------------------------------------------------------------------------------------
 
 namespace Telerik.JustMock.AutoMock.Ninject
 {
+    using System;
+    using System.Collections.Generic;
+
+    using Telerik.JustMock.AutoMock.Ninject.Activation;
+    using Telerik.JustMock.AutoMock.Ninject.Infrastructure;
+
     /// <summary>
     /// Contains configuration options for Ninject.
     /// </summary>
     public class NinjectSettings : INinjectSettings
     {
-        private readonly Dictionary<string, object> _values = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> values = new Dictionary<string, object>();
 
         /// <summary>
         /// Gets or sets the attribute that indicates that a member should be injected.
         /// </summary>
         public Type InjectAttribute
         {
-            get { return Get("InjectAttribute", typeof(InjectAttribute)); }
-            set { Set("InjectAttribute", value); }
+            get { return this.Get("InjectAttribute", typeof(InjectAttribute)); }
+            set { this.Set("InjectAttribute", value); }
         }
 
         /// <summary>
@@ -38,8 +48,8 @@ namespace Telerik.JustMock.AutoMock.Ninject
         /// </summary>
         public TimeSpan CachePruningInterval
         {
-            get { return Get("CachePruningInterval", TimeSpan.FromSeconds(30)); }
-            set { Set("CachePruningInterval", value); }
+            get { return this.Get("CachePruningInterval", TimeSpan.FromSeconds(30)); }
+            set { this.Set("CachePruningInterval", value); }
         }
 
         /// <summary>
@@ -47,18 +57,17 @@ namespace Telerik.JustMock.AutoMock.Ninject
         /// </summary>
         public Func<IContext, object> DefaultScopeCallback
         {
-            get { return Get("DefaultScopeCallback", StandardScopeCallbacks.Transient); }
-            set { Set("DefaultScopeCallback", value); }
+            get { return this.Get("DefaultScopeCallback", StandardScopeCallbacks.Transient); }
+            set { this.Set("DefaultScopeCallback", value); }
         }
 
-        #if !NO_ASSEMBLY_SCANNING
         /// <summary>
         /// Gets or sets a value indicating whether the kernel should automatically load extensions at startup.
         /// </summary>
         public bool LoadExtensions
         {
-            get { return Get("LoadExtensions", true); }
-            set { Set("LoadExtensions", value); }
+            get { return this.Get("LoadExtensions", true); }
+            set { this.Set("LoadExtensions", value); }
         }
 
         /// <summary>
@@ -66,38 +75,36 @@ namespace Telerik.JustMock.AutoMock.Ninject
         /// </summary>
         public string[] ExtensionSearchPatterns
         {
-            get { return Get("ExtensionSearchPatterns", new [] { "Ninject.Extensions.*.dll", "Ninject.Web*.dll" }); }
-            set { Set("ExtensionSearchPatterns", value); }
+            get { return this.Get("ExtensionSearchPatterns", new[] { "Ninject.Extensions.*.dll", "Ninject.Web*.dll" }); }
+            set { this.Set("ExtensionSearchPatterns", value); }
         }
-        #endif //!NO_ASSEMBLY_SCANNING
 
-        #if !NO_LCG
+#if !NO_LCG
         /// <summary>
-        /// Gets a value indicating whether Ninject should use reflection-based injection instead of
+        /// Gets or sets a value indicating whether Ninject should use reflection-based injection instead of
         /// the (usually faster) lightweight code generation system.
         /// </summary>
         public bool UseReflectionBasedInjection
         {
-            get { return Get("UseReflectionBasedInjection", false); }
-            set { Set("UseReflectionBasedInjection", value); }
+            get { return this.Get("UseReflectionBasedInjection", false); }
+            set { this.Set("UseReflectionBasedInjection", value); }
         }
-        #endif //!NO_LCG
+#endif //!NO_LCG
 
-        #if !SILVERLIGHT
         /// <summary>
-        /// Gets a value indicating whether Ninject should inject non public members.
+        /// Gets or sets a value indicating whether Ninject should inject non public members.
         /// </summary>
         public bool InjectNonPublic
         {
-            get { return Get("InjectNonPublic", false); }
-            set { Set("InjectNonPublic", value); }
+            get { return this.Get("InjectNonPublic", false); }
+            set { this.Set("InjectNonPublic", value); }
         }
 
         /// <summary>
-        /// Gets a value indicating whether Ninject should inject private properties of base classes.
+        /// Gets or sets a value indicating whether Ninject should inject private properties of base classes.
         /// </summary>
         /// <remarks>
-        /// Activating this setting has an impact on the performance. It is recomended not
+        /// Activating this setting has an impact on the performance. It is recommended not
         /// to use this feature and use constructor injection instead.
         /// </remarks>
         public bool InjectParentPrivateProperties
@@ -105,7 +112,6 @@ namespace Telerik.JustMock.AutoMock.Ninject
             get { return this.Get("InjectParentPrivateProperties", false); }
             set { this.Set("InjectParentPrivateProperties", value); }
         }
-        #endif //!SILVERLIGHT
 
         /// <summary>
         /// Gets or sets a value indicating whether the activation cache is disabled.
@@ -115,7 +121,7 @@ namespace Telerik.JustMock.AutoMock.Ninject
         /// Bind{IA}().ToMethod(ctx =&gt; kernel.Get{IA}();
         /// </summary>
         /// <value>
-        /// 	<c>true</c> if activation cache is disabled; otherwise, <c>false</c>.
+        /// <c>true</c> if activation cache is disabled; otherwise, <c>false</c>.
         /// </value>
         public bool ActivationCacheDisabled
         {
@@ -128,12 +134,24 @@ namespace Telerik.JustMock.AutoMock.Ninject
         /// By default this is disabled and whenever a provider returns null an exception is thrown.
         /// </summary>
         /// <value>
-        /// 	<c>true</c> if null is allowed as injected value otherwise false.
+        /// <c>true</c> if null is allowed as injected value otherwise false.
         /// </value>
         public bool AllowNullInjection
         {
             get { return this.Get("AllowNullInjection", false); }
             set { this.Set("AllowNullInjection", value); }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the old (&lt;= 3.3.4) behavior of <see cref="IServiceProvider.GetService(Type)"/>
+        /// should be used which throws an exception if the requested service cannot be found. Note that the documentation
+        /// of that method https://docs.microsoft.com/en-us/dotnet/api/system.iserviceprovider.getservice?view=netframework-4.6.2
+        /// states that the method should return <see langword="null"/> if there is no such service.
+        /// </summary>
+        public bool ThrowOnGetServiceNotFound
+        {
+            get { return this.Get("ThrowOnGetServiceNotFound", false); }
+            set { this.Set("ThrowOnGetServiceNotFound", value); }
         }
 
         /// <summary>
@@ -145,8 +163,7 @@ namespace Telerik.JustMock.AutoMock.Ninject
         /// <returns>The value, or the default value if none was found.</returns>
         public T Get<T>(string key, T defaultValue)
         {
-            object value;
-            return _values.TryGetValue(key, out value) ? (T)value : defaultValue;
+            return this.values.TryGetValue(key, out object value) ? (T)value : defaultValue;
         }
 
         /// <summary>
@@ -156,7 +173,7 @@ namespace Telerik.JustMock.AutoMock.Ninject
         /// <param name="value">The setting's value.</param>
         public void Set(string key, object value)
         {
-            _values[key] = value;
+            this.values[key] = value;
         }
     }
 }

@@ -1,12 +1,10 @@
-//-------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // <copyright file="StandardKernel.cs" company="Ninject Project Contributors">
-//   Copyright (c) 2007-2009, Enkari, Ltd.
-//   Copyright (c) 2009-2011 Ninject Project Contributors
-//   Authors: Nate Kohari (nate@enkari.com)
-//            Remo Gloor (remo.gloor@gmail.com)
-//           
+//   Copyright (c) 2007-2010 Enkari, Ltd. All rights reserved.
+//   Copyright (c) 2010-2017 Ninject Project Contributors. All rights reserved.
+//
 //   Dual-licensed under the Apache License, Version 2.0, and the Microsoft Public License (Ms-PL).
-//   you may not use this file except in compliance with one of the Licenses.
+//   You may not use this file except in compliance with one of the Licenses.
 //   You may obtain a copy of the License at
 //
 //       http://www.apache.org/licenses/LICENSE-2.0
@@ -19,7 +17,7 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 // </copyright>
-//-------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 namespace Telerik.JustMock.AutoMock.Ninject
 {
@@ -31,6 +29,7 @@ namespace Telerik.JustMock.AutoMock.Ninject
     using Telerik.JustMock.AutoMock.Ninject.Injection;
     using Telerik.JustMock.AutoMock.Ninject.Modules;
     using Telerik.JustMock.AutoMock.Ninject.Planning;
+    using Telerik.JustMock.AutoMock.Ninject.Planning.Bindings;
     using Telerik.JustMock.AutoMock.Ninject.Planning.Bindings.Resolvers;
     using Telerik.JustMock.AutoMock.Ninject.Planning.Strategies;
     using Telerik.JustMock.AutoMock.Ninject.Selection;
@@ -45,7 +44,8 @@ namespace Telerik.JustMock.AutoMock.Ninject
         /// Initializes a new instance of the <see cref="StandardKernel"/> class.
         /// </summary>
         /// <param name="modules">The modules to load into the kernel.</param>
-        public StandardKernel(params INinjectModule[] modules) : base(modules)
+        public StandardKernel(params INinjectModule[] modules)
+            : base(modules)
         {
         }
 
@@ -54,7 +54,8 @@ namespace Telerik.JustMock.AutoMock.Ninject
         /// </summary>
         /// <param name="settings">The configuration to use.</param>
         /// <param name="modules">The modules to load into the kernel.</param>
-        public StandardKernel(INinjectSettings settings, params INinjectModule[] modules) : base(settings, modules)
+        public StandardKernel(INinjectSettings settings, params INinjectModule[] modules)
+            : base(settings, modules)
         {
         }
 
@@ -84,7 +85,7 @@ namespace Telerik.JustMock.AutoMock.Ninject
                 Components.Add<TComponent, TImplementation>();
             }
         }
-        
+
         /// <summary>
         /// Adds components to the kernel during startup.
         /// </summary>
@@ -100,7 +101,7 @@ namespace Telerik.JustMock.AutoMock.Ninject
             AddComponent<IInjectionHeuristic, StandardInjectionHeuristic>();
 
             AddComponent<IPipeline, Pipeline>();
-            if (!Settings.ActivationCacheDisabled)
+            if (!this.Settings.ActivationCacheDisabled)
             {
                 AddComponent<IActivationStrategy, ActivationCacheStrategy>();
             }
@@ -112,6 +113,8 @@ namespace Telerik.JustMock.AutoMock.Ninject
             AddComponent<IActivationStrategy, BindingActionStrategy>();
             AddComponent<IActivationStrategy, DisposableStrategy>();
 
+            AddComponent<IBindingPrecedenceComparer, BindingPrecedenceComparer>();
+
             AddComponent<IBindingResolver, StandardBindingResolver>();
             AddComponent<IBindingResolver, OpenGenericBindingResolver>();
 
@@ -119,7 +122,7 @@ namespace Telerik.JustMock.AutoMock.Ninject
             AddComponent<IMissingBindingResolver, SelfBindingResolver>();
 
 #if !NO_LCG
-            if (!Settings.UseReflectionBasedInjection)
+            if (!this.Settings.UseReflectionBasedInjection)
             {
                 AddComponent<IInjectorFactory, DynamicMethodInjectorFactory>();
             }
@@ -133,11 +136,9 @@ namespace Telerik.JustMock.AutoMock.Ninject
             AddComponent<IActivationCache, ActivationCache>();
             AddComponent<ICachePruner, GarbageCollectionCachePruner>();
 
-#if !NO_ASSEMBLY_SCANNING
             AddComponent<IModuleLoader, ModuleLoader>();
             AddComponent<IModuleLoaderPlugin, CompiledModuleLoaderPlugin>();
             AddComponent<IAssemblyNameRetriever, AssemblyNameRetriever>();
-#endif
         }
     }
 }
