@@ -26,6 +26,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 	/// <summary>
 	///   Provides proxy objects for classes and interfaces.
 	/// </summary>
+	/// <exclude />
 	[CLSCompliant(true)]
 	internal class ProxyGenerator : IProxyGenerator
 	{

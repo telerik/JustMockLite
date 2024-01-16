@@ -23,6 +23,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
 
+	/// <exclude />
 	internal class MixinData
 	{
 		private readonly Dictionary<Type, int> mixinPositions = new Dictionary<Type, int>();

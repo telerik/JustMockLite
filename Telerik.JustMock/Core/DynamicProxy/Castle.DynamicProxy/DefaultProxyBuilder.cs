@@ -26,6 +26,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 	/// <summary>
 	///   Default implementation of <see cref = "IProxyBuilder" /> interface producing in-memory proxy assemblies.
 	/// </summary>
+	/// <exclude />
 	internal class DefaultProxyBuilder : IProxyBuilder
 	{
 		private readonly ModuleScope scope;
