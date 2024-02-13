@@ -29,6 +29,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 	/// Arrays passed to this class as constructor arguments or property or field values become owned by this class.
 	/// They should not be mutated after creation.
 	/// </remarks>
+	/// <exclude />
 	internal class CustomAttributeInfo : IEquatable<CustomAttributeInfo>
 	{
 		// Cached empty arrays to avoid unnecessary allocations

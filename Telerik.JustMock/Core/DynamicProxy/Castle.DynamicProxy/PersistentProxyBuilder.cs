@@ -22,6 +22,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 	/// <remarks>
 	///   The saved assembly contains just the last generated type.
 	/// </remarks>
+	/// <exclude />
 	internal class PersistentProxyBuilder : DefaultProxyBuilder
 	{
 		/// <summary>

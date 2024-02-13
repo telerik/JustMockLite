@@ -28,6 +28,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Serialization
 	/// <summary>
 	///   Applied to the assemblies saved by <see cref="ModuleScope" /> in order to persist the cache data included in the persisted assembly.
 	/// </summary>
+	/// <exclude />
 	[AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false)]
 	[CLSCompliant(false)]
 	internal class CacheMappingsAttribute : Attribute

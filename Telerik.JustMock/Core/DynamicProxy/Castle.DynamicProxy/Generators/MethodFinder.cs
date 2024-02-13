@@ -23,6 +23,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 	///   Returns the methods implemented by a type. Use this instead of Type.GetMethods() to work around a CLR issue
 	///   where duplicate MethodInfos are returned by Type.GetMethods() after a token of a generic type's method was loaded.
 	/// </summary>
+	/// <exclude />
 	internal class MethodFinder
 	{
 		private static readonly Dictionary<Type, MethodInfo[]> cachedMethodInfosByType = new Dictionary<Type, MethodInfo[]>();
