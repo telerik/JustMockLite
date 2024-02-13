@@ -23,6 +23,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 	///   Wraps a reference that is passed 
 	///   ByRef and provides indirect load/store support.
 	/// </summary>
+	/// <exclude />
 	[DebuggerDisplay("&{OwnerReference}")]
 	internal class IndirectReference : TypeReference
 	{

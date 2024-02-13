@@ -28,6 +28,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Serialization
 	/// <summary>
 	///   Handles the deserialization of proxies.
 	/// </summary>
+	/// <exclude />
 	[Serializable]
 	internal class ProxyObjectReference : IObjectReference, ISerializable, IDeserializationCallback
 	{

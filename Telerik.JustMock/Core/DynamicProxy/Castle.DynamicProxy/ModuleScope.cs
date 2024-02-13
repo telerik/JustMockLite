@@ -30,6 +30,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 	using Telerik.JustMock.Core.Castle.DynamicProxy.Serialization;
 #endif
 
+	/// <exclude />
 	internal class ModuleScope
 	{
 		/// <summary>

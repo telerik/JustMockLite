@@ -33,6 +33,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
 	///     used to create a proxy (or proxy type).
 	///   </para>
 	/// </summary>
+	/// <exclude />
 #if FEATURE_SERIALIZATION
 	[Serializable]
 #endif
