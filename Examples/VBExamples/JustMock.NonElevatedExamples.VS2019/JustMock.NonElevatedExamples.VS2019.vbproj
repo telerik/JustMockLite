@@ -59,7 +59,7 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Telerik.JustMock">
-      <HintPath>..\..\..\..\..\Binaries\$(Configuration)\net45\Telerik.JustMock.dll</HintPath>
+      <HintPath>..\..\..\..\..\Binaries\$(Configuration)\net472\Telerik.JustMock.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
