@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015 Progress Software Corporation
+ Copyright © 2010-2015,2024 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 */
 
 using System;
+using System.Linq;
 using System.Reflection;
 
 namespace Telerik.JustMock.Core.Behaviors
@@ -60,18 +61,39 @@ namespace Telerik.JustMock.Core.Behaviors
 		public static void RaiseEventImpl(object instance, EventInfo evt, object[] args)
 		{
 			if (evt == null)
+			{
 				throw new MockException("Unable to deduce which event was specified in the parameter.");
+			}
 
 			if (args == null)
 			{
 				args = new object[] { null };
 			}
 
-			if (args.Length == 1
-				&& (evt.EventHandlerType.IsGenericType && evt.EventHandlerType.GetGenericTypeDefinition() == typeof(EventHandler<>)
-					|| evt.EventHandlerType == typeof(EventHandler)
-					|| args[0] is EventArgs)
-				)
+			bool shouldInsertEventSender = false;
+
+			if (evt.EventHandlerType.IsGenericType
+				&& evt.EventHandlerType.GetGenericTypeDefinition() == typeof(EventHandler<>))
+			{
+				shouldInsertEventSender = args.Length == 1
+					&& evt.EventHandlerType.GetGenericArguments().Length == 1
+					&& evt.EventHandlerType.GetGenericArguments()[0].IsAssignableFrom(args[0]?.GetType());
+			}
+			else if (evt.EventHandlerType == typeof(EventHandler))
+			{
+				shouldInsertEventSender = args.Length == 1
+					&& (args[0] == null || typeof(EventArgs).IsAssignableFrom(args[0]?.GetType()));
+			}
+			else
+			{
+				var eventHandlerParams = evt.EventHandlerType.GetMethod("Invoke").GetParameters();
+				shouldInsertEventSender = args.Length == 1
+					&& eventHandlerParams.Length == 2
+					&& eventHandlerParams[0].ParameterType == typeof(object)
+					&& eventHandlerParams[1].ParameterType.IsAssignableFrom(args[0]?.GetType());
+			}
+
+			if (shouldInsertEventSender)
 			{
 				args = new[] { instance, args[0] };
 			}
@@ -80,7 +102,9 @@ namespace Telerik.JustMock.Core.Behaviors
 			{
 				var mockMixin = MocksRepository.GetMockMixin(instance, evt.DeclaringType);
 				if (mockMixin != null)
+				{
 					instance = mockMixin;
+				}
 			}
 
 			var mixin = instance as IEventsMixin;
