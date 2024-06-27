@@ -72,6 +72,8 @@ namespace Telerik.JustMock.Core.Behaviors
 
 			bool shouldInsertEventSender = false;
 
+			// check whether the event handler is EventHandler or EventHandler<> compliant and insert
+			// the sender argument automatically if it is not explicitly supplied 
 			if (evt.EventHandlerType.IsGenericType
 				&& evt.EventHandlerType.GetGenericTypeDefinition() == typeof(EventHandler<>))
 			{
@@ -86,6 +88,7 @@ namespace Telerik.JustMock.Core.Behaviors
 			}
 			else
 			{
+				// special case with (Object, T) handler signature, where T is any type
 				var eventHandlerParams = evt.EventHandlerType.GetMethod("Invoke").GetParameters();
 				shouldInsertEventSender = args.Length == 1
 					&& eventHandlerParams.Length == 2
