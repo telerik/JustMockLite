@@ -137,15 +137,16 @@ namespace Telerik.JustMock.Core
 			// "The return Type contains some invalid type(i.e. null, ByRef)". In order to make
 			// it working we are applying the following simple workaround:
 			//   1. Pass a non-ref type to constructor and create dynamic method instance
-			//   2. Using reflection change the value of private field 'm_returnType' of the
-			//      newly created dynamic method to be ByRef type
+			//   2. Using reflection change the value of the private field representing the
+			//      return type of the newly created dynamic method to be ByRef type
 			Type dynamicReturnType = (returnType.IsByRef) ? returnType.GetElementType() : returnType;
 
 			var method = new DynamicMethod("DynamicMethod_" + Guid.NewGuid().ToString("N"), dynamicReturnType, parameterTypes, true);
 
 			if (returnType.IsByRef)
 			{
-				method.GetType().GetField("m_returnType", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+				var returnTypeFieldName = Environment.Version.Major >= 8 ? "_returnType" : "m_returnType";
+				method.GetType().GetField(returnTypeFieldName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)
 					.SetValue(method, returnType);
 			}
 
