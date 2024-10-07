@@ -22,6 +22,7 @@ using Telerik.JustMock.Core;
 using Telerik.JustMock.Helpers;
 using System.Threading.Tasks;
 using System.Security.Policy;
+using Telerik.JustMock.AutoMock;
 
 
 #region JustMock Test Attributes
@@ -60,6 +61,22 @@ namespace Telerik.JustMock.Tests
         Task<object> GenericTaskWithObjectReturnType();
         Task<object> GenericTaskWithObjectReturnTypeAndOneParam(object value);
     }
+
+    public class TaskClient
+    {
+        private ITaskAsync task;
+
+        public TaskClient(ITaskAsync t)
+        {
+            task = t;
+        }
+
+        public async Task<int> TaskUsageWithValue()
+        {
+            return await task.GenericTaskWithValueReturnTypeAndOneParam(10);
+        }
+    }
+
 
 #if NETCORE
     public interface IValueTaskAsync
@@ -158,6 +175,38 @@ namespace Telerik.JustMock.Tests
             Assert.Same(expected, result);
         }
 
+        [TestMethod, TestCategory("Lite"), TestCategory("ReturnsAsync")]
+        public async Task TestTaskAutomockingReturnsAsyncResult()
+        {
+            // Arange
+            var container = new MockingContainer<TaskClient>();
+            var expectedResult = 10;
+
+            container.Arrange<ITaskAsync>(t => t.GenericTaskWithValueReturnTypeAndOneParam(Arg.AnyInt)).ReturnsAsync(expectedResult);
+
+            // Act
+            var actualResult = await container.Instance.TaskUsageWithValue();
+
+            // Assert
+            Assert.Equals(expectedResult, actualResult);
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("ReturnsAsync")]
+        public async Task TestTaskAutomockingAsyncResultWithIntParameter()
+        {
+            // Arange
+            var container = new MockingContainer<TaskClient>();
+            var expectedResult = 10;
+
+            container.Arrange<ITaskAsync, int>(t => t.GenericTaskWithValueReturnTypeAndOneParam(Arg.AnyInt)).ReturnsAsync(expectedResult);
+
+            // Act
+            var actualResult = await container.Instance.TaskUsageWithValue();
+
+            // Assert
+            Assert.Equals(expectedResult, actualResult);
+        }
+
 #if NETCORE
         [TestMethod, TestCategory("Lite"), TestCategory("ReturnsAsync")]
         public async Task ShouldReturnAsyncValueForGenericValueTaskWithinAsyncTest()
@@ -227,6 +276,22 @@ namespace Telerik.JustMock.Tests
             var result = await mock.GenericTaskWithObjectReturnTypeAndOneParam(20);
 
             Assert.Same(expected, result);
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("ReturnsAsync")]
+        public async Task TestValueTaskAutomockingAsyncResultWithIntParameter()
+        {
+            // Arange
+            var container = new MockingContainer<TaskClient>();
+            var expectedResult = 10;
+
+            container.Arrange<IValueTaskAsync, int>(t => t.GenericTaskWithValueReturnTypeAndOneParam(Arg.AnyInt)).ReturnsAsync(expectedResult);
+
+            // Act
+            var actualResult = await container.Instance.TaskUsageWithValue();
+
+            // Assert
+            Assert.Equals(expectedResult, actualResult);
         }
 #endif
     }
