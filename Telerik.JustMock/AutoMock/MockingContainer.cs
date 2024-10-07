@@ -19,6 +19,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
 using Telerik.JustMock.AutoMock.Ninject;
 using Telerik.JustMock.AutoMock.Ninject.Planning.Bindings.Resolvers;
 using Telerik.JustMock.AutoMock.Ninject.Syntax;
@@ -183,32 +184,75 @@ namespace Telerik.JustMock.AutoMock
 			return ProfilerInterceptor.GuardInternal(() => this.Get<TInterface>().Arrange(expression));
 		}
 
-		/// <summary>
+        /// <summary>
+        /// Entry-point for setting expectations.
+        /// </summary>
+        /// <typeparam name="TInterface">Mocking interface</typeparam>
+        /// <param name="expression">Target expression</param>
+        /// <returns>
+        /// Reference to <see cref="FuncExpectation<Task>"/> to setup the mock.
+        /// </returns>
+        public FuncExpectation<Task> Arrange<TInterface>(Expression<Func<TInterface, Task>> expression)
+        {
+            return ProfilerInterceptor.GuardInternal(() => this.Get<TInterface>().Arrange(expression));
+        }
+
+        /// <summary>
 		/// Entry-point for setting expectations.
 		/// </summary>
-		/// <typeparam name="TInterface">
-		/// Mocking interface
-		/// </typeparam>
+		/// <typeparam name="TInterface">Mocking interface</typeparam>
+		/// <typeparam name="TResult">Task result type</typeparam>
 		/// <param name="expression">Target expression</param>
 		/// <returns>
-		/// Reference to <see cref="ActionExpectation"/> to setup the mock.
+		/// Reference to <see cref="FuncExpectation<Task<TResult>>"/> to setup the mock.
 		/// </returns>
-		public ActionExpectation Arrange<TInterface>(Expression<Action<TInterface>> expression)
+        public FuncExpectation<Task<TResult>> Arrange<TInterface, TResult>(Expression<Func<TInterface, Task<TResult>>> expression)
+        {
+            return ProfilerInterceptor.GuardInternal(() => this.Get<TInterface>().Arrange(expression));
+        }
+
+#if NETCORE
+        /// <summary>
+        /// Entry-point for setting expectations.
+        /// </summary>
+        /// <typeparam name="TInterface">Mocking interface</typeparam>
+        /// <typeparam name="TResult">Task result type</typeparam>
+        /// <param name="expression">Target expression</param>
+        /// <returns>
+        /// Reference to <see cref="FuncExpectation<ValueTask<TResult>>"/> to setup the mock.
+        /// </returns>
+        public FuncExpectation<ValueTask<TResult>> Arrange<TInterface, TResult>(Expression<Func<TInterface, ValueTask<TResult>>> expression)
+        {
+            return ProfilerInterceptor.GuardInternal(() => this.Get<TInterface>().Arrange(expression));
+        }
+#endif
+
+        /// <summary>
+        /// Entry-point for setting expectations.
+        /// </summary>
+        /// <typeparam name="TInterface">
+        /// Mocking interface
+        /// </typeparam>
+        /// <param name="expression">Target expression</param>
+        /// <returns>
+        /// Reference to <see cref="ActionExpectation"/> to setup the mock.
+        /// </returns>
+        public ActionExpectation Arrange<TInterface>(Expression<Action<TInterface>> expression)
 		{
 			return ProfilerInterceptor.GuardInternal(() => this.Get<TInterface>().Arrange(expression));
 		}
 
-		/// <summary>
-		/// Entry-point for setting expectations.
-		/// </summary>
-		/// <typeparam name="TInterface">
-		/// Mocking interface
-		/// </typeparam>
-		/// <param name="action">Target action</param>
-		/// <returns>
-		/// Reference to <see cref="ActionExpectation"/> to setup the mock.
-		/// </returns>
-		public ActionExpectation ArrangeSet<TInterface>(Action<TInterface> action)
+        /// <summary>
+        /// Entry-point for setting expectations.
+        /// </summary>
+        /// <typeparam name="TInterface">
+        /// Mocking interface
+        /// </typeparam>
+        /// <param name="action">Target action</param>
+        /// <returns>
+        /// Reference to <see cref="ActionExpectation"/> to setup the mock.
+        /// </returns>
+        public ActionExpectation ArrangeSet<TInterface>(Action<TInterface> action)
 		{
 			return ProfilerInterceptor.GuardInternal(() => this.Get<TInterface>().ArrangeSet(action));
 		}
