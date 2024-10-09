@@ -14,10 +14,10 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST
 {
-	using System.Reflection.Emit;
+    using System.Reflection.Emit;
 
-	internal interface IExpressionOrStatement
-	{
-		void Emit(ILGenerator gen);
-	}
+    internal interface IExpressionOrStatement
+    {
+        void Emit(ILGenerator gen);
+    }
 }

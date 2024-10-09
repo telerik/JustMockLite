@@ -20,18 +20,18 @@ using System.Linq;
 
 namespace Telerik.JustMock
 {
-	///<summary>
-	/// Defines the kind of range value to consider.
-	///</summary>
-	public enum RangeKind
-	{
-		/// <summary>
-		/// Does not consider first and last value.
-		/// </summary>
-		Exclusive,
-		/// <summary>
-		/// Considers the First and last value.
-		/// </summary>  
-		Inclusive
-	}
+    ///<summary>
+    /// Defines the kind of range value to consider.
+    ///</summary>
+    public enum RangeKind
+    {
+        /// <summary>
+        /// Does not consider first and last value.
+        /// </summary>
+        Exclusive,
+        /// <summary>
+        /// Considers the First and last value.
+        /// </summary>  
+        Inclusive
+    }
 }

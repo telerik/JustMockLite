@@ -26,197 +26,197 @@ using Debug = System.Diagnostics.Debug;
 
 namespace Telerik.JustMock.Core
 {
-	internal class RepositorySharedContext
-	{
-		private volatile int nextArrangeId = 0;
+    internal class RepositorySharedContext
+    {
+        private volatile int nextArrangeId = 0;
 
-		private readonly ThreadLocalProperty<IRecorder> recorder = new ThreadLocalProperty<IRecorder>();
-		private readonly ThreadLocalProperty<object> inArrange = new ThreadLocalProperty<object>();
-		private readonly ThreadLocalProperty<object> inArrangeArgMatching = new ThreadLocalProperty<object>();
-		private readonly ThreadLocalProperty<object> dispatchToMethodMocks = new ThreadLocalProperty<object>();
-		private readonly ThreadLocalProperty<object> inAssertSet = new ThreadLocalProperty<object>();
-		private readonly ThreadLocalProperty<object> runClassConstructorCount = new ThreadLocalProperty<object>();
+        private readonly ThreadLocalProperty<IRecorder> recorder = new ThreadLocalProperty<IRecorder>();
+        private readonly ThreadLocalProperty<object> inArrange = new ThreadLocalProperty<object>();
+        private readonly ThreadLocalProperty<object> inArrangeArgMatching = new ThreadLocalProperty<object>();
+        private readonly ThreadLocalProperty<object> dispatchToMethodMocks = new ThreadLocalProperty<object>();
+        private readonly ThreadLocalProperty<object> inAssertSet = new ThreadLocalProperty<object>();
+        private readonly ThreadLocalProperty<object> runClassConstructorCount = new ThreadLocalProperty<object>();
 
-		public IRecorder Recorder
-		{
-			get { return this.recorder.Get(); }
-			private set { this.recorder.Set(value); }
-		}
+        public IRecorder Recorder
+        {
+            get { return this.recorder.Get(); }
+            private set { this.recorder.Set(value); }
+        }
 
-		public bool InArrange
-		{
-			get { return this.inArrange.Get() != null; }
-			private set { this.inArrange.Set(value ? (object)value : null); }
-		}
+        public bool InArrange
+        {
+            get { return this.inArrange.Get() != null; }
+            private set { this.inArrange.Set(value ? (object)value : null); }
+        }
 
-		public bool InArrangeArgMatching
-		{
-			get { return this.inArrangeArgMatching.Get() != null; }
-			private set { this.inArrangeArgMatching.Set(value ? (object)value : null); }
-		}
+        public bool InArrangeArgMatching
+        {
+            get { return this.inArrangeArgMatching.Get() != null; }
+            private set { this.inArrangeArgMatching.Set(value ? (object)value : null); }
+        }
 
-		public bool InAssertSet
-		{
-			get { return this.inAssertSet.Get() != null; }
-			private set { this.inAssertSet.Set(value ? (object)value : null); }
-		}
+        public bool InAssertSet
+        {
+            get { return this.inAssertSet.Get() != null; }
+            private set { this.inAssertSet.Set(value ? (object)value : null); }
+        }
 
-		public int RunClassConstructorCount
-		{
-			get
-			{
-				var value = this.runClassConstructorCount.Get();
-				if (value == null)
-				{
-					value = 0;
-					this.runClassConstructorCount.Set(value);
-				}
-				return (int)value;
-			}
-			private set { this.runClassConstructorCount.Set(value); }
-		}
+        public int RunClassConstructorCount
+        {
+            get
+            {
+                var value = this.runClassConstructorCount.Get();
+                if (value == null)
+                {
+                    value = 0;
+                    this.runClassConstructorCount.Set(value);
+                }
+                return (int)value;
+            }
+            private set { this.runClassConstructorCount.Set(value); }
+        }
 
-		public bool DispatchToMethodMocks
-		{
-			get { return this.dispatchToMethodMocks.Get() != null; }
-			private set { this.dispatchToMethodMocks.Set(value ? (object)value : null); }
-		}
+        public bool DispatchToMethodMocks
+        {
+            get { return this.dispatchToMethodMocks.Get() != null; }
+            private set { this.dispatchToMethodMocks.Set(value ? (object)value : null); }
+        }
 
-		public IDisposable StartRecording(IRecorder recorder, bool dispatchToMethodMocks)
-		{
-			Monitor.Enter(this);
-			this.Recorder = recorder;
-			this.DispatchToMethodMocks = dispatchToMethodMocks;
-			return new InRecordingContext(this);
-		}
+        public IDisposable StartRecording(IRecorder recorder, bool dispatchToMethodMocks)
+        {
+            Monitor.Enter(this);
+            this.Recorder = recorder;
+            this.DispatchToMethodMocks = dispatchToMethodMocks;
+            return new InRecordingContext(this);
+        }
 
-		public IDisposable StartArrange()
-		{
-			Monitor.Enter(this);
-			return new InArrangeContext(this);
-		}
+        public IDisposable StartArrange()
+        {
+            Monitor.Enter(this);
+            return new InArrangeContext(this);
+        }
 
-		public IDisposable StartArrangeArgMatching()
-		{
-			Monitor.Enter(this);
-			return new InArrangeArgMatchingContext(this);
-		}
+        public IDisposable StartArrangeArgMatching()
+        {
+            Monitor.Enter(this);
+            return new InArrangeArgMatchingContext(this);
+        }
 
-		public IDisposable StartAssertSet()
-		{
-			Monitor.Enter(this);
-			return new InAssertSetContext(this);
-		}
+        public IDisposable StartAssertSet()
+        {
+            Monitor.Enter(this);
+            return new InAssertSetContext(this);
+        }
 
-		public IDisposable StartRunClassConstructor()
-		{
-			Monitor.Enter(this);
-			return new InRunClassConstructorContext(this);
-		}
+        public IDisposable StartRunClassConstructor()
+        {
+            Monitor.Enter(this);
+            return new InRunClassConstructorContext(this);
+        }
 
-		public int GetNextArrangeId()
-		{
-			lock (this)
-				return nextArrangeId++;
-		}
+        public int GetNextArrangeId()
+        {
+            lock (this)
+                return nextArrangeId++;
+        }
 
-		abstract private class ContextSession : IDisposable
-		{
-			private readonly RepositorySharedContext context;
+        abstract private class ContextSession : IDisposable
+        {
+            private readonly RepositorySharedContext context;
 
-			public RepositorySharedContext Context { get { return context; } }
+            public RepositorySharedContext Context { get { return context; } }
 
-			public ContextSession(RepositorySharedContext context)
-			{
-				this.context = context;
-			}
+            public ContextSession(RepositorySharedContext context)
+            {
+                this.context = context;
+            }
 
-			public abstract void Dispose();
-		}
+            public abstract void Dispose();
+        }
 
-		private class InRecordingContext : ContextSession
-		{
-			private readonly int oldCounter;
+        private class InRecordingContext : ContextSession
+        {
+            private readonly int oldCounter;
 
-			public InRecordingContext(RepositorySharedContext context)
-				: base(context)
-			{
-				this.oldCounter = ProfilerInterceptor.ReentrancyCounter;
+            public InRecordingContext(RepositorySharedContext context)
+                : base(context)
+            {
+                this.oldCounter = ProfilerInterceptor.ReentrancyCounter;
 
-				ProfilerInterceptor.ReentrancyCounter = 0;
-			}
+                ProfilerInterceptor.ReentrancyCounter = 0;
+            }
 
-			public override void Dispose()
-			{
-				ProfilerInterceptor.ReentrancyCounter = this.oldCounter;
+            public override void Dispose()
+            {
+                ProfilerInterceptor.ReentrancyCounter = this.oldCounter;
 
-				this.Context.Recorder = null;
-				Monitor.Exit(this.Context);
-			}
-		}
+                this.Context.Recorder = null;
+                Monitor.Exit(this.Context);
+            }
+        }
 
-		private class InArrangeContext : ContextSession
-		{
-			public InArrangeContext(RepositorySharedContext context)
-				: base(context)
-			{
-				Debug.Assert(!this.Context.InArrange);
-				context.InArrange = true;
-			}
+        private class InArrangeContext : ContextSession
+        {
+            public InArrangeContext(RepositorySharedContext context)
+                : base(context)
+            {
+                Debug.Assert(!this.Context.InArrange);
+                context.InArrange = true;
+            }
 
-			public override void Dispose()
-			{
-				this.Context.InArrange = false;
-				Monitor.Exit(this.Context);
-			}
-		}
+            public override void Dispose()
+            {
+                this.Context.InArrange = false;
+                Monitor.Exit(this.Context);
+            }
+        }
 
-		private class InArrangeArgMatchingContext : ContextSession
-		{
-			public InArrangeArgMatchingContext(RepositorySharedContext context)
-				: base(context)
-			{
-				Debug.Assert(!this.Context.InArrangeArgMatching);
-				context.InArrangeArgMatching = true;
-			}
+        private class InArrangeArgMatchingContext : ContextSession
+        {
+            public InArrangeArgMatchingContext(RepositorySharedContext context)
+                : base(context)
+            {
+                Debug.Assert(!this.Context.InArrangeArgMatching);
+                context.InArrangeArgMatching = true;
+            }
 
-			public override void Dispose()
-			{
-				this.Context.InArrangeArgMatching = false;
-				Monitor.Exit(this.Context);
-			}
-		}
+            public override void Dispose()
+            {
+                this.Context.InArrangeArgMatching = false;
+                Monitor.Exit(this.Context);
+            }
+        }
 
-		private class InAssertSetContext : ContextSession
-		{
-			public InAssertSetContext(RepositorySharedContext context)
-				: base(context)
-			{
-				Debug.Assert(!this.Context.InAssertSet);
-				context.InAssertSet = true;
-			}
+        private class InAssertSetContext : ContextSession
+        {
+            public InAssertSetContext(RepositorySharedContext context)
+                : base(context)
+            {
+                Debug.Assert(!this.Context.InAssertSet);
+                context.InAssertSet = true;
+            }
 
-			public override void Dispose()
-			{
-				this.Context.InAssertSet = false;
-				Monitor.Exit(this.Context);
-			}
-		}
+            public override void Dispose()
+            {
+                this.Context.InAssertSet = false;
+                Monitor.Exit(this.Context);
+            }
+        }
 
-		private class InRunClassConstructorContext : ContextSession
-		{
-			public InRunClassConstructorContext(RepositorySharedContext context)
-				: base(context)
-			{
-				context.RunClassConstructorCount++;
-			}
+        private class InRunClassConstructorContext : ContextSession
+        {
+            public InRunClassConstructorContext(RepositorySharedContext context)
+                : base(context)
+            {
+                context.RunClassConstructorCount++;
+            }
 
-			public override void Dispose()
-			{
-				Debug.Assert(this.Context.RunClassConstructorCount >= 1);
-				this.Context.RunClassConstructorCount--;
-				Monitor.Exit(this.Context);
-			}
-		}
-	}
+            public override void Dispose()
+            {
+                Debug.Assert(this.Context.RunClassConstructorCount >= 1);
+                this.Context.RunClassConstructorCount--;
+                Monitor.Exit(this.Context);
+            }
+        }
+    }
 }

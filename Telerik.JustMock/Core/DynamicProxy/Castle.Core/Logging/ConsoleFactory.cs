@@ -14,46 +14,46 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Logging
 {
-	using System;
+    using System;
 
 #if FEATURE_SERIALIZATION
-	[Serializable]
+    [Serializable]
 #endif
     internal class ConsoleFactory : ILoggerFactory
-	{
-		private LoggerLevel? level;
+    {
+        private LoggerLevel? level;
 
-		public ConsoleFactory()
-		{
-		}
+        public ConsoleFactory()
+        {
+        }
 
-		public ConsoleFactory(LoggerLevel level)
-		{
-			this.level = level;
-		}
+        public ConsoleFactory(LoggerLevel level)
+        {
+            this.level = level;
+        }
 
-		public ILogger Create(Type type)
-		{
-			return Create(type.FullName);
-		}
+        public ILogger Create(Type type)
+        {
+            return Create(type.FullName);
+        }
 
-		public ILogger Create(string name)
-		{
-			if (level.HasValue)
-			{
-				return Create(name, level.Value);
-			}
-			return new ConsoleLogger(name);
-		}
+        public ILogger Create(string name)
+        {
+            if (level.HasValue)
+            {
+                return Create(name, level.Value);
+            }
+            return new ConsoleLogger(name);
+        }
 
-		public ILogger Create(Type type, LoggerLevel level)
-		{
-			return new ConsoleLogger(type.Name, level);
-		}
+        public ILogger Create(Type type, LoggerLevel level)
+        {
+            return new ConsoleLogger(type.Name, level);
+        }
 
-		public ILogger Create(string name, LoggerLevel level)
-		{
-			return new ConsoleLogger(name, level);
-		}
-	}
+        public ILogger Create(string name, LoggerLevel level)
+        {
+            return new ConsoleLogger(name, level);
+        }
+    }
 }

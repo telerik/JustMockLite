@@ -14,89 +14,89 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
-	using System;
-	using System.Globalization;
-	using System.IO;
+    using System;
+    using System.Globalization;
+    using System.IO;
 
-	/// <summary>
-	/// Enable access to files on network shares
-	/// </summary>
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Unc")]
-	internal class UncResource : AbstractStreamResource
-	{
-		private string basePath;
-		private string filePath;
+    /// <summary>
+    /// Enable access to files on network shares
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Unc")]
+    internal class UncResource : AbstractStreamResource
+    {
+        private string basePath;
+        private string filePath;
 
-		public UncResource(CustomUri resource)
-		{
-			CreateStream = delegate
-			{
-				return CreateStreamFromUri(resource, DefaultBasePath);
-			};
-		}
+        public UncResource(CustomUri resource)
+        {
+            CreateStream = delegate
+            {
+                return CreateStreamFromUri(resource, DefaultBasePath);
+            };
+        }
 
-		public UncResource(CustomUri resource, string basePath)
-		{
-			CreateStream = delegate
-			{
-				return CreateStreamFromUri(resource, basePath);
-			};
-		}
+        public UncResource(CustomUri resource, string basePath)
+        {
+            CreateStream = delegate
+            {
+                return CreateStreamFromUri(resource, basePath);
+            };
+        }
 
-		public UncResource(string resourceName) : this(new CustomUri(resourceName))
-		{
-		}
+        public UncResource(string resourceName) : this(new CustomUri(resourceName))
+        {
+        }
 
-		public UncResource(string resourceName, string basePath) : this(new CustomUri(resourceName), basePath)
-		{
-		}
+        public UncResource(string resourceName, string basePath) : this(new CustomUri(resourceName), basePath)
+        {
+        }
 
-		public override string FileBasePath
-		{
-			get { return basePath; }
-		}
+        public override string FileBasePath
+        {
+            get { return basePath; }
+        }
 
-		public override IResource CreateRelative(string relativePath)
-		{
-			return new UncResource(Path.Combine(basePath, relativePath));
-		}
+        public override IResource CreateRelative(string relativePath)
+        {
+            return new UncResource(Path.Combine(basePath, relativePath));
+        }
 
-		public override string ToString()
-		{
-			return string.Format(CultureInfo.CurrentCulture, "UncResource: [{0}] [{1}]", filePath, basePath);
-		}
+        public override string ToString()
+        {
+            return string.Format(CultureInfo.CurrentCulture, "UncResource: [{0}] [{1}]", filePath, basePath);
+        }
 
-		private Stream CreateStreamFromUri(CustomUri resource, string rootPath)
-		{
-			if (resource == null)
-				throw new ArgumentNullException(nameof(resource));
-			if (!resource.IsUnc)
-				throw new ArgumentException("Resource must be an Unc", nameof(resource));
-			if (!resource.IsFile)
-				throw new ArgumentException("The specified resource is not a file", nameof(resource));
+        private Stream CreateStreamFromUri(CustomUri resource, string rootPath)
+        {
+            if (resource == null)
+                throw new ArgumentNullException(nameof(resource));
+            if (!resource.IsUnc)
+                throw new ArgumentException("Resource must be an Unc", nameof(resource));
+            if (!resource.IsFile)
+                throw new ArgumentException("The specified resource is not a file", nameof(resource));
 
-			string resourcePath = resource.Path;
+            string resourcePath = resource.Path;
 
-			if (!File.Exists(resourcePath) && rootPath != null)
-			{
-				resourcePath = Path.Combine(rootPath, resourcePath);
-			}
+            if (!File.Exists(resourcePath) && rootPath != null)
+            {
+                resourcePath = Path.Combine(rootPath, resourcePath);
+            }
 
-			filePath = Path.GetFileName(resourcePath);
-			basePath = Path.GetDirectoryName(resourcePath);
+            filePath = Path.GetFileName(resourcePath);
+            basePath = Path.GetDirectoryName(resourcePath);
 
-			CheckFileExists(resourcePath);
+            CheckFileExists(resourcePath);
 
-			return File.OpenRead(resourcePath);
-		}
+            return File.OpenRead(resourcePath);
+        }
 
-		private static void CheckFileExists(string path)
-		{
-			if (!File.Exists(path))
-			{
-				string message = string.Format(CultureInfo.InvariantCulture, "File {0} could not be found", path);
-				throw new ResourceException(message);
-			}
-		}
-	}
+        private static void CheckFileExists(string path)
+        {
+            if (!File.Exists(path))
+            {
+                string message = string.Format(CultureInfo.InvariantCulture, "File {0} could not be found", path);
+                throw new ResourceException(message);
+            }
+        }
+    }
 }

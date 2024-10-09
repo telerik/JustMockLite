@@ -22,14 +22,14 @@ using System.Text;
 
 namespace Telerik.JustMock.Expectations.Abstraction
 {
-	/// <summary>
-	/// Defines the order for mock setups.
-	/// </summary>
-	public interface IOrder
-	{
-		/// <summary>
-		/// Specifies a call should occur in a specific order.
-		/// </summary>
-		IOccurrence InOrder(string message = null);
-	}
+    /// <summary>
+    /// Defines the order for mock setups.
+    /// </summary>
+    public interface IOrder
+    {
+        /// <summary>
+        /// Specifies a call should occur in a specific order.
+        /// </summary>
+        IOccurrence InOrder(string message = null);
+    }
 }

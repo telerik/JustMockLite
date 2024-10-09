@@ -21,16 +21,16 @@ using ModelContent = Telerik.Sitefinity.GenericContent.Model.Content;
 
 namespace Telerik.Sitefinity.Fluent.AnyContent.Implementation
 {
-	public class AnyContentManager : IAnyContentManager
-	{
-		public ModelContent Unpublish(ModelContent item, CultureInfo culture)
-		{
-			var hasTracking = item as IHasTrackingContext;
-			if (hasTracking != null)
-			{
-				hasTracking.RegisterOperation(OperationStatus.Unpublished, null);
-			}
-			return null;
-		}
-	}
+    public class AnyContentManager : IAnyContentManager
+    {
+        public ModelContent Unpublish(ModelContent item, CultureInfo culture)
+        {
+            var hasTracking = item as IHasTrackingContext;
+            if (hasTracking != null)
+            {
+                hasTracking.RegisterOperation(OperationStatus.Unpublished, null);
+            }
+            return null;
+        }
+    }
 }

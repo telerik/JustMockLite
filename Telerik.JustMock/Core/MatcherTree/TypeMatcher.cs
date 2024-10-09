@@ -21,50 +21,50 @@ using System.Linq.Expressions;
 
 namespace Telerik.JustMock.Core.MatcherTree
 {
-	internal class TypeMatcher : CategoricalMatcherBase, ITypedMatcher
-	{
-		public Type Type { get; private set; }
+    internal class TypeMatcher : CategoricalMatcherBase, ITypedMatcher
+    {
+        public Type Type { get; private set; }
 
-		public override string DebugView
-		{
-			get { return String.Format("IsAny<{0}>", Type.GetShortCSharpName()); }
-		}
-		
-		public TypeMatcher(Type type)
-		{
-			this.Type = type;
-		}
+        public override string DebugView
+        {
+            get { return String.Format("IsAny<{0}>", Type.GetShortCSharpName()); }
+        }
 
-		public override bool CanMatch(IMatcher matcher)
-		{
-			return matcher is ITypedMatcher;
-		}
+        public TypeMatcher(Type type)
+        {
+            this.Type = type;
+        }
 
-		public override bool Equals(IMatcher other)
-		{
-			var typeMatcher = other as TypeMatcher;
-			if (typeMatcher == null)
-				return false;
+        public override bool CanMatch(IMatcher matcher)
+        {
+            return matcher is ITypedMatcher;
+        }
 
-			return typeMatcher.Type == this.Type;
-		}
+        public override bool Equals(IMatcher other)
+        {
+            var typeMatcher = other as TypeMatcher;
+            if (typeMatcher == null)
+                return false;
 
-		protected override bool MatchesCore(IMatcher other)
-		{
-			var typed = other as ITypedMatcher;
-			return (typed.Type == null && (!this.Type.IsValueType || Nullable.GetUnderlyingType(this.Type) != null))
-				|| (typed.Type != null && this.Type.IsAssignableFrom(typed.Type));
-		}
+            return typeMatcher.Type == this.Type;
+        }
 
-		public override Expression ToExpression(Type argumentType)
-		{
-			return Expression.Call(null, typeof(TypeMatcher).GetMethod("Create").MakeGenericMethod(this.Type));
-		}
+        protected override bool MatchesCore(IMatcher other)
+        {
+            var typed = other as ITypedMatcher;
+            return (typed.Type == null && (!this.Type.IsValueType || Nullable.GetUnderlyingType(this.Type) != null))
+                || (typed.Type != null && this.Type.IsAssignableFrom(typed.Type));
+        }
 
-		[ArgIgnore]
-		public static T Create<T>()
-		{
-			throw new NotSupportedException();
-		}
-	}
+        public override Expression ToExpression(Type argumentType)
+        {
+            return Expression.Call(null, typeof(TypeMatcher).GetMethod("Create").MakeGenericMethod(this.Type));
+        }
+
+        [ArgIgnore]
+        public static T Create<T>()
+        {
+            throw new NotSupportedException();
+        }
+    }
 }

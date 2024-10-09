@@ -14,30 +14,30 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST
 {
-	using System.Diagnostics;
-	using System.Reflection;
-	using System.Reflection.Emit;
+    using System.Diagnostics;
+    using System.Reflection;
+    using System.Reflection.Emit;
 
-	using Castle.DynamicProxy.Tokens;
+    using Castle.DynamicProxy.Tokens;
 
-	internal class MethodTokenExpression : IExpression
-	{
-		private readonly MethodInfo method;
+    internal class MethodTokenExpression : IExpression
+    {
+        private readonly MethodInfo method;
 
-		public MethodTokenExpression(MethodInfo method)
-		{
-			this.method = method;
-			Debug.Assert(method.DeclaringType != null);  // DynamicProxy isn't using global methods nor `DynamicMethod`
-		}
+        public MethodTokenExpression(MethodInfo method)
+        {
+            this.method = method;
+            Debug.Assert(method.DeclaringType != null);  // DynamicProxy isn't using global methods nor `DynamicMethod`
+        }
 
-		public void Emit(ILGenerator gen)
-		{
-			gen.Emit(OpCodes.Ldtoken, method);
-			gen.Emit(OpCodes.Ldtoken, method.DeclaringType);
+        public void Emit(ILGenerator gen)
+        {
+            gen.Emit(OpCodes.Ldtoken, method);
+            gen.Emit(OpCodes.Ldtoken, method.DeclaringType);
 
-			var minfo = MethodBaseMethods.GetMethodFromHandle;
-			gen.Emit(OpCodes.Call, minfo);
-			gen.Emit(OpCodes.Castclass, typeof(MethodInfo));
-		}
-	}
+            var minfo = MethodBaseMethods.GetMethodFromHandle;
+            gen.Emit(OpCodes.Call, minfo);
+            gen.Emit(OpCodes.Castclass, typeof(MethodInfo));
+        }
+    }
 }

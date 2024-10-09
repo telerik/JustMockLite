@@ -14,48 +14,48 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 {
-	using System;
-	using System.ComponentModel;
-	using System.Diagnostics;
-	using System.Reflection;
+    using System;
+    using System.ComponentModel;
+    using System.Diagnostics;
+    using System.Reflection;
 
 #if FEATURE_SERIALIZATION
-	[Serializable]
+    [Serializable]
 #endif
-	[EditorBrowsable(EditorBrowsableState.Never)]
-	public sealed class InterfaceMethodWithoutTargetInvocation : AbstractInvocation
-	{
-		public InterfaceMethodWithoutTargetInvocation(object target, object proxy, IInterceptor[] interceptors, MethodInfo proxiedMethod, object[] arguments)
-			: base(proxy, interceptors, proxiedMethod, arguments)
-		{
-			// This invocation type is suitable for interface method invocations that cannot proceed
-			// to a target, i.e. where `InvokeMethodOnTarget` will always throw:
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public sealed class InterfaceMethodWithoutTargetInvocation : AbstractInvocation
+    {
+        public InterfaceMethodWithoutTargetInvocation(object target, object proxy, IInterceptor[] interceptors, MethodInfo proxiedMethod, object[] arguments)
+            : base(proxy, interceptors, proxiedMethod, arguments)
+        {
+            // This invocation type is suitable for interface method invocations that cannot proceed
+            // to a target, i.e. where `InvokeMethodOnTarget` will always throw:
 
-			Debug.Assert(target == null, $"{nameof(InterfaceMethodWithoutTargetInvocation)} does not support targets.");
-			Debug.Assert(proxiedMethod.IsAbstract, $"{nameof(InterfaceMethodWithoutTargetInvocation)} does not support non-abstract methods.");
+            Debug.Assert(target == null, $"{nameof(InterfaceMethodWithoutTargetInvocation)} does not support targets.");
+            Debug.Assert(proxiedMethod.IsAbstract, $"{nameof(InterfaceMethodWithoutTargetInvocation)} does not support non-abstract methods.");
 
-			// Why this restriction? Because it greatly benefits proxy type generation performance.
-			//
-			// For invocations that can proceed to a target, `InvokeMethodOnTarget`'s implementation
-			// depends on the target method's signature. Because of this, DynamicProxy needs to
-			// dynamically generate a separate invocation type per such method. Type generation is
-			// always expensive... that is, slow.
-			//
-			// However, if it is known that `InvokeMethodOnTarget` won't forward, but throw,
-			// no custom (dynamically generated) invocation type is needed at all, and we can use
-			// this unspecific invocation type instead.
-		}
+            // Why this restriction? Because it greatly benefits proxy type generation performance.
+            //
+            // For invocations that can proceed to a target, `InvokeMethodOnTarget`'s implementation
+            // depends on the target method's signature. Because of this, DynamicProxy needs to
+            // dynamically generate a separate invocation type per such method. Type generation is
+            // always expensive... that is, slow.
+            //
+            // However, if it is known that `InvokeMethodOnTarget` won't forward, but throw,
+            // no custom (dynamically generated) invocation type is needed at all, and we can use
+            // this unspecific invocation type instead.
+        }
 
-		// The next three properties mimick the behavior seen with an interface proxy without target.
-		// (This is why this type's name starts with `Interface`.) A similar type could be written
-		// for class proxies without target, but the values returned here would be different.
+        // The next three properties mimick the behavior seen with an interface proxy without target.
+        // (This is why this type's name starts with `Interface`.) A similar type could be written
+        // for class proxies without target, but the values returned here would be different.
 
-		public override object InvocationTarget => null;
+        public override object InvocationTarget => null;
 
-		public override MethodInfo MethodInvocationTarget => null;
+        public override MethodInfo MethodInvocationTarget => null;
 
-		public override Type TargetType => null;
+        public override Type TargetType => null;
 
-		protected override void InvokeMethodOnTarget() => ThrowOnNoTarget();
-	}
+        protected override void InvokeMethodOnTarget() => ThrowOnNoTarget();
+    }
 }

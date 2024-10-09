@@ -22,111 +22,111 @@ using Telerik.JustMock.Core.Behaviors;
 
 namespace Telerik.JustMock.Core
 {
-	/// <summary>
-	/// An implementation detail interface. Not intended for external usage.
-	/// </summary>
-	[Mixin]
-	public interface IMockMixin
-	{
-		/// <summary>
-		/// The repository that created this mock, or the repository that
-		/// made the last arrangement for this mock, if this mock has been used
-		/// in different contexts.
-		/// </summary>
-		MocksRepository Repository { get; set; }
+    /// <summary>
+    /// An implementation detail interface. Not intended for external usage.
+    /// </summary>
+    [Mixin]
+    public interface IMockMixin
+    {
+        /// <summary>
+        /// The repository that created this mock, or the repository that
+        /// made the last arrangement for this mock, if this mock has been used
+        /// in different contexts.
+        /// </summary>
+        MocksRepository Repository { get; set; }
 
-		/// <summary>
-		/// The repository that first created this mock mixin.
-		/// </summary>
-		MocksRepository Originator { get; }
+        /// <summary>
+        /// The repository that first created this mock mixin.
+        /// </summary>
+        MocksRepository Originator { get; }
 
-		/// <summary>
-		/// A collection of mocks that are dependent on this one. Dependent mocks
-		/// are recursively asserted. Dependent mocks are added for example by arranging a call
-		/// on this mock to return another mock.
-		/// </summary>
-		IList<object> DependentMocks { get; }
+        /// <summary>
+        /// A collection of mocks that are dependent on this one. Dependent mocks
+        /// are recursively asserted. Dependent mocks are added for example by arranging a call
+        /// on this mock to return another mock.
+        /// </summary>
+        IList<object> DependentMocks { get; }
 
-		/// <summary>
-		/// Behaviors that are processed after the behaviors for any method mock are processed.
-		/// </summary>
-		IList<IBehavior> SupplementaryBehaviors { get; }
+        /// <summary>
+        /// Behaviors that are processed after the behaviors for any method mock are processed.
+        /// </summary>
+        IList<IBehavior> SupplementaryBehaviors { get; }
 
-		/// <summary>
-		/// Behaviors to process when there was no method mock for a dispatched invocation.
-		/// </summary>
-		IList<IBehavior> FallbackBehaviors { get; }
+        /// <summary>
+        /// Behaviors to process when there was no method mock for a dispatched invocation.
+        /// </summary>
+        IList<IBehavior> FallbackBehaviors { get; }
 
-		/// <summary>
-		/// The type of the mock associated with this mixin.
-		/// </summary>
-		Type DeclaringType { get; }
+        /// <summary>
+        /// The type of the mock associated with this mixin.
+        /// </summary>
+        Type DeclaringType { get; }
 
-		/// <summary>
-		/// True if the static constructor of the associated type should be mocked.
-		/// </summary>
-		bool IsStaticConstructorMocked { get; set; }
+        /// <summary>
+        /// True if the static constructor of the associated type should be mocked.
+        /// </summary>
+        bool IsStaticConstructorMocked { get; set; }
 
-		/// <summary>
-		/// True if the constructor of the associated instance should be mocked
-		/// </summary>
-		bool IsInstanceConstructorMocked { get; set; }
+        /// <summary>
+        /// True if the constructor of the associated instance should be mocked
+        /// </summary>
+        bool IsInstanceConstructorMocked { get; set; }
 
-		/// <summary>
-		/// Set to the object for which this instance is an external mock mixin
-		/// </summary>
-		object ExternalizedMock { get; set; }
-	}
+        /// <summary>
+        /// Set to the object for which this instance is an external mock mixin
+        /// </summary>
+        object ExternalizedMock { get; set; }
+    }
 
-	internal class MockMixin : IMockMixin
-	{
-		private List<object> dependentMocks;
-		private readonly List<IBehavior> supplementaryBehaviors = new List<IBehavior>();
-		private readonly List<IBehavior> fallbackBehaviors = new List<IBehavior>();
-		private MocksRepository repository;
-		private MocksRepository originator;
+    internal class MockMixin : IMockMixin
+    {
+        private List<object> dependentMocks;
+        private readonly List<IBehavior> supplementaryBehaviors = new List<IBehavior>();
+        private readonly List<IBehavior> fallbackBehaviors = new List<IBehavior>();
+        private MocksRepository repository;
+        private MocksRepository originator;
 
-		public object ExternalizedMock { get; set; }
+        public object ExternalizedMock { get; set; }
 
-		public MocksRepository Repository
-		{
-			get { return this.repository; }
-			set
-			{
-				this.repository = value;
-				if (this.originator == null)
-					this.originator = value;
-			}
-		}
+        public MocksRepository Repository
+        {
+            get { return this.repository; }
+            set
+            {
+                this.repository = value;
+                if (this.originator == null)
+                    this.originator = value;
+            }
+        }
 
-		public MocksRepository Originator
-		{
-			get { return this.originator; }
-		}
+        public MocksRepository Originator
+        {
+            get { return this.originator; }
+        }
 
-		public Type DeclaringType { get; set; }
+        public Type DeclaringType { get; set; }
 
-		public bool IsStaticConstructorMocked { get; set; }
-		public bool IsInstanceConstructorMocked { get; set; }
+        public bool IsStaticConstructorMocked { get; set; }
+        public bool IsInstanceConstructorMocked { get; set; }
 
-		public IList<object> DependentMocks
-		{
-			get
-			{
-				if (this.dependentMocks == null)
-					this.dependentMocks = new List<object>();
-				return this.dependentMocks;
-			}
-		}
+        public IList<object> DependentMocks
+        {
+            get
+            {
+                if (this.dependentMocks == null)
+                    this.dependentMocks = new List<object>();
+                return this.dependentMocks;
+            }
+        }
 
-		public IList<IBehavior> SupplementaryBehaviors
-		{
-			get { return this.supplementaryBehaviors; }
-		}
+        public IList<IBehavior> SupplementaryBehaviors
+        {
+            get { return this.supplementaryBehaviors; }
+        }
 
-		public IList<IBehavior> FallbackBehaviors
-		{
-			get { return this.fallbackBehaviors; }
-		}
-	}
+        public IList<IBehavior> FallbackBehaviors
+        {
+            get { return this.fallbackBehaviors; }
+        }
+    }
 }

@@ -14,30 +14,30 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST
 {
-	using System.Reflection.Emit;
+    using System.Reflection.Emit;
 
-	internal class AssignArrayStatement : IStatement
-	{
-		private readonly Reference targetArray;
-		private readonly int targetPosition;
-		private readonly IExpression value;
+    internal class AssignArrayStatement : IStatement
+    {
+        private readonly Reference targetArray;
+        private readonly int targetPosition;
+        private readonly IExpression value;
 
-		public AssignArrayStatement(Reference targetArray, int targetPosition, IExpression value)
-		{
-			this.targetArray = targetArray;
-			this.targetPosition = targetPosition;
-			this.value = value;
-		}
+        public AssignArrayStatement(Reference targetArray, int targetPosition, IExpression value)
+        {
+            this.targetArray = targetArray;
+            this.targetPosition = targetPosition;
+            this.value = value;
+        }
 
-		public void Emit(ILGenerator il)
-		{
-			ArgumentsUtil.EmitLoadOwnerAndReference(targetArray, il);
+        public void Emit(ILGenerator il)
+        {
+            ArgumentsUtil.EmitLoadOwnerAndReference(targetArray, il);
 
-			il.Emit(OpCodes.Ldc_I4, targetPosition);
+            il.Emit(OpCodes.Ldc_I4, targetPosition);
 
-			value.Emit(il);
+            value.Emit(il);
 
-			il.Emit(OpCodes.Stelem_Ref);
-		}
-	}
+            il.Emit(OpCodes.Stelem_Ref);
+        }
+    }
 }

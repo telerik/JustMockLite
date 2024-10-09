@@ -14,21 +14,21 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 {
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 
-	internal class TypeConstructorEmitter : ConstructorEmitter
-	{
-		internal TypeConstructorEmitter(AbstractTypeEmitter mainType)
-			: base(mainType, mainType.TypeBuilder.DefineTypeInitializer())
-		{
-		}
+    internal class TypeConstructorEmitter : ConstructorEmitter
+    {
+        internal TypeConstructorEmitter(AbstractTypeEmitter mainType)
+            : base(mainType, mainType.TypeBuilder.DefineTypeInitializer())
+        {
+        }
 
-		public override void EnsureValidCodeBlock()
-		{
-			if (CodeBuilder.IsEmpty)
-			{
-				CodeBuilder.AddStatement(new ReturnStatement());
-			}
-		}
-	}
+        public override void EnsureValidCodeBlock()
+        {
+            if (CodeBuilder.IsEmpty)
+            {
+                CodeBuilder.AddStatement(new ReturnStatement());
+            }
+        }
+    }
 }

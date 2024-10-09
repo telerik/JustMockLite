@@ -17,19 +17,19 @@
 
 namespace Telerik.JustMock
 {
-	/// <summary>
-	/// Defines the behavior of target constructor.
-	/// </summary>
-	public enum Constructor
-	{
-		/// <summary>
-		/// Specifies that the constructor should not be mocked. 
-		/// </summary>
-		NotMocked,
-	  
-		/// <summary>
-		/// Specifies that the constructor should be mocked
-		/// </summary>
-		Mocked
-	}
+    /// <summary>
+    /// Defines the behavior of target constructor.
+    /// </summary>
+    public enum Constructor
+    {
+        /// <summary>
+        /// Specifies that the constructor should not be mocked. 
+        /// </summary>
+        NotMocked,
+      
+        /// <summary>
+        /// Specifies that the constructor should be mocked
+        /// </summary>
+        Mocked
+    }
 }

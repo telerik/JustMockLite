@@ -16,30 +16,30 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Logging
 {
-	using System;
+    using System;
 
 #if FEATURE_SERIALIZATION
-	[Serializable]
+    [Serializable]
 #endif
 #if NET6_0_OR_GREATER
-	[System.Runtime.Versioning.SupportedOSPlatform("windows")]
+    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
 #endif
-	internal class DiagnosticsLoggerFactory : AbstractLoggerFactory
-	{
-		private const string DefaultLogName = "CastleDefaultLogger";
+    internal class DiagnosticsLoggerFactory : AbstractLoggerFactory
+    {
+        private const string DefaultLogName = "CastleDefaultLogger";
 
-		public override ILogger Create(string name)
-		{
-			return new DiagnosticsLogger(DefaultLogName, name);
-		}
+        public override ILogger Create(string name)
+        {
+            return new DiagnosticsLogger(DefaultLogName, name);
+        }
 
-		public override ILogger Create(string name, LoggerLevel level)
-		{
-			var logger = new DiagnosticsLogger(DefaultLogName, name);
-			logger.Level = level;
-			return logger;
-		}
-	}
+        public override ILogger Create(string name, LoggerLevel level)
+        {
+            var logger = new DiagnosticsLogger(DefaultLogName, name);
+            logger.Level = level;
+            return logger;
+        }
+    }
 }
 
 #endif

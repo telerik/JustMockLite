@@ -22,91 +22,91 @@ using System.Linq.Expressions;
 
 namespace Telerik.JustMock
 {
-	/// <summary>
-	/// Provides various argument matching shortcuts.
-	/// </summary>
-	public partial interface IArgExpr
-	{
-			
-		/// <summary>
-		/// Matches argument can contain any int value.
-		/// </summary>
-		Expression AnyInt { get; }
-			
-		/// <summary>
-		/// Matches argument can contain any float value.
-		/// </summary>
-		Expression AnyFloat { get; }
-			
-		/// <summary>
-		/// Matches argument can contain any double value.
-		/// </summary>
-		Expression AnyDouble { get; }
-			
-		/// <summary>
-		/// Matches argument can contain any decimal value.
-		/// </summary>
-		Expression AnyDecimal { get; }
-			
-		/// <summary>
-		/// Matches argument can contain any long value.
-		/// </summary>
-		Expression AnyLong { get; }
-			
-		/// <summary>
-		/// Matches argument can contain any char value.
-		/// </summary>
-		Expression AnyChar { get; }
-			
-		/// <summary>
-		/// Matches argument can contain any string value.
-		/// </summary>
-		Expression AnyString { get; }
-			
-		/// <summary>
-		/// Matches argument can contain any object value.
-		/// </summary>
-		Expression AnyObject { get; }
-			
-		/// <summary>
-		/// Matches argument can contain any short value.
-		/// </summary>
-		Expression AnyShort { get; }
-			
-		/// <summary>
-		/// Matches argument can contain any bool value.
-		/// </summary>
-		Expression AnyBool { get; }
-			
-		/// <summary>
-		/// Matches argument can contain any Guid value.
-		/// </summary>
-		Expression AnyGuid { get; }
-			
-		/// <summary>
-		/// Matches argument can contain any DateTime value.
-		/// </summary>
-		Expression AnyDateTime { get; }
-			
-		/// <summary>
-		/// Matches argument can contain any TimeSpan value.
-		/// </summary>
-		Expression AnyTimeSpan { get; }
-			
-		/// <summary>
-		/// Matches argument can contain any byte value.
-		/// </summary>
-		Expression AnyByte { get; }
-			
-		/// <summary>
-		/// Matches argument can contain any SByte value.
-		/// </summary>
-		Expression AnySByte { get; }
-			
-		/// <summary>
-		/// Matches argument can contain any Uri value.
-		/// </summary>
-		Expression AnyUri { get; }
-		
-	}
+    /// <summary>
+    /// Provides various argument matching shortcuts.
+    /// </summary>
+    public partial interface IArgExpr
+    {
+
+        /// <summary>
+        /// Matches argument can contain any int value.
+        /// </summary>
+        Expression AnyInt { get; }
+
+        /// <summary>
+        /// Matches argument can contain any float value.
+        /// </summary>
+        Expression AnyFloat { get; }
+
+        /// <summary>
+        /// Matches argument can contain any double value.
+        /// </summary>
+        Expression AnyDouble { get; }
+
+        /// <summary>
+        /// Matches argument can contain any decimal value.
+        /// </summary>
+        Expression AnyDecimal { get; }
+
+        /// <summary>
+        /// Matches argument can contain any long value.
+        /// </summary>
+        Expression AnyLong { get; }
+
+        /// <summary>
+        /// Matches argument can contain any char value.
+        /// </summary>
+        Expression AnyChar { get; }
+
+        /// <summary>
+        /// Matches argument can contain any string value.
+        /// </summary>
+        Expression AnyString { get; }
+
+        /// <summary>
+        /// Matches argument can contain any object value.
+        /// </summary>
+        Expression AnyObject { get; }
+
+        /// <summary>
+        /// Matches argument can contain any short value.
+        /// </summary>
+        Expression AnyShort { get; }
+
+        /// <summary>
+        /// Matches argument can contain any bool value.
+        /// </summary>
+        Expression AnyBool { get; }
+
+        /// <summary>
+        /// Matches argument can contain any Guid value.
+        /// </summary>
+        Expression AnyGuid { get; }
+
+        /// <summary>
+        /// Matches argument can contain any DateTime value.
+        /// </summary>
+        Expression AnyDateTime { get; }
+
+        /// <summary>
+        /// Matches argument can contain any TimeSpan value.
+        /// </summary>
+        Expression AnyTimeSpan { get; }
+            
+        /// <summary>
+        /// Matches argument can contain any byte value.
+        /// </summary>
+        Expression AnyByte { get; }
+            
+        /// <summary>
+        /// Matches argument can contain any SByte value.
+        /// </summary>
+        Expression AnySByte { get; }
+
+        /// <summary>
+        /// Matches argument can contain any Uri value.
+        /// </summary>
+        Expression AnyUri { get; }
+
+    }
 }

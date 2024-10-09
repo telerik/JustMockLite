@@ -18,8 +18,8 @@
 
 namespace Telerik.JustMock.DemoLib
 {
-	public partial class VerifyModel : OpenAccessContextBase
-	{
-		public VerifyModel() { }
-	}
+    public partial class VerifyModel : OpenAccessContextBase
+    {
+        public VerifyModel() { }
+    }
 }

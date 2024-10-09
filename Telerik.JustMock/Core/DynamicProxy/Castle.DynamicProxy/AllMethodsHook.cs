@@ -14,57 +14,57 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Reflection;
+    using System;
+    using System.Collections.Generic;
+    using System.Reflection;
 
 #if FEATURE_SERIALIZATION
-	[Serializable]
+    [Serializable]
 #endif
-	internal class AllMethodsHook : IProxyGenerationHook, IConstructorGenerationHook
-	{
-		public static readonly AllMethodsHook Instance = new AllMethodsHook();
+    internal class AllMethodsHook : IProxyGenerationHook, IConstructorGenerationHook
+    {
+        public static readonly AllMethodsHook Instance = new AllMethodsHook();
 
-		protected static readonly ICollection<Type> SkippedTypes = new[]
-		{
-			typeof(object),
-			typeof(MarshalByRefObject),
-			typeof(ContextBoundObject)
-		};
+        protected static readonly ICollection<Type> SkippedTypes = new[]
+        {
+            typeof(object),
+            typeof(MarshalByRefObject),
+            typeof(ContextBoundObject)
+        };
 
-		public virtual bool ShouldInterceptMethod(Type type, MethodInfo methodInfo)
-		{
-			return SkippedTypes.Contains(methodInfo.DeclaringType) == false;
-		}
+        public virtual bool ShouldInterceptMethod(Type type, MethodInfo methodInfo)
+        {
+            return SkippedTypes.Contains(methodInfo.DeclaringType) == false;
+        }
 
-		public virtual void NonProxyableMemberNotification(Type type, MemberInfo memberInfo)
-		{
-		}
+        public virtual void NonProxyableMemberNotification(Type type, MemberInfo memberInfo)
+        {
+        }
 
-		public virtual void MethodsInspected()
-		{
-		}
+        public virtual void MethodsInspected()
+        {
+        }
 
-		public override bool Equals(object obj)
-		{
-			return obj != null && obj.GetType() == GetType();
-		}
+        public override bool Equals(object obj)
+        {
+            return obj != null && obj.GetType() == GetType();
+        }
 
-		public override int GetHashCode()
-		{
-			return GetType().GetHashCode();
-		}
+        public override int GetHashCode()
+        {
+            return GetType().GetHashCode();
+        }
 
-		public ProxyConstructorImplementation DefaultConstructorImplementation
-		{
-			get { return ProxyConstructorImplementation.SkipConstructor; }
-		}
+        public ProxyConstructorImplementation DefaultConstructorImplementation
+        {
+            get { return ProxyConstructorImplementation.SkipConstructor; }
+        }
 
-		public ProxyConstructorImplementation GetConstructorImplementation(ConstructorInfo constructorInfo, ConstructorImplementationAnalysis analysis)
-		{
-			return analysis.IsBaseVisible
-					   ? ProxyConstructorImplementation.CallBase
-					   : ProxyConstructorImplementation.SkipConstructor;
-		}
-	}
+        public ProxyConstructorImplementation GetConstructorImplementation(ConstructorInfo constructorInfo, ConstructorImplementationAnalysis analysis)
+        {
+            return analysis.IsBaseVisible
+                       ? ProxyConstructorImplementation.CallBase
+                       : ProxyConstructorImplementation.SkipConstructor;
+        }
+    }
 }

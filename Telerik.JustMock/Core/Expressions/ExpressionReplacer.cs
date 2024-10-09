@@ -21,25 +21,25 @@ using System.Linq.Expressions;
 
 namespace Telerik.JustMock.Core.Expressions
 {
-	internal class ExpressionReplacer : ExpressionVisitor
-	{
-		private Predicate<Expression> searchExpression;
-		private Func<Expression, Expression> replaceExpression;
+    internal class ExpressionReplacer : ExpressionVisitor
+    {
+        private Predicate<Expression> searchExpression;
+        private Func<Expression, Expression> replaceExpression;
 
-		public static Expression Replace(Expression source, Expression searchExpr, Expression replaceExpr)
-		{
-			return Replace(source, exp => Equals(exp, searchExpr), exp => replaceExpr);
-		}
+        public static Expression Replace(Expression source, Expression searchExpr, Expression replaceExpr)
+        {
+            return Replace(source, exp => Equals(exp, searchExpr), exp => replaceExpr);
+        }
 
-		public static Expression Replace(Expression source, Predicate<Expression> searchPred, Func<Expression, Expression> replaceFunc)
-		{
-			var replacer = new ExpressionReplacer { searchExpression = searchPred, replaceExpression = replaceFunc };
-			return replacer.Visit(source);
-		}
+        public static Expression Replace(Expression source, Predicate<Expression> searchPred, Func<Expression, Expression> replaceFunc)
+        {
+            var replacer = new ExpressionReplacer { searchExpression = searchPred, replaceExpression = replaceFunc };
+            return replacer.Visit(source);
+        }
 
-		public override Expression Visit(Expression exp)
-		{
-			return this.searchExpression(exp) ? this.replaceExpression(exp) : base.Visit(exp);
-		}
-	}
+        public override Expression Visit(Expression exp)
+        {
+            return this.searchExpression(exp) ? this.replaceExpression(exp) : base.Visit(exp);
+        }
+    }
 }

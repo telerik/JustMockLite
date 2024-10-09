@@ -14,48 +14,48 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 {
-	using System.Reflection;
+    using System.Reflection;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 
-	internal class MinimalisticMethodGenerator : MethodGenerator
-	{
-		public MinimalisticMethodGenerator(MetaMethod method, OverrideMethodDelegate overrideMethod)
-			: base(method, overrideMethod)
-		{
-		}
+    internal class MinimalisticMethodGenerator : MethodGenerator
+    {
+        public MinimalisticMethodGenerator(MetaMethod method, OverrideMethodDelegate overrideMethod)
+            : base(method, overrideMethod)
+        {
+        }
 
-		protected override MethodEmitter BuildProxiedMethodBody(MethodEmitter emitter, ClassEmitter @class,
-		                                                        INamingScope namingScope)
-		{
-			InitOutParameters(emitter, MethodToOverride.GetParameters());
+        protected override MethodEmitter BuildProxiedMethodBody(MethodEmitter emitter, ClassEmitter @class,
+                                                                INamingScope namingScope)
+        {
+            InitOutParameters(emitter, MethodToOverride.GetParameters());
 
-			if (emitter.ReturnType == typeof(void))
-			{
-				emitter.CodeBuilder.AddStatement(new ReturnStatement());
-			}
-			else
-			{
-				emitter.CodeBuilder.AddStatement(new ReturnStatement(new DefaultValueExpression(emitter.ReturnType)));
-			}
+            if (emitter.ReturnType == typeof(void))
+            {
+                emitter.CodeBuilder.AddStatement(new ReturnStatement());
+            }
+            else
+            {
+                emitter.CodeBuilder.AddStatement(new ReturnStatement(new DefaultValueExpression(emitter.ReturnType)));
+            }
 
-			return emitter;
-		}
+            return emitter;
+        }
 
-		private void InitOutParameters(MethodEmitter emitter, ParameterInfo[] parameters)
-		{
-			for (var index = 0; index < parameters.Length; index++)
-			{
-				var parameter = parameters[index];
-				if (parameter.IsOut)
-				{
-					emitter.CodeBuilder.AddStatement(
-						new AssignArgumentStatement(new ArgumentReference(parameter.ParameterType, index + 1, parameter.Attributes),
-						                            new DefaultValueExpression(parameter.ParameterType)));
-				}
-			}
-		}
-	}
+        private void InitOutParameters(MethodEmitter emitter, ParameterInfo[] parameters)
+        {
+            for (var index = 0; index < parameters.Length; index++)
+            {
+                var parameter = parameters[index];
+                if (parameter.IsOut)
+                {
+                    emitter.CodeBuilder.AddStatement(
+                        new AssignArgumentStatement(new ArgumentReference(parameter.ParameterType, index + 1, parameter.Attributes),
+                                                    new DefaultValueExpression(parameter.ParameterType)));
+                }
+            }
+        }
+    }
 }

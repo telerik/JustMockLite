@@ -20,44 +20,44 @@ using System.Linq;
 
 namespace Telerik.JustMock.Core.MatcherTree
 {
-	internal class MethodMockMatcherTreeNode : MatcherTreeNode
-	{
-		public int Id { get; private set; }
-		public IMethodMock MethodMock { get; set; }
-		public MethodMockMatcherTreeNode(IMethodMock methodMock = null, int id = 0)
-			: base(null)
-		{
-			MethodMock = methodMock;
-			Id = id;
-		}
+    internal class MethodMockMatcherTreeNode : MatcherTreeNode
+    {
+        public int Id { get; private set; }
+        public IMethodMock MethodMock { get; set; }
+        public MethodMockMatcherTreeNode(IMethodMock methodMock = null, int id = 0)
+            : base(null)
+        {
+            MethodMock = methodMock;
+            Id = id;
+        }
 
-		public override IMatcherTreeNode Clone()
-		{
-			return new MethodMockMatcherTreeNode(MethodMock, Id);
-		}
+        public override IMatcherTreeNode Clone()
+        {
+            return new MethodMockMatcherTreeNode(MethodMock, Id);
+        }
 
-		public IMatcherTreeNode DetachMethodMock()
-		{
-			IMatcherTreeNode current = this;
-			while (current.Parent != null && current.Parent.Children.Count == 1)
-			{
-				current.Parent.Children.Clear();
-				current = current.Parent;
-			}
+        public IMatcherTreeNode DetachMethodMock()
+        {
+            IMatcherTreeNode current = this;
+            while (current.Parent != null && current.Parent.Children.Count == 1)
+            {
+                current.Parent.Children.Clear();
+                current = current.Parent;
+            }
 
-			if (current.Parent != null)
-				current.Parent.Children.Remove(current);
+            if (current.Parent != null)
+                current.Parent.Children.Remove(current);
 
-			while (current.Parent != null)
-				current = current.Parent;
+            while (current.Parent != null)
+                current = current.Parent;
 
-			return current;
-		}
+            return current;
+        }
 
-		public void ReattachMethodMock()
-		{
-			var root = DetachMethodMock();
-			((MethodInfoMatcherTreeNode)root).AddChild(MethodMock.CallPattern, this);
-		}
-	}
+        public void ReattachMethodMock()
+        {
+            var root = DetachMethodMock();
+            ((MethodInfoMatcherTreeNode)root).AddChild(MethodMock.CallPattern, this);
+        }
+    }
 }

@@ -14,48 +14,48 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 {
-	using System.Collections.Generic;
-	using System.Diagnostics;
+    using System.Collections.Generic;
+    using System.Diagnostics;
 
-	internal class NamingScope : INamingScope
-	{
-		private readonly IDictionary<string, int> names = new Dictionary<string, int>();
-		private readonly INamingScope parentScope;
+    internal class NamingScope : INamingScope
+    {
+        private readonly IDictionary<string, int> names = new Dictionary<string, int>();
+        private readonly INamingScope parentScope;
 
-		public NamingScope()
-		{
-		}
+        public NamingScope()
+        {
+        }
 
-		private NamingScope(INamingScope parent)
-		{
-			parentScope = parent;
-		}
+        private NamingScope(INamingScope parent)
+        {
+            parentScope = parent;
+        }
 
-		public INamingScope ParentScope
-		{
-			get { return parentScope; }
-		}
+        public INamingScope ParentScope
+        {
+            get { return parentScope; }
+        }
 
-		public string GetUniqueName(string suggestedName)
-		{
-			Debug.Assert(string.IsNullOrEmpty(suggestedName) == false,
-			             "string.IsNullOrEmpty(suggestedName) == false");
+        public string GetUniqueName(string suggestedName)
+        {
+            Debug.Assert(string.IsNullOrEmpty(suggestedName) == false,
+                         "string.IsNullOrEmpty(suggestedName) == false");
 
-			int counter;
-			if (!names.TryGetValue(suggestedName, out counter))
-			{
-				names.Add(suggestedName, 0);
-				return suggestedName;
-			}
+            int counter;
+            if (!names.TryGetValue(suggestedName, out counter))
+            {
+                names.Add(suggestedName, 0);
+                return suggestedName;
+            }
 
-			counter++;
-			names[suggestedName] = counter;
-			return suggestedName + "_" + counter.ToString();
-		}
+            counter++;
+            names[suggestedName] = counter;
+            return suggestedName + "_" + counter.ToString();
+        }
 
-		public INamingScope SafeSubScope()
-		{
-			return new NamingScope(this);
-		}
-	}
+        public INamingScope SafeSubScope()
+        {
+            return new NamingScope(this);
+        }
+    }
 }

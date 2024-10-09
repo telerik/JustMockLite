@@ -50,251 +50,251 @@ using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFa
 
 namespace Telerik.JustMock.Tests
 {
-	[TestClass]
-	public class PropertiesFixture
-	{
-		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
-		public void ShouldBeAbleToReturnForProperty()
-		{
-			var foo = Mock.Create<IFoo>();
+    [TestClass]
+    public class PropertiesFixture
+    {
+        [TestMethod, TestCategory("Lite"), TestCategory("Properties")]
+        public void ShouldBeAbleToReturnForProperty()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			Mock.Arrange(() => foo.Value).Returns(25);
+            Mock.Arrange(() => foo.Value).Returns(25);
 
-			Assert.Equal(25, foo.Value);
-		}
+            Assert.Equal(25, foo.Value);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
-		public void ShouldAbleToReturnForIndexer()
-		{
-			var indexedFoo = Mock.Create<IIndexedFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Properties")]
+        public void ShouldAbleToReturnForIndexer()
+        {
+            var indexedFoo = Mock.Create<IIndexedFoo>();
 
-			Mock.Arrange(() => indexedFoo[0]).Returns("ping");
+            Mock.Arrange(() => indexedFoo[0]).Returns("ping");
 
-			Assert.Equal(indexedFoo[0], "ping");
-		}
+            Assert.Equal(indexedFoo[0], "ping");
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
-		public void ShouldReturnDifferentForDifferentIndex()
-		{
-			var indexedFoo = Mock.Create<IIndexedFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Properties")]
+        public void ShouldReturnDifferentForDifferentIndex()
+        {
+            var indexedFoo = Mock.Create<IIndexedFoo>();
 
-			Mock.Arrange(() => indexedFoo[0]).Returns("ping");
-			Mock.Arrange(() => indexedFoo[1]).Returns("pong");
+            Mock.Arrange(() => indexedFoo[0]).Returns("ping");
+            Mock.Arrange(() => indexedFoo[1]).Returns("pong");
 
-			Assert.Equal(indexedFoo[0], "ping");
-			Assert.Equal(indexedFoo[1], "pong");
-		}
+            Assert.Equal(indexedFoo[0], "ping");
+            Assert.Equal(indexedFoo[1], "pong");
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
-		public void ShouldAssertPropertySet()
-		{
-			var foo = Mock.Create<IFoo>(Behavior.Strict);
+        [TestMethod, TestCategory("Lite"), TestCategory("Properties")]
+        public void ShouldAssertPropertySet()
+        {
+            var foo = Mock.Create<IFoo>(Behavior.Strict);
 
-			Mock.ArrangeSet<IFoo>(() => { foo.Value = 3; });
+            Mock.ArrangeSet<IFoo>(() => { foo.Value = 3; });
 
-			foo.Value = 3;
+            foo.Value = 3;
 
-			Assert.Throws<MockException>(() => foo.Value = 2);
-		}
+            Assert.Throws<MockException>(() => foo.Value = 2);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
-		public void SHouldAssertPropertySetUsingMatcher()
-		{
-			var foo = Mock.Create<IFoo>(Behavior.Strict);
+        [TestMethod, TestCategory("Lite"), TestCategory("Properties")]
+        public void SHouldAssertPropertySetUsingMatcher()
+        {
+            var foo = Mock.Create<IFoo>(Behavior.Strict);
 
-			Mock.ArrangeSet<IFoo>(() => foo.Value = Arg.Matches<int>(x => x > 3));
+            Mock.ArrangeSet<IFoo>(() => foo.Value = Arg.Matches<int>(x => x > 3));
 
-			foo.Value = 4;
-			foo.Value = 5;
+            foo.Value = 4;
+            foo.Value = 5;
 
-			Assert.Throws<MockException>(() => foo.Value = 3);
-		}
+            Assert.Throws<MockException>(() => foo.Value = 3);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
-		public void ShouldAssertIndexedSet()
-		{
-			var foo = Mock.Create<IIndexedFoo>(Behavior.Strict);
+        [TestMethod, TestCategory("Lite"), TestCategory("Properties")]
+        public void ShouldAssertIndexedSet()
+        {
+            var foo = Mock.Create<IIndexedFoo>(Behavior.Strict);
 
-			Mock.ArrangeSet<IIndexedFoo>(() => { foo[0] = "foo"; });
+            Mock.ArrangeSet<IIndexedFoo>(() => { foo[0] = "foo"; });
 
-			foo[0] = "foo";
+            foo[0] = "foo";
 
-			Assert.Throws<MockException>(() => foo[0] = "fxx");
-		}
+            Assert.Throws<MockException>(() => foo[0] = "fxx");
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
-		public void SHouldAssertIndexedSetWithMatcher()
-		{
-			var foo = Mock.Create<IIndexedFoo>(Behavior.Strict);
+        [TestMethod, TestCategory("Lite"), TestCategory("Properties")]
+        public void SHouldAssertIndexedSetWithMatcher()
+        {
+            var foo = Mock.Create<IIndexedFoo>(Behavior.Strict);
 
-			Mock.ArrangeSet<IIndexedFoo>(() => { foo[0] = Arg.Matches<string>(x => x.Equals("ping")); });
-			Mock.ArrangeSet<IIndexedFoo>(() => { foo[1] = Arg.IsAny<string>(); });
+            Mock.ArrangeSet<IIndexedFoo>(() => { foo[0] = Arg.Matches<string>(x => x.Equals("ping")); });
+            Mock.ArrangeSet<IIndexedFoo>(() => { foo[1] = Arg.IsAny<string>(); });
 
-			foo[0] = "ping";
-			foo[1] = "pong";
-		}
+            foo[0] = "ping";
+            foo[1] = "pong";
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
-		public void ShouldAssertThrowOnProperty()
-		{
-			var foo = Mock.Create<IFoo>(Behavior.Strict);
+        [TestMethod, TestCategory("Lite"), TestCategory("Properties")]
+        public void ShouldAssertThrowOnProperty()
+        {
+            var foo = Mock.Create<IFoo>(Behavior.Strict);
 
-			Mock.ArrangeSet<IFoo>(() => foo.Value = 1).Throws(new ArgumentException());
+            Mock.ArrangeSet<IFoo>(() => foo.Value = 1).Throws(new ArgumentException());
 
-			Assert.Throws<ArgumentException>(() => foo.Value = 1);
-		}
+            Assert.Throws<ArgumentException>(() => foo.Value = 1);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
-		public void ShouldAssertVoidCalls()
-		{
-			var foo = Mock.Create<IFoo>(Behavior.Strict);
-			Mock.Arrange(() => foo.Call(Arg.Matches<int>(x => x == 1), Arg.Matches<int>(x => x > 1)));
+        [TestMethod, TestCategory("Lite"), TestCategory("Properties")]
+        public void ShouldAssertVoidCalls()
+        {
+            var foo = Mock.Create<IFoo>(Behavior.Strict);
+            Mock.Arrange(() => foo.Call(Arg.Matches<int>(x => x == 1), Arg.Matches<int>(x => x > 1)));
 
-			foo.Call(1, 2);
-		}
+            foo.Call(1, 2);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
-		public void ShouldAssertDoInsteadOnProperySet()
-		{
-			bool expected = false;
-			var foo = Mock.Create<IFoo>(Behavior.Strict);
-			Mock.ArrangeSet<IFoo>(() => { foo.Value = 1; }).DoInstead(() => expected = true);
+        [TestMethod, TestCategory("Lite"), TestCategory("Properties")]
+        public void ShouldAssertDoInsteadOnProperySet()
+        {
+            bool expected = false;
+            var foo = Mock.Create<IFoo>(Behavior.Strict);
+            Mock.ArrangeSet<IFoo>(() => { foo.Value = 1; }).DoInstead(() => expected = true);
 
-			foo.Value = 1;
+            foo.Value = 1;
 
-			Assert.True(expected);
-		}
+            Assert.True(expected);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
-		public void ShouldAssertCallOriginalForPropertySet()
-		{
-			var foo = Mock.Create<FooAbstract>(Behavior.Strict);
-			Mock.ArrangeSet<FooAbstract>(() => { foo.Value = 1; }).CallOriginal();
-			Assert.Throws<NotImplementedException>(() => { foo.Value = 1; });
-		}
+        [TestMethod, TestCategory("Lite"), TestCategory("Properties")]
+        public void ShouldAssertCallOriginalForPropertySet()
+        {
+            var foo = Mock.Create<FooAbstract>(Behavior.Strict);
+            Mock.ArrangeSet<FooAbstract>(() => { foo.Value = 1; }).CallOriginal();
+            Assert.Throws<NotImplementedException>(() => { foo.Value = 1; });
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
-		public void ShouldThrowExpectionForASpecificSet()
-		{
-			var foo = Mock.Create<Foo>();
-			Mock.ArrangeSet<Foo>(() => foo.MyProperty = 10).Throws(new ArgumentException());
+        [TestMethod, TestCategory("Lite"), TestCategory("Properties")]
+        public void ShouldThrowExpectionForASpecificSet()
+        {
+            var foo = Mock.Create<Foo>();
+            Mock.ArrangeSet<Foo>(() => foo.MyProperty = 10).Throws(new ArgumentException());
 
-			// should not throw any expection.
-			foo.MyProperty = 1;
+            // should not throw any expection.
+            foo.MyProperty = 1;
 
-			Assert.Throws<ArgumentException>(() => { foo.MyProperty = 10; });
-		}
+            Assert.Throws<ArgumentException>(() => { foo.MyProperty = 10; });
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
-		public void ShouldAutomaticallyArrangeGetSetWhenNoneSpecifiedForStub()
-		{
-			var foo = Mock.Create<IFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Properties")]
+        public void ShouldAutomaticallyArrangeGetSetWhenNoneSpecifiedForStub()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			foo.Name = "Spike";
+            foo.Name = "Spike";
 
-			Assert.Equal("Spike", foo.Name);
-		}
+            Assert.Equal("Spike", foo.Name);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
-		public void ShouldBeAbleToSetPropertiesMultipleTimes()
-		{
-			var foo = Mock.Create<IFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Properties")]
+        public void ShouldBeAbleToSetPropertiesMultipleTimes()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			foo.Name = "Dude";
-			foo.Name += "s";
+            foo.Name = "Dude";
+            foo.Name += "s";
 
-			Assert.Equal("Dudes", foo.Name);
-		}
+            Assert.Equal("Dudes", foo.Name);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
-		public void ShouldDoGetOrSetForIndexedProperty()
-		{
-			var indexed = Mock.Create<IIndexedFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Properties")]
+        public void ShouldDoGetOrSetForIndexedProperty()
+        {
+            var indexed = Mock.Create<IIndexedFoo>();
 
-			indexed[1] = "hello";
+            indexed[1] = "hello";
 
-			Assert.Equal("hello", indexed[1]);
-		}
+            Assert.Equal("hello", indexed[1]);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
-		public void ShoudlAssertSetOnlyProperty()
-		{
-			var foo = Mock.Create<IFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Properties")]
+        public void ShoudlAssertSetOnlyProperty()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			foo.Track = true;
+            foo.Track = true;
 
-			Mock.AssertSet(() => foo.Track = true);
-		}
+            Mock.AssertSet(() => foo.Track = true);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
-		public void ShouldAutoSetGetWhenAlreadyInvokedButNotArranged()
-		{
-			var project = Mock.Create<IProject>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Properties")]
+        public void ShouldAutoSetGetWhenAlreadyInvokedButNotArranged()
+        {
+            var project = Mock.Create<IProject>();
 
-			if (project.Parent == null)
-				project.Parent = new Foo();
+            if (project.Parent == null)
+                project.Parent = new Foo();
 
-			Assert.NotNull(project.Parent);
-		}
+            Assert.NotNull(project.Parent);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Properties")]
-		public void ShouldSetStringPropertyToNull()
-		{
-			var mock = Mock.Create<IAutomockedProperties>();
-			mock.Name = null;
-			mock.Array = null;
-			mock.Items = null;
-			Assert.Null(mock.Name);
-			Assert.Null(mock.Array);
-			Assert.Null(mock.Items);
-		}
+        [TestMethod, TestCategory("Lite"), TestCategory("Properties")]
+        public void ShouldSetStringPropertyToNull()
+        {
+            var mock = Mock.Create<IAutomockedProperties>();
+            mock.Name = null;
+            mock.Array = null;
+            mock.Items = null;
+            Assert.Null(mock.Name);
+            Assert.Null(mock.Array);
+            Assert.Null(mock.Items);
+        }
 
-		public interface IAutomockedProperties
-		{
-			string Name { get; set; }
-			int[] Array { get; set; }
-			IEnumerable<int> Items { get; set; }
-		}
+        public interface IAutomockedProperties
+        {
+            string Name { get; set; }
+            int[] Array { get; set; }
+            IEnumerable<int> Items { get; set; }
+        }
 
-		public class Foo
-		{
-			public virtual int MyProperty { get; set; }
-		}
+        public class Foo
+        {
+            public virtual int MyProperty { get; set; }
+        }
 
-		public abstract class FooAbstract
-		{
-			public virtual int Value
-			{
-				set
-				{
-					throw new NotImplementedException();
-				}
-			}
-		}
+        public abstract class FooAbstract
+        {
+            public virtual int Value
+            {
+                set
+                {
+                    throw new NotImplementedException();
+                }
+            }
+        }
 
-		public interface ISolutionItem
-		{
-			object Parent { get; set; }
-		}
+        public interface ISolutionItem
+        {
+            object Parent { get; set; }
+        }
 
-		public interface IProject : ISolutionItem
-		{
+        public interface IProject : ISolutionItem
+        {
 
-		}
+        }
 
-		public interface IIndexedFoo
-		{
-			string this[int key] { get; set; }
-		}
+        public interface IIndexedFoo
+        {
+            string this[int key] { get; set; }
+        }
 
-		public interface IFoo
-		{
-			bool Track { set; }
-			string Name { get; set; }
-			string Execute(string arg1);
-			int Value { get; set; }
-			int ReadOnlyValue { get; }
-			void Call(int arg1, int arg2);
-		}
-	}
+        public interface IFoo
+        {
+            bool Track { set; }
+            string Name { get; set; }
+            string Execute(string arg1);
+            int Value { get; set; }
+            int ReadOnlyValue { get; }
+            void Call(int arg1, int arg2);
+        }
+    }
 }

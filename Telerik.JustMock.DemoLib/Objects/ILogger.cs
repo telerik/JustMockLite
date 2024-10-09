@@ -18,11 +18,11 @@
 
 namespace Telerik.JustMock.DemoLib.Objects
 {
-	/// <summary>
-	/// Logger API
-	/// </summary>
-	public interface ILogger
-	{
-		void Log(string message);
-	}
+    /// <summary>
+    /// Logger API
+    /// </summary>
+    public interface ILogger
+    {
+        void Log(string message);
+    }
 }

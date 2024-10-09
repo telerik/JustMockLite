@@ -18,39 +18,39 @@
 namespace Telerik.JustMock.Core.Internal
 {
 #if COREFX
-	internal class MonitorLock : Lock
-	{
-		private readonly object locker = new object();
+    internal class MonitorLock : Lock
+    {
+        private readonly object locker = new object();
 
-		public override IUpgradeableLockHolder ForReadingUpgradeable()
-		{
-			return ForReadingUpgradeable(true);
-		}
+        public override IUpgradeableLockHolder ForReadingUpgradeable()
+        {
+            return ForReadingUpgradeable(true);
+        }
 
-		public override ILockHolder ForReading()
-		{
-			return ForReading(true);
-		}
+        public override ILockHolder ForReading()
+        {
+            return ForReading(true);
+        }
 
-		public override ILockHolder ForWriting()
-		{
-			return ForWriting(true);
-		}
+        public override ILockHolder ForWriting()
+        {
+            return ForWriting(true);
+        }
 
-		public override IUpgradeableLockHolder ForReadingUpgradeable(bool waitForLock)
-		{
-			return new MonitorUpgradeableLockHolder(locker, waitForLock);
-		}
+        public override IUpgradeableLockHolder ForReadingUpgradeable(bool waitForLock)
+        {
+            return new MonitorUpgradeableLockHolder(locker, waitForLock);
+        }
 
-		public override ILockHolder ForReading(bool waitForLock)
-		{
-			return new MonitorLockHolder(locker, waitForLock);
-		}
+        public override ILockHolder ForReading(bool waitForLock)
+        {
+            return new MonitorLockHolder(locker, waitForLock);
+        }
 
-		public override ILockHolder ForWriting(bool waitForLock)
-		{
-			return new MonitorLockHolder(locker, waitForLock);
-		}
-	}
+        public override ILockHolder ForWriting(bool waitForLock)
+        {
+            return new MonitorLockHolder(locker, waitForLock);
+        }
+    }
 #endif
 }

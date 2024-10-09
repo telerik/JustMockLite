@@ -18,11 +18,11 @@
 
 namespace Telerik.JustMock.DemoLibSigned
 {
-	public class DummyContext
-	{
-		internal virtual int Execute(int x)
-		{
-			return 42;
-		}
-	}
+    public class DummyContext
+    {
+        internal virtual int Execute(int x)
+        {
+            return 42;
+        }
+    }
 }

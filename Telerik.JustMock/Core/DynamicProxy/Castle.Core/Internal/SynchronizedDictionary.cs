@@ -14,107 +14,107 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Internal
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Threading;
+    using System;
+    using System.Collections.Generic;
+    using System.Threading;
 
-	internal sealed class SynchronizedDictionary<TKey, TValue> : IDisposable
-	{
-		private Dictionary<TKey, TValue> items;
-		private ReaderWriterLockSlim itemsLock;
+    internal sealed class SynchronizedDictionary<TKey, TValue> : IDisposable
+    {
+        private Dictionary<TKey, TValue> items;
+        private ReaderWriterLockSlim itemsLock;
 
-		public SynchronizedDictionary()
-		{
-			items = new Dictionary<TKey, TValue>();
-			itemsLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
-		}
+        public SynchronizedDictionary()
+        {
+            items = new Dictionary<TKey, TValue>();
+            itemsLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+        }
 
-		public void AddOrUpdateWithoutTakingLock(TKey key, TValue value)
-		{
-			items[key] = value;
-		}
+        public void AddOrUpdateWithoutTakingLock(TKey key, TValue value)
+        {
+            items[key] = value;
+        }
 
-		public void Dispose()
-		{
-			itemsLock.Dispose();
-		}
+        public void Dispose()
+        {
+            itemsLock.Dispose();
+        }
 
-		public TValue GetOrAdd(TKey key, Func<TKey, TValue> valueFactory)
-		{
-			TValue value;
+        public TValue GetOrAdd(TKey key, Func<TKey, TValue> valueFactory)
+        {
+            TValue value;
 
-			itemsLock.EnterReadLock();
-			try
-			{
-				if (items.TryGetValue(key, out value))
-				{
-					return value;
-				}
-			}
-			finally
-			{
-				itemsLock.ExitReadLock();
-			}
+            itemsLock.EnterReadLock();
+            try
+            {
+                if (items.TryGetValue(key, out value))
+                {
+                    return value;
+                }
+            }
+            finally
+            {
+                itemsLock.ExitReadLock();
+            }
 
-			itemsLock.EnterUpgradeableReadLock();
-			try
-			{
-				if (items.TryGetValue(key, out value))
-				{
-					return value;
-				}
-				else
-				{
-					value = valueFactory.Invoke(key);
+            itemsLock.EnterUpgradeableReadLock();
+            try
+            {
+                if (items.TryGetValue(key, out value))
+                {
+                    return value;
+                }
+                else
+                {
+                    value = valueFactory.Invoke(key);
 
-					itemsLock.EnterWriteLock();
-					try
-					{
-						items.Add(key, value);
-						return value;
-					}
-					finally
-					{
-						itemsLock.ExitWriteLock();
-					}
-				}
-			}
-			finally
-			{
-				itemsLock.ExitUpgradeableReadLock();
-			}
-		}
+                    itemsLock.EnterWriteLock();
+                    try
+                    {
+                        items.Add(key, value);
+                        return value;
+                    }
+                    finally
+                    {
+                        itemsLock.ExitWriteLock();
+                    }
+                }
+            }
+            finally
+            {
+                itemsLock.ExitUpgradeableReadLock();
+            }
+        }
 
-		public TValue GetOrAddWithoutTakingLock(TKey key, Func<TKey, TValue> valueFactory)
-		{
-			TValue value;
+        public TValue GetOrAddWithoutTakingLock(TKey key, Func<TKey, TValue> valueFactory)
+        {
+            TValue value;
 
-			if (items.TryGetValue(key, out value))
-			{
-				return value;
-			}
-			else
-			{
-				value = valueFactory.Invoke(key);
-				items.Add(key, value);
-				return value;
-			}
-		}
+            if (items.TryGetValue(key, out value))
+            {
+                return value;
+            }
+            else
+            {
+                value = valueFactory.Invoke(key);
+                items.Add(key, value);
+                return value;
+            }
+        }
 
-		public void ForEach(Action<TKey, TValue> action)
-		{
-			itemsLock.EnterReadLock();
-			try
-			{
-				foreach (var item in items)
-				{
-					action.Invoke(item.Key, item.Value);
-				}
-			}
-			finally
-			{
-				itemsLock.ExitReadLock();
-			}
-		}
-	}
+        public void ForEach(Action<TKey, TValue> action)
+        {
+            itemsLock.EnterReadLock();
+            try
+            {
+                foreach (var item in items)
+                {
+                    action.Invoke(item.Key, item.Value);
+                }
+            }
+            finally
+            {
+                itemsLock.ExitReadLock();
+            }
+        }
+    }
 }

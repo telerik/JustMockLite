@@ -14,126 +14,126 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
-	using System;
-	using System.Text;
+    using System;
+    using System.Text;
 
 #if FEATURE_SERIALIZATION
-	[Serializable]
+    [Serializable]
 #endif
-	internal sealed class CustomUri
-	{
-		public static readonly string SchemeDelimiter = "://";
-		public static readonly string UriSchemeFile = "file";
-		public static readonly string UriSchemeAssembly = "assembly";
+    internal sealed class CustomUri
+    {
+        public static readonly string SchemeDelimiter = "://";
+        public static readonly string UriSchemeFile = "file";
+        public static readonly string UriSchemeAssembly = "assembly";
 
-		private string scheme;
-		private string host;
-		private string path;
-		private bool isUnc;
-		private bool isFile;
-		private bool isAssembly;
+        private string scheme;
+        private string host;
+        private string path;
+        private bool isUnc;
+        private bool isFile;
+        private bool isAssembly;
 
-		public CustomUri(string resourceIdentifier)
-		{
-			if (resourceIdentifier == null)
-			{
-				throw new ArgumentNullException(nameof(resourceIdentifier));
-			}
-			if (resourceIdentifier == string.Empty)
-			{
-				throw new ArgumentException("Empty resource identifier is not allowed", nameof(resourceIdentifier));
-			}
+        public CustomUri(string resourceIdentifier)
+        {
+            if (resourceIdentifier == null)
+            {
+                throw new ArgumentNullException(nameof(resourceIdentifier));
+            }
+            if (resourceIdentifier == string.Empty)
+            {
+                throw new ArgumentException("Empty resource identifier is not allowed", nameof(resourceIdentifier));
+            }
 
-			ParseIdentifier(resourceIdentifier);
-		}
+            ParseIdentifier(resourceIdentifier);
+        }
 
-		public bool IsUnc
-		{
-			get { return isUnc; }
-		}
+        public bool IsUnc
+        {
+            get { return isUnc; }
+        }
 
-		public bool IsFile
-		{
-			get { return isFile; }
-		}
+        public bool IsFile
+        {
+            get { return isFile; }
+        }
 
-		public bool IsAssembly
-		{
-			get { return isAssembly; }
-		}
+        public bool IsAssembly
+        {
+            get { return isAssembly; }
+        }
 
-		public string Scheme
-		{
-			get { return scheme; }
-		}
+        public string Scheme
+        {
+            get { return scheme; }
+        }
 
-		public string Host
-		{
-			get { return host; }
-		}
+        public string Host
+        {
+            get { return host; }
+        }
 
-		public string Path
-		{
-			get { return path; }
-		}
+        public string Path
+        {
+            get { return path; }
+        }
 
-		private void ParseIdentifier(string identifier)
-		{
-			int comma = identifier.IndexOf(':');
+        private void ParseIdentifier(string identifier)
+        {
+            int comma = identifier.IndexOf(':');
 
-			if (comma == -1 && !(identifier[0] == '\\' && identifier[1] == '\\') && identifier[0] != '/')
-			{
-				throw new ArgumentException("Invalid Uri: no scheme delimiter found on " + identifier);
-			}
+            if (comma == -1 && !(identifier[0] == '\\' && identifier[1] == '\\') && identifier[0] != '/')
+            {
+                throw new ArgumentException("Invalid Uri: no scheme delimiter found on " + identifier);
+            }
 
-			bool translateSlashes = true;
+            bool translateSlashes = true;
 
-			if (identifier[0] == '\\' && identifier[1] == '\\')
-			{
-				// Unc
+            if (identifier[0] == '\\' && identifier[1] == '\\')
+            {
+                // Unc
 
-				isUnc = true;
-				isFile = true;
-				scheme = UriSchemeFile;
-				translateSlashes = false;
-			}
-			else if (identifier[comma + 1] == '/' && identifier[comma + 2] == '/')
-			{
-				// Extract scheme
+                isUnc = true;
+                isFile = true;
+                scheme = UriSchemeFile;
+                translateSlashes = false;
+            }
+            else if (identifier[comma + 1] == '/' && identifier[comma + 2] == '/')
+            {
+                // Extract scheme
 
-				scheme = identifier.Substring(0, comma);
+                scheme = identifier.Substring(0, comma);
 
-				isFile = (scheme == UriSchemeFile);
-				isAssembly = (scheme == UriSchemeAssembly);
+                isFile = (scheme == UriSchemeFile);
+                isAssembly = (scheme == UriSchemeAssembly);
 
-				identifier = identifier.Substring(comma + SchemeDelimiter.Length);
-			}
-			else
-			{
-				isFile = true;
-				scheme = UriSchemeFile;
-			}
+                identifier = identifier.Substring(comma + SchemeDelimiter.Length);
+            }
+            else
+            {
+                isFile = true;
+                scheme = UriSchemeFile;
+            }
 
-			var sb = new StringBuilder();
-			foreach(char ch in identifier.ToCharArray())
-			{
-				if (translateSlashes && (ch == '\\' || ch == '/'))
-				{
-					if (host == null && !IsFile)
-					{
-						host = sb.ToString();
-						sb.Length = 0;
-					}
+            var sb = new StringBuilder();
+            foreach(char ch in identifier.ToCharArray())
+            {
+                if (translateSlashes && (ch == '\\' || ch == '/'))
+                {
+                    if (host == null && !IsFile)
+                    {
+                        host = sb.ToString();
+                        sb.Length = 0;
+                    }
 
-					sb.Append('/');
-				}
-				else
-				{
-					sb.Append(ch);
-				}
-			}
+                    sb.Append('/');
+                }
+                else
+                {
+                    sb.Append(ch);
+                }
+            }
 
-			path = Environment.ExpandEnvironmentVariables(sb.ToString());
-		}
-	}
+            path = Environment.ExpandEnvironmentVariables(sb.ToString());
+        }
+    }
 }

@@ -14,12 +14,12 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Tokens
 {
-	using System;
-	using System.Reflection;
+    using System;
+    using System.Reflection;
 
-	internal static class DelegateMethods
-	{
-		public static readonly MethodInfo CreateDelegate =
-			typeof(Delegate).GetMethod("CreateDelegate", new[] { typeof(Type), typeof(object), typeof(MethodInfo) });
-	}
+    internal static class DelegateMethods
+    {
+        public static readonly MethodInfo CreateDelegate =
+            typeof(Delegate).GetMethod("CreateDelegate", new[] { typeof(Type), typeof(object), typeof(MethodInfo) });
+    }
 }

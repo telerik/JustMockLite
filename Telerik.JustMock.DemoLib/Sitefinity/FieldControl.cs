@@ -18,11 +18,11 @@
 
 namespace Telerik.Sitefinity.Web.UI.Fields
 {
-	public abstract class FieldControl
-	{
-	}
+    public abstract class FieldControl
+    {
+    }
 
-	public class ChoiceField : FieldControl
-	{
-	}
+    public class ChoiceField : FieldControl
+    {
+    }
 }

@@ -14,26 +14,26 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Logging
 {
-	using System;
-	using System.Runtime.Serialization;
+    using System;
+    using System.Runtime.Serialization;
 
-	[Serializable]
+    [Serializable]
     internal class LoggerException : Exception
-	{
-		public LoggerException()
-		{
-		}
+    {
+        public LoggerException()
+        {
+        }
 
-		public LoggerException(string message) : base(message)
-		{
-		}
+        public LoggerException(string message) : base(message)
+        {
+        }
 
-		public LoggerException(string message, Exception innerException) : base(message, innerException)
-		{
-		}
+        public LoggerException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
 
-		protected LoggerException(SerializationInfo info, StreamingContext context) : base(info, context)
-		{
-		}
-	}
+        protected LoggerException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
+    }
 }

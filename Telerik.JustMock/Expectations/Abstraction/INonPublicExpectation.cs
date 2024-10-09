@@ -20,21 +20,21 @@ using System.Reflection;
 
 namespace Telerik.JustMock.Expectations.Abstraction
 {
-	/// <summary>
-	/// Defines methods to mock non-public members.
-	/// </summary>
-	/// <remarks>
-	/// Non-public methods are identified by their name and, optionally, by their arguments
-	/// when there's a need to disambiguate between overloads, or when you need to specify
-	/// matchers for the arguments using. Arguments are passed using either constant objects
-	/// when a specific value needs to be matched, or using one of the members of the
-	/// <see cref="Arg.Expr"/> class. If a member is not overloaded and you want the arrangement
-	/// to work for all arguments, then you can specify just the name of the member and omit
-	/// all arguments. This is equivalent to passing the correct Arg.Expr.IsAny&lt;T&gt;() arguments
-	/// or adding the .IgnoreArguments() clause.
-	/// </remarks>
-	public interface INonPublicExpectation
-	{
+    /// <summary>
+    /// Defines methods to mock non-public members.
+    /// </summary>
+    /// <remarks>
+    /// Non-public methods are identified by their name and, optionally, by their arguments
+    /// when there's a need to disambiguate between overloads, or when you need to specify
+    /// matchers for the arguments using. Arguments are passed using either constant objects
+    /// when a specific value needs to be matched, or using one of the members of the
+    /// <see cref="Arg.Expr"/> class. If a member is not overloaded and you want the arrangement
+    /// to work for all arguments, then you can specify just the name of the member and omit
+    /// all arguments. This is equivalent to passing the correct Arg.Expr.IsAny&lt;T&gt;() arguments
+    /// or adding the .IgnoreArguments() clause.
+    /// </remarks>
+    public interface INonPublicExpectation
+    {
         /// <summary>
         /// Arranges a method for mocking.
         /// </summary>
@@ -330,14 +330,14 @@ namespace Telerik.JustMock.Expectations.Abstraction
         /// <param name="args">Method arguments. Use <see cref="Arg.Expr"/> for predefined argument matchers.</param>
         ActionExpectation Arrange(MethodBase method, params object[] args);
 
-		/// <summary>
-		/// Asserts the specified member that it is called as expected.
-		/// </summary>
-		/// <typeparam name="T">Specify the target type</typeparam>
-		/// <param name="memberName">Name of the member</param>
-		/// <param name="occurs">Specifies the number of times a call should occur.</param>
-		/// <param name="args">Method arguments</param>
-		void Assert<T>(string memberName, Occurs occurs, params object[] args);
+        /// <summary>
+        /// Asserts the specified member that it is called as expected.
+        /// </summary>
+        /// <typeparam name="T">Specify the target type</typeparam>
+        /// <param name="memberName">Name of the member</param>
+        /// <param name="occurs">Specifies the number of times a call should occur.</param>
+        /// <param name="args">Method arguments</param>
+        void Assert<T>(string memberName, Occurs occurs, params object[] args);
 
         /// <summary>
         /// Asserts the specified member that it is called as expected.
@@ -416,13 +416,13 @@ namespace Telerik.JustMock.Expectations.Abstraction
         /// <param name="args">Method arguments</param>
         void Assert(MethodBase method, Occurs occurs, params object[] args);
 
-		/// <summary>
-		/// Asserts the specified member that it is called as expected.
-		/// </summary>
-		/// <typeparam name="T">Specify the target type</typeparam>
-		/// <param name="memberName">Name of the member</param>
-		/// <param name="args">Method arguments</param>
-		void Assert<T>(string memberName, params object[] args);
+        /// <summary>
+        /// Asserts the specified member that it is called as expected.
+        /// </summary>
+        /// <typeparam name="T">Specify the target type</typeparam>
+        /// <param name="memberName">Name of the member</param>
+        /// <param name="args">Method arguments</param>
+        void Assert<T>(string memberName, params object[] args);
 
         /// <summary>
         /// Asserts the specified member that it is called as expected.
@@ -495,22 +495,22 @@ namespace Telerik.JustMock.Expectations.Abstraction
         /// <param name="args">Method arguments</param>
         void Assert(MethodBase method, params object[] args);
 
-		/// <summary>
-		/// Returns the number of times the specified member was called.
-		/// </summary>
-		/// <param name="method">Target method</param>
-		/// <param name="args">Method arguments</param>
-		/// <returns>Number of calls.</returns>
-		int GetTimesCalled(MethodBase method, params object[] args);
+        /// <summary>
+        /// Returns the number of times the specified member was called.
+        /// </summary>
+        /// <param name="method">Target method</param>
+        /// <param name="args">Method arguments</param>
+        /// <returns>Number of calls.</returns>
+        int GetTimesCalled(MethodBase method, params object[] args);
 
-		/// <summary>
-		/// Returns the number of times the specified member was called.
-		/// </summary>
-		/// <param name="type">Type of the target</param>
-		/// <param name="memberName">Name of the member</param>
-		/// <param name="args">Method arguments</param>
-		/// <returns>Number of calls.</returns>
-		int GetTimesCalled(Type type, string memberName, params object[] args);
+        /// <summary>
+        /// Returns the number of times the specified member was called.
+        /// </summary>
+        /// <param name="type">Type of the target</param>
+        /// <param name="memberName">Name of the member</param>
+        /// <param name="args">Method arguments</param>
+        /// <returns>Number of calls.</returns>
+        int GetTimesCalled(Type type, string memberName, params object[] args);
 
         /// <summary>
         /// Returns the number of times the specified member was called.
@@ -533,114 +533,114 @@ namespace Telerik.JustMock.Expectations.Abstraction
         /// <param name="args">Arguments to pass to the event handlers.</param>
         void Raise(object instance, EventInfo eventInfo, params object[] args);
 
-		/// <summary>
-		/// Raises a static event specified using reflection. If the event is declared on a C# or VB class
-		/// and has the default implementation for add/remove, then that event can also be raised using this 
-		/// method, even with the profiler off.
-		/// </summary>
-		/// <param name="eventInfo">The event to raise.</param>
-		/// <param name="args">Arguments to pass to the event handlers.</param>
-		void Raise(EventInfo eventInfo, params object[] args);
+        /// <summary>
+        /// Raises a static event specified using reflection. If the event is declared on a C# or VB class
+        /// and has the default implementation for add/remove, then that event can also be raised using this 
+        /// method, even with the profiler off.
+        /// </summary>
+        /// <param name="eventInfo">The event to raise.</param>
+        /// <param name="args">Arguments to pass to the event handlers.</param>
+        void Raise(EventInfo eventInfo, params object[] args);
 
-		/// <summary>
-		/// Raises an event by name. If the event is declared on a C# or VB class
-		/// and has the default implementation for add/remove, then that event can also be raised using this 
-		/// method, even with the profiler off.
-		/// </summary>
-		/// <param name="instance">Instance on which to raise the event.</param>
-		/// <param name="eventName">The name of event to raise.</param>
-		/// <param name="args">Arguments to pass to the event handlers.</param>
-		void Raise(object instance, string eventName, params object[] args);
+        /// <summary>
+        /// Raises an event by name. If the event is declared on a C# or VB class
+        /// and has the default implementation for add/remove, then that event can also be raised using this 
+        /// method, even with the profiler off.
+        /// </summary>
+        /// <param name="instance">Instance on which to raise the event.</param>
+        /// <param name="eventName">The name of event to raise.</param>
+        /// <param name="args">Arguments to pass to the event handlers.</param>
+        void Raise(object instance, string eventName, params object[] args);
 
-		/// <summary>
-		/// Raises a static event by name. If the event is declared on a C# or VB class
-		/// and has the default implementation for add/remove, then that event can also be raised using this 
-		/// method, even with the profiler off.
-		/// </summary>
-		/// <param name="type">The type on which the event is declared.</param>
-		/// <param name="eventName">The name of event to raise.</param>
-		/// <param name="args">Arguments to pass to the event handlers.</param>
-		void Raise(Type type, string eventName, params object[] args);
+        /// <summary>
+        /// Raises a static event by name. If the event is declared on a C# or VB class
+        /// and has the default implementation for add/remove, then that event can also be raised using this 
+        /// method, even with the profiler off.
+        /// </summary>
+        /// <param name="type">The type on which the event is declared.</param>
+        /// <param name="eventName">The name of event to raise.</param>
+        /// <param name="args">Arguments to pass to the event handlers.</param>
+        void Raise(Type type, string eventName, params object[] args);
 
-		/// <summary>
-		/// Creates an accessor object that can invoke non-public methods and get/set non-public properties and fields.
-		/// Equivalent to <code>new PrivateAccessor(instance)</code>.
-		/// </summary>
-		/// <param name="instance">Instance to which non-public access will be given.</param>
-		/// <returns>Non-public accessor.</returns>
-		PrivateAccessor MakePrivateAccessor(object instance);
+        /// <summary>
+        /// Creates an accessor object that can invoke non-public methods and get/set non-public properties and fields.
+        /// Equivalent to <code>new PrivateAccessor(instance)</code>.
+        /// </summary>
+        /// <param name="instance">Instance to which non-public access will be given.</param>
+        /// <returns>Non-public accessor.</returns>
+        PrivateAccessor MakePrivateAccessor(object instance);
 
-		/// <summary>
-		/// Creates an accessor object that can invoke static (Shared in Visual Basic) non-public methods and static get/set non-public properties and fields.
-		/// Equivalent to <code>PrivateAccessor.ForType(type)</code>.
-		/// </summary>
-		/// <param name="type">Type whose static members will be given non-public access to.</param>
-		/// <returns>Non-public accessor.</returns>
-		PrivateAccessor MakeStaticPrivateAccessor(Type type);
+        /// <summary>
+        /// Creates an accessor object that can invoke static (Shared in Visual Basic) non-public methods and static get/set non-public properties and fields.
+        /// Equivalent to <code>PrivateAccessor.ForType(type)</code>.
+        /// </summary>
+        /// <param name="type">Type whose static members will be given non-public access to.</param>
+        /// <returns>Non-public accessor.</returns>
+        PrivateAccessor MakeStaticPrivateAccessor(Type type);
 
-		/// <summary>
-		/// Returns a dynamic wrapper of the given object that can be used to arrange non-public instance members on the object.
-		/// </summary>
-		/// <param name="instance">The object to wrap.</param>
-		/// <returns>A wrapper that can be passed to Arrange.</returns>
-		dynamic Wrap(object instance);
+        /// <summary>
+        /// Returns a dynamic wrapper of the given object that can be used to arrange non-public instance members on the object.
+        /// </summary>
+        /// <param name="instance">The object to wrap.</param>
+        /// <returns>A wrapper that can be passed to Arrange.</returns>
+        dynamic Wrap(object instance);
 
-		/// <summary>
-		/// Returns a dynamic wrapper of the given type that can be used to arrange non-public static members on the type.
-		/// </summary>
-		/// <param name="type">The type to wrap.</param>
-		/// <returns>A wrapper that can be passed to Arrange.</returns>
-		dynamic WrapType(Type type);
+        /// <summary>
+        /// Returns a dynamic wrapper of the given type that can be used to arrange non-public static members on the type.
+        /// </summary>
+        /// <param name="type">The type to wrap.</param>
+        /// <returns>A wrapper that can be passed to Arrange.</returns>
+        dynamic WrapType(Type type);
 
-		/// <summary>
-		/// Arranges an expectation on a void method given using a dynamic wrapper built with Wrap().
-		/// </summary>
-		/// <param name="dynamicExpression">An expression built using a wrapper returned by Wrap.</param>
-		/// <returns>An expectation object that can further configure the arrangement</returns>
-		/// <example>
-		/// var mock = Mock.NonPublic.Wrap(myobj);
-		/// Mock.NonPublic.Arrange(mock.PrivateMethod(ArgExpr.IsAny&lt;int&gt;()).DoNothing();
-		/// Mock.NonPublic.Arrange(mock.Value = ArgExpr.IsAny&lt;int&gt;()).MustBeCalled();
-		/// 
-		/// var staticMock = Mock.NonPublic.WrapType(typeof(MyType));
-		/// Mock.NonPublic.Arrange(staticMock.PrivateMethod()).DoNothing();
-		/// </example>
-		ActionExpectation Arrange(dynamic dynamicExpression);
+        /// <summary>
+        /// Arranges an expectation on a void method given using a dynamic wrapper built with Wrap().
+        /// </summary>
+        /// <param name="dynamicExpression">An expression built using a wrapper returned by Wrap.</param>
+        /// <returns>An expectation object that can further configure the arrangement</returns>
+        /// <example>
+        /// var mock = Mock.NonPublic.Wrap(myobj);
+        /// Mock.NonPublic.Arrange(mock.PrivateMethod(ArgExpr.IsAny&lt;int&gt;()).DoNothing();
+        /// Mock.NonPublic.Arrange(mock.Value = ArgExpr.IsAny&lt;int&gt;()).MustBeCalled();
+        /// 
+        /// var staticMock = Mock.NonPublic.WrapType(typeof(MyType));
+        /// Mock.NonPublic.Arrange(staticMock.PrivateMethod()).DoNothing();
+        /// </example>
+        ActionExpectation Arrange(dynamic dynamicExpression);
 
-		/// <summary>
-		/// Arranges an expectation on a non-void method given using a dynamic wrapper built with Wrap().
-		/// </summary>
-		/// <param name="dynamicExpression">An expression built using a wrapper returned by Wrap.</param>
-		/// <returns>An expectation object that can further configure the arrangement</returns>
-		/// <example>
-		/// var mock = Mock.NonPublic.Wrap(myobj);
-		/// Mock.NonPublic.Arrange&lt;int&gt;(mock.PrivateValue).Returns(123);
-		/// Mock.NonPublic.Arrange&lt;string&gt;(mock.GetNamePrivate(123)).Returns("me");
-		/// </example>
-		FuncExpectation<TReturn> Arrange<TReturn>(dynamic dynamicExpression);
+        /// <summary>
+        /// Arranges an expectation on a non-void method given using a dynamic wrapper built with Wrap().
+        /// </summary>
+        /// <param name="dynamicExpression">An expression built using a wrapper returned by Wrap.</param>
+        /// <returns>An expectation object that can further configure the arrangement</returns>
+        /// <example>
+        /// var mock = Mock.NonPublic.Wrap(myobj);
+        /// Mock.NonPublic.Arrange&lt;int&gt;(mock.PrivateValue).Returns(123);
+        /// Mock.NonPublic.Arrange&lt;string&gt;(mock.GetNamePrivate(123)).Returns("me");
+        /// </example>
+        FuncExpectation<TReturn> Arrange<TReturn>(dynamic dynamicExpression);
 
-		/// <summary>
-		/// Asserts an expectation given using a dynamic wrapper built with Wrap()
-		/// </summary>
-		/// <param name="dynamicExpression">An expression built using a wrapper returned by Wrap.</param>
-		/// <param name="occurs">Occurrence expectation to assert.</param>
-		/// <param name="message">A message to display if the assertion fails.</param>
-		void Assert(dynamic dynamicExpression, Occurs occurs, string message = null);
+        /// <summary>
+        /// Asserts an expectation given using a dynamic wrapper built with Wrap()
+        /// </summary>
+        /// <param name="dynamicExpression">An expression built using a wrapper returned by Wrap.</param>
+        /// <param name="occurs">Occurrence expectation to assert.</param>
+        /// <param name="message">A message to display if the assertion fails.</param>
+        void Assert(dynamic dynamicExpression, Occurs occurs, string message = null);
 
-		/// <summary>
-		/// Asserts an expectation given using a dynamic wrapper built with Wrap()
-		/// </summary>
-		/// <param name="dynamicExpression">An expression built using a wrapper returned by Wrap.</param>
-		/// <param name="args">Additional arguments to clarify the assertion expression.</param>
-		/// <param name="occurs">Occurrence expectation to assert.</param>
-		/// <param name="message">A message to display if the assertion fails.</param>
-		void Assert(dynamic dynamicExpression, Args args, Occurs occurs, string message = null);
+        /// <summary>
+        /// Asserts an expectation given using a dynamic wrapper built with Wrap()
+        /// </summary>
+        /// <param name="dynamicExpression">An expression built using a wrapper returned by Wrap.</param>
+        /// <param name="args">Additional arguments to clarify the assertion expression.</param>
+        /// <param name="occurs">Occurrence expectation to assert.</param>
+        /// <param name="message">A message to display if the assertion fails.</param>
+        void Assert(dynamic dynamicExpression, Args args, Occurs occurs, string message = null);
 
 #if !PORTABLE
-		/// <summary>
-		/// Non public ref return interface for mocking.
-		/// </summary>
-		INonPublicRefReturnExpectation RefReturn { get; }
+        /// <summary>
+        /// Non public ref return interface for mocking.
+        /// </summary>
+        INonPublicRefReturnExpectation RefReturn { get; }
 #endif
-	}
+    }
 }

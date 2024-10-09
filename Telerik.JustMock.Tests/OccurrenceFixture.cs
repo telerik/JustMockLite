@@ -48,213 +48,213 @@ using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFa
 
 namespace Telerik.JustMock.Tests
 {
-	[TestClass]
-	public class OccurrenceFixture
-	{
-		[TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
-		public void ShouldAssertOccursNever()
-		{
-			var foo = Mock.Create<IFoo>();
+    [TestClass]
+    public class OccurrenceFixture
+    {
+        [TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
+        public void ShouldAssertOccursNever()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			Mock.Assert(() => foo.Submit(), Occurs.Never());
-		}
+            Mock.Assert(() => foo.Submit(), Occurs.Never());
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
-		public void ShouldAssertOccursNeverOnArrangedMethod()
-		{
-			var foo = Mock.Create<IFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
+        public void ShouldAssertOccursNeverOnArrangedMethod()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			Mock.Arrange(() => foo.Submit()).DoNothing();
+            Mock.Arrange(() => foo.Submit()).DoNothing();
 
-			Mock.Assert(() => foo.Submit(), Occurs.Never());
-		}
+            Mock.Assert(() => foo.Submit(), Occurs.Never());
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
-		public void ShouldThrowWhenAnyCallIsMadeForOccursNever()
-		{
-			var foo = Mock.Create<IFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
+        public void ShouldThrowWhenAnyCallIsMadeForOccursNever()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			foo.Submit();
+            foo.Submit();
 
-			Assert.Throws<AssertionException>(() => Mock.Assert(() => foo.Submit(), Occurs.Never()));
-		}
+            Assert.Throws<AssertionException>(() => Mock.Assert(() => foo.Submit(), Occurs.Never()));
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
-		public void ShouldAssertExpectedOnce()
-		{
-			var foo = Mock.Create<IFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
+        public void ShouldAssertExpectedOnce()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			foo.Submit();
+            foo.Submit();
 
-			Mock.Assert(() => foo.Submit(), Occurs.Once());
-		}
+            Mock.Assert(() => foo.Submit(), Occurs.Once());
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
-		public void ShouldAssertAtLeastOnce()
-		{
-			var foo = Mock.Create<IFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
+        public void ShouldAssertAtLeastOnce()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			Assert.Throws<AssertionException>(() => Mock.Assert(() => foo.Submit(), Occurs.AtLeastOnce()));
+            Assert.Throws<AssertionException>(() => Mock.Assert(() => foo.Submit(), Occurs.AtLeastOnce()));
 
-			foo.Submit();
+            foo.Submit();
 
-			Mock.Assert(() => foo.Submit(), Occurs.AtLeastOnce());
+            Mock.Assert(() => foo.Submit(), Occurs.AtLeastOnce());
 
-			foo.Submit();
-			foo.Submit();
+            foo.Submit();
+            foo.Submit();
 
-			Mock.Assert(() => foo.Submit(), Occurs.AtLeastOnce());
-		}
+            Mock.Assert(() => foo.Submit(), Occurs.AtLeastOnce());
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
-		public void ShouldThrowWhenCallsAreMoreThanExpectedOnce()
-		{
-			var foo = Mock.Create<IFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
+        public void ShouldThrowWhenCallsAreMoreThanExpectedOnce()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			foo.Submit();
-			foo.Submit();
+            foo.Submit();
+            foo.Submit();
 
-			Assert.Throws<AssertionException>(() => Mock.Assert(() => foo.Submit(), Occurs.Once()));
-		}
+            Assert.Throws<AssertionException>(() => Mock.Assert(() => foo.Submit(), Occurs.Once()));
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
-		public void ShouldThrowWhenExpectedIsLessThanAtleastNumberOfTimes()
-		{
-			var foo = Mock.Create<IFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
+        public void ShouldThrowWhenExpectedIsLessThanAtleastNumberOfTimes()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			foo.Submit();
-			foo.Submit();
+            foo.Submit();
+            foo.Submit();
 
-			Assert.Throws<AssertionException>(() => Mock.Assert(() => foo.Submit(), Occurs.AtLeast(3)));
+            Assert.Throws<AssertionException>(() => Mock.Assert(() => foo.Submit(), Occurs.AtLeast(3)));
 
-			foo.Submit();
+            foo.Submit();
 
-			Mock.Assert(() => foo.Submit(), Occurs.AtLeast(3));
-		}
+            Mock.Assert(() => foo.Submit(), Occurs.AtLeast(3));
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
-		public void ShouldThrowWhenExpectedCallsAreLessThanTheAtMostNumberOfTImes()
-		{
-			var foo = Mock.Create<IFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
+        public void ShouldThrowWhenExpectedCallsAreLessThanTheAtMostNumberOfTImes()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			foo.Submit();
-			foo.Submit();
+            foo.Submit();
+            foo.Submit();
 
-			Mock.Assert(() => foo.Submit(), Occurs.AtMost(2));
+            Mock.Assert(() => foo.Submit(), Occurs.AtMost(2));
 
-			foo.Submit();
-			foo.Submit();
+            foo.Submit();
+            foo.Submit();
 
-			Assert.Throws<AssertionException>(() => Mock.Assert(() => foo.Submit(), Occurs.AtMost(3)));
-		}
+            Assert.Throws<AssertionException>(() => Mock.Assert(() => foo.Submit(), Occurs.AtMost(3)));
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
-		public void ShouldThrowWhenExpectedCallsAreLessThanExactNumberOfTimes()
-		{
-			var foo = Mock.Create<IFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
+        public void ShouldThrowWhenExpectedCallsAreLessThanExactNumberOfTimes()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			foo.Submit();
-			foo.Submit();
+            foo.Submit();
+            foo.Submit();
 
-			Assert.Throws<AssertionException>(() => Mock.Assert(() => foo.Submit(), Occurs.Exactly(3)));
-		}
+            Assert.Throws<AssertionException>(() => Mock.Assert(() => foo.Submit(), Occurs.Exactly(3)));
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
-		public void ShouldThrowWhenExpectedCallsAreMoreThanExactNumberOfTimes()
-		{
-			var foo = Mock.Create<IFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
+        public void ShouldThrowWhenExpectedCallsAreMoreThanExactNumberOfTimes()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			foo.Submit();
-			foo.Submit();
-			foo.Submit();
-			foo.Submit();
+            foo.Submit();
+            foo.Submit();
+            foo.Submit();
+            foo.Submit();
 
-			Assert.Throws<AssertionException>(() => Mock.Assert(() => foo.Submit(), Occurs.Exactly(3)));
-		}
+            Assert.Throws<AssertionException>(() => Mock.Assert(() => foo.Submit(), Occurs.Exactly(3)));
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
-		public void ShouldAssertExpectedFormatReturnedForSpecificOccurence()
-		{
-			var foo = Mock.Create<IFoo>();
-			Assert.Throws<AssertionException>(() => Mock.Assert(() => foo.Echo(1), Occurs.Exactly(1)));
-		}
+        [TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
+        public void ShouldAssertExpectedFormatReturnedForSpecificOccurence()
+        {
+            var foo = Mock.Create<IFoo>();
+            Assert.Throws<AssertionException>(() => Mock.Assert(() => foo.Echo(1), Occurs.Exactly(1)));
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
-		public void ShouldAssertUnmatchedOccurrenceFromArrangeOfCallPatternWithAny()
-		{
-			var foo = Mock.Create<IFoo>();
-			Mock.Arrange(() => foo.Echo(Arg.AnyInt)).OccursOnce();
-			Assert.Throws<AssertionException>(() => Mock.Assert(foo));
-		}
+        [TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
+        public void ShouldAssertUnmatchedOccurrenceFromArrangeOfCallPatternWithAny()
+        {
+            var foo = Mock.Create<IFoo>();
+            Mock.Arrange(() => foo.Echo(Arg.AnyInt)).OccursOnce();
+            Assert.Throws<AssertionException>(() => Mock.Assert(foo));
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
-		public void ShouldAssertUnexpectedCallForCallPatternWithTypeMatcher()
-		{
-			var foo = Mock.Create<IFoo>();
-			Mock.Arrange(() => foo.Echo(Arg.AnyInt)).OccursNever();
-			Mock.Assert(foo);
+        [TestMethod, TestCategory("Lite"), TestCategory("Occurrence")]
+        public void ShouldAssertUnexpectedCallForCallPatternWithTypeMatcher()
+        {
+            var foo = Mock.Create<IFoo>();
+            Mock.Arrange(() => foo.Echo(Arg.AnyInt)).OccursNever();
+            Mock.Assert(foo);
 
-			Assert.Throws<AssertionException>(() => foo.Echo(15));
-			Assert.Throws<AssertionException>(() => Mock.Assert(foo));
-		}
+            Assert.Throws<AssertionException>(() => foo.Echo(15));
+            Assert.Throws<AssertionException>(() => Mock.Assert(foo));
+        }
 
-		public interface IFoo
-		{
-			void Submit();
-			int Echo(int intArg);
-		}
+        public interface IFoo
+        {
+            void Submit();
+            int Echo(int intArg);
+        }
 
-		public class BaseClass
-		{
-			public void BaseMethod() { }
-			public void GenericBaseMethod<T>() { }
-		}
+        public class BaseClass
+        {
+            public void BaseMethod() { }
+            public void GenericBaseMethod<T>() { }
+        }
 
-		public class DerivedClass : BaseClass
-		{ }
+        public class DerivedClass : BaseClass
+        { }
 
-		public class GenericBaseClass<T>
-		{
-			public void GenericBaseMethod<U, V>() { }
-		}
+        public class GenericBaseClass<T>
+        {
+            public void GenericBaseMethod<U, V>() { }
+        }
 
-		public class GenericDerivedClass<T> : GenericBaseClass<T>
-		{ }
+        public class GenericDerivedClass<T> : GenericBaseClass<T>
+        { }
 
-		public interface IFooProvider
-		{
-			IFoo TheFoo { get; }
-		}
+        public interface IFooProvider
+        {
+            IFoo TheFoo { get; }
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Occurrence"), TestCategory("Bug")]
-		public void ShouldNotChangeOccurrenceCountDuringRecursiveArrange()
-		{
-			var mock = Mock.Create<IFooProvider>();
-			Mock.Arrange(() => mock.TheFoo.Submit());
-			Mock.Assert(() => mock.TheFoo, Occurs.Never());
-		}
+        [TestMethod, TestCategory("Lite"), TestCategory("Occurrence"), TestCategory("Bug")]
+        public void ShouldNotChangeOccurrenceCountDuringRecursiveArrange()
+        {
+            var mock = Mock.Create<IFooProvider>();
+            Mock.Arrange(() => mock.TheFoo.Submit());
+            Mock.Assert(() => mock.TheFoo, Occurs.Never());
+        }
 
-		public interface IContainerResolver
-		{
-			T Resolve<T>(Dictionary<string, object> data);
-		}
+        public interface IContainerResolver
+        {
+            T Resolve<T>(Dictionary<string, object> data);
+        }
 
-		public class MockDirectoryInfo
-		{
-			public MockDirectoryInfo(string path)
-			{
-			}
-		}
+        public class MockDirectoryInfo
+        {
+            public MockDirectoryInfo(string path)
+            {
+            }
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Occurrence"), TestCategory("Bug")]
-		public void ShouldArrangeAndAssertExpressionInvolvingCollectionInitializerSyntax()
-		{
-			IContainerResolver containerResolver = Mock.Create<IContainerResolver>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Occurrence"), TestCategory("Bug")]
+        public void ShouldArrangeAndAssertExpressionInvolvingCollectionInitializerSyntax()
+        {
+            IContainerResolver containerResolver = Mock.Create<IContainerResolver>();
 
-			Mock.Arrange(() => containerResolver.Resolve<MockDirectoryInfo>(new Dictionary<string, object> { { "path", @"pptestRoot\DrivesData\TestFamily" } })).Returns(new MockDirectoryInfo("ss")).OccursOnce();
+            Mock.Arrange(() => containerResolver.Resolve<MockDirectoryInfo>(new Dictionary<string, object> { { "path", @"pptestRoot\DrivesData\TestFamily" } })).Returns(new MockDirectoryInfo("ss")).OccursOnce();
 
-			var ex = Assert.Throws<AssertionException>(() => Mock.Assert(containerResolver));
-			Assert.True(ex.Message.Contains("Occurrence expectation failed."));
-		}
-	}
+            var ex = Assert.Throws<AssertionException>(() => Mock.Assert(containerResolver));
+            Assert.True(ex.Message.Contains("Occurrence expectation failed."));
+        }
+    }
 }

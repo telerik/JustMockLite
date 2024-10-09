@@ -14,13 +14,13 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST
 {
-	using System.Reflection.Emit;
+    using System.Reflection.Emit;
 
-	internal class EndExceptionBlockStatement : IStatement
-	{
-		public void Emit(ILGenerator gen)
-		{
-			gen.EndExceptionBlock();
-		}
-	}
+    internal class EndExceptionBlockStatement : IStatement
+    {
+        public void Emit(ILGenerator gen)
+        {
+            gen.EndExceptionBlock();
+        }
+    }
 }

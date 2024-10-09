@@ -19,9 +19,9 @@ using Telerik.Sitefinity.Web.UI.Fields.Config;
 
 namespace Telerik.Sitefinity.Fluent.Definitions.Fields
 {
-	public class ChoiceFieldDefinitionFacade<TParentFacade>
-		: BaseChoiceFieldDefinitionFacade<ChoiceFieldElement, ChoiceFieldDefinitionFacade<TParentFacade>, TParentFacade>
-		where TParentFacade : class
-	{
-	}
+    public class ChoiceFieldDefinitionFacade<TParentFacade>
+        : BaseChoiceFieldDefinitionFacade<ChoiceFieldElement, ChoiceFieldDefinitionFacade<TParentFacade>, TParentFacade>
+        where TParentFacade : class
+    {
+    }
 }

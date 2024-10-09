@@ -23,88 +23,88 @@ using System.Reflection;
 
 namespace Telerik.JustMock.Core.Context
 {
-	internal class MSpecContextResolver : MockingContextResolverBase
-	{
-		private const string MSpecAssertionFailedName = "Machine.Specifications.SpecificationException, Machine.Specifications";
+    internal class MSpecContextResolver : MockingContextResolverBase
+    {
+        private const string MSpecAssertionFailedName = "Machine.Specifications.SpecificationException, Machine.Specifications";
 
-		private readonly Dictionary<Type, MocksRepository> repositories = new Dictionary<Type, MocksRepository>();
+        private readonly Dictionary<Type, MocksRepository> repositories = new Dictionary<Type, MocksRepository>();
 
-		public MSpecContextResolver()
-			: base(MSpecAssertionFailedName)
-		{
-		}
+        public MSpecContextResolver()
+            : base(MSpecAssertionFailedName)
+        {
+        }
 
-		public override MocksRepository ResolveRepository(UnresolvedContextBehavior unresolvedContextBehavior)
-		{
-			lock (this.repositorySync)
-			{
-				var testMethod = this.GetTestMethod();
-				if (testMethod != null)
-				{
-					return repositories[testMethod.DeclaringType];
-				}
+        public override MocksRepository ResolveRepository(UnresolvedContextBehavior unresolvedContextBehavior)
+        {
+            lock (this.repositorySync)
+            {
+                var testMethod = this.GetTestMethod();
+                if (testMethod != null)
+                {
+                    return repositories[testMethod.DeclaringType];
+                }
 
-				if (unresolvedContextBehavior == UnresolvedContextBehavior.DoNotCreateNew)
-				{
-					return null;
-				}
+                if (unresolvedContextBehavior == UnresolvedContextBehavior.DoNotCreateNew)
+                {
+                    return null;
+                }
 
-				var stackTrace = new StackTrace();
-				var frames = stackTrace.EnumerateFrames().ToList();
-				var caller = frames.FirstOrDefault(method => method.Module.Assembly != typeof(MocksRepository).Assembly);
-				var mspecTestClass = caller.DeclaringType;
+                var stackTrace = new StackTrace();
+                var frames = stackTrace.EnumerateFrames().ToList();
+                var caller = frames.FirstOrDefault(method => method.Module.Assembly != typeof(MocksRepository).Assembly);
+                var mspecTestClass = caller.DeclaringType;
 
-				MocksRepository parentRepo;
-				repositories.TryGetValue(mspecTestClass.BaseType, out parentRepo);
+                MocksRepository parentRepo;
+                repositories.TryGetValue(mspecTestClass.BaseType, out parentRepo);
 
-				var repo = new MocksRepository(parentRepo, caller);
-				repositories.Add(mspecTestClass, repo);
+                var repo = new MocksRepository(parentRepo, caller);
+                repositories.Add(mspecTestClass, repo);
 
-				return repo;
-			}
-		}
+                return repo;
+            }
+        }
 
-		public override bool RetireRepository()
-		{
-			lock (this.repositorySync)
-			{
-				var stackTrace = new StackTrace();
-				var testMethod = FindExistingTestMethod(stackTrace.EnumerateFrames());
-				if (testMethod == null)
-				{
-					return false;
-				}
+        public override bool RetireRepository()
+        {
+            lock (this.repositorySync)
+            {
+                var stackTrace = new StackTrace();
+                var testMethod = FindExistingTestMethod(stackTrace.EnumerateFrames());
+                if (testMethod == null)
+                {
+                    return false;
+                }
 
-				var key = testMethod.DeclaringType;
-				var repo = repositories[key];
-				repositories.Remove(key);
-				repo.Retire();
+                var key = testMethod.DeclaringType;
+                var repo = repositories[key];
+                repositories.Remove(key);
+                repo.Retire();
 
-				return true;
-			}
-		}
+                return true;
+            }
+        }
 
-		public override MethodBase GetTestMethod()
-		{
-			var stackTrace = new StackTrace();
-			var frames = stackTrace.EnumerateFrames().ToList();
-			var testMethod = this.FindExistingTestMethod(frames);
+        public override MethodBase GetTestMethod()
+        {
+            var stackTrace = new StackTrace();
+            var frames = stackTrace.EnumerateFrames().ToList();
+            var testMethod = this.FindExistingTestMethod(frames);
 
-			return testMethod;
-		}
+            return testMethod;
+        }
 
-		public static bool IsAvailable
-		{
-			get { return FindType(MSpecAssertionFailedName, false) != null; }
-		}
+        public static bool IsAvailable
+        {
+            get { return FindType(MSpecAssertionFailedName, false) != null; }
+        }
 
-		private MethodBase FindExistingTestMethod(IEnumerable<MethodBase> frames)
-		{
-			var q = from method in frames
-					where method.DeclaringType != null && repositories.ContainsKey(method.DeclaringType)
-					select method;
+        private MethodBase FindExistingTestMethod(IEnumerable<MethodBase> frames)
+        {
+            var q = from method in frames
+                    where method.DeclaringType != null && repositories.ContainsKey(method.DeclaringType)
+                    select method;
 
-			return q.FirstOrDefault();
-		}
-	}
+            return q.FirstOrDefault();
+        }
+    }
 }

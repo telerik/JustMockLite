@@ -14,105 +14,105 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 {
-	using System;
-	using System.Linq;
-	using System.Reflection;
-	using System.Reflection.Emit;
+    using System;
+    using System.Linq;
+    using System.Reflection;
+    using System.Reflection.Emit;
 
-	using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+    using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 
-	internal abstract class ArgumentsUtil
-	{
-		public static ArgumentReference[] ConvertToArgumentReference(Type[] args)
-		{
-			var arguments = new ArgumentReference[args.Length];
+    internal abstract class ArgumentsUtil
+    {
+        public static ArgumentReference[] ConvertToArgumentReference(Type[] args)
+        {
+            var arguments = new ArgumentReference[args.Length];
 
-			for (var i = 0; i < args.Length; ++i)
-			{
-				arguments[i] = new ArgumentReference(args[i]);
-			}
+            for (var i = 0; i < args.Length; ++i)
+            {
+                arguments[i] = new ArgumentReference(args[i]);
+            }
 
-			return arguments;
-		}
+            return arguments;
+        }
 
-		public static ArgumentReference[] ConvertToArgumentReference(ParameterInfo[] args)
-		{
-			var arguments = new ArgumentReference[args.Length];
+        public static ArgumentReference[] ConvertToArgumentReference(ParameterInfo[] args)
+        {
+            var arguments = new ArgumentReference[args.Length];
 
-			for (var i = 0; i < args.Length; ++i)
-			{
-				arguments[i] = new ArgumentReference(args[i].ParameterType);
-			}
+            for (var i = 0; i < args.Length; ++i)
+            {
+                arguments[i] = new ArgumentReference(args[i].ParameterType);
+            }
 
-			return arguments;
-		}
+            return arguments;
+        }
 
-		public static IExpression[] ConvertToArgumentReferenceExpression(ParameterInfo[] args)
-		{
-			var arguments = new IExpression[args.Length];
+        public static IExpression[] ConvertToArgumentReferenceExpression(ParameterInfo[] args)
+        {
+            var arguments = new IExpression[args.Length];
 
-			for (var i = 0; i < args.Length; ++i)
-			{
-				arguments[i] = new ArgumentReference(args[i].ParameterType, i + 1, args[i].Attributes);
-			}
+            for (var i = 0; i < args.Length; ++i)
+            {
+                arguments[i] = new ArgumentReference(args[i].ParameterType, i + 1, args[i].Attributes);
+            }
 
-			return arguments;
-		}
+            return arguments;
+        }
 
-		public static void EmitLoadOwnerAndReference(Reference reference, ILGenerator il)
-		{
-			if (reference == null)
-			{
-				return;
-			}
+        public static void EmitLoadOwnerAndReference(Reference reference, ILGenerator il)
+        {
+            if (reference == null)
+            {
+                return;
+            }
 
-			EmitLoadOwnerAndReference(reference.OwnerReference, il);
+            EmitLoadOwnerAndReference(reference.OwnerReference, il);
 
-			reference.LoadReference(il);
-		}
+            reference.LoadReference(il);
+        }
 
-		public static Type[] GetTypes(ParameterInfo[] parameters)
-		{
-			var types = new Type[parameters.Length];
-			for (var i = 0; i < parameters.Length; i++)
-			{
-				types[i] = parameters[i].ParameterType;
-			}
-			return types;
-		}
+        public static Type[] GetTypes(ParameterInfo[] parameters)
+        {
+            var types = new Type[parameters.Length];
+            for (var i = 0; i < parameters.Length; i++)
+            {
+                types[i] = parameters[i].ParameterType;
+            }
+            return types;
+        }
 
-		public static Type[] InitializeAndConvert(ArgumentReference[] args)
-		{
-			var types = new Type[args.Length];
+        public static Type[] InitializeAndConvert(ArgumentReference[] args)
+        {
+            var types = new Type[args.Length];
 
-			for (var i = 0; i < args.Length; ++i)
-			{
-				args[i].Position = i + 1;
-				types[i] = args[i].Type;
-			}
+            for (var i = 0; i < args.Length; ++i)
+            {
+                args[i].Position = i + 1;
+                types[i] = args[i].Type;
+            }
 
-			return types;
-		}
+            return types;
+        }
 
-		public static void InitializeArgumentsByPosition(ArgumentReference[] args, bool isStatic)
-		{
-			var offset = isStatic ? 0 : 1;
-			for (var i = 0; i < args.Length; ++i)
-			{
-				args[i].Position = i + offset;
-			}
-		}
+        public static void InitializeArgumentsByPosition(ArgumentReference[] args, bool isStatic)
+        {
+            var offset = isStatic ? 0 : 1;
+            for (var i = 0; i < args.Length; ++i)
+            {
+                args[i].Position = i + offset;
+            }
+        }
 
-		public static MethodInfo PointerFromIntPtr()
-		{
-			return typeof(IntPtr).GetMethods(BindingFlags.Public | BindingFlags.Static)
-					.First(m => m.Name == "op_Explicit" && m.ReturnType.IsPointer);
-		}
+        public static MethodInfo PointerFromIntPtr()
+        {
+            return typeof(IntPtr).GetMethods(BindingFlags.Public | BindingFlags.Static)
+                    .First(m => m.Name == "op_Explicit" && m.ReturnType.IsPointer);
+        }
 
-		public static MethodInfo IntPtrFromPointer()
-		{
-			return typeof(IntPtr).GetMethods(BindingFlags.Public | BindingFlags.Static)
-					.First(m => m.Name == "op_Explicit" && m.GetParameters()[0].ParameterType.IsPointer);
-		}
-	}
+        public static MethodInfo IntPtrFromPointer()
+        {
+            return typeof(IntPtr).GetMethods(BindingFlags.Public | BindingFlags.Static)
+                    .First(m => m.Name == "op_Explicit" && m.GetParameters()[0].ParameterType.IsPointer);
+        }
+    }
 }

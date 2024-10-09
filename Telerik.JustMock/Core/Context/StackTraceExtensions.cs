@@ -25,76 +25,76 @@ using Telerik.JustMock.Core.Internal;
 
 namespace Telerik.JustMock.Core.Context
 {
-	internal static class StackTraceExtensions
-	{
-		private static readonly Dictionary<MethodBase, MethodBase> entryPointCache = new Dictionary<MethodBase, MethodBase>();
-		private static readonly Lock entryPointCacheLock = Lock.Create();
+    internal static class StackTraceExtensions
+    {
+        private static readonly Dictionary<MethodBase, MethodBase> entryPointCache = new Dictionary<MethodBase, MethodBase>();
+        private static readonly Lock entryPointCacheLock = Lock.Create();
 
-		private static readonly Type IAsyncStateMachineType;
-		private static readonly Type StateMachineAttributeType;
-		private static readonly PropertyInfo StateMachineTypeProperty;
+        private static readonly Type IAsyncStateMachineType;
+        private static readonly Type StateMachineAttributeType;
+        private static readonly PropertyInfo StateMachineTypeProperty;
 
-		static StackTraceExtensions()
-		{
-			IAsyncStateMachineType = Type.GetType("System.Runtime.CompilerServices.IAsyncStateMachine");
-			StateMachineAttributeType = Type.GetType("System.Runtime.CompilerServices.StateMachineAttribute");
-			if (StateMachineAttributeType != null)
-				StateMachineTypeProperty = StateMachineAttributeType.GetProperty("StateMachineType");
-		}
+        static StackTraceExtensions()
+        {
+            IAsyncStateMachineType = Type.GetType("System.Runtime.CompilerServices.IAsyncStateMachine");
+            StateMachineAttributeType = Type.GetType("System.Runtime.CompilerServices.StateMachineAttribute");
+            if (StateMachineAttributeType != null)
+                StateMachineTypeProperty = StateMachineAttributeType.GetProperty("StateMachineType");
+        }
 
-		public static IEnumerable<MethodBase> EnumerateFrames(this StackTrace stackTrace)
-		{
-			return EnumerateFramesVerbatim(stackTrace)
-				.Select(GetEntryPointFromStateMachineCached);
-		}
+        public static IEnumerable<MethodBase> EnumerateFrames(this StackTrace stackTrace)
+        {
+            return EnumerateFramesVerbatim(stackTrace)
+                .Select(GetEntryPointFromStateMachineCached);
+        }
 
-		private static MethodBase GetEntryPointFromStateMachineCached(MethodBase method)
-		{
-			if (StateMachineAttributeType == null)
-				return method;
+        private static MethodBase GetEntryPointFromStateMachineCached(MethodBase method)
+        {
+            if (StateMachineAttributeType == null)
+                return method;
 
-			using (var locker = entryPointCacheLock.ForReadingUpgradeable())
-			{
-				MethodBase entryMethod;
-				if (entryPointCache.TryGetValue(method, out entryMethod))
-					return entryMethod;
-				locker.Upgrade();
-				if (entryPointCache.TryGetValue(method, out entryMethod))
-					return entryMethod;
+            using (var locker = entryPointCacheLock.ForReadingUpgradeable())
+            {
+                MethodBase entryMethod;
+                if (entryPointCache.TryGetValue(method, out entryMethod))
+                    return entryMethod;
+                locker.Upgrade();
+                if (entryPointCache.TryGetValue(method, out entryMethod))
+                    return entryMethod;
 
-				entryMethod = GetEntryPointFromStateMachine(method) ?? method;
-				entryPointCache.Add(method, entryMethod);
-				return entryMethod;
-			}
-		}
+                entryMethod = GetEntryPointFromStateMachine(method) ?? method;
+                entryPointCache.Add(method, entryMethod);
+                return entryMethod;
+            }
+        }
 
-		private static MethodBase GetEntryPointFromStateMachine(MethodBase method)
-		{
-			var declType = method.DeclaringType;
-			if (declType == null
-				|| !Attribute.IsDefined(declType, typeof(CompilerGeneratedAttribute))
-				|| !declType.GetInterfaces().Contains(IAsyncStateMachineType)
-				|| declType.DeclaringType == null)
-				return null;
+        private static MethodBase GetEntryPointFromStateMachine(MethodBase method)
+        {
+            var declType = method.DeclaringType;
+            if (declType == null
+                || !Attribute.IsDefined(declType, typeof(CompilerGeneratedAttribute))
+                || !declType.GetInterfaces().Contains(IAsyncStateMachineType)
+                || declType.DeclaringType == null)
+                return null;
 
-			var parentType = declType.DeclaringType;
-			var allMethods = parentType.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+            var parentType = declType.DeclaringType;
+            var allMethods = parentType.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
 
-			return allMethods.FirstOrDefault(m =>
-				{
-					var stateMachineAttr = Attribute.GetCustomAttribute(m, StateMachineAttributeType);
-					if (stateMachineAttr == null)
-						return false;
-					var stateMachineImpl = StateMachineTypeProperty.GetValue(stateMachineAttr, null);
-					return ReferenceEquals(stateMachineImpl, declType);
-				});
-		}
+            return allMethods.FirstOrDefault(m =>
+                {
+                    var stateMachineAttr = Attribute.GetCustomAttribute(m, StateMachineAttributeType);
+                    if (stateMachineAttr == null)
+                        return false;
+                    var stateMachineImpl = StateMachineTypeProperty.GetValue(stateMachineAttr, null);
+                    return ReferenceEquals(stateMachineImpl, declType);
+                });
+        }
 
-		private static IEnumerable<MethodBase> EnumerateFramesVerbatim(StackTrace stackTrace)
-		{
-			var count = stackTrace.FrameCount;
-			for (int i = 0; i < count; ++i)
-				yield return stackTrace.GetFrame(i).GetMethod();
-		}
-	}
+        private static IEnumerable<MethodBase> EnumerateFramesVerbatim(StackTrace stackTrace)
+        {
+            var count = stackTrace.FrameCount;
+            for (int i = 0; i < count; ++i)
+                yield return stackTrace.GetFrame(i).GetMethod();
+        }
+    }
 }

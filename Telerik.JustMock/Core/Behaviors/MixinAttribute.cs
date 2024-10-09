@@ -19,8 +19,8 @@ using System;
 
 namespace Telerik.JustMock.Core.Behaviors
 {
-	[AttributeUsage(AttributeTargets.Interface, Inherited = true, AllowMultiple = false)]
-	internal sealed class MixinAttribute : Attribute
-	{
-	}
+    [AttributeUsage(AttributeTargets.Interface, Inherited = true, AllowMultiple = false)]
+    internal sealed class MixinAttribute : Attribute
+    {
+    }
 }

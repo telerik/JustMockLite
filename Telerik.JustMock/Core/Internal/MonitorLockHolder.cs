@@ -17,36 +17,36 @@
 
 namespace Telerik.JustMock.Core.Internal
 {
-	using System.Threading;
+    using System.Threading;
 
-	internal class MonitorLockHolder : ILockHolder
-	{
-		private readonly object locker;
-		private bool lockAcquired;
+    internal class MonitorLockHolder : ILockHolder
+    {
+        private readonly object locker;
+        private bool lockAcquired;
 
-		public MonitorLockHolder(object locker, bool waitForLock)
-		{
-			this.locker = locker;
-			if(waitForLock)
-			{
-				Monitor.Enter(locker);
-				lockAcquired = true;
-				return;
-			}
+        public MonitorLockHolder(object locker, bool waitForLock)
+        {
+            this.locker = locker;
+            if(waitForLock)
+            {
+                Monitor.Enter(locker);
+                lockAcquired = true;
+                return;
+            }
 
-			lockAcquired = Monitor.TryEnter(locker, 0);
-		}
+            lockAcquired = Monitor.TryEnter(locker, 0);
+        }
 
-		public void Dispose()
-		{
-			if (!LockAcquired) return;
-			Monitor.Exit(locker);
-			lockAcquired = false;
-		}
+        public void Dispose()
+        {
+            if (!LockAcquired) return;
+            Monitor.Exit(locker);
+            lockAcquired = false;
+        }
 
-		public bool LockAcquired
-		{
-			get { return lockAcquired; }
-		}
-	}
+        public bool LockAcquired
+        {
+            get { return lockAcquired; }
+        }
+    }
 }

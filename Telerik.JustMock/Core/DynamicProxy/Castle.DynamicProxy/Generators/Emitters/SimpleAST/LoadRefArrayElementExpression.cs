@@ -14,24 +14,24 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST
 {
-	using System.Reflection.Emit;
+    using System.Reflection.Emit;
 
-	internal class LoadRefArrayElementExpression : IExpression
-	{
-		private readonly Reference arrayReference;
-		private readonly LiteralIntExpression index;
+    internal class LoadRefArrayElementExpression : IExpression
+    {
+        private readonly Reference arrayReference;
+        private readonly LiteralIntExpression index;
 
-		public LoadRefArrayElementExpression(int index, Reference arrayReference)
-		{
-			this.index = new LiteralIntExpression(index);
-			this.arrayReference = arrayReference;
-		}
+        public LoadRefArrayElementExpression(int index, Reference arrayReference)
+        {
+            this.index = new LiteralIntExpression(index);
+            this.arrayReference = arrayReference;
+        }
 
-		public void Emit(ILGenerator gen)
-		{
-			ArgumentsUtil.EmitLoadOwnerAndReference(arrayReference, gen);
-			index.Emit(gen);
-			gen.Emit(OpCodes.Ldelem_Ref);
-		}
-	}
+        public void Emit(ILGenerator gen)
+        {
+            ArgumentsUtil.EmitLoadOwnerAndReference(arrayReference, gen);
+            index.Emit(gen);
+            gen.Emit(OpCodes.Ldelem_Ref);
+        }
+    }
 }

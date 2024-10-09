@@ -20,17 +20,17 @@ using ModelContent = Telerik.Sitefinity.GenericContent.Model.Content;
 
 namespace Telerik.Sitefinity.Fluent.AnyContent
 {
-	public interface IAnyContentManager
-	{
-		/// <summary>
-		/// Unpublish a content item in live state.
-		/// </summary>
-		/// <param name="item">Live item to unpublish.</param>
-		/// <param name="culture">The culture in which to perform the operation. 
-		/// <remarks>In monolingual the culture is ignored.
-		/// In multilingual mode if null - the current ui culture will be used.
-		/// </remarks></param>
-		/// <returns>Master (draft) state.</returns>
-		ModelContent Unpublish(ModelContent item, CultureInfo culture);
-	}
+    public interface IAnyContentManager
+    {
+        /// <summary>
+        /// Unpublish a content item in live state.
+        /// </summary>
+        /// <param name="item">Live item to unpublish.</param>
+        /// <param name="culture">The culture in which to perform the operation. 
+        /// <remarks>In monolingual the culture is ignored.
+        /// In multilingual mode if null - the current ui culture will be used.
+        /// </remarks></param>
+        /// <returns>Master (draft) state.</returns>
+        ModelContent Unpublish(ModelContent item, CultureInfo culture);
+    }
 }

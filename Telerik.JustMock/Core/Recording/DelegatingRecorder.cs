@@ -20,17 +20,17 @@ using System.Linq;
 
 namespace Telerik.JustMock.Core.Recording
 {
-	internal class DelegatingRecorder : IRecorder
-	{
-		public delegate void RecordDelegate(Invocation invocation);
+    internal class DelegatingRecorder : IRecorder
+    {
+        public delegate void RecordDelegate(Invocation invocation);
 
-		public event RecordDelegate Record;
+        public event RecordDelegate Record;
 
-		void IRecorder.Record(Invocation invocation)
-		{
-			var handler = this.Record;
-			if (handler != null)
-				handler(invocation);
-		}
-	}
+        void IRecorder.Record(Invocation invocation)
+        {
+            var handler = this.Record;
+            if (handler != null)
+                handler(invocation);
+        }
+    }
 }

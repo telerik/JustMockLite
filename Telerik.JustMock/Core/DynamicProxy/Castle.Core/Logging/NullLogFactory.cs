@@ -14,33 +14,33 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Logging
 {
-	using System;
+    using System;
 
-	/// <summary>
-	/// NullLogFactory used when logging is turned off.
-	/// </summary>
+    /// <summary>
+    /// NullLogFactory used when logging is turned off.
+    /// </summary>
 #if FEATURE_SERIALIZATION
-	[Serializable]
+    [Serializable]
 #endif
     internal class NullLogFactory : AbstractLoggerFactory
-	{
-		/// <summary>
-		///   Creates an instance of ILogger with the specified name.
-		/// </summary>
-		/// <param name = "name">Name.</param>
-		public override ILogger Create(string name)
-		{
-			return NullLogger.Instance;
-		}
+    {
+        /// <summary>
+        ///   Creates an instance of ILogger with the specified name.
+        /// </summary>
+        /// <param name = "name">Name.</param>
+        public override ILogger Create(string name)
+        {
+            return NullLogger.Instance;
+        }
 
-		/// <summary>
-		///   Creates an instance of ILogger with the specified name and LoggerLevel.
-		/// </summary>
-		/// <param name = "name">Name.</param>
-		/// <param name = "level">Level.</param>
-		public override ILogger Create(string name, LoggerLevel level)
-		{
-			return NullLogger.Instance;
-		}
-	}
+        /// <summary>
+        ///   Creates an instance of ILogger with the specified name and LoggerLevel.
+        /// </summary>
+        /// <param name = "name">Name.</param>
+        /// <param name = "level">Level.</param>
+        public override ILogger Create(string name, LoggerLevel level)
+        {
+            return NullLogger.Instance;
+        }
+    }
 }

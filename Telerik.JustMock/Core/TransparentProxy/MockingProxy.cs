@@ -27,115 +27,115 @@ using Telerik.JustMock.Core.Castle.DynamicProxy;
 namespace Telerik.JustMock.Core.TransparentProxy
 {
 #if !NETCORE
-	internal sealed class MockingProxy : RealProxy
-	{
-		public readonly MarshalByRefObject WrappedInstance;
-		private readonly IMockMixin mockMixin;
-		private readonly IInterceptor interceptor;
+    internal sealed class MockingProxy : RealProxy
+    {
+        public readonly MarshalByRefObject WrappedInstance;
+        private readonly IMockMixin mockMixin;
+        private readonly IInterceptor interceptor;
 
-		public MockingProxy(MarshalByRefObject wrappedInstance, IInterceptor interceptor, IMockMixin mockMixin)
-			: base(wrappedInstance.GetType())
-		{
-			this.WrappedInstance = wrappedInstance;
-			this.interceptor = interceptor;
-			this.mockMixin = mockMixin;
-		}
+        public MockingProxy(MarshalByRefObject wrappedInstance, IInterceptor interceptor, IMockMixin mockMixin)
+            : base(wrappedInstance.GetType())
+        {
+            this.WrappedInstance = wrappedInstance;
+            this.interceptor = interceptor;
+            this.mockMixin = mockMixin;
+        }
 
-		public override IMessage Invoke(IMessage msg)
-		{
-			var methodCall = msg as IMethodCallMessage;
-			if (methodCall == null)
-			{
-				return null;
-			}
+        public override IMessage Invoke(IMessage msg)
+        {
+            var methodCall = msg as IMethodCallMessage;
+            if (methodCall == null)
+            {
+                return null;
+            }
 
-			var invocation = new ProxyInvocation(this, methodCall);
-			try
-			{
-				this.interceptor.Intercept(invocation);
-			}
-			catch (Exception ex)
-			{
-				invocation.Exception = ex;
-			}
+            var invocation = new ProxyInvocation(this, methodCall);
+            try
+            {
+                this.interceptor.Intercept(invocation);
+            }
+            catch (Exception ex)
+            {
+                invocation.Exception = ex;
+            }
 
-			if (invocation.Exception != null)
-			{
-				return new ReturnMessage(invocation.Exception, methodCall);
-			}
+            if (invocation.Exception != null)
+            {
+                return new ReturnMessage(invocation.Exception, methodCall);
+            }
 
-			return new ReturnMessage(invocation.ReturnValue,
-				invocation.Arguments, invocation.Arguments.Length,
-				methodCall.LogicalCallContext, methodCall);
-		}
+            return new ReturnMessage(invocation.ReturnValue,
+                invocation.Arguments, invocation.Arguments.Length,
+                methodCall.LogicalCallContext, methodCall);
+        }
 
-		public static bool CanCreate(Type type)
-		{
-			return typeof(MarshalByRefObject).IsAssignableFrom(type);
-		}
+        public static bool CanCreate(Type type)
+        {
+            return typeof(MarshalByRefObject).IsAssignableFrom(type);
+        }
 
-		public static object CreateProxy(object wrappedInstance, MocksRepository repository, IMockMixin mockMixin)
-		{
-			var realProxy = new MockingProxy((MarshalByRefObject)wrappedInstance, repository.Interceptor, mockMixin);
-			return realProxy.GetTransparentProxy();
-		}
+        public static object CreateProxy(object wrappedInstance, MocksRepository repository, IMockMixin mockMixin)
+        {
+            var realProxy = new MockingProxy((MarshalByRefObject)wrappedInstance, repository.Interceptor, mockMixin);
+            return realProxy.GetTransparentProxy();
+        }
 
-		public static bool CanIntercept(object instance, MethodBase method)
-		{
-			return instance != null
-				&& RemotingServices.GetRealProxy(instance) is MockingProxy
-				&& method is MethodInfo;
-		}
+        public static bool CanIntercept(object instance, MethodBase method)
+        {
+            return instance != null
+                && RemotingServices.GetRealProxy(instance) is MockingProxy
+                && method is MethodInfo;
+        }
 
-		public static MockingProxy GetRealProxy(object instance)
-		{
-			return instance != null ? RemotingServices.GetRealProxy(instance) as MockingProxy : null;
-		}
+        public static MockingProxy GetRealProxy(object instance)
+        {
+            return instance != null ? RemotingServices.GetRealProxy(instance) as MockingProxy : null;
+        }
 
-		public static IMockMixin GetMockMixin(object instance)
-		{
-			var proxy = GetRealProxy(instance);
-			return proxy != null ? proxy.mockMixin : null;
-		}
+        public static IMockMixin GetMockMixin(object instance)
+        {
+            var proxy = GetRealProxy(instance);
+            return proxy != null ? proxy.mockMixin : null;
+        }
 
-		public static object Unwrap(object maybeProxy)
-		{
-			var proxy = GetRealProxy(maybeProxy);
-			return proxy != null ? proxy.WrappedInstance : maybeProxy;
-		}
-	}
+        public static object Unwrap(object maybeProxy)
+        {
+            var proxy = GetRealProxy(maybeProxy);
+            return proxy != null ? proxy.WrappedInstance : maybeProxy;
+        }
+    }
 #else
-	internal class MockingProxy
-	{
-		public static bool CanCreate(Type type)
-		{
-			return false;
-		}
+    internal class MockingProxy
+    {
+        public static bool CanCreate(Type type)
+        {
+            return false;
+        }
 
-		public static object CreateProxy(object wrappedInstance, MocksRepository repository, IMockMixin mockMixin)
-		{
-			throw new NotImplementedException();
-		}
+        public static object CreateProxy(object wrappedInstance, MocksRepository repository, IMockMixin mockMixin)
+        {
+            throw new NotImplementedException();
+        }
 
-		public static bool CanIntercept(object instance, MethodBase method)
-		{
-			return false;
-		}
+        public static bool CanIntercept(object instance, MethodBase method)
+        {
+            return false;
+        }
 
-		public static MockingProxy GetRealProxy(object instance)
-		{
-			throw new NotImplementedException();
-		}
+        public static MockingProxy GetRealProxy(object instance)
+        {
+            throw new NotImplementedException();
+        }
 
-		public static IMockMixin GetMockMixin(object instance)
-		{
-			return null;
-		}
+        public static IMockMixin GetMockMixin(object instance)
+        {
+            return null;
+        }
 
-		public static object Unwrap(object maybeProxy)
-		{
-			return maybeProxy;
-		}
-	}
+        public static object Unwrap(object maybeProxy)
+        {
+            return maybeProxy;
+        }
+    }
 #endif
 }

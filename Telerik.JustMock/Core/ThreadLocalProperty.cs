@@ -23,45 +23,45 @@ using Telerik.JustMock.Core.Castle.Core.Internal;
 
 namespace Telerik.JustMock.Core
 {
-	internal class ThreadLocalProperty<T> where T : class
-	{
-		private readonly WeakKeyDictionary<Thread, T> values = new WeakKeyDictionary<Thread, T>();
+    internal class ThreadLocalProperty<T> where T : class
+    {
+        private readonly WeakKeyDictionary<Thread, T> values = new WeakKeyDictionary<Thread, T>();
 
-		public T Get()
-		{
-			return GetValueOnThread(Thread.CurrentThread);
-		}
+        public T Get()
+        {
+            return GetValueOnThread(Thread.CurrentThread);
+        }
 
-		public T GetOrSetDefault(Func<T> getDefault)
-		{
-			var value = GetValueOnThread(Thread.CurrentThread);
-			if (value == null)
-			{
-				value = getDefault();
-				Set(value);
-			}
+        public T GetOrSetDefault(Func<T> getDefault)
+        {
+            var value = GetValueOnThread(Thread.CurrentThread);
+            if (value == null)
+            {
+                value = getDefault();
+                Set(value);
+            }
 
-			return value;
-		}
+            return value;
+        }
 
-		public void Set(T value)
-		{
-			lock (values)
-				values[Thread.CurrentThread] = value;
-		}
+        public void Set(T value)
+        {
+            lock (values)
+                values[Thread.CurrentThread] = value;
+        }
 
-		public ICollection<T> GetAllThreadsValues()
-		{
-			lock(values)
-				return values.Values.ToArray();
-		}
+        public ICollection<T> GetAllThreadsValues()
+        {
+            lock(values)
+                return values.Values.ToArray();
+        }
 
-		private T GetValueOnThread(Thread thread)
-		{
-			T value;
-			lock (values)
-				values.TryGetValue(thread, out value);
-			return value;
-		}
-	}
+        private T GetValueOnThread(Thread thread)
+        {
+            T value;
+            lock (values)
+                values.TryGetValue(thread, out value);
+            return value;
+        }
+    }
 }

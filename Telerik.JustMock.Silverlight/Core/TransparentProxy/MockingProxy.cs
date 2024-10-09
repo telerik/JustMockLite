@@ -20,31 +20,31 @@ using System.Reflection;
 
 namespace Telerik.JustMock.Core.TransparentProxy
 {
-	internal class MockingProxy
-	{
-		public static bool CanCreate(Type type)
-		{
-			return false;
-		}
+    internal class MockingProxy
+    {
+        public static bool CanCreate(Type type)
+        {
+            return false;
+        }
 
-		public static object CreateProxy(object wrappedInstance, MocksRepository repository, IMockMixin mockMixin)
-		{
-			throw new NotSupportedException();
-		}
+        public static object CreateProxy(object wrappedInstance, MocksRepository repository, IMockMixin mockMixin)
+        {
+            throw new NotSupportedException();
+        }
 
-		public static bool CanIntercept(object instance, MethodBase method)
-		{
-			return false;
-		}
+        public static bool CanIntercept(object instance, MethodBase method)
+        {
+            return false;
+        }
 
-		public static IMockMixin GetMockMixin(object instance)
-		{
-			return null;
-		}
+        public static IMockMixin GetMockMixin(object instance)
+        {
+            return null;
+        }
 
-		public static object Unwrap(object maybeProxy)
-		{
-			return maybeProxy;
-		}
-	}
+        public static object Unwrap(object maybeProxy)
+        {
+            return maybeProxy;
+        }
+    }
 }

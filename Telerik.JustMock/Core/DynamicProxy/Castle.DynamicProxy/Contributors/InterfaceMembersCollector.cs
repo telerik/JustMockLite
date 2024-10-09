@@ -14,33 +14,33 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 {
-	using System;
-	using System.Reflection;
+    using System;
+    using System.Reflection;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
 
-	internal class InterfaceMembersCollector : MembersCollector
-	{
-		public InterfaceMembersCollector(Type @interface)
-			: base(@interface)
-		{
-		}
+    internal class InterfaceMembersCollector : MembersCollector
+    {
+        public InterfaceMembersCollector(Type @interface)
+            : base(@interface)
+        {
+        }
 
-		protected override MetaMethod GetMethodToGenerate(MethodInfo method, IProxyGenerationHook hook, bool isStandalone)
-		{
-			if (ProxyUtil.IsAccessibleMethod(method) == false)
-			{
-				return null;
-			}
+        protected override MetaMethod GetMethodToGenerate(MethodInfo method, IProxyGenerationHook hook, bool isStandalone)
+        {
+            if (ProxyUtil.IsAccessibleMethod(method) == false)
+            {
+                return null;
+            }
 
-			var proxyable = AcceptMethod(method, true, hook);
-			if (!proxyable && !method.IsAbstract)
-			{
-				// we don't need to do anything
-				return null;
-			}
+            var proxyable = AcceptMethod(method, true, hook);
+            if (!proxyable && !method.IsAbstract)
+            {
+                // we don't need to do anything
+                return null;
+            }
 
-			return new MetaMethod(method, method, isStandalone, proxyable, false);
-		}
-	}
+            return new MetaMethod(method, method, isStandalone, proxyable, false);
+        }
+    }
 }

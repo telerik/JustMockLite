@@ -32,8 +32,8 @@ namespace Telerik.JustMock
         private static ArgExprImplementation expr = new ArgExprImplementation();
 
         /// <summary>
-		/// Specifies argument matchers used in non-public method arrangements.
-		/// </summary>
+        /// Specifies argument matchers used in non-public method arrangements.
+        /// </summary>
         public static IArgExpr Expr
         {
             get
