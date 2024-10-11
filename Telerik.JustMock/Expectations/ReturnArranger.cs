@@ -22,28 +22,28 @@ using Telerik.JustMock.Core;
 
 namespace Telerik.JustMock.Expectations
 {
-	internal class ReturnArranger : FunctionalSpecParser.IReturnArranger
-	{
-		private ReturnArranger()
-		{
-		}
+    internal class ReturnArranger : FunctionalSpecParser.IReturnArranger
+    {
+        private ReturnArranger()
+        {
+        }
 
-		public static readonly ReturnArranger Instance = new ReturnArranger();
+        public static readonly ReturnArranger Instance = new ReturnArranger();
 
-		public void ArrangeReturn<T>(Expression<Func<T>> callPattern, LambdaExpression returnValueExpr)
-		{
-			var noParams = returnValueExpr as Expression<Func<T>>;
-			if (noParams != null)
-			{
-				Telerik.JustMock.Mock.Arrange(callPattern).Returns((T)noParams.Body.EvaluateExpression());
-				return;
-			}
+        public void ArrangeReturn<T>(Expression<Func<T>> callPattern, LambdaExpression returnValueExpr)
+        {
+            var noParams = returnValueExpr as Expression<Func<T>>;
+            if (noParams != null)
+            {
+                Telerik.JustMock.Mock.Arrange(callPattern).Returns((T)noParams.Body.EvaluateExpression());
+                return;
+            }
 
-			var method = typeof(FuncExpectation<T>).GetMethods()
-												   .Single(m => m.Name == "Returns" && m.GetGenericArguments().Length == returnValueExpr.Parameters.Count);
-			method = method.MakeGenericMethod(returnValueExpr.Parameters.Select(param => param.Type).ToArray());
-			var expectation = Telerik.JustMock.Mock.Arrange(callPattern);
-			method.Invoke(expectation, new object[] { returnValueExpr.Compile() });
-		}
-	}
+            var method = typeof(FuncExpectation<T>).GetMethods()
+                                                   .Single(m => m.Name == "Returns" && m.GetGenericArguments().Length == returnValueExpr.Parameters.Count);
+            method = method.MakeGenericMethod(returnValueExpr.Parameters.Select(param => param.Type).ToArray());
+            var expectation = Telerik.JustMock.Mock.Arrange(callPattern);
+            method.Invoke(expectation, new object[] { returnValueExpr.Compile() });
+        }
+    }
 }

@@ -23,69 +23,69 @@ using Telerik.JustMock.Core.MatcherTree;
 
 namespace Telerik.JustMock.Core.Behaviors
 {
-	internal class PreserveRefOutValuesBehavior : IBehavior
-	{
-		private readonly Dictionary<int, object> values = new Dictionary<int, object>();
+    internal class PreserveRefOutValuesBehavior : IBehavior
+    {
+        private readonly Dictionary<int, object> values = new Dictionary<int, object>();
 
-		public PreserveRefOutValuesBehavior(IMethodMock methodMock)
-		{
-			var argMatchers = methodMock.CallPattern.ArgumentMatchers;
-			var method = methodMock.CallPattern.Method;
-			var parameters = GetParameters(method);
-			var offsetDueToExtensionMethod = method.IsExtensionMethod() ? 1 : 0;
+        public PreserveRefOutValuesBehavior(IMethodMock methodMock)
+        {
+            var argMatchers = methodMock.CallPattern.ArgumentMatchers;
+            var method = methodMock.CallPattern.Method;
+            var parameters = GetParameters(method);
+            var offsetDueToExtensionMethod = method.IsExtensionMethod() ? 1 : 0;
 
-			for (int i = 0; i < parameters.Length; ++i)
-			{
-				if (!parameters[i].ParameterType.IsByRef || argMatchers[i].ProtectRefOut)
-					continue;
+            for (int i = 0; i < parameters.Length; ++i)
+            {
+                if (!parameters[i].ParameterType.IsByRef || argMatchers[i].ProtectRefOut)
+                    continue;
 
-				var matcher = argMatchers[i] as IValueMatcher;
-				if (matcher == null)
-					continue;
+                var matcher = argMatchers[i] as IValueMatcher;
+                if (matcher == null)
+                    continue;
 
-				var value = matcher.Value;
-				values.Add(i + offsetDueToExtensionMethod, value);
-			}
-		}
+                var value = matcher.Value;
+                values.Add(i + offsetDueToExtensionMethod, value);
+            }
+        }
 
-		public void Process(Invocation invocation)
-		{
-			foreach (var kvp in this.values)
-			{
-				invocation.Args[kvp.Key] = kvp.Value;
-			}
-		}
+        public void Process(Invocation invocation)
+        {
+            foreach (var kvp in this.values)
+            {
+                invocation.Args[kvp.Key] = kvp.Value;
+            }
+        }
 
-		public static void Attach(IMethodMock methodMock)
-		{
-			var behavior = new PreserveRefOutValuesBehavior(methodMock);
-			var madeReplacements = ReplaceRefOutArgsWithAnyMatcher(methodMock.CallPattern);
-			if (madeReplacements)
-				methodMock.Behaviors.Add(behavior);
-		}
+        public static void Attach(IMethodMock methodMock)
+        {
+            var behavior = new PreserveRefOutValuesBehavior(methodMock);
+            var madeReplacements = ReplaceRefOutArgsWithAnyMatcher(methodMock.CallPattern);
+            if (madeReplacements)
+                methodMock.Behaviors.Add(behavior);
+        }
 
-		public static bool ReplaceRefOutArgsWithAnyMatcher(CallPattern callPattern)
-		{
-			bool madeReplacements = false;
-			var parameters = GetParameters(callPattern.Method);
-			for (int i = 0; i < parameters.Length; ++i)
-			{
-				if (parameters[i].ParameterType.IsByRef && !callPattern.ArgumentMatchers[i].ProtectRefOut)
-				{
-					callPattern.ArgumentMatchers[i] = new AnyMatcher();
-					madeReplacements = true;
-				}
-			}
+        public static bool ReplaceRefOutArgsWithAnyMatcher(CallPattern callPattern)
+        {
+            bool madeReplacements = false;
+            var parameters = GetParameters(callPattern.Method);
+            for (int i = 0; i < parameters.Length; ++i)
+            {
+                if (parameters[i].ParameterType.IsByRef && !callPattern.ArgumentMatchers[i].ProtectRefOut)
+                {
+                    callPattern.ArgumentMatchers[i] = new AnyMatcher();
+                    madeReplacements = true;
+                }
+            }
 
-			return madeReplacements;
-		}
+            return madeReplacements;
+        }
 
-		private static ParameterInfo[] GetParameters(MethodBase method)
-		{
-			var parameters = method.GetParameters();
-			if (method.IsExtensionMethod())
-				parameters = parameters.Skip(1).ToArray();
-			return parameters;
-		}
-	}
+        private static ParameterInfo[] GetParameters(MethodBase method)
+        {
+            var parameters = method.GetParameters();
+            if (method.IsExtensionMethod())
+                parameters = parameters.Skip(1).ToArray();
+            return parameters;
+        }
+    }
 }

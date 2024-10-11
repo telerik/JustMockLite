@@ -16,39 +16,39 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 {
-	using System;
+    using System;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Tokens;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Tokens;
 
-	internal class InterfaceProxySerializableContributor : SerializableContributor
-	{
-		public InterfaceProxySerializableContributor(Type targetType, string proxyGeneratorId, Type[] interfaces)
-			: base(targetType, interfaces, proxyGeneratorId)
-		{
-		}
+    internal class InterfaceProxySerializableContributor : SerializableContributor
+    {
+        public InterfaceProxySerializableContributor(Type targetType, string proxyGeneratorId, Type[] interfaces)
+            : base(targetType, interfaces, proxyGeneratorId)
+        {
+        }
 
-		protected override void CustomizeGetObjectData(CodeBuilder codeBuilder, ArgumentReference serializationInfo,
-		                                               ArgumentReference streamingContext, ClassEmitter emitter)
-		{
-			var targetField = emitter.GetField("__target");
+        protected override void CustomizeGetObjectData(CodeBuilder codeBuilder, ArgumentReference serializationInfo,
+                                                       ArgumentReference streamingContext, ClassEmitter emitter)
+        {
+            var targetField = emitter.GetField("__target");
 
-			codeBuilder.AddStatement(
-				new MethodInvocationExpression(
-					serializationInfo,
-					SerializationInfoMethods.AddValue_Object,
-					new LiteralStringExpression("__targetFieldType"),
-					new LiteralStringExpression(targetField.Reference.FieldType.AssemblyQualifiedName)));
+            codeBuilder.AddStatement(
+                new MethodInvocationExpression(
+                    serializationInfo,
+                    SerializationInfoMethods.AddValue_Object,
+                    new LiteralStringExpression("__targetFieldType"),
+                    new LiteralStringExpression(targetField.Reference.FieldType.AssemblyQualifiedName)));
 
-			codeBuilder.AddStatement(
-				new MethodInvocationExpression(
-					serializationInfo,
-					SerializationInfoMethods.AddValue_Object,
-					new LiteralStringExpression("__theInterface"),
-					new LiteralStringExpression(targetType.AssemblyQualifiedName)));
-		}
-	}
+            codeBuilder.AddStatement(
+                new MethodInvocationExpression(
+                    serializationInfo,
+                    SerializationInfoMethods.AddValue_Object,
+                    new LiteralStringExpression("__theInterface"),
+                    new LiteralStringExpression(targetType.AssemblyQualifiedName)));
+        }
+    }
 }
 
 #endif

@@ -19,11 +19,11 @@ using System;
 
 namespace Telerik.Sitefinity.Model
 {
-	public interface IContent
-	{
-		/// <summary>
-		/// Gets or sets the date and time the content was created.        /// </summary>
-		/// <value>The date created.</value>
-		DateTime DateCreated { get; set; }
-	}
+    public interface IContent
+    {
+        /// <summary>
+        /// Gets or sets the date and time the content was created.        /// </summary>
+        /// <value>The date created.</value>
+        DateTime DateCreated { get; set; }
+    }
 }

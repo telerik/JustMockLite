@@ -19,33 +19,33 @@ using System;
 
 namespace Telerik.JustMock.DemoLib
 {
-	public class OpenAccessContextBase : System.Object
-	{
-		[System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-		public OpenAccessContextBase() { }
+    public class OpenAccessContextBase : System.Object
+    {
+        [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+        public OpenAccessContextBase() { }
 
-		public void SaveChanges()
-		{
-			this.SaveChanges();
-		}
+        public void SaveChanges()
+        {
+            this.SaveChanges();
+        }
 
-		/// <summary>
-		/// Saves the changes with the specified concurency mode
-		/// </summary>
-		/// <param name="failureMode">Mode to use</param>
-		public virtual void SaveChanges(string failureMode)
-		{
+        /// <summary>
+        /// Saves the changes with the specified concurency mode
+        /// </summary>
+        /// <param name="failureMode">Mode to use</param>
+        public virtual void SaveChanges(string failureMode)
+        {
 
-		}
+        }
 
-		public void Add(System.Collections.IEnumerable entities)
-		{
-			this.Add(entities);
-		}
+        public void Add(System.Collections.IEnumerable entities)
+        {
+            this.Add(entities);
+        }
 
-		public void Add(object entity)
-		{
-			throw new NotImplementedException();
-		}
-	}
+        public void Add(object entity)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

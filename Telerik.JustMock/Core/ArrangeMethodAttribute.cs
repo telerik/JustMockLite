@@ -22,8 +22,8 @@ using System.Text;
 
 namespace Telerik.JustMock.Core
 {
-	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-	internal sealed class ArrangeMethodAttribute : Attribute
-	{
-	}
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+    internal sealed class ArrangeMethodAttribute : Attribute
+    {
+    }
 }

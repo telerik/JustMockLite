@@ -18,8 +18,8 @@
 
 namespace Telerik.JustMock.DemoLib.Objects
 {
-	public class User
-	{
-		public string UserId { get; set; }
-	}
+    public class User
+    {
+        public string UserId { get; set; }
+    }
 }

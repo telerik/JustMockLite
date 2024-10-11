@@ -18,11 +18,11 @@
 
 namespace Telerik.JustMock.DemoLib.Objects
 {
-	public class InternalObject
-	{
-		internal InternalObject()
-		{
+    public class InternalObject
+    {
+        internal InternalObject()
+        {
 
-		}
-	}
+        }
+    }
 }

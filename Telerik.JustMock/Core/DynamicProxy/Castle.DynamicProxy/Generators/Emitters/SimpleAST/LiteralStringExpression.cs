@@ -14,20 +14,20 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST
 {
-	using System.Reflection.Emit;
+    using System.Reflection.Emit;
 
-	internal class LiteralStringExpression : IExpression
-	{
-		private readonly string value;
+    internal class LiteralStringExpression : IExpression
+    {
+        private readonly string value;
 
-		public LiteralStringExpression(string value)
-		{
-			this.value = value;
-		}
+        public LiteralStringExpression(string value)
+        {
+            this.value = value;
+        }
 
-		public void Emit(ILGenerator gen)
-		{
-			gen.Emit(OpCodes.Ldstr, value);
-		}
-	}
+        public void Emit(ILGenerator gen)
+        {
+            gen.Emit(OpCodes.Ldstr, value);
+        }
+    }
 }

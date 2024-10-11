@@ -14,37 +14,37 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
-	using System;
-	using System.IO;
-	using System.Text;
+    using System;
+    using System.IO;
+    using System.Text;
 
     internal abstract class AbstractResource : IResource
-	{
+    {
 #if FEATURE_APPDOMAIN
-		protected static readonly string DefaultBasePath = AppDomain.CurrentDomain.BaseDirectory;
+        protected static readonly string DefaultBasePath = AppDomain.CurrentDomain.BaseDirectory;
 #else
-		protected static readonly string DefaultBasePath = AppContext.BaseDirectory;
+        protected static readonly string DefaultBasePath = AppContext.BaseDirectory;
 #endif
 
-		public virtual string FileBasePath
-		{
-			get { return DefaultBasePath; }
-		}
+        public virtual string FileBasePath
+        {
+            get { return DefaultBasePath; }
+        }
 
-		public abstract TextReader GetStreamReader();
+        public abstract TextReader GetStreamReader();
 
-		public abstract TextReader GetStreamReader(Encoding encoding);
+        public abstract TextReader GetStreamReader(Encoding encoding);
 
-		public abstract IResource CreateRelative(string relativePath);
+        public abstract IResource CreateRelative(string relativePath);
 
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-		protected virtual void Dispose(bool disposing)
-		{
-		}
-	}
+        protected virtual void Dispose(bool disposing)
+        {
+        }
+    }
 }

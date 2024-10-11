@@ -14,82 +14,82 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST
 {
-	using System.Diagnostics;
-	using System.Reflection;
-	using System.Reflection.Emit;
+    using System.Diagnostics;
+    using System.Reflection;
+    using System.Reflection.Emit;
 
-	[DebuggerDisplay("{fieldBuilder.Name} ({fieldBuilder.FieldType})")]
-	internal class FieldReference : Reference
-	{
-		private readonly FieldInfo field;
-		private readonly FieldBuilder fieldBuilder;
-		private readonly bool isStatic;
+    [DebuggerDisplay("{fieldBuilder.Name} ({fieldBuilder.FieldType})")]
+    internal class FieldReference : Reference
+    {
+        private readonly FieldInfo field;
+        private readonly FieldBuilder fieldBuilder;
+        private readonly bool isStatic;
 
-		public FieldReference(FieldInfo field)
-		{
-			this.field = field;
-			if ((field.Attributes & FieldAttributes.Static) != 0)
-			{
-				isStatic = true;
-				owner = null;
-			}
-		}
+        public FieldReference(FieldInfo field)
+        {
+            this.field = field;
+            if ((field.Attributes & FieldAttributes.Static) != 0)
+            {
+                isStatic = true;
+                owner = null;
+            }
+        }
 
-		public FieldReference(FieldBuilder fieldBuilder)
-		{
-			this.fieldBuilder = fieldBuilder;
-			field = fieldBuilder;
-			if ((fieldBuilder.Attributes & FieldAttributes.Static) != 0)
-			{
-				isStatic = true;
-				owner = null;
-			}
-		}
+        public FieldReference(FieldBuilder fieldBuilder)
+        {
+            this.fieldBuilder = fieldBuilder;
+            field = fieldBuilder;
+            if ((fieldBuilder.Attributes & FieldAttributes.Static) != 0)
+            {
+                isStatic = true;
+                owner = null;
+            }
+        }
 
-		public FieldBuilder FieldBuilder
-		{
-			get { return fieldBuilder; }
-		}
+        public FieldBuilder FieldBuilder
+        {
+            get { return fieldBuilder; }
+        }
 
-		public FieldInfo Reference
-		{
-			get { return field; }
-		}
+        public FieldInfo Reference
+        {
+            get { return field; }
+        }
 
-		public override void LoadAddressOfReference(ILGenerator gen)
-		{
-			if (isStatic)
-			{
-				gen.Emit(OpCodes.Ldsflda, Reference);
-			}
-			else
-			{
-				gen.Emit(OpCodes.Ldflda, Reference);
-			}
-		}
+        public override void LoadAddressOfReference(ILGenerator gen)
+        {
+            if (isStatic)
+            {
+                gen.Emit(OpCodes.Ldsflda, Reference);
+            }
+            else
+            {
+                gen.Emit(OpCodes.Ldflda, Reference);
+            }
+        }
 
-		public override void LoadReference(ILGenerator gen)
-		{
-			if (isStatic)
-			{
-				gen.Emit(OpCodes.Ldsfld, Reference);
-			}
-			else
-			{
-				gen.Emit(OpCodes.Ldfld, Reference);
-			}
-		}
+        public override void LoadReference(ILGenerator gen)
+        {
+            if (isStatic)
+            {
+                gen.Emit(OpCodes.Ldsfld, Reference);
+            }
+            else
+            {
+                gen.Emit(OpCodes.Ldfld, Reference);
+            }
+        }
 
-		public override void StoreReference(ILGenerator gen)
-		{
-			if (isStatic)
-			{
-				gen.Emit(OpCodes.Stsfld, Reference);
-			}
-			else
-			{
-				gen.Emit(OpCodes.Stfld, Reference);
-			}
-		}
-	}
+        public override void StoreReference(ILGenerator gen)
+        {
+            if (isStatic)
+            {
+                gen.Emit(OpCodes.Stsfld, Reference);
+            }
+            else
+            {
+                gen.Emit(OpCodes.Stfld, Reference);
+            }
+        }
+    }
 }

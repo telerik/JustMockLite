@@ -19,8 +19,8 @@ using System;
 
 namespace Telerik.JustMock
 {
-	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
-	internal sealed class ArgIgnoreTypeAttribute : ArgMatcherAttribute
-	{
-	}
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+    internal sealed class ArgIgnoreTypeAttribute : ArgMatcherAttribute
+    {
+    }
 }

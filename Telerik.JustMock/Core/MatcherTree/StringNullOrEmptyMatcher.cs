@@ -21,41 +21,41 @@ using System.Linq.Expressions;
 
 namespace Telerik.JustMock.Core.MatcherTree
 {
-	internal class StringNullOrEmptyMatcher : CategoricalMatcherBase, IFunctionalMatcher
-	{
-		public Type Type { get { return typeof(string); } }
+    internal class StringNullOrEmptyMatcher : CategoricalMatcherBase, IFunctionalMatcher
+    {
+        public Type Type { get { return typeof(string); } }
 
-		public override string DebugView
-		{
-			get { return "null or empty string"; }
-		}
+        public override string DebugView
+        {
+            get { return "null or empty string"; }
+        }
 
-		public override bool CanMatch(IMatcher matcher)
-		{
-			return matcher is IValueMatcher;
-		}
+        public override bool CanMatch(IMatcher matcher)
+        {
+            return matcher is IValueMatcher;
+        }
 
-		protected override bool MatchesCore(IMatcher other)
-		{
-			var valueMatcher = (IValueMatcher)other;
-			var value = valueMatcher.Value;
-			return value == null || (value as string) == String.Empty;
-		}
+        protected override bool MatchesCore(IMatcher other)
+        {
+            var valueMatcher = (IValueMatcher)other;
+            var value = valueMatcher.Value;
+            return value == null || (value as string) == String.Empty;
+        }
 
-		public override bool Equals(IMatcher other)
-		{
-			return other is StringNullOrEmptyMatcher;
-		}
+        public override bool Equals(IMatcher other)
+        {
+            return other is StringNullOrEmptyMatcher;
+        }
 
-		public override Expression ToExpression(Type argumentType)
-		{
-			return Expression.Call(null, typeof(StringNullOrEmptyMatcher).GetMethod("Create"));
-		}
+        public override Expression ToExpression(Type argumentType)
+        {
+            return Expression.Call(null, typeof(StringNullOrEmptyMatcher).GetMethod("Create"));
+        }
 
-		[ArgMatcher(Matcher = typeof(StringNullOrEmptyMatcher))]
-		public static string Create()
-		{
-			throw new NotSupportedException();
-		}
-	}
+        [ArgMatcher(Matcher = typeof(StringNullOrEmptyMatcher))]
+        public static string Create()
+        {
+            throw new NotSupportedException();
+        }
+    }
 }

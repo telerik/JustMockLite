@@ -14,103 +14,103 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 {
-	using System;
-	using System.Reflection;
-	using System.Reflection.Emit;
+    using System;
+    using System.Reflection;
+    using System.Reflection.Emit;
 
-	internal class PropertyEmitter : IMemberEmitter
-	{
-		private readonly PropertyBuilder builder;
-		private readonly AbstractTypeEmitter parentTypeEmitter;
-		private MethodEmitter getMethod;
-		private MethodEmitter setMethod;
+    internal class PropertyEmitter : IMemberEmitter
+    {
+        private readonly PropertyBuilder builder;
+        private readonly AbstractTypeEmitter parentTypeEmitter;
+        private MethodEmitter getMethod;
+        private MethodEmitter setMethod;
 
-		public PropertyEmitter(AbstractTypeEmitter parentTypeEmitter, string name, PropertyAttributes attributes,
-		                       Type propertyType, Type[] arguments)
-		{
-			this.parentTypeEmitter = parentTypeEmitter;
+        public PropertyEmitter(AbstractTypeEmitter parentTypeEmitter, string name, PropertyAttributes attributes,
+                               Type propertyType, Type[] arguments)
+        {
+            this.parentTypeEmitter = parentTypeEmitter;
 
-			builder = parentTypeEmitter.TypeBuilder.DefineProperty(
-				name, attributes, CallingConventions.HasThis, propertyType,
-				null, null, arguments, null, null);
-		}
+            builder = parentTypeEmitter.TypeBuilder.DefineProperty(
+                name, attributes, CallingConventions.HasThis, propertyType,
+                null, null, arguments, null, null);
+        }
 
-		public MemberInfo Member
-		{
-			get { return null; }
-		}
+        public MemberInfo Member
+        {
+            get { return null; }
+        }
 
-		public Type ReturnType
-		{
-			get { return builder.PropertyType; }
-		}
+        public Type ReturnType
+        {
+            get { return builder.PropertyType; }
+        }
 
-		public MethodEmitter CreateGetMethod(string name, MethodAttributes attrs, MethodInfo methodToOverride,
-		                                     params Type[] parameters)
-		{
-			if (getMethod != null)
-			{
-				throw new InvalidOperationException("A get method exists");
-			}
+        public MethodEmitter CreateGetMethod(string name, MethodAttributes attrs, MethodInfo methodToOverride,
+                                             params Type[] parameters)
+        {
+            if (getMethod != null)
+            {
+                throw new InvalidOperationException("A get method exists");
+            }
 
-			getMethod = new MethodEmitter(parentTypeEmitter, name, attrs, methodToOverride);
-			return getMethod;
-		}
+            getMethod = new MethodEmitter(parentTypeEmitter, name, attrs, methodToOverride);
+            return getMethod;
+        }
 
-		public MethodEmitter CreateGetMethod(string name, MethodAttributes attributes, MethodInfo methodToOverride)
-		{
-			return CreateGetMethod(name, attributes, methodToOverride, Type.EmptyTypes);
-		}
+        public MethodEmitter CreateGetMethod(string name, MethodAttributes attributes, MethodInfo methodToOverride)
+        {
+            return CreateGetMethod(name, attributes, methodToOverride, Type.EmptyTypes);
+        }
 
-		public MethodEmitter CreateSetMethod(string name, MethodAttributes attrs, MethodInfo methodToOverride,
-		                                     params Type[] parameters)
-		{
-			if (setMethod != null)
-			{
-				throw new InvalidOperationException("A set method exists");
-			}
+        public MethodEmitter CreateSetMethod(string name, MethodAttributes attrs, MethodInfo methodToOverride,
+                                             params Type[] parameters)
+        {
+            if (setMethod != null)
+            {
+                throw new InvalidOperationException("A set method exists");
+            }
 
-			setMethod = new MethodEmitter(parentTypeEmitter, name, attrs, methodToOverride);
-			return setMethod;
-		}
+            setMethod = new MethodEmitter(parentTypeEmitter, name, attrs, methodToOverride);
+            return setMethod;
+        }
 
-		public MethodEmitter CreateSetMethod(string name, MethodAttributes attributes, MethodInfo methodToOverride)
-		{
-			var method = CreateSetMethod(name, attributes, methodToOverride, Type.EmptyTypes);
-			return method;
-		}
+        public MethodEmitter CreateSetMethod(string name, MethodAttributes attributes, MethodInfo methodToOverride)
+        {
+            var method = CreateSetMethod(name, attributes, methodToOverride, Type.EmptyTypes);
+            return method;
+        }
 
-		public void DefineCustomAttribute(CustomAttributeBuilder attribute)
-		{
-			builder.SetCustomAttribute(attribute);
-		}
+        public void DefineCustomAttribute(CustomAttributeBuilder attribute)
+        {
+            builder.SetCustomAttribute(attribute);
+        }
 
-		public void EnsureValidCodeBlock()
-		{
-			if (setMethod != null)
-			{
-				setMethod.EnsureValidCodeBlock();
-			}
+        public void EnsureValidCodeBlock()
+        {
+            if (setMethod != null)
+            {
+                setMethod.EnsureValidCodeBlock();
+            }
 
-			if (getMethod != null)
-			{
-				getMethod.EnsureValidCodeBlock();
-			}
-		}
+            if (getMethod != null)
+            {
+                getMethod.EnsureValidCodeBlock();
+            }
+        }
 
-		public void Generate()
-		{
-			if (setMethod != null)
-			{
-				setMethod.Generate();
-				builder.SetSetMethod(setMethod.MethodBuilder);
-			}
+        public void Generate()
+        {
+            if (setMethod != null)
+            {
+                setMethod.Generate();
+                builder.SetSetMethod(setMethod.MethodBuilder);
+            }
 
-			if (getMethod != null)
-			{
-				getMethod.Generate();
-				builder.SetGetMethod(getMethod.MethodBuilder);
-			}
-		}
-	}
+            if (getMethod != null)
+            {
+                getMethod.Generate();
+                builder.SetGetMethod(getMethod.MethodBuilder);
+            }
+        }
+    }
 }

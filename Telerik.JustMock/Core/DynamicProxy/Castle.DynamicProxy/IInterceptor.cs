@@ -14,11 +14,11 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy
 {
-	/// <summary>
-	///   Provides the main DynamicProxy extension point that allows member interception.
-	/// </summary>
-	public interface IInterceptor
-	{
-		void Intercept(IInvocation invocation);
-	}
+    /// <summary>
+    ///   Provides the main DynamicProxy extension point that allows member interception.
+    /// </summary>
+    public interface IInterceptor
+    {
+        void Intercept(IInvocation invocation);
+    }
 }

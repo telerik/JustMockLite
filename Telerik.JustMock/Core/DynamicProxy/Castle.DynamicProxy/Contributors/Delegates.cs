@@ -14,15 +14,15 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 {
-	using System.Reflection;
+    using System.Reflection;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 
-	internal delegate MethodEmitter OverrideMethodDelegate(
-		string name, MethodAttributes attributes, MethodInfo methodToOverride);
+    internal delegate MethodEmitter OverrideMethodDelegate(
+        string name, MethodAttributes attributes, MethodInfo methodToOverride);
 
-	internal delegate IExpression GetTargetExpressionDelegate(ClassEmitter @class, MethodInfo method);
+    internal delegate IExpression GetTargetExpressionDelegate(ClassEmitter @class, MethodInfo method);
 
-	internal delegate Reference GetTargetReferenceDelegate(ClassEmitter @class, MethodInfo method);
+    internal delegate Reference GetTargetReferenceDelegate(ClassEmitter @class, MethodInfo method);
 }

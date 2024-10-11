@@ -19,19 +19,19 @@ using System;
 
 namespace Telerik.JustMock.Core.Behaviors
 {
-	/// <summary>
-	/// An implementation detail interface. Not intended for external usage.
-	/// </summary>
-	public interface IBehavior
-	{
-		/// <summary> </summary>
-		/// <param name="invocation"></param>
-		void Process(Invocation invocation);
-	}
+    /// <summary>
+    /// An implementation detail interface. Not intended for external usage.
+    /// </summary>
+    public interface IBehavior
+    {
+        /// <summary> </summary>
+        /// <param name="invocation"></param>
+        void Process(Invocation invocation);
+    }
 
-	internal interface IAssertableBehavior : IBehavior
-	{
-		void Assert();
-		string DebugView { get; }
-	}
+    internal interface IAssertableBehavior : IBehavior
+    {
+        void Assert();
+        string DebugView { get; }
+    }
 }

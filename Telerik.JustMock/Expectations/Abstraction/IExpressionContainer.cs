@@ -19,16 +19,16 @@ using System.Linq.Expressions;
 
 namespace Telerik.JustMock.Expectations.Abstraction
 {
-	internal interface IExpressionContainer
-	{
-		Expression Expression { get; }
-	}
+    internal interface IExpressionContainer
+    {
+        Expression Expression { get; }
+    }
 
-	internal static class ExpressionContainerExtensions
-	{
-		public static Expression ToLambda(this IExpressionContainer expressionContainer)
-		{
-			return Expression.Lambda(expressionContainer.Expression);
-		}
-	}
+    internal static class ExpressionContainerExtensions
+    {
+        public static Expression ToLambda(this IExpressionContainer expressionContainer)
+        {
+            return Expression.Lambda(expressionContainer.Expression);
+        }
+    }
 }

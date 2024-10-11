@@ -14,8 +14,8 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Logging
 {
-	internal interface IContextStacks
-	{
-		IContextStack this[string key] { get; }
-	}
+    internal interface IContextStacks
+    {
+        IContextStack this[string key] { get; }
+    }
 }

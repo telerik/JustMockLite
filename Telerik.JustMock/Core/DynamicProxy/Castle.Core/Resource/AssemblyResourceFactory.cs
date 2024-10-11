@@ -14,28 +14,28 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
-	using System;
+    using System;
 
-	internal class AssemblyResourceFactory : IResourceFactory
-	{
-		public bool Accept(CustomUri uri)
-		{
-			return "assembly".Equals(uri.Scheme);
-		}
+    internal class AssemblyResourceFactory : IResourceFactory
+    {
+        public bool Accept(CustomUri uri)
+        {
+            return "assembly".Equals(uri.Scheme);
+        }
 
-		public IResource Create(CustomUri uri)
-		{
-			return Create(uri, null);
-		}
+        public IResource Create(CustomUri uri)
+        {
+            return Create(uri, null);
+        }
 
-		public IResource Create(CustomUri uri, string basePath)
-		{
-			if (basePath == null)
-			{
-				return new AssemblyResource(uri);
-			}
+        public IResource Create(CustomUri uri, string basePath)
+        {
+            if (basePath == null)
+            {
+                return new AssemblyResource(uri);
+            }
 
-			return new AssemblyResource(uri, basePath);
-		}
-	}
+            return new AssemblyResource(uri, basePath);
+        }
+    }
 }

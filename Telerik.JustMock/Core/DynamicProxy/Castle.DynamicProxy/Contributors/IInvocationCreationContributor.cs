@@ -14,20 +14,20 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 {
-	using System.Reflection;
+    using System.Reflection;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 
-	internal interface IInvocationCreationContributor
-	{
-		ConstructorEmitter CreateConstructor(ArgumentReference[] baseCtorArguments, AbstractTypeEmitter invocation);
+    internal interface IInvocationCreationContributor
+    {
+        ConstructorEmitter CreateConstructor(ArgumentReference[] baseCtorArguments, AbstractTypeEmitter invocation);
 
-		MethodInfo GetCallbackMethod();
+        MethodInfo GetCallbackMethod();
 
-		MethodInvocationExpression GetCallbackMethodInvocation(AbstractTypeEmitter invocation, IExpression[] args,
-		                                                       Reference targetField, MethodEmitter invokeMethodOnTarget);
+        MethodInvocationExpression GetCallbackMethodInvocation(AbstractTypeEmitter invocation, IExpression[] args,
+                                                               Reference targetField, MethodEmitter invokeMethodOnTarget);
 
-		IExpression[] GetConstructorInvocationArguments(IExpression[] arguments, ClassEmitter proxy);
-	}
+        IExpression[] GetConstructorInvocationArguments(IExpression[] arguments, ClassEmitter proxy);
+    }
 }

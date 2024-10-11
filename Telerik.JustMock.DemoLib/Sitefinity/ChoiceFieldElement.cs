@@ -20,12 +20,12 @@ using Telerik.Sitefinity.Web.UI.Fields.Contracts;
 
 namespace Telerik.Sitefinity.Web.UI.Fields.Config
 {
-	public class ChoiceFieldElement : FieldControlDefinitionElement, IChoiceFieldDefinition
-	{
-		public List<IChoiceDefinition> Choices
-		{
-			get { return new List<IChoiceDefinition>(); }
-		}
-	}
+    public class ChoiceFieldElement : FieldControlDefinitionElement, IChoiceFieldDefinition
+    {
+        public List<IChoiceDefinition> Choices
+        {
+            get { return new List<IChoiceDefinition>(); }
+        }
+    }
 
 }

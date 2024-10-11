@@ -19,19 +19,19 @@ using System;
 
 namespace Telerik.JustMock.DemoLib.Objects
 {
-	/// <summary>
-	/// Dummy account class.
-	/// </summary>
-	internal class Logger : ILogger
-	{
-		internal void LogInternal(string messaage)
-		{
-			throw new NotImplementedException();
-		}
+    /// <summary>
+    /// Dummy account class.
+    /// </summary>
+    internal class Logger : ILogger
+    {
+        internal void LogInternal(string messaage)
+        {
+            throw new NotImplementedException();
+        }
 
-		public void Log(string message)
-		{
-			LogInternal(message);
-		}
-	}
+        public void Log(string message)
+        {
+            LogInternal(message);
+        }
+    }
 }

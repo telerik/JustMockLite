@@ -20,27 +20,27 @@ using System.Linq;
 
 namespace Telerik.JustMock.Expectations.Abstraction
 {
-	/// <summary>
-	/// Arrangement filtering interface.
-	/// </summary>
-	/// <typeparam name="TContainer"></typeparam>
-	public interface IIgnorable<TContainer> : IWhen<TContainer>
-	{
-		/// <summary>
-		/// Specifies to ignore any argument for the target call.
-		/// </summary>
-		/// <returns>Func or Action Container</returns>
-		TContainer IgnoreArguments();
+    /// <summary>
+    /// Arrangement filtering interface.
+    /// </summary>
+    /// <typeparam name="TContainer"></typeparam>
+    public interface IIgnorable<TContainer> : IWhen<TContainer>
+    {
+        /// <summary>
+        /// Specifies to ignore any argument for the target call.
+        /// </summary>
+        /// <returns>Func or Action Container</returns>
+        TContainer IgnoreArguments();
 
-		/// <summary>
-		/// Specifies an additional condition that must be true for this arrangement to be
-		/// considered when the arranged member is called. This condition is evaluated in addition
-		/// to the conditions imposed by any argument matchers in the arrangement.
-		/// 
-		/// This method allows a more general way of matching arrangements than argument matchers do.
-		/// </summary>
-		/// <param name="condition">A function that should return 'true' when this
-		/// arrangement should be considered and 'false' if this arrangement doesn't match the user criteria.</param>
-		TContainer When(Func<bool> condition);
-	}
+        /// <summary>
+        /// Specifies an additional condition that must be true for this arrangement to be
+        /// considered when the arranged member is called. This condition is evaluated in addition
+        /// to the conditions imposed by any argument matchers in the arrangement.
+        /// 
+        /// This method allows a more general way of matching arrangements than argument matchers do.
+        /// </summary>
+        /// <param name="condition">A function that should return 'true' when this
+        /// arrangement should be considered and 'false' if this arrangement doesn't match the user criteria.</param>
+        TContainer When(Func<bool> condition);
+    }
 }

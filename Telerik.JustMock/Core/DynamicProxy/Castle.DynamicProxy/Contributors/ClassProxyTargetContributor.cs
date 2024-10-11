@@ -14,173 +14,173 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Diagnostics;
-	using System.Linq;
-	using System.Reflection;
-	using System.Reflection.Emit;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Reflection;
+    using System.Reflection.Emit;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Tokens;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Tokens;
 
-	internal class ClassProxyTargetContributor : CompositeTypeContributor
-	{
-		private readonly Type targetType;
+    internal class ClassProxyTargetContributor : CompositeTypeContributor
+    {
+        private readonly Type targetType;
 
-		public ClassProxyTargetContributor(Type targetType, INamingScope namingScope)
-			: base(namingScope)
-		{
-			this.targetType = targetType;
-		}
+        public ClassProxyTargetContributor(Type targetType, INamingScope namingScope)
+            : base(namingScope)
+        {
+            this.targetType = targetType;
+        }
 
-		protected override IEnumerable<MembersCollector> GetCollectors()
-		{
-			var targetItem = new ClassMembersCollector(targetType) { Logger = Logger };
-			yield return targetItem;
+        protected override IEnumerable<MembersCollector> GetCollectors()
+        {
+            var targetItem = new ClassMembersCollector(targetType) { Logger = Logger };
+            yield return targetItem;
 
-			foreach (var @interface in interfaces)
-			{
-				var item = new InterfaceMembersOnClassCollector(@interface, true,
-					targetType.GetInterfaceMap(@interface)) { Logger = Logger };
-				yield return item;
-			}
-		}
+            foreach (var @interface in interfaces)
+            {
+                var item = new InterfaceMembersOnClassCollector(@interface, true,
+                    targetType.GetInterfaceMap(@interface)) { Logger = Logger };
+                yield return item;
+            }
+        }
 
-		protected override MethodGenerator GetMethodGenerator(MetaMethod method, ClassEmitter @class,
-		                                                      OverrideMethodDelegate overrideMethod)
-		{
-			if (method.Ignore)
-			{
-				return null;
-			}
+        protected override MethodGenerator GetMethodGenerator(MetaMethod method, ClassEmitter @class,
+                                                              OverrideMethodDelegate overrideMethod)
+        {
+            if (method.Ignore)
+            {
+                return null;
+            }
 
-			if (!method.Proxyable)
-			{
-				return new MinimalisticMethodGenerator(method, overrideMethod);
-			}
+            if (!method.Proxyable)
+            {
+                return new MinimalisticMethodGenerator(method, overrideMethod);
+            }
 
-			if (ExplicitlyImplementedInterfaceMethod(method))
-			{
-				return ExplicitlyImplementedInterfaceMethodGenerator(method, @class, overrideMethod);
-			}
+            if (ExplicitlyImplementedInterfaceMethod(method))
+            {
+                return ExplicitlyImplementedInterfaceMethodGenerator(method, @class, overrideMethod);
+            }
 
-			var invocation = GetInvocationType(method, @class);
+            var invocation = GetInvocationType(method, @class);
 
-			GetTargetExpressionDelegate getTargetTypeExpression = (c, m) => new TypeTokenExpression(targetType);
+            GetTargetExpressionDelegate getTargetTypeExpression = (c, m) => new TypeTokenExpression(targetType);
 
-			return new MethodWithInvocationGenerator(method,
-			                                         @class.GetField("__interceptors"),
-			                                         invocation,
-			                                         getTargetTypeExpression,
-			                                         getTargetTypeExpression,
-			                                         overrideMethod,
-			                                         null);
-		}
+            return new MethodWithInvocationGenerator(method,
+                                                     @class.GetField("__interceptors"),
+                                                     invocation,
+                                                     getTargetTypeExpression,
+                                                     getTargetTypeExpression,
+                                                     overrideMethod,
+                                                     null);
+        }
 
-		private Type BuildInvocationType(MetaMethod method, ClassEmitter @class)
-		{
-			var methodInfo = method.Method;
-			if (!method.HasTarget)
-			{
-				return new InheritanceInvocationTypeGenerator(targetType,
-				                                              method,
-				                                              null, null)
-					.Generate(@class, namingScope)
-					.BuildType();
-			}
-			var callback = CreateCallbackMethod(@class, methodInfo, method.MethodOnTarget);
-			return new InheritanceInvocationTypeGenerator(callback.DeclaringType,
-			                                              method,
-			                                              callback, null)
-				.Generate(@class, namingScope)
-				.BuildType();
-		}
+        private Type BuildInvocationType(MetaMethod method, ClassEmitter @class)
+        {
+            var methodInfo = method.Method;
+            if (!method.HasTarget)
+            {
+                return new InheritanceInvocationTypeGenerator(targetType,
+                                                              method,
+                                                              null, null)
+                    .Generate(@class, namingScope)
+                    .BuildType();
+            }
+            var callback = CreateCallbackMethod(@class, methodInfo, method.MethodOnTarget);
+            return new InheritanceInvocationTypeGenerator(callback.DeclaringType,
+                                                          method,
+                                                          callback, null)
+                .Generate(@class, namingScope)
+                .BuildType();
+        }
 
-		private MethodBuilder CreateCallbackMethod(ClassEmitter emitter, MethodInfo methodInfo, MethodInfo methodOnTarget)
-		{
-			var targetMethod = methodOnTarget ?? methodInfo;
-			var callBackMethod = emitter.CreateMethod(namingScope.GetUniqueName(methodInfo.Name + "_callback"), targetMethod);
+        private MethodBuilder CreateCallbackMethod(ClassEmitter emitter, MethodInfo methodInfo, MethodInfo methodOnTarget)
+        {
+            var targetMethod = methodOnTarget ?? methodInfo;
+            var callBackMethod = emitter.CreateMethod(namingScope.GetUniqueName(methodInfo.Name + "_callback"), targetMethod);
 
-			if (targetMethod.IsGenericMethod)
-			{
-				targetMethod = targetMethod.MakeGenericMethod(callBackMethod.GenericTypeParams.AsTypeArray());
-			}
+            if (targetMethod.IsGenericMethod)
+            {
+                targetMethod = targetMethod.MakeGenericMethod(callBackMethod.GenericTypeParams.AsTypeArray());
+            }
 
-			// invocation on base class
+            // invocation on base class
 
-			callBackMethod.CodeBuilder.AddStatement(
-				new ReturnStatement(
-					new MethodInvocationExpression(SelfReference.Self,
-					                               targetMethod,
-					                               callBackMethod.Arguments)));
+            callBackMethod.CodeBuilder.AddStatement(
+                new ReturnStatement(
+                    new MethodInvocationExpression(SelfReference.Self,
+                                                   targetMethod,
+                                                   callBackMethod.Arguments)));
 
-			return callBackMethod.MethodBuilder;
-		}
+            return callBackMethod.MethodBuilder;
+        }
 
-		private bool ExplicitlyImplementedInterfaceMethod(MetaMethod method)
-		{
-			return method.MethodOnTarget.IsPrivate;
-		}
+        private bool ExplicitlyImplementedInterfaceMethod(MetaMethod method)
+        {
+            return method.MethodOnTarget.IsPrivate;
+        }
 
-		private MethodGenerator ExplicitlyImplementedInterfaceMethodGenerator(MetaMethod method, ClassEmitter @class,
-		                                                                      OverrideMethodDelegate overrideMethod)
-		{
-			var @delegate = GetDelegateType(method, @class);
-			var contributor = GetContributor(@delegate, method);
-			var invocation = new InheritanceInvocationTypeGenerator(targetType, method, null, contributor)
-				.Generate(@class, namingScope)
-				.BuildType();
-			return new MethodWithInvocationGenerator(method,
-			                                         @class.GetField("__interceptors"),
-			                                         invocation,
-			                                         (c, m) => new TypeTokenExpression(targetType),
-			                                         overrideMethod,
-			                                         contributor);
-		}
+        private MethodGenerator ExplicitlyImplementedInterfaceMethodGenerator(MetaMethod method, ClassEmitter @class,
+                                                                              OverrideMethodDelegate overrideMethod)
+        {
+            var @delegate = GetDelegateType(method, @class);
+            var contributor = GetContributor(@delegate, method);
+            var invocation = new InheritanceInvocationTypeGenerator(targetType, method, null, contributor)
+                .Generate(@class, namingScope)
+                .BuildType();
+            return new MethodWithInvocationGenerator(method,
+                                                     @class.GetField("__interceptors"),
+                                                     invocation,
+                                                     (c, m) => new TypeTokenExpression(targetType),
+                                                     overrideMethod,
+                                                     contributor);
+        }
 
-		private IInvocationCreationContributor GetContributor(Type @delegate, MetaMethod method)
-		{
-			if (@delegate.IsGenericType == false)
-			{
-				return new InvocationWithDelegateContributor(@delegate, targetType, method, namingScope);
-			}
-			return new InvocationWithGenericDelegateContributor(@delegate,
-			                                                    method,
-			                                                    new FieldReference(InvocationMethods.ProxyObject));
-		}
+        private IInvocationCreationContributor GetContributor(Type @delegate, MetaMethod method)
+        {
+            if (@delegate.IsGenericType == false)
+            {
+                return new InvocationWithDelegateContributor(@delegate, targetType, method, namingScope);
+            }
+            return new InvocationWithGenericDelegateContributor(@delegate,
+                                                                method,
+                                                                new FieldReference(InvocationMethods.ProxyObject));
+        }
 
-		private Type GetDelegateType(MetaMethod method, ClassEmitter @class)
-		{
-			var scope = @class.ModuleScope;
-			var key = new CacheKey(
-				typeof(Delegate),
-				targetType,
-				new[] { method.MethodOnTarget.ReturnType }
-					.Concat(ArgumentsUtil.GetTypes(method.MethodOnTarget.GetParameters())).
-					ToArray(),
-				null);
+        private Type GetDelegateType(MetaMethod method, ClassEmitter @class)
+        {
+            var scope = @class.ModuleScope;
+            var key = new CacheKey(
+                typeof(Delegate),
+                targetType,
+                new[] { method.MethodOnTarget.ReturnType }
+                    .Concat(ArgumentsUtil.GetTypes(method.MethodOnTarget.GetParameters())).
+                    ToArray(),
+                null);
 
-			return scope.TypeCache.GetOrAddWithoutTakingLock(key, _ =>
-				new DelegateTypeGenerator(method, targetType)
-				.Generate(@class, namingScope)
-				.BuildType());
-		}
+            return scope.TypeCache.GetOrAddWithoutTakingLock(key, _ =>
+                new DelegateTypeGenerator(method, targetType)
+                .Generate(@class, namingScope)
+                .BuildType());
+        }
 
-		private Type GetInvocationType(MetaMethod method, ClassEmitter @class)
-		{
-			if (!method.HasTarget)
-			{
-				// We do not need to generate a custom invocation type because no custom implementation
-				// for `InvokeMethodOnTarget` will be needed (proceeding to target isn't possible here):
-				return typeof(InheritanceInvocationWithoutTarget);
-			}
+        private Type GetInvocationType(MetaMethod method, ClassEmitter @class)
+        {
+            if (!method.HasTarget)
+            {
+                // We do not need to generate a custom invocation type because no custom implementation
+                // for `InvokeMethodOnTarget` will be needed (proceeding to target isn't possible here):
+                return typeof(InheritanceInvocationWithoutTarget);
+            }
 
-			// NOTE: No caching since invocation is tied to this specific proxy type via its invocation method
-			return BuildInvocationType(method, @class);
-		}
-	}
+            // NOTE: No caching since invocation is tied to this specific proxy type via its invocation method
+            return BuildInvocationType(method, @class);
+        }
+    }
 }

@@ -20,35 +20,35 @@ using Telerik.JustMock.DemoLib.Objects;
 
 namespace Telerik.JustMock.DemoLib
 {
-	public class TransactionService
-	{
-		public static void RecalculateTicket(TransactionHeaderViewModel model)
-		{
+    public class TransactionService
+    {
+        public static void RecalculateTicket(TransactionHeaderViewModel model)
+        {
 
-		}
+        }
 
-		public static void SaveTransaction(TransactionHeaderViewModel ticket, bool recalculate)
-		{
-			if (UserService.GetLoggedInUser() == null)
-			{
-				throw new ArgumentException();
-			}
+        public static void SaveTransaction(TransactionHeaderViewModel ticket, bool recalculate)
+        {
+            if (UserService.GetLoggedInUser() == null)
+            {
+                throw new ArgumentException();
+            }
 
-			if (ConfigurationService.GetConfiguration() == null)
-			{
-				throw new InvalidOperationException("no valid configuration");
-			}
+            if (ConfigurationService.GetConfiguration() == null)
+            {
+                throw new InvalidOperationException("no valid configuration");
+            }
 
-			ticket.ReservationNumber = GetReservationNumber(UserService.Username);
-			//ticket.OperatorId = Guid.NewGuid().ToString();
-			ticket.SetLineNumbers();
-			ticket.SetPaidAmount();
-			ticket.SaveTicket();
-		}
+            ticket.ReservationNumber = GetReservationNumber(UserService.Username);
+            //ticket.OperatorId = Guid.NewGuid().ToString();
+            ticket.SetLineNumbers();
+            ticket.SetPaidAmount();
+            ticket.SaveTicket();
+        }
 
-		public static int GetReservationNumber(string s)
-		{
-			return 0;
-		}
-	}
+        public static int GetReservationNumber(string s)
+        {
+            return 0;
+        }
+    }
 }

@@ -17,9 +17,9 @@
 
 namespace Telerik.JustMock.Core.Internal
 {
-	internal interface IUpgradeableLockHolder : ILockHolder
-	{
-		ILockHolder Upgrade();
-		ILockHolder Upgrade(bool waitForLock);
-	}
+    internal interface IUpgradeableLockHolder : ILockHolder
+    {
+        ILockHolder Upgrade();
+        ILockHolder Upgrade(bool waitForLock);
+    }
 }

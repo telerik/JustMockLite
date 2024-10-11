@@ -50,152 +50,142 @@ using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFa
 
 namespace Telerik.JustMock.Tests.Regression
 {
-	[TestClass]
-	public partial class MatchersFixture
-	{
-		
-		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
-		public void ShouldAssertAnyMatcherWithFloat()
-		{
-			var foo = Mock.Create<IFoo>();
+    [TestClass]
+    public partial class MatchersFixture
+    {
 
-			Mock.Arrange(() => foo.Execute(Arg.AnyFloat)).MustBeCalled();
+        [TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
+        public void ShouldAssertAnyMatcherWithFloat()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			foo.Execute(default(float));
+            Mock.Arrange(() => foo.Execute(Arg.AnyFloat)).MustBeCalled();
 
-			Mock.Assert(foo);
-		}
-		
-		
-		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
-		public void ShouldAssertAnyMatcherWithDouble()
-		{
-			var foo = Mock.Create<IFoo>();
+            foo.Execute(default(float));
 
-			Mock.Arrange(() => foo.Execute(Arg.AnyDouble)).MustBeCalled();
+            Mock.Assert(foo);
+        }
 
-			foo.Execute(default(double));
+        [TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
+        public void ShouldAssertAnyMatcherWithDouble()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			Mock.Assert(foo);
-		}
-		
-		
-		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
-		public void ShouldAssertAnyMatcherWithDecimal()
-		{
-			var foo = Mock.Create<IFoo>();
+            Mock.Arrange(() => foo.Execute(Arg.AnyDouble)).MustBeCalled();
 
-			Mock.Arrange(() => foo.Execute(Arg.AnyDecimal)).MustBeCalled();
+            foo.Execute(default(double));
 
-			foo.Execute(default(decimal));
+            Mock.Assert(foo);
+        }
 
-			Mock.Assert(foo);
-		}
-		
-		
-		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
-		public void ShouldAssertAnyMatcherWithLong()
-		{
-			var foo = Mock.Create<IFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
+        public void ShouldAssertAnyMatcherWithDecimal()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			Mock.Arrange(() => foo.Execute(Arg.AnyLong)).MustBeCalled();
+            Mock.Arrange(() => foo.Execute(Arg.AnyDecimal)).MustBeCalled();
 
-			foo.Execute(default(long));
+            foo.Execute(default(decimal));
 
-			Mock.Assert(foo);
-		}
-		
-		
-		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
-		public void ShouldAssertAnyMatcherWithChar()
-		{
-			var foo = Mock.Create<IFoo>();
+            Mock.Assert(foo);
+        }
 
-			Mock.Arrange(() => foo.Execute(Arg.AnyChar)).MustBeCalled();
+        [TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
+        public void ShouldAssertAnyMatcherWithLong()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			foo.Execute(default(char));
+            Mock.Arrange(() => foo.Execute(Arg.AnyLong)).MustBeCalled();
 
-			Mock.Assert(foo);
-		}
-		
-		
-		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
-		public void ShouldAssertAnyMatcherWithString()
-		{
-			var foo = Mock.Create<IFoo>();
+            foo.Execute(default(long));
 
-			Mock.Arrange(() => foo.Execute(Arg.AnyString)).MustBeCalled();
+            Mock.Assert(foo);
+        }
 
-			foo.Execute(default(string));
+        [TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
+        public void ShouldAssertAnyMatcherWithChar()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			Mock.Assert(foo);
-		}
-		
-		
-		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
-		public void ShouldAssertAnyMatcherWithObject()
-		{
-			var foo = Mock.Create<IFoo>();
+            Mock.Arrange(() => foo.Execute(Arg.AnyChar)).MustBeCalled();
 
-			Mock.Arrange(() => foo.Execute(Arg.AnyObject)).MustBeCalled();
+            foo.Execute(default(char));
 
-			foo.Execute(default(object));
+            Mock.Assert(foo);
+        }
 
-			Mock.Assert(foo);
-		}
-		
-		
-		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
-		public void ShouldAssertAnyMatcherWithShort()
-		{
-			var foo = Mock.Create<IFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
+        public void ShouldAssertAnyMatcherWithString()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			Mock.Arrange(() => foo.Execute(Arg.AnyShort)).MustBeCalled();
+            Mock.Arrange(() => foo.Execute(Arg.AnyString)).MustBeCalled();
 
-			foo.Execute(default(short));
+            foo.Execute(default(string));
 
-			Mock.Assert(foo);
-		}
-		
-		
-		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
-		public void ShouldAssertAnyMatcherWithBool()
-		{
-			var foo = Mock.Create<IFoo>();
+            Mock.Assert(foo);
+        }
 
-			Mock.Arrange(() => foo.Execute(Arg.AnyBool)).MustBeCalled();
+        [TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
+        public void ShouldAssertAnyMatcherWithObject()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			foo.Execute(default(bool));
+            Mock.Arrange(() => foo.Execute(Arg.AnyObject)).MustBeCalled();
 
-			Mock.Assert(foo);
-		}
-		
-		
-		[TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
-		public void ShouldAssertAnyMatcherWithGuid()
-		{
-			var foo = Mock.Create<IFoo>();
+            foo.Execute(default(object));
 
-			Mock.Arrange(() => foo.Execute(Arg.AnyGuid)).MustBeCalled();
+            Mock.Assert(foo);
+        }
 
-			foo.Execute(default(Guid));
+        [TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
+        public void ShouldAssertAnyMatcherWithShort()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			Mock.Assert(foo);
-		}
-		
-		
-		public interface IFoo
-		{
-			void Execute(float arg1);
-			void Execute(double arg1);
-			void Execute(decimal arg1);
-			void Execute(long arg1);
-			void Execute(char arg1);
-			void Execute(string arg1);
-			void Execute(object arg1);
-			void Execute(short arg1);
-			void Execute(bool arg1);
-			void Execute(Guid arg1);
-		}
-	}
+            Mock.Arrange(() => foo.Execute(Arg.AnyShort)).MustBeCalled();
+
+            foo.Execute(default(short));
+
+            Mock.Assert(foo);
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
+        public void ShouldAssertAnyMatcherWithBool()
+        {
+            var foo = Mock.Create<IFoo>();
+
+            Mock.Arrange(() => foo.Execute(Arg.AnyBool)).MustBeCalled();
+
+            foo.Execute(default(bool));
+
+            Mock.Assert(foo);
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
+        public void ShouldAssertAnyMatcherWithGuid()
+        {
+            var foo = Mock.Create<IFoo>();
+
+            Mock.Arrange(() => foo.Execute(Arg.AnyGuid)).MustBeCalled();
+
+            foo.Execute(default(Guid));
+
+            Mock.Assert(foo);
+        }
+
+        public interface IFoo
+        {
+            void Execute(float arg1);
+            void Execute(double arg1);
+            void Execute(decimal arg1);
+            void Execute(long arg1);
+            void Execute(char arg1);
+            void Execute(string arg1);
+            void Execute(object arg1);
+            void Execute(short arg1);
+            void Execute(bool arg1);
+            void Execute(Guid arg1);
+        }
+    }
 }

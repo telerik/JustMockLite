@@ -14,55 +14,55 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Reflection.Emit;
+    using System;
+    using System.Collections.Generic;
+    using System.Reflection.Emit;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 
-	internal sealed class CodeBuilder
-	{
-		private readonly List<LocalReference> locals;
-		private readonly List<IStatement> statements;
-		private bool isEmpty;
+    internal sealed class CodeBuilder
+    {
+        private readonly List<LocalReference> locals;
+        private readonly List<IStatement> statements;
+        private bool isEmpty;
 
-		public CodeBuilder()
-		{
-			statements = new List<IStatement>();
-			locals = new List<LocalReference>();
-			isEmpty = true;
-		}
+        public CodeBuilder()
+        {
+            statements = new List<IStatement>();
+            locals = new List<LocalReference>();
+            isEmpty = true;
+        }
 
-		internal bool IsEmpty
-		{
-			get { return isEmpty; }
-		}
+        internal bool IsEmpty
+        {
+            get { return isEmpty; }
+        }
 
-		public CodeBuilder AddStatement(IStatement statement)
-		{
-			isEmpty = false;
-			statements.Add(statement);
-			return this;
-		}
+        public CodeBuilder AddStatement(IStatement statement)
+        {
+            isEmpty = false;
+            statements.Add(statement);
+            return this;
+        }
 
-		public LocalReference DeclareLocal(Type type)
-		{
-			var local = new LocalReference(type);
-			locals.Add(local);
-			return local;
-		}
+        public LocalReference DeclareLocal(Type type)
+        {
+            var local = new LocalReference(type);
+            locals.Add(local);
+            return local;
+        }
 
-		internal void Generate(ILGenerator il)
-		{
-			foreach (var local in locals)
-			{
-				local.Generate(il);
-			}
+        internal void Generate(ILGenerator il)
+        {
+            foreach (var local in locals)
+            {
+                local.Generate(il);
+            }
 
-			foreach (var statement in statements)
-			{
-				statement.Emit(il);
-			}
-		}
-	}
+            foreach (var statement in statements)
+            {
+                statement.Emit(il);
+            }
+        }
+    }
 }

@@ -14,35 +14,35 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
-	using System;
+    using System;
 
-	/// <summary>
-	/// Depicts the contract for resource factories.
-	/// </summary>
-	internal interface IResourceFactory
-	{
-		/// <summary>
-		/// Used to check whether the resource factory
-		/// is able to deal with the given resource
-		/// identifier.
-		/// </summary>
-		/// <remarks>
-		/// Implementors should return <c>true</c>
-		/// only if the given identifier is supported
-		/// by the resource factory
-		/// </remarks>
-		bool Accept(CustomUri uri);
+    /// <summary>
+    /// Depicts the contract for resource factories.
+    /// </summary>
+    internal interface IResourceFactory
+    {
+        /// <summary>
+        /// Used to check whether the resource factory
+        /// is able to deal with the given resource
+        /// identifier.
+        /// </summary>
+        /// <remarks>
+        /// Implementors should return <c>true</c>
+        /// only if the given identifier is supported
+        /// by the resource factory
+        /// </remarks>
+        bool Accept(CustomUri uri);
 
-		/// <summary>
-		/// Creates an <see cref="IResource"/> instance
-		/// for the given resource identifier
-		/// </summary>
-		IResource Create(CustomUri uri);
+        /// <summary>
+        /// Creates an <see cref="IResource"/> instance
+        /// for the given resource identifier
+        /// </summary>
+        IResource Create(CustomUri uri);
 
-		/// <summary>
-		/// Creates an <see cref="IResource"/> instance
-		/// for the given resource identifier
-		/// </summary>
-		IResource Create(CustomUri uri, string basePath);
-	}
+        /// <summary>
+        /// Creates an <see cref="IResource"/> instance
+        /// for the given resource identifier
+        /// </summary>
+        IResource Create(CustomUri uri, string basePath);
+    }
 }

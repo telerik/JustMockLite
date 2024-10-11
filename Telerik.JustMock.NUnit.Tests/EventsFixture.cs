@@ -22,26 +22,26 @@ using NUnit.Framework;
 
 namespace Telerik.JustMock.Tests
 {
-	[TestFixture]
-	public class EventsFixtureNUnit
-	{
-		private ProjectNavigatorViewModel viewModel;
-		private ISolutionService solutionService;
+    [TestFixture]
+    public class EventsFixtureNUnit
+    {
+        private ProjectNavigatorViewModel viewModel;
+        private ISolutionService solutionService;
 
-		[SetUp]
-		public void Initialize()
-		{
-			this.solutionService = Mock.Create<ISolutionService>();
-			this.viewModel = new ProjectNavigatorViewModel(this.solutionService);
-		}
+        [SetUp]
+        public void Initialize()
+        {
+            this.solutionService = Mock.Create<ISolutionService>();
+            this.viewModel = new ProjectNavigatorViewModel(this.solutionService);
+        }
 
-		[Test, Category("Lite"), Category("Events")]
-		[TestCaseSource("DummyTestCaseSource")]
-		public void ShouldRaiseEventsOnDataDrivenTests(object _)
-		{
-			Mock.Raise(() => this.solutionService.ProjectAdded += null, new ProjectEventArgs(null));
-		}
+        [Test, Category("Lite"), Category("Events")]
+        [TestCaseSource("DummyTestCaseSource")]
+        public void ShouldRaiseEventsOnDataDrivenTests(object _)
+        {
+            Mock.Raise(() => this.solutionService.ProjectAdded += null, new ProjectEventArgs(null));
+        }
 
-		private static IEnumerable<TestCaseData> DummyTestCaseSource = new[] { new TestCaseData(null), new TestCaseData(null) };
-	}
+        private static IEnumerable<TestCaseData> DummyTestCaseSource = new[] { new TestCaseData(null), new TestCaseData(null) };
+    }
 }

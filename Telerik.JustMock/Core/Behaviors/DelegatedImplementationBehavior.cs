@@ -21,36 +21,36 @@ using System.Linq;
 
 namespace Telerik.JustMock.Core.Behaviors
 {
-	internal class DelegatedImplementationBehavior : IBehavior
-	{
-		private readonly IEnumerable<Type> types;
-		private readonly object implementer;
+    internal class DelegatedImplementationBehavior : IBehavior
+    {
+        private readonly IEnumerable<Type> types;
+        private readonly object implementer;
 
-		public DelegatedImplementationBehavior(object implementer, IEnumerable<Type> types)
-		{
-			this.implementer = implementer;
-			this.types = types;
-		}
+        public DelegatedImplementationBehavior(object implementer, IEnumerable<Type> types)
+        {
+            this.implementer = implementer;
+            this.types = types;
+        }
 
-		public void Process(Invocation invocation)
-		{
-			var mockMethod = invocation.Method;
-			var inheritanceChain = mockMethod.GetInheritanceChain();
+        public void Process(Invocation invocation)
+        {
+            var mockMethod = invocation.Method;
+            var inheritanceChain = mockMethod.GetInheritanceChain();
 
-			var delegatedImplMethod =
-				inheritanceChain.FirstOrDefault(
-					method =>
-						types.Any(
-							type =>
-								{
-									var targetType = method.IsExtensionMethod() ? method.GetParameters()[0].ParameterType : method.DeclaringType;
-									return targetType.IsAssignableFrom(type);
-								}));
-			if (delegatedImplMethod != null)
-			{
-				invocation.ReturnValue = delegatedImplMethod.Invoke(implementer, invocation.Args);
-				invocation.UserProvidedImplementation = true;
-			}
-		}
-	}
+            var delegatedImplMethod =
+                inheritanceChain.FirstOrDefault(
+                    method =>
+                        types.Any(
+                            type =>
+                                {
+                                    var targetType = method.IsExtensionMethod() ? method.GetParameters()[0].ParameterType : method.DeclaringType;
+                                    return targetType.IsAssignableFrom(type);
+                                }));
+            if (delegatedImplMethod != null)
+            {
+                invocation.ReturnValue = delegatedImplMethod.Invoke(implementer, invocation.Args);
+                invocation.UserProvidedImplementation = true;
+            }
+        }
+    }
 }

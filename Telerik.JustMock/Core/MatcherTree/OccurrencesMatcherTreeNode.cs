@@ -22,63 +22,63 @@ using System.Text;
 
 namespace Telerik.JustMock.Core.MatcherTree
 {
-	internal class OccurrencesMatcherTreeNode : MatcherTreeNode
-	{
-		public int Calls { get; set; }
-		public HashSet<IMethodMock> Mocks { get; private set; }
+    internal class OccurrencesMatcherTreeNode : MatcherTreeNode
+    {
+        public int Calls { get; set; }
+        public HashSet<IMethodMock> Mocks { get; private set; }
 
-		public OccurrencesMatcherTreeNode()
-			: base(null)
-		{
-			Mocks = new HashSet<IMethodMock>();
-			Calls = 1;
-		}
+        public OccurrencesMatcherTreeNode()
+            : base(null)
+        {
+            Mocks = new HashSet<IMethodMock>();
+            Calls = 1;
+        }
 
-		public OccurrencesMatcherTreeNode(IMethodMock mock)
-			: this()
-		{
-			if (mock != null)
-				Mocks.Add(mock);
-		}
-		
-		public override IMatcherTreeNode Clone()
-		{
-			return new OccurrencesMatcherTreeNode
-			{
-				Mocks = new HashSet<IMethodMock>(Mocks),
-				Calls = Calls,
-			};
-		}
+        public OccurrencesMatcherTreeNode(IMethodMock mock)
+            : this()
+        {
+            if (mock != null)
+                Mocks.Add(mock);
+        }
 
-		public string GetDebugView()
-		{
-			var matchers = new List<IMatcherTreeNode>();
-			var parent = this.Parent;
-			while (!(parent is MethodInfoMatcherTreeNode))
-			{
-				matchers.Add(parent);
-				parent = parent.Parent;
-			}
-			matchers.Reverse();
+        public override IMatcherTreeNode Clone()
+        {
+            return new OccurrencesMatcherTreeNode
+            {
+                Mocks = new HashSet<IMethodMock>(Mocks),
+                Calls = Calls,
+            };
+        }
 
-			var method = ((MethodInfoMatcherTreeNode)parent).MethodInfo;
+        public string GetDebugView()
+        {
+            var matchers = new List<IMatcherTreeNode>();
+            var parent = this.Parent;
+            while (!(parent is MethodInfoMatcherTreeNode))
+            {
+                matchers.Add(parent);
+                parent = parent.Parent;
+            }
+            matchers.Reverse();
 
-			var sb = new StringBuilder();
-			bool isInstance = !method.IsStatic || method.IsExtensionMethod();
-			var argMatchers = isInstance ? matchers.Skip(1) : matchers;
+            var method = ((MethodInfoMatcherTreeNode)parent).MethodInfo;
 
-			if (isInstance)
-				sb.AppendFormat("({0}).", matchers[0].Matcher.DebugView);
-			else
-				sb.AppendFormat("{0}.", method.DeclaringType);
+            var sb = new StringBuilder();
+            bool isInstance = !method.IsStatic || method.IsExtensionMethod();
+            var argMatchers = isInstance ? matchers.Skip(1) : matchers;
 
-			sb.AppendFormat("{0}({1}) called {2} time{3}; (signature: {4})",
-				method.Name,
-				", ".Join(argMatchers.Select(m => m.Matcher.DebugView)),
-				this.Calls, this.Calls != 1 ? "s" : "",
-				method);
+            if (isInstance)
+                sb.AppendFormat("({0}).", matchers[0].Matcher.DebugView);
+            else
+                sb.AppendFormat("{0}.", method.DeclaringType);
 
-			return sb.ToString();
-		}
-	}
+            sb.AppendFormat("{0}({1}) called {2} time{3}; (signature: {4})",
+                method.Name,
+                ", ".Join(argMatchers.Select(m => m.Matcher.DebugView)),
+                this.Calls, this.Calls != 1 ? "s" : "",
+                method);
+
+            return sb.ToString();
+        }
+    }
 }

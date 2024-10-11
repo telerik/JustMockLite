@@ -21,94 +21,94 @@ using System.Linq.Expressions;
 
 namespace Telerik.JustMock.Core.MatcherTree
 {
-	internal class ParamsMatcher : IMatcher, ICompositeMatcher, IContainerMatcher
-	{
-		private IMatcher[] matchers;
+    internal class ParamsMatcher : IMatcher, ICompositeMatcher, IContainerMatcher
+    {
+        private IMatcher[] matchers;
 
-		public ParamsMatcher(IMatcher[] matchers)
-		{
-			this.matchers = matchers;
-		}
+        public ParamsMatcher(IMatcher[] matchers)
+        {
+            this.matchers = matchers;
+        }
 
-		public IMatcher[] Matchers
-		{
-			get { return this.matchers; }
-		}
+        public IMatcher[] Matchers
+        {
+            get { return this.matchers; }
+        }
 
-		public bool ProtectRefOut
-		{
-			get { return false; }
-			set { throw new InvalidOperationException(); }
-		}
+        public bool ProtectRefOut
+        {
+            get { return false; }
+            set { throw new InvalidOperationException(); }
+        }
 
-		public string DebugView
-		{
-			get { return "params[]"; }
-		}
+        public string DebugView
+        {
+            get { return "params[]"; }
+        }
 
-		public bool CanMatch(IMatcher matcher)
-		{
-			return matcher is ICompositeMatcher;
-		}
+        public bool CanMatch(IMatcher matcher)
+        {
+            return matcher is ICompositeMatcher;
+        }
 
-		public bool Matches(IMatcher other)
-		{
-			var paramsMatcher = other as ParamsMatcher;
-			if (paramsMatcher != null)
-			{
-				if (this.matchers.Length != paramsMatcher.matchers.Length)
-					return false;
+        public bool Matches(IMatcher other)
+        {
+            var paramsMatcher = other as ParamsMatcher;
+            if (paramsMatcher != null)
+            {
+                if (this.matchers.Length != paramsMatcher.matchers.Length)
+                    return false;
 
-				for (int i = 0; i < this.matchers.Length; i++)
-				{
-					if (!this.matchers[i].Matches(paramsMatcher.matchers[i]))
-						return false;
-				}
+                for (int i = 0; i < this.matchers.Length; i++)
+                {
+                    if (!this.matchers[i].Matches(paramsMatcher.matchers[i]))
+                        return false;
+                }
 
-				return true;
-			}
+                return true;
+            }
 
-			var matcher = other as IValueMatcher;
-			var array = matcher != null ? matcher.Value as Array: other as Array;
+            var matcher = other as IValueMatcher;
+            var array = matcher != null ? matcher.Value as Array: other as Array;
 
-			if (array != null)
-			{
-				if (array.Length != this.matchers.Length)
-					return false;
+            if (array != null)
+            {
+                if (array.Length != this.matchers.Length)
+                    return false;
 
-				for (int i = 0; i < matchers.Length; i++)
-				{
-					if (!matchers[i].Matches(new ValueMatcher(array.GetValue(i))))
-						return false;
-				}
+                for (int i = 0; i < matchers.Length; i++)
+                {
+                    if (!matchers[i].Matches(new ValueMatcher(array.GetValue(i))))
+                        return false;
+                }
 
-				return true;
-			}
+                return true;
+            }
 
-			return false;
-		}
+            return false;
+        }
 
-		public bool Equals(IMatcher other)
-		{
-			var paramsMatcher = other as ParamsMatcher;
-			if (paramsMatcher == null)
-				return false;
+        public bool Equals(IMatcher other)
+        {
+            var paramsMatcher = other as ParamsMatcher;
+            if (paramsMatcher == null)
+                return false;
 
-			if (paramsMatcher.matchers.Length != this.matchers.Length)
-				return false;
+            if (paramsMatcher.matchers.Length != this.matchers.Length)
+                return false;
 
-			for(int i=0;i<this.matchers.Length;i++)
-			{
-				if(!this.matchers[i].Equals(paramsMatcher.matchers[i]))
-					return false;
-			}
+            for(int i=0;i<this.matchers.Length;i++)
+            {
+                if(!this.matchers[i].Equals(paramsMatcher.matchers[i]))
+                    return false;
+            }
 
-			return true;
-		}
+            return true;
+        }
 
-		public Expression ToExpression(Type argumentType)
-		{
-			throw new NotSupportedException();
-		}
-	}
+        public Expression ToExpression(Type argumentType)
+        {
+            throw new NotSupportedException();
+        }
+    }
 }

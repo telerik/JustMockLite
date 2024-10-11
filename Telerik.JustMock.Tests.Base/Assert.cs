@@ -32,124 +32,124 @@ using FrameworkAssert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
 namespace Telerik.JustMock.Tests
 {
-	/// <summary>
-	/// Assertion wrapper that exposes Xunit alike methods.
-	/// </summary>
-	public static class Assert
-	{
-		public static Exception Throws<T>(Action action) where T : Exception
-		{
-			Exception targetException = null;
+    /// <summary>
+    /// Assertion wrapper that exposes Xunit alike methods.
+    /// </summary>
+    public static class Assert
+    {
+        public static Exception Throws<T>(Action action) where T : Exception
+        {
+            Exception targetException = null;
 
-			try
-			{
-				action();
-			}
-			catch (T ex)
-			{
-				// Test pass
-				return ex;
-			}
+            try
+            {
+                action();
+            }
+            catch (T ex)
+            {
+                // Test pass
+                return ex;
+            }
 #if PORTABLE
-			catch (System.Reflection.TargetInvocationException ex)
-			{
-				var inner = ex.InnerException;
-				if (inner is T)
-				{
-					return inner;
-				}
-				else
-				{
-					FrameworkAssert.Fail(String.Format("Wrong exception type thrown. Expected {0}, got {1}.", typeof(T), inner.GetType()));
-				}
-			}
+            catch (System.Reflection.TargetInvocationException ex)
+            {
+                var inner = ex.InnerException;
+                if (inner is T)
+                {
+                    return inner;
+                }
+                else
+                {
+                    FrameworkAssert.Fail(String.Format("Wrong exception type thrown. Expected {0}, got {1}.", typeof(T), inner.GetType()));
+                }
+            }
 #endif
-			catch (Exception ex)
-			{
+            catch (Exception ex)
+            {
 #if XUNIT
-				FrameworkAssert.True(false,String.Format("Wrong exception type thrown. Expected {0}, got {1}.", typeof(T), ex.GetType()));
+                FrameworkAssert.True(false,String.Format("Wrong exception type thrown. Expected {0}, got {1}.", typeof(T), ex.GetType()));
 #else
-				FrameworkAssert.Fail(String.Format("Wrong exception type thrown. Expected {0}, got {1}.", typeof(T), ex.GetType()));
+                FrameworkAssert.Fail(String.Format("Wrong exception type thrown. Expected {0}, got {1}.", typeof(T), ex.GetType()));
 #endif
-			}
+            }
 #if XUNIT
-			FrameworkAssert.True(false, String.Format("No Expected {0} was thrown", typeof(T).FullName));
+            FrameworkAssert.True(false, String.Format("No Expected {0} was thrown", typeof(T).FullName));
 #else
-			FrameworkAssert.Fail(String.Format("No Expected {0} was thrown", typeof(T).FullName));
+            FrameworkAssert.Fail(String.Format("No Expected {0} was thrown", typeof(T).FullName));
 #endif
-			throw new Exception();
-		}
-		
-		public static void NotNull(object value)
-		{
-#if XUNIT
-			FrameworkAssert.NotNull(value);
-#else
-			FrameworkAssert.IsNotNull(value);
-#endif
-		}
+            throw new Exception();
+        }
 
-		public static void Null(object value)
-		{
+        public static void NotNull(object value)
+        {
 #if XUNIT
-			FrameworkAssert.Null(value);
+            FrameworkAssert.NotNull(value);
 #else
-			FrameworkAssert.IsNull(value);
+            FrameworkAssert.IsNotNull(value);
 #endif
-		}
+        }
 
-		public static void Equal<T>(T expected, T actual)
-		{
+        public static void Null(object value)
+        {
 #if XUNIT
-			FrameworkAssert.Equal(expected, actual);
+            FrameworkAssert.Null(value);
 #else
-			FrameworkAssert.AreEqual(expected, actual);
+            FrameworkAssert.IsNull(value);
 #endif
-		}
+        }
 
-		public static void NotEqual<T>(T notExpected, T actual)
-		{
+        public static void Equal<T>(T expected, T actual)
+        {
 #if XUNIT
-			FrameworkAssert.NotEqual(notExpected, actual);
+            FrameworkAssert.Equal(expected, actual);
 #else
-			FrameworkAssert.AreNotEqual(notExpected, actual);
+            FrameworkAssert.AreEqual(expected, actual);
 #endif
-		}
+        }
 
-		public static void True(bool condition)
-		{
+        public static void NotEqual<T>(T notExpected, T actual)
+        {
 #if XUNIT
-			FrameworkAssert.True(condition);
+            FrameworkAssert.NotEqual(notExpected, actual);
 #else
-			FrameworkAssert.IsTrue(condition);
+            FrameworkAssert.AreNotEqual(notExpected, actual);
 #endif
-		}
+        }
 
-		public static void False(bool condition)
-		{
+        public static void True(bool condition)
+        {
 #if XUNIT
-			FrameworkAssert.False(condition);
+            FrameworkAssert.True(condition);
 #else
-			FrameworkAssert.IsFalse(condition);
+            FrameworkAssert.IsTrue(condition);
 #endif
-		}
+        }
 
-		public static void Same(object expected, object actual)
-		{
+        public static void False(bool condition)
+        {
 #if XUNIT
-			FrameworkAssert.Same(expected, actual);
+            FrameworkAssert.False(condition);
 #else
-			FrameworkAssert.AreSame(expected, actual);
+            FrameworkAssert.IsFalse(condition);
 #endif
-		}
+        }
 
-		public static void NotSame(object expected, object actual)
-		{
+        public static void Same(object expected, object actual)
+        {
 #if XUNIT
-			FrameworkAssert.NotSame(expected, actual);
+            FrameworkAssert.Same(expected, actual);
 #else
-			FrameworkAssert.AreNotSame(expected, actual);
+            FrameworkAssert.AreSame(expected, actual);
 #endif
-		}
-	}
+        }
+
+        public static void NotSame(object expected, object actual)
+        {
+#if XUNIT
+            FrameworkAssert.NotSame(expected, actual);
+#else
+            FrameworkAssert.AreNotSame(expected, actual);
+#endif
+        }
+    }
 }

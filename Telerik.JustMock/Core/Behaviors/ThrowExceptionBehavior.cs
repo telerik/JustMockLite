@@ -20,19 +20,19 @@ using System.Linq;
 
 namespace Telerik.JustMock.Core.Behaviors
 {
-	internal class ThrowExceptionBehavior : IBehavior
-	{
-		private readonly Exception exception;
+    internal class ThrowExceptionBehavior : IBehavior
+    {
+        private readonly Exception exception;
 
-		public ThrowExceptionBehavior(Exception exception)
-		{
-			this.exception = exception;
-		}
+        public ThrowExceptionBehavior(Exception exception)
+        {
+            this.exception = exception;
+        }
 
-		public void Process(Invocation invocation)
-		{
-			invocation.UserProvidedImplementation = true;
-			invocation.ExceptionThrower = () => { throw this.exception; };
-		}
-	}
+        public void Process(Invocation invocation)
+        {
+            invocation.UserProvidedImplementation = true;
+            invocation.ExceptionThrower = () => { throw this.exception; };
+        }
+    }
 }

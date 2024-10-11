@@ -14,84 +14,84 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Diagnostics;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
 
-	internal class InterfaceProxyWithoutTargetContributor : CompositeTypeContributor
-	{
-		private readonly GetTargetExpressionDelegate getTargetExpression;
-		protected bool canChangeTarget = false;
+    internal class InterfaceProxyWithoutTargetContributor : CompositeTypeContributor
+    {
+        private readonly GetTargetExpressionDelegate getTargetExpression;
+        protected bool canChangeTarget = false;
 
-		public InterfaceProxyWithoutTargetContributor(INamingScope namingScope, GetTargetExpressionDelegate getTarget)
-			: base(namingScope)
-		{
-			getTargetExpression = getTarget;
-		}
+        public InterfaceProxyWithoutTargetContributor(INamingScope namingScope, GetTargetExpressionDelegate getTarget)
+            : base(namingScope)
+        {
+            getTargetExpression = getTarget;
+        }
 
-		protected override IEnumerable<MembersCollector> GetCollectors()
-		{
-			foreach (var @interface in interfaces)
-			{
-				var item = new InterfaceMembersCollector(@interface);
-				yield return item;
-			}
-		}
+        protected override IEnumerable<MembersCollector> GetCollectors()
+        {
+            foreach (var @interface in interfaces)
+            {
+                var item = new InterfaceMembersCollector(@interface);
+                yield return item;
+            }
+        }
 
-		protected override MethodGenerator GetMethodGenerator(MetaMethod method, ClassEmitter @class,
-		                                                      OverrideMethodDelegate overrideMethod)
-		{
-			if (!method.Proxyable)
-			{
-				return new MinimalisticMethodGenerator(method, overrideMethod);
-			}
+        protected override MethodGenerator GetMethodGenerator(MetaMethod method, ClassEmitter @class,
+                                                              OverrideMethodDelegate overrideMethod)
+        {
+            if (!method.Proxyable)
+            {
+                return new MinimalisticMethodGenerator(method, overrideMethod);
+            }
 
-			var invocation = GetInvocationType(method, @class);
-			return new MethodWithInvocationGenerator(method,
-			                                         @class.GetField("__interceptors"),
-			                                         invocation,
-			                                         getTargetExpression,
-			                                         overrideMethod,
-			                                         null);
-		}
+            var invocation = GetInvocationType(method, @class);
+            return new MethodWithInvocationGenerator(method,
+                                                     @class.GetField("__interceptors"),
+                                                     invocation,
+                                                     getTargetExpression,
+                                                     overrideMethod,
+                                                     null);
+        }
 
-		private Type GetInvocationType(MetaMethod method, ClassEmitter emitter)
-		{
-			var methodInfo = method.Method;
+        private Type GetInvocationType(MetaMethod method, ClassEmitter emitter)
+        {
+            var methodInfo = method.Method;
 
-			if (canChangeTarget == false && methodInfo.IsAbstract)
-			{
-				// We do not need to generate a custom invocation type because no custom implementation
-				// for `InvokeMethodOnTarget` will be needed (proceeding to target isn't possible here):
-				return typeof(InterfaceMethodWithoutTargetInvocation);
-			}
+            if (canChangeTarget == false && methodInfo.IsAbstract)
+            {
+                // We do not need to generate a custom invocation type because no custom implementation
+                // for `InvokeMethodOnTarget` will be needed (proceeding to target isn't possible here):
+                return typeof(InterfaceMethodWithoutTargetInvocation);
+            }
 
-			var scope = emitter.ModuleScope;
-			Type[] invocationInterfaces;
-			if (canChangeTarget)
-			{
-				invocationInterfaces = new[] { typeof(IInvocation), typeof(IChangeProxyTarget) };
-			}
-			else
-			{
-				invocationInterfaces = new[] { typeof(IInvocation) };
-			}
-			var key = new CacheKey(methodInfo, CompositionInvocationTypeGenerator.BaseType, invocationInterfaces, null);
+            var scope = emitter.ModuleScope;
+            Type[] invocationInterfaces;
+            if (canChangeTarget)
+            {
+                invocationInterfaces = new[] { typeof(IInvocation), typeof(IChangeProxyTarget) };
+            }
+            else
+            {
+                invocationInterfaces = new[] { typeof(IInvocation) };
+            }
+            var key = new CacheKey(methodInfo, CompositionInvocationTypeGenerator.BaseType, invocationInterfaces, null);
 
-			// no locking required as we're already within a lock
+            // no locking required as we're already within a lock
 
-			return scope.TypeCache.GetOrAddWithoutTakingLock(key, _ =>
-				new CompositionInvocationTypeGenerator(methodInfo.DeclaringType,
-				                                       method,
-				                                       methodInfo,
-				                                       canChangeTarget,
-				                                       null)
-				.Generate(emitter, namingScope)
-				.BuildType());
-		}
-	}
+            return scope.TypeCache.GetOrAddWithoutTakingLock(key, _ =>
+                new CompositionInvocationTypeGenerator(methodInfo.DeclaringType,
+                                                       method,
+                                                       methodInfo,
+                                                       canChangeTarget,
+                                                       null)
+                .Generate(emitter, namingScope)
+                .BuildType());
+        }
+    }
 }

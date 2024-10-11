@@ -14,51 +14,51 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 {
-	using System.Collections.Generic;
-	using System.Reflection;
+    using System.Collections.Generic;
+    using System.Reflection;
 
-	internal class MetaType
-	{
-		private readonly MetaTypeElementCollection<MetaEvent> events = new MetaTypeElementCollection<MetaEvent>();
-		private readonly MetaTypeElementCollection<MetaMethod> methods = new MetaTypeElementCollection<MetaMethod>();
-		private readonly Dictionary<MethodInfo, MetaMethod> methodsIndex = new Dictionary<MethodInfo, MetaMethod>();
-		private readonly MetaTypeElementCollection<MetaProperty> properties = new MetaTypeElementCollection<MetaProperty>();
+    internal class MetaType
+    {
+        private readonly MetaTypeElementCollection<MetaEvent> events = new MetaTypeElementCollection<MetaEvent>();
+        private readonly MetaTypeElementCollection<MetaMethod> methods = new MetaTypeElementCollection<MetaMethod>();
+        private readonly Dictionary<MethodInfo, MetaMethod> methodsIndex = new Dictionary<MethodInfo, MetaMethod>();
+        private readonly MetaTypeElementCollection<MetaProperty> properties = new MetaTypeElementCollection<MetaProperty>();
 
-		public IEnumerable<MetaEvent> Events
-		{
-			get { return events; }
-		}
+        public IEnumerable<MetaEvent> Events
+        {
+            get { return events; }
+        }
 
-		public IEnumerable<MetaMethod> Methods
-		{
-			get { return methods; // NOTE: should be readonly 
-			}
-		}
+        public IEnumerable<MetaMethod> Methods
+        {
+            get { return methods; // NOTE: should be readonly 
+            }
+        }
 
-		public IEnumerable<MetaProperty> Properties
-		{
-			get { return properties; }
-		}
+        public IEnumerable<MetaProperty> Properties
+        {
+            get { return properties; }
+        }
 
-		public void AddEvent(MetaEvent @event)
-		{
-			events.Add(@event);
-		}
+        public void AddEvent(MetaEvent @event)
+        {
+            events.Add(@event);
+        }
 
-		public void AddMethod(MetaMethod method)
-		{
-			methods.Add(method);
-			methodsIndex.Add(method.Method, method);  // shouldn't get added twice
-		}
+        public void AddMethod(MetaMethod method)
+        {
+            methods.Add(method);
+            methodsIndex.Add(method.Method, method);  // shouldn't get added twice
+        }
 
-		public void AddProperty(MetaProperty property)
-		{
-			properties.Add(property);
-		}
+        public void AddProperty(MetaProperty property)
+        {
+            properties.Add(property);
+        }
 
-		public MetaMethod FindMethod(MethodInfo method)
-		{
-			return methodsIndex.TryGetValue(method, out var metaMethod) ? metaMethod : null;
-		}
-	}
+        public MetaMethod FindMethod(MethodInfo method)
+        {
+            return methodsIndex.TryGetValue(method, out var metaMethod) ? metaMethod : null;
+        }
+    }
 }

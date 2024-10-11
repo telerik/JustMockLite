@@ -19,11 +19,11 @@ using Telerik.JustMock.DemoLib.Objects;
 
 namespace Telerik.JustMock.DemoLib
 {
-	public static class ConfigurationService
-	{
-		public static Configuration GetConfiguration()
-		{
-			return null;
-		}
-	}
+    public static class ConfigurationService
+    {
+        public static Configuration GetConfiguration()
+        {
+            return null;
+        }
+    }
 }

@@ -14,7 +14,7 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST
 {
-	internal interface IExpression : IExpressionOrStatement
-	{
-	}
+    internal interface IExpression : IExpressionOrStatement
+    {
+    }
 }

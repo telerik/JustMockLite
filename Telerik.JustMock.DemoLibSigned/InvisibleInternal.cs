@@ -17,8 +17,8 @@
 
 namespace Telerik.JustMock.DemoLibSigned
 {
-	public abstract class InvisibleInternal
-	{
-		internal abstract string Data { get; set; }
-	}
+    public abstract class InvisibleInternal
+    {
+        internal abstract string Data { get; set; }
+    }
 }

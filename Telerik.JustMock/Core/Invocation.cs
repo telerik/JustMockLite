@@ -21,100 +21,100 @@ using System.Text;
 
 namespace Telerik.JustMock.Core
 {
-	/// <summary>
-	/// An implementation detail interface. Not intended for external usage.
-	/// </summary>
-	public sealed class Invocation
-	{
-		private MethodBase method;
+    /// <summary>
+    /// An implementation detail interface. Not intended for external usage.
+    /// </summary>
+    public sealed class Invocation
+    {
+        private MethodBase method;
 
-		private object returnValue;
-		private bool isReturnValueSet;
+        private object returnValue;
+        private bool isReturnValueSet;
 
-		internal object Instance { get; private set; }
+        internal object Instance { get; private set; }
 
-		internal object[] Args { get; private set; }
+        internal object[] Args { get; private set; }
 
-		#region Output properties
+        #region Output properties
 
-		internal object ReturnValue
-		{
-			get { return this.returnValue; }
-			set
-			{
-				this.returnValue = value;
-				isReturnValueSet = true;
-			}
-		}
+        internal object ReturnValue
+        {
+            get { return this.returnValue; }
+            set
+            {
+                this.returnValue = value;
+                isReturnValueSet = true;
+            }
+        }
 
-		internal bool IsReturnValueSet
-		{
-			get { return this.isReturnValueSet; }
-		}
+        internal bool IsReturnValueSet
+        {
+            get { return this.isReturnValueSet; }
+        }
 
-		internal bool CallOriginal { get; set; }
-		internal bool UserProvidedImplementation { get; set; }
-		internal Action ExceptionThrower { get; set; }
+        internal bool CallOriginal { get; set; }
+        internal bool UserProvidedImplementation { get; set; }
+        internal Action ExceptionThrower { get; set; }
 
-		#endregion
+        #endregion
 
-		internal bool InArrange { get; set; }
-		internal bool InArrangeArgMatching { get; set; }
-		internal bool InAssertSet { get; set; }
-		internal bool InRunClassConstructor { get; set; }
-		internal bool Recording { get; set; }
-		internal bool RetainBehaviorDuringRecording { get; set; }
+        internal bool InArrange { get; set; }
+        internal bool InArrangeArgMatching { get; set; }
+        internal bool InAssertSet { get; set; }
+        internal bool InRunClassConstructor { get; set; }
+        internal bool Recording { get; set; }
+        internal bool RetainBehaviorDuringRecording { get; set; }
 
-		internal MocksRepository Repository { get; set; }
+        internal MocksRepository Repository { get; set; }
 
-		internal IMockMixin MockMixin { get; private set; }
+        internal IMockMixin MockMixin { get; private set; }
 
-		internal Invocation(object instance, MethodBase method, object[] args)
-		{
-			this.Instance = instance;
-			this.Method = method;
-			this.Args = args;
+        internal Invocation(object instance, MethodBase method, object[] args)
+        {
+            this.Instance = instance;
+            this.Method = method;
+            this.Args = args;
 
-			this.MockMixin = method.IsExtensionMethod() && args.Length >= 1
-				? MocksRepository.GetMockMixin(args[0], null)
-				: MocksRepository.GetMockMixin(instance, method.DeclaringType);
-		}
+            this.MockMixin = method.IsExtensionMethod() && args.Length >= 1
+                ? MocksRepository.GetMockMixin(args[0], null)
+                : MocksRepository.GetMockMixin(instance, method.DeclaringType);
+        }
 
-		internal void ThrowExceptionIfNecessary()
-		{
-			if (ExceptionThrower != null)
-				ExceptionThrower();
-		}
+        internal void ThrowExceptionIfNecessary()
+        {
+            if (ExceptionThrower != null)
+                ExceptionThrower();
+        }
 
-		internal MethodBase Method
-		{
-			get
-			{
-				return this.method;
-			}
-			private set
-			{
-				if (value != null)
-				{
-					if (value.ContainsGenericParameters)
-						throw new ArgumentException("Invocation method must be a concrete method");
-				}
+        internal MethodBase Method
+        {
+            get
+            {
+                return this.method;
+            }
+            private set
+            {
+                if (value != null)
+                {
+                    if (value.ContainsGenericParameters)
+                        throw new ArgumentException("Invocation method must be a concrete method");
+                }
 
-				var asMethodInfo = value as MethodInfo;
-				if (asMethodInfo != null)
-					value = asMethodInfo.NormalizeComInterfaceMethod();
+                var asMethodInfo = value as MethodInfo;
+                if (asMethodInfo != null)
+                    value = asMethodInfo.NormalizeComInterfaceMethod();
 
-				this.method = value;
-			}
-		}
+                this.method = value;
+            }
+        }
 
-		internal string InputToString()
-		{
-			var sb = new StringBuilder();
-			sb.AppendFormat("{0}.{1}(", Instance != null ? MockingUtil.GetUnproxiedType(Instance) : method.DeclaringType, method.Name);
-			sb.Append(", ".Join(Args));
-			sb.Append(")");
-			return sb.ToString();
-		}
-	}
+        internal string InputToString()
+        {
+            var sb = new StringBuilder();
+            sb.AppendFormat("{0}.{1}(", Instance != null ? MockingUtil.GetUnproxiedType(Instance) : method.DeclaringType, method.Name);
+            sb.Append(", ".Join(Args));
+            sb.Append(")");
+            return sb.ToString();
+        }
+    }
 }

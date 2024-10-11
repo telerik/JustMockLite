@@ -16,35 +16,35 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Smtp
 {
-	using System.Collections.Generic;
-	using System.Net.Mail;
+    using System.Collections.Generic;
+    using System.Net.Mail;
 
-	/// <summary>
-	/// Email sender abstraction.
-	/// </summary>
-	internal interface IEmailSender
-	{
-		/// <summary>
-		/// Sends a mail message.
-		/// </summary>
-		/// <param name="from">From field</param>
-		/// <param name="to">To field</param>
-		/// <param name="subject">E-mail's subject</param>
-		/// <param name="messageText">message's body</param>
-		void Send(string from, string to, string subject, string messageText);
+    /// <summary>
+    /// Email sender abstraction.
+    /// </summary>
+    internal interface IEmailSender
+    {
+        /// <summary>
+        /// Sends a mail message.
+        /// </summary>
+        /// <param name="from">From field</param>
+        /// <param name="to">To field</param>
+        /// <param name="subject">E-mail's subject</param>
+        /// <param name="messageText">message's body</param>
+        void Send(string from, string to, string subject, string messageText);
 
-		/// <summary>
-		/// Sends a <see cref="MailMessage">message</see>. 
-		/// </summary>
-		/// <param name="message"><see cref="MailMessage">Message</see> instance</param>
-		void Send(MailMessage message);
+        /// <summary>
+        /// Sends a <see cref="MailMessage">message</see>. 
+        /// </summary>
+        /// <param name="message"><see cref="MailMessage">Message</see> instance</param>
+        void Send(MailMessage message);
 
-		/// <summary>
-		/// Sends multiple <see cref="MailMessage">messages</see>. 
-		/// </summary>
-		/// <param name="messages">List of <see cref="MailMessage">messages</see></param>
-		void Send(IEnumerable<MailMessage> messages);
-	}
+        /// <summary>
+        /// Sends multiple <see cref="MailMessage">messages</see>. 
+        /// </summary>
+        /// <param name="messages">List of <see cref="MailMessage">messages</see></param>
+        void Send(IEnumerable<MailMessage> messages);
+    }
 }
 
 #endif

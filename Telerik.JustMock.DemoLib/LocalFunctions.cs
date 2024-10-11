@@ -5,15 +5,15 @@ using System.Text;
 
 namespace Telerik.JustMock.DemoLib
 {
-	public class DemoLibLocalFunctions
-	{
-		public int Method()
-		{
-			return 5 + Local();
-			int Local()
-			{
-				return 10;
-			}
-		}
-	}
+    public class DemoLibLocalFunctions
+    {
+        public int Method()
+        {
+            return 5 + Local();
+            int Local()
+            {
+                return 10;
+            }
+        }
+    }
 }

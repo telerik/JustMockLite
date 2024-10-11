@@ -22,95 +22,95 @@ using System.Reflection;
 
 namespace Telerik.JustMock.Core.Behaviors
 {
-	/// <summary>
-	/// An implementation detail interface. Not intended for external usage.
-	/// </summary>
-	[Mixin]
-	public interface IEventsMixin
-	{
-		/// <summary>
-		/// An implementation detail. Not intended for external usage.
-		/// </summary>
-		void RaiseEvent(EventInfo evt, object[] delegateArguments);
-	}
+    /// <summary>
+    /// An implementation detail interface. Not intended for external usage.
+    /// </summary>
+    [Mixin]
+    public interface IEventsMixin
+    {
+        /// <summary>
+        /// An implementation detail. Not intended for external usage.
+        /// </summary>
+        void RaiseEvent(EventInfo evt, object[] delegateArguments);
+    }
 
-	internal class EventStubsBehavior : IBehavior
-	{
-		private readonly Dictionary<EventInfo, Delegate> eventHandlers = new Dictionary<EventInfo, Delegate>();
+    internal class EventStubsBehavior : IBehavior
+    {
+        private readonly Dictionary<EventInfo, Delegate> eventHandlers = new Dictionary<EventInfo, Delegate>();
 
-		public object CreateMixin()
-		{
-			return new EventsMixin(this);
-		}
+        public object CreateMixin()
+        {
+            return new EventsMixin(this);
+        }
 
-		public void Process(Invocation invocation)
-		{
-			var method = invocation.Method;
+        public void Process(Invocation invocation)
+        {
+            var method = invocation.Method;
 
-			var candidateEvent = method.GetEventFromAddOrRemove();
-			if (candidateEvent == null)
-				return;
+            var candidateEvent = method.GetEventFromAddOrRemove();
+            if (candidateEvent == null)
+                return;
 
-			invocation.UserProvidedImplementation = true;
-			var delg = (Delegate)invocation.Args[0];
+            invocation.UserProvidedImplementation = true;
+            var delg = (Delegate)invocation.Args[0];
 
-			if (candidateEvent.GetAddMethod(true) == invocation.Method)
-				this.AddEventHandler(candidateEvent, delg);
-			else
-				this.RemoveEventHandler(candidateEvent, delg);
-		}
+            if (candidateEvent.GetAddMethod(true) == invocation.Method)
+                this.AddEventHandler(candidateEvent, delg);
+            else
+                this.RemoveEventHandler(candidateEvent, delg);
+        }
 
-		private void AddEventHandler(EventInfo evt, Delegate handler)
-		{
-			Delegate existing;
-			eventHandlers.TryGetValue(evt, out existing);
-			eventHandlers[evt] = Delegate.Combine(existing, handler);
-		}
+        private void AddEventHandler(EventInfo evt, Delegate handler)
+        {
+            Delegate existing;
+            eventHandlers.TryGetValue(evt, out existing);
+            eventHandlers[evt] = Delegate.Combine(existing, handler);
+        }
 
-		private void RemoveEventHandler(EventInfo evt, Delegate handler)
-		{
-			Delegate existing;
-			eventHandlers.TryGetValue(evt, out existing);
-			eventHandlers[evt] = Delegate.Remove(existing, handler);
-		}
+        private void RemoveEventHandler(EventInfo evt, Delegate handler)
+        {
+            Delegate existing;
+            eventHandlers.TryGetValue(evt, out existing);
+            eventHandlers[evt] = Delegate.Remove(existing, handler);
+        }
 
-		public void RaiseEvent(EventInfo evt, object[] delegateArguments)
-		{
-			Delegate existing;
-			eventHandlers.TryGetValue(evt, out existing);
+        public void RaiseEvent(EventInfo evt, object[] delegateArguments)
+        {
+            Delegate existing;
+            eventHandlers.TryGetValue(evt, out existing);
 
-			if (existing != null)
-			{
-				try
-				{
-					object state;
-					MockingUtil.BindToMethod(MockingUtil.Default, new[] { existing.Method }, ref delegateArguments, null, null, null, out state);
-				}
-				catch (MissingMethodException ex)
-				{
-					throw new MockException(String.Format("Event signature {0} is incompatible with argument types ({1})",
-						existing.Method, String.Join(", ", delegateArguments.Select(x => x != null ? x.GetType().ToString() : "null").ToArray())
-						), ex);
-				}
+            if (existing != null)
+            {
+                try
+                {
+                    object state;
+                    MockingUtil.BindToMethod(MockingUtil.Default, new[] { existing.Method }, ref delegateArguments, null, null, null, out state);
+                }
+                catch (MissingMethodException ex)
+                {
+                    throw new MockException(String.Format("Event signature {0} is incompatible with argument types ({1})",
+                        existing.Method, String.Join(", ", delegateArguments.Select(x => x != null ? x.GetType().ToString() : "null").ToArray())
+                        ), ex);
+                }
 
-				var invoker = MockingUtil.MakeFuncCaller(existing);
-				ProfilerInterceptor.GuardExternal(() => invoker(delegateArguments, existing));
-			}
-		}
+                var invoker = MockingUtil.MakeFuncCaller(existing);
+                ProfilerInterceptor.GuardExternal(() => invoker(delegateArguments, existing));
+            }
+        }
 
-		private class EventsMixin : IEventsMixin
-		{
-			private readonly EventStubsBehavior events;
+        private class EventsMixin : IEventsMixin
+        {
+            private readonly EventStubsBehavior events;
 
-			public EventsMixin(EventStubsBehavior events)
-			{
-				this.events = events;
-			}
+            public EventsMixin(EventStubsBehavior events)
+            {
+                this.events = events;
+            }
 
-			public void RaiseEvent(EventInfo evt, object[] delegateArguments)
-			{
-				events.RaiseEvent(evt, delegateArguments);
-			}
-		}
-	}
+            public void RaiseEvent(EventInfo evt, object[] delegateArguments)
+            {
+                events.RaiseEvent(evt, delegateArguments);
+            }
+        }
+    }
 }

@@ -47,98 +47,98 @@ using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFa
 
 namespace Telerik.JustMock.Tests
 {
-	[TestClass]
-	public class WaitEventFixture
-	{
-		[TestMethod, TestCategory("Lite"), TestCategory("Events")]
-		public void ShouldWaitForSpecificDurationBeforeRasingTheEvent()
-		{
-			string userName = string.Empty;
-			string password = string.Empty;
+    [TestClass]
+    public class WaitEventFixture
+    {
+        [TestMethod, TestCategory("Lite"), TestCategory("Events")]
+        public void ShouldWaitForSpecificDurationBeforeRasingTheEvent()
+        {
+            string userName = string.Empty;
+            string password = string.Empty;
 
-			var mockLogger = Mock.Create<ILogger>();
+            var mockLogger = Mock.Create<ILogger>();
 
-			Mock.Arrange(() => mockLogger.LogMessage(userName)).OccursOnce();
+            Mock.Arrange(() => mockLogger.LogMessage(userName)).OccursOnce();
 
-			var mockValidator = Mock.Create<IUserValidationService>();
+            var mockValidator = Mock.Create<IUserValidationService>();
 
-			Mock.Arrange(() => mockValidator.ValidateUser(userName, password))
-				.Raises(() => mockValidator.CustomEvent += null, userName, Wait.For(2))
-				.Returns(true);
+            Mock.Arrange(() => mockValidator.ValidateUser(userName, password))
+                .Raises(() => mockValidator.CustomEvent += null, userName, Wait.For(2))
+                .Returns(true);
 
-			var sut = new Login(mockValidator, mockLogger);
+            var sut = new Login(mockValidator, mockLogger);
 
-			Assert.Equal(true, sut.LoginUser(userName, password));
+            Assert.Equal(true, sut.LoginUser(userName, password));
 
-			Mock.Assert(mockLogger);
-			Mock.Assert(mockValidator);
+            Mock.Assert(mockLogger);
+            Mock.Assert(mockValidator);
 
-			Assert.True(sut.ElapsedTime.Seconds >= 1);
-		}
+            Assert.True(sut.ElapsedTime.Seconds >= 1);
+        }
 
-		public class Login
-		{
-			private readonly IUserValidationService _validationService;
+        public class Login
+        {
+            private readonly IUserValidationService _validationService;
 
-			private readonly ILogger _logger;
+            private readonly ILogger _logger;
 
-			//Next two properties are added to show Delayed Event Execution
-			public TimeSpan ElapsedTime { get; private set; }
-			private DateTime _startTime;
+            //Next two properties are added to show Delayed Event Execution
+            public TimeSpan ElapsedTime { get; private set; }
+            private DateTime _startTime;
 
-			public Login(IUserValidationService service)
-				: this(service, null)
-			{
-			}
+            public Login(IUserValidationService service)
+                : this(service, null)
+            {
+            }
 
-			public Login(IUserValidationService service, ILogger logger)
-			{
-				_logger = logger;
-				_validationService = service;
-				_validationService.CustomEvent +=
-					new CustomEventHandler(HandleValidationEvent);
-			}
+            public Login(IUserValidationService service, ILogger logger)
+            {
+                _logger = logger;
+                _validationService = service;
+                _validationService.CustomEvent +=
+                    new CustomEventHandler(HandleValidationEvent);
+            }
 
-			void HandleValidationEvent(string message)
-			{
-				///Thread.Sleep(1000);
-				ElapsedTime = DateTime.Now - _startTime;
-				if (_logger != null)
-				{
-					_logger.LogMessage(message);
-				}
-			}
+            void HandleValidationEvent(string message)
+            {
+                ///Thread.Sleep(1000);
+                ElapsedTime = DateTime.Now - _startTime;
+                if (_logger != null)
+                {
+                    _logger.LogMessage(message);
+                }
+            }
 
-			public bool LoginUser(string userName, string password)
-			{
-				ElapsedTime = new TimeSpan(0);
-				_startTime = DateTime.Now;
-				return _validationService.ValidateUser(userName, password);
-			}
-		}
+            public bool LoginUser(string userName, string password)
+            {
+                ElapsedTime = new TimeSpan(0);
+                _startTime = DateTime.Now;
+                return _validationService.ValidateUser(userName, password);
+            }
+        }
 
-		public interface ILogger
-		{
-			void LogMessage(string message);
-		}
+        public interface ILogger
+        {
+            void LogMessage(string message);
+        }
 
-		public interface IUserValidationService
-		{
-			bool ValidateUser(string userName, string password);
-			event EventHandler StandardEvent;
-			event CustomEventHandler CustomEvent;
-		}
+        public interface IUserValidationService
+        {
+            bool ValidateUser(string userName, string password);
+            event EventHandler StandardEvent;
+            event CustomEventHandler CustomEvent;
+        }
 
-		public delegate void CustomEventHandler(string s);
+        public delegate void CustomEventHandler(string s);
 
-		public class CustomEventArgs : EventArgs
-		{
-			public string Name { get; private set; }
+        public class CustomEventArgs : EventArgs
+        {
+            public string Name { get; private set; }
 
-			public CustomEventArgs(string name)
-			{
-				this.Name = name;
-			}
-		}
-	}
+            public CustomEventArgs(string name)
+            {
+                this.Name = name;
+            }
+        }
+    }
 }

@@ -18,20 +18,20 @@
 
 namespace Telerik.JustMock.Core.Behaviors
 {
-	internal class CallOriginalBehavior : IBehavior
-	{
-		public void Process(Invocation invocation)
-		{
-			if (ShouldCallOriginal(invocation))
-			{
-				invocation.UserProvidedImplementation = true;
-				invocation.CallOriginal = true;
-			}
-		}
+    internal class CallOriginalBehavior : IBehavior
+    {
+        public void Process(Invocation invocation)
+        {
+            if (ShouldCallOriginal(invocation))
+            {
+                invocation.UserProvidedImplementation = true;
+                invocation.CallOriginal = true;
+            }
+        }
 
-		public static bool ShouldCallOriginal(Invocation invocation)
-		{
-			return !invocation.Recording || invocation.RetainBehaviorDuringRecording;
-		}
-	}
+        public static bool ShouldCallOriginal(Invocation invocation)
+        {
+            return !invocation.Recording || invocation.RetainBehaviorDuringRecording;
+        }
+    }
 }

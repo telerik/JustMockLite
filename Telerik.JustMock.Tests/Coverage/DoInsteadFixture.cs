@@ -52,205 +52,192 @@ using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFa
 
 namespace Telerik.JustMock.Tests.Coverage
 {
-	[TestClass]
-	public class DoInsteadFixture
-	{
-			
-		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
-		public void ShouldAssertDoInsteadWithFiveArgsForExpected()
-		{
-			int expected = 0;
+    [TestClass]
+    public class DoInsteadFixture
+    {
 
-			var foo = Mock.Create<IFoo>();
-			Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
-				.DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5) => { expected = arg1 + arg2 + arg3 + arg4 + arg5; });
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldAssertDoInsteadWithFiveArgsForExpected()
+        {
+            int expected = 0;
 
-			foo.Submit(1, 1, 1, 1, 1);
+            var foo = Mock.Create<IFoo>();
+            Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
+                .DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5) => { expected = arg1 + arg2 + arg3 + arg4 + arg5; });
 
-			Assert.Equal(5, expected);
-		}
-		
-			
-		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
-		public void ShouldAssertDoInsteadWithSixArgsForExpected()
-		{
-			int expected = 0;
+            foo.Submit(1, 1, 1, 1, 1);
 
-			var foo = Mock.Create<IFoo>();
-			Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
-				.DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5, int arg6) => { expected = arg1 + arg2 + arg3 + arg4 + arg5 + arg6; });
+            Assert.Equal(5, expected);
+        }
 
-			foo.Submit(1, 1, 1, 1, 1, 1);
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldAssertDoInsteadWithSixArgsForExpected()
+        {
+            int expected = 0;
 
-			Assert.Equal(6, expected);
-		}
-		
-			
-		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
-		public void ShouldAssertDoInsteadWithSevenArgsForExpected()
-		{
-			int expected = 0;
+            var foo = Mock.Create<IFoo>();
+            Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
+                .DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5, int arg6) => { expected = arg1 + arg2 + arg3 + arg4 + arg5 + arg6; });
 
-			var foo = Mock.Create<IFoo>();
-			Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
-				.DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7) => { expected = arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7; });
+            foo.Submit(1, 1, 1, 1, 1, 1);
 
-			foo.Submit(1, 1, 1, 1, 1, 1, 1);
+            Assert.Equal(6, expected);
+        }
 
-			Assert.Equal(7, expected);
-		}
-		
-			
-		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
-		public void ShouldAssertDoInsteadWithEightArgsForExpected()
-		{
-			int expected = 0;
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldAssertDoInsteadWithSevenArgsForExpected()
+        {
+            int expected = 0;
 
-			var foo = Mock.Create<IFoo>();
-			Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
-				.DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8) => { expected = arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8; });
+            var foo = Mock.Create<IFoo>();
+            Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
+                .DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7) => { expected = arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7; });
 
-			foo.Submit(1, 1, 1, 1, 1, 1, 1, 1);
+            foo.Submit(1, 1, 1, 1, 1, 1, 1);
 
-			Assert.Equal(8, expected);
-		}
-		
-			
-		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
-		public void ShouldAssertDoInsteadWithNineArgsForExpected()
-		{
-			int expected = 0;
+            Assert.Equal(7, expected);
+        }
 
-			var foo = Mock.Create<IFoo>();
-			Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
-				.DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9) => { expected = arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9; });
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldAssertDoInsteadWithEightArgsForExpected()
+        {
+            int expected = 0;
 
-			foo.Submit(1, 1, 1, 1, 1, 1, 1, 1, 1);
+            var foo = Mock.Create<IFoo>();
+            Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
+                .DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8) => { expected = arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8; });
 
-			Assert.Equal(9, expected);
-		}
-		
-			
-		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
-		public void ShouldAssertDoInsteadWithTenArgsForExpected()
-		{
-			int expected = 0;
+            foo.Submit(1, 1, 1, 1, 1, 1, 1, 1);
 
-			var foo = Mock.Create<IFoo>();
-			Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
-				.DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10) => { expected = arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10; });
+            Assert.Equal(8, expected);
+        }
 
-			foo.Submit(1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldAssertDoInsteadWithNineArgsForExpected()
+        {
+            int expected = 0;
 
-			Assert.Equal(10, expected);
-		}
-		
-			
-		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
-		public void ShouldAssertDoInsteadWithElevenArgsForExpected()
-		{
-			int expected = 0;
+            var foo = Mock.Create<IFoo>();
+            Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
+                .DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9) => { expected = arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9; });
 
-			var foo = Mock.Create<IFoo>();
-			Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
-				.DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11) => { expected = arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11; });
+            foo.Submit(1, 1, 1, 1, 1, 1, 1, 1, 1);
 
-			foo.Submit(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+            Assert.Equal(9, expected);
+        }
 
-			Assert.Equal(11, expected);
-		}
-		
-			
-		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
-		public void ShouldAssertDoInsteadWithTwelveArgsForExpected()
-		{
-			int expected = 0;
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldAssertDoInsteadWithTenArgsForExpected()
+        {
+            int expected = 0;
 
-			var foo = Mock.Create<IFoo>();
-			Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
-				.DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12) => { expected = arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12; });
+            var foo = Mock.Create<IFoo>();
+            Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
+                .DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10) => { expected = arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10; });
 
-			foo.Submit(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+            foo.Submit(1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 
-			Assert.Equal(12, expected);
-		}
-		
-			
-		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
-		public void ShouldAssertDoInsteadWithThirteenArgsForExpected()
-		{
-			int expected = 0;
+            Assert.Equal(10, expected);
+        }
+            
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldAssertDoInsteadWithElevenArgsForExpected()
+        {
+            int expected = 0;
 
-			var foo = Mock.Create<IFoo>();
-			Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
-				.DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12, int arg13) => { expected = arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13; });
+            var foo = Mock.Create<IFoo>();
+            Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
+                .DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11) => { expected = arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11; });
 
-			foo.Submit(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+            foo.Submit(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 
-			Assert.Equal(13, expected);
-		}
-		
-			
-		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
-		public void ShouldAssertDoInsteadWithFourteenArgsForExpected()
-		{
-			int expected = 0;
+            Assert.Equal(11, expected);
+        }
 
-			var foo = Mock.Create<IFoo>();
-			Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
-				.DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12, int arg13, int arg14) => { expected = arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14; });
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldAssertDoInsteadWithTwelveArgsForExpected()
+        {
+            int expected = 0;
 
-			foo.Submit(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+            var foo = Mock.Create<IFoo>();
+            Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
+                .DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12) => { expected = arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12; });
 
-			Assert.Equal(14, expected);
-		}
-		
-			
-		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
-		public void ShouldAssertDoInsteadWithFifteenArgsForExpected()
-		{
-			int expected = 0;
+            foo.Submit(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 
-			var foo = Mock.Create<IFoo>();
-			Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
-				.DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12, int arg13, int arg14, int arg15) => { expected = arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14 + arg15; });
+            Assert.Equal(12, expected);
+        }
 
-			foo.Submit(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldAssertDoInsteadWithThirteenArgsForExpected()
+        {
+            int expected = 0;
 
-			Assert.Equal(15, expected);
-		}
-		
-			
-		[TestMethod, TestCategory("Lite"), TestCategory("Mock")]
-		public void ShouldAssertDoInsteadWithSixteenArgsForExpected()
-		{
-			int expected = 0;
+            var foo = Mock.Create<IFoo>();
+            Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
+                .DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12, int arg13) => { expected = arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13; });
 
-			var foo = Mock.Create<IFoo>();
-			Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
-				.DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12, int arg13, int arg14, int arg15, int arg16) => { expected = arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14 + arg15 + arg16; });
+            foo.Submit(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 
-			foo.Submit(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+            Assert.Equal(13, expected);
+        }
 
-			Assert.Equal(16, expected);
-		}
-		
-				
-		public interface IFoo
-		{
-			void Submit(int arg1, int arg2, int arg3, int arg4, int arg5);
-			void Submit(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6);
-			void Submit(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7);
-			void Submit(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8);
-			void Submit(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9);
-			void Submit(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10);
-			void Submit(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11);
-			void Submit(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12);
-			void Submit(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12, int arg13);
-			void Submit(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12, int arg13, int arg14);
-			void Submit(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12, int arg13, int arg14, int arg15);
-			void Submit(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12, int arg13, int arg14, int arg15, int arg16);
-			
-		}
-	}
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldAssertDoInsteadWithFourteenArgsForExpected()
+        {
+            int expected = 0;
+
+            var foo = Mock.Create<IFoo>();
+            Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
+                .DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12, int arg13, int arg14) => { expected = arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14; });
+
+            foo.Submit(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+
+            Assert.Equal(14, expected);
+        }
+            
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldAssertDoInsteadWithFifteenArgsForExpected()
+        {
+            int expected = 0;
+
+            var foo = Mock.Create<IFoo>();
+            Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
+                .DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12, int arg13, int arg14, int arg15) => { expected = arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14 + arg15; });
+
+            foo.Submit(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+
+            Assert.Equal(15, expected);
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldAssertDoInsteadWithSixteenArgsForExpected()
+        {
+            int expected = 0;
+
+            var foo = Mock.Create<IFoo>();
+            Mock.Arrange(() => foo.Submit(Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt, Arg.AnyInt))
+                .DoInstead((int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12, int arg13, int arg14, int arg15, int arg16) => { expected = arg1 + arg2 + arg3 + arg4 + arg5 + arg6 + arg7 + arg8 + arg9 + arg10 + arg11 + arg12 + arg13 + arg14 + arg15 + arg16; });
+
+            foo.Submit(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+
+            Assert.Equal(16, expected);
+        }
+ 
+        public interface IFoo
+        {
+            void Submit(int arg1, int arg2, int arg3, int arg4, int arg5);
+            void Submit(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6);
+            void Submit(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7);
+            void Submit(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8);
+            void Submit(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9);
+            void Submit(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10);
+            void Submit(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11);
+            void Submit(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12);
+            void Submit(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12, int arg13);
+            void Submit(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12, int arg13, int arg14);
+            void Submit(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12, int arg13, int arg14, int arg15);
+            void Submit(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11, int arg12, int arg13, int arg14, int arg15, int arg16); 
+        }
+    }
 }

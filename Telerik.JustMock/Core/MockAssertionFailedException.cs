@@ -19,21 +19,21 @@ using System;
 
 namespace Telerik.JustMock.Core
 {
-	/// <summary>
-	/// The exception that is thrown when Mock.Assert fails.
-	/// </summary>
-	[Serializable]
-	public sealed class MockAssertionFailedException : MockException
-	{
-		/// <summary>
-		/// Initializes a new instance of the <see cref="MockAssertionFailedException"/> class.
-		/// </summary>
-		/// <param name="message">Exception message.</param>
-		/// <param name="innerException">Inner exception.</param>
-		public MockAssertionFailedException(string message, Exception innerException) : base(message, innerException) { }
+    /// <summary>
+    /// The exception that is thrown when Mock.Assert fails.
+    /// </summary>
+    [Serializable]
+    public sealed class MockAssertionFailedException : MockException
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MockAssertionFailedException"/> class.
+        /// </summary>
+        /// <param name="message">Exception message.</param>
+        /// <param name="innerException">Inner exception.</param>
+        public MockAssertionFailedException(string message, Exception innerException) : base(message, innerException) { }
 
 #if !COREFX
-		private MockAssertionFailedException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+        private MockAssertionFailedException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 #endif
-	}
+    }
 }

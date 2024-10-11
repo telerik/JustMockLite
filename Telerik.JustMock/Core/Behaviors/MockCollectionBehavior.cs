@@ -20,19 +20,19 @@ using System.Collections;
 
 namespace Telerik.JustMock.Core.Behaviors
 {
-	internal class MockCollectionBehavior : IBehavior
-	{
-		private readonly IEnumerable collection;
+    internal class MockCollectionBehavior : IBehavior
+    {
+        private readonly IEnumerable collection;
 
-		public MockCollectionBehavior(Type resultCollection, MocksRepository repo, IEnumerable collection)
-		{
-			this.collection = (IEnumerable)MockCollection.Create(resultCollection, repo, null, collection);
-		}
+        public MockCollectionBehavior(Type resultCollection, MocksRepository repo, IEnumerable collection)
+        {
+            this.collection = (IEnumerable)MockCollection.Create(resultCollection, repo, null, collection);
+        }
 
-		public void Process(Invocation invocation)
-		{
-			invocation.ReturnValue = collection;
-			invocation.UserProvidedImplementation = true;
-		}
-	}
+        public void Process(Invocation invocation)
+        {
+            invocation.ReturnValue = collection;
+            invocation.UserProvidedImplementation = true;
+        }
+    }
 }

@@ -23,95 +23,95 @@ using System.Reflection;
 
 namespace Telerik.JustMock.Core.Behaviors
 {
-	internal class ImplementationOverrideBehavior : IBehavior
-	{
-		private static readonly object[] Empty = new object[0];
+    internal class ImplementationOverrideBehavior : IBehavior
+    {
+        private static readonly object[] Empty = new object[0];
 
-		private readonly Delegate implementationOverride;
-		private readonly bool ignoreDelegateReturnValue;
-		private readonly Func<object[], Delegate, object> overrideInvoker;
+        private readonly Delegate implementationOverride;
+        private readonly bool ignoreDelegateReturnValue;
+        private readonly Func<object[], Delegate, object> overrideInvoker;
 
-		public ImplementationOverrideBehavior(Delegate implementationOverride, bool ignoreDelegateReturnValue)
-		{
-			this.ignoreDelegateReturnValue = ignoreDelegateReturnValue;
-			this.implementationOverride = implementationOverride;
+        public ImplementationOverrideBehavior(Delegate implementationOverride, bool ignoreDelegateReturnValue)
+        {
+            this.ignoreDelegateReturnValue = ignoreDelegateReturnValue;
+            this.implementationOverride = implementationOverride;
 
-			this.overrideInvoker = MockingUtil.MakeFuncCaller(implementationOverride);
-		}
+            this.overrideInvoker = MockingUtil.MakeFuncCaller(implementationOverride);
+        }
 
-		public object CallOverride(Invocation invocation)
-		{
-			var args = implementationOverride.Method.GetParameters().Length > 0 && invocation.Args != null ? invocation.Args : Empty;
+        public object CallOverride(Invocation invocation)
+        {
+            var args = implementationOverride.Method.GetParameters().Length > 0 && invocation.Args != null ? invocation.Args : Empty;
 
-			var paramsCount = invocation.Method.GetParameters().Length;
-			var implementationParamsCount = implementationOverride.Method.GetParameters().Length;
+            var paramsCount = invocation.Method.GetParameters().Length;
+            var implementationParamsCount = implementationOverride.Method.GetParameters().Length;
 
-			if (invocation.Method.IsExtensionMethod() && paramsCount - 1 == implementationParamsCount)
-			{
-				args = args.Skip(1).ToArray();
-			}
+            if (invocation.Method.IsExtensionMethod() && paramsCount - 1 == implementationParamsCount)
+            {
+                args = args.Skip(1).ToArray();
+            }
 
-			int extraParamCount = 1 + (implementationOverride.Target != null && implementationOverride.Method.IsStatic ? 1 : 0);
-			if (!invocation.Method.IsStatic && extraParamCount + paramsCount == implementationParamsCount)
-			{
-				args = new[] { invocation.Instance }.Concat(args).ToArray();
-			}
+            int extraParamCount = 1 + (implementationOverride.Target != null && implementationOverride.Method.IsStatic ? 1 : 0);
+            if (!invocation.Method.IsStatic && extraParamCount + paramsCount == implementationParamsCount)
+            {
+                args = new[] { invocation.Instance }.Concat(args).ToArray();
+            }
 
-			try
-			{
-				var returnValue = ProfilerInterceptor.GuardExternal(() => overrideInvoker(args, this.implementationOverride));
-				return returnValue;
-			}
-			catch (InvalidCastException ex)
-			{
-				throw new MockException("The implementation callback has an incorrect signature", ex);
-			}
-		}
+            try
+            {
+                var returnValue = ProfilerInterceptor.GuardExternal(() => overrideInvoker(args, this.implementationOverride));
+                return returnValue;
+            }
+            catch (InvalidCastException ex)
+            {
+                throw new MockException("The implementation callback has an incorrect signature", ex);
+            }
+        }
 
 #if !PORTABLE
-		private ref T GetOverrideRef<T>()
-		{
-			try
-			{
-				return ref ProfilerInterceptor.GuardExternal((target, args) =>
-				{
-					return ref ((Expectations.FuncExpectation<T>.RefDelegate)this.implementationOverride)();
-				}, null, null);
-			}
-			catch (InvalidCastException ex)
-			{
-				throw new MockException("The implementation callback has an incorrect signature", ex);
-			}
-		}
+        private ref T GetOverrideRef<T>()
+        {
+            try
+            {
+                return ref ProfilerInterceptor.GuardExternal((target, args) =>
+                {
+                    return ref ((Expectations.FuncExpectation<T>.RefDelegate)this.implementationOverride)();
+                }, null, null);
+            }
+            catch (InvalidCastException ex)
+            {
+                throw new MockException("The implementation callback has an incorrect signature", ex);
+            }
+        }
 #endif
 
-		public void Process(Invocation invocation)
-		{
+        public void Process(Invocation invocation)
+        {
 #if !PORTABLE
-			var returnType = invocation.Method.GetReturnType();
+            var returnType = invocation.Method.GetReturnType();
 
-			if (returnType.IsByRef)
-			{
-				var delegateType = typeof(object).Assembly.GetType("Telerik.JustMock.RefDelegate`1").MakeGenericType(new[] { returnType.GetElementType() });
-				ConstructorInfo constructor = delegateType.GetConstructor(new[] { typeof(object), typeof(IntPtr) });
+            if (returnType.IsByRef)
+            {
+                var delegateType = typeof(object).Assembly.GetType("Telerik.JustMock.RefDelegate`1").MakeGenericType(new[] { returnType.GetElementType() });
+                ConstructorInfo constructor = delegateType.GetConstructor(new[] { typeof(object), typeof(IntPtr) });
 
-				MethodInfo genericMethodInfo = this.GetType().GetMethod("GetOverrideRef", BindingFlags.NonPublic | BindingFlags.Instance);
-				MethodInfo methodInfo = genericMethodInfo.MakeGenericMethod(returnType.GetElementType());
+                MethodInfo genericMethodInfo = this.GetType().GetMethod("GetOverrideRef", BindingFlags.NonPublic | BindingFlags.Instance);
+                MethodInfo methodInfo = genericMethodInfo.MakeGenericMethod(returnType.GetElementType());
 
-				invocation.ReturnValue = constructor.Invoke(new object[] { this, methodInfo.MethodHandle.GetFunctionPointer() });
-			}
-			else
-			{
+                invocation.ReturnValue = constructor.Invoke(new object[] { this, methodInfo.MethodHandle.GetFunctionPointer() });
+            }
+            else
+            {
 #endif
-				var returnValue = CallOverride(invocation);
-				if (this.implementationOverride.Method.ReturnType != typeof(void) && !this.ignoreDelegateReturnValue)
-				{
-					invocation.ReturnValue = returnValue;
-				}
+                var returnValue = CallOverride(invocation);
+                if (this.implementationOverride.Method.ReturnType != typeof(void) && !this.ignoreDelegateReturnValue)
+                {
+                    invocation.ReturnValue = returnValue;
+                }
 #if !PORTABLE
-			}
+            }
 #endif
-			invocation.UserProvidedImplementation = true;
-		}
-	}
+            invocation.UserProvidedImplementation = true;
+        }
+    }
 }

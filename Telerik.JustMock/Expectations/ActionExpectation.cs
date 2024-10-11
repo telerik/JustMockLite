@@ -21,13 +21,13 @@ using Telerik.JustMock.Expectations.Abstraction;
 
 namespace Telerik.JustMock.Expectations
 {
-	/// <summary>
-	/// Defines action related setups.
-	/// </summary>
-	public sealed class ActionExpectation : CommonExpectation<ActionExpectation>, IIgnorable<ActionExpectation>
-	{
-		internal ActionExpectation()
-		{
-		}
-	}
+    /// <summary>
+    /// Defines action related setups.
+    /// </summary>
+    public sealed class ActionExpectation : CommonExpectation<ActionExpectation>, IIgnorable<ActionExpectation>
+    {
+        internal ActionExpectation()
+        {
+        }
+    }
 }

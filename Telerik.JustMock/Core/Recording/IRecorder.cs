@@ -20,8 +20,8 @@ using System.Linq;
 
 namespace Telerik.JustMock.Core.Recording
 {
-	internal interface IRecorder
-	{
-		void Record(Invocation invocation);
-	}
+    internal interface IRecorder
+    {
+        void Record(Invocation invocation);
+    }
 }

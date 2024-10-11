@@ -18,16 +18,16 @@
 
 namespace Telerik.JustMock.DemoLibSigned
 {
-	public class SingedClass
-	{
-		public void DoSomeThing()
-		{
+    public class SingedClass
+    {
+        public void DoSomeThing()
+        {
 
-		}
+        }
 
-		public void DoSomeThing(SingedClass signed)
-		{
+        public void DoSomeThing(SingedClass signed)
+        {
 
-		}
-	}
+        }
+    }
 }

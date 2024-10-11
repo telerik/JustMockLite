@@ -19,16 +19,16 @@ using System;
 
 namespace Telerik.JustMock.DemoLib.Objects
 {
-	public class ClassWithDynamicDataMethod
-	{
-		public bool Method1()
-		{
-			return Method2(new { V1 = "A" });
-		}
+    public class ClassWithDynamicDataMethod
+    {
+        public bool Method1()
+        {
+            return Method2(new { V1 = "A" });
+        }
 
-		public static bool Method2(dynamic data)
-		{
-			throw new NotImplementedException();
-		}
-	}
+        public static bool Method2(dynamic data)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

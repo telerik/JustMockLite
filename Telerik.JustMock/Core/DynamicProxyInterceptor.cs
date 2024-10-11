@@ -21,67 +21,67 @@ using Telerik.JustMock.Diagnostics;
 
 namespace Telerik.JustMock.Core
 {
-	internal class DynamicProxyInterceptor : IInterceptor
-	{
-		private readonly MocksRepository constructionRepo;
+    internal class DynamicProxyInterceptor : IInterceptor
+    {
+        private readonly MocksRepository constructionRepo;
 
-		internal DynamicProxyInterceptor(MocksRepository constructionRepo)
-		{
-			this.constructionRepo = constructionRepo;
-		}
+        internal DynamicProxyInterceptor(MocksRepository constructionRepo)
+        {
+            this.constructionRepo = constructionRepo;
+        }
 
-		public void Intercept(IInvocation invocation)
-		{
-			if (ProfilerInterceptor.ReentrancyCounter > 0)
-			{
-				CallOriginal(invocation, false);
-				return;
-			}
+        public void Intercept(IInvocation invocation)
+        {
+            if (ProfilerInterceptor.ReentrancyCounter > 0)
+            {
+                CallOriginal(invocation, false);
+                return;
+            }
 
-			bool callOriginal = false;
-			ProfilerInterceptor.GuardInternal(() =>
-			{
-				var mockInvocation = new Invocation(invocation.Proxy, invocation.GetConcreteMethod(), invocation.Arguments);
+            bool callOriginal = false;
+            ProfilerInterceptor.GuardInternal(() =>
+            {
+                var mockInvocation = new Invocation(invocation.Proxy, invocation.GetConcreteMethod(), invocation.Arguments);
 
-				DebugView.TraceEvent(IndentLevel.Dispatch, () => String.Format("Intercepted DP call: {0}", mockInvocation.InputToString()));
-				DebugView.PrintStackTrace();
+                DebugView.TraceEvent(IndentLevel.Dispatch, () => String.Format("Intercepted DP call: {0}", mockInvocation.InputToString()));
+                DebugView.PrintStackTrace();
 
-				var mock = mockInvocation.MockMixin;
-				var repo = mock != null ? mock.Repository : this.constructionRepo;
+                var mock = mockInvocation.MockMixin;
+                var repo = mock != null ? mock.Repository : this.constructionRepo;
 
-				lock (repo)
-				{
-					repo.DispatchInvocation(mockInvocation);
-				}
+                lock (repo)
+                {
+                    repo.DispatchInvocation(mockInvocation);
+                }
 
-				invocation.ReturnValue = mockInvocation.ReturnValue;
-				callOriginal = mockInvocation.CallOriginal;
+                invocation.ReturnValue = mockInvocation.ReturnValue;
+                callOriginal = mockInvocation.CallOriginal;
 
-				if (callOriginal)
-				{
-					DebugView.TraceEvent(IndentLevel.DispatchResult, () => "Calling original implementation");
-				}
-				else if (mockInvocation.IsReturnValueSet)
-				{
-					DebugView.TraceEvent(IndentLevel.DispatchResult, () => String.Format("Returning value '{0}'", invocation.ReturnValue));
-				}
-			});
+                if (callOriginal)
+                {
+                    DebugView.TraceEvent(IndentLevel.DispatchResult, () => "Calling original implementation");
+                }
+                else if (mockInvocation.IsReturnValueSet)
+                {
+                    DebugView.TraceEvent(IndentLevel.DispatchResult, () => String.Format("Returning value '{0}'", invocation.ReturnValue));
+                }
+            });
 
-			if (callOriginal)
-				CallOriginal(invocation, true);
-		}
+            if (callOriginal)
+                CallOriginal(invocation, true);
+        }
 
-		private void CallOriginal(IInvocation invocation, bool throwOnFail)
-		{
-			try
-			{
-				invocation.Proceed();
-			}
-			catch (NotImplementedException)
-			{
-				if (throwOnFail)
-					throw new NotImplementedException("You can't call the original implementation of a method that does not have one (abstract or interface method).");
-			}
-		}
-	}
+        private void CallOriginal(IInvocation invocation, bool throwOnFail)
+        {
+            try
+            {
+                invocation.Proceed();
+            }
+            catch (NotImplementedException)
+            {
+                if (throwOnFail)
+                    throw new NotImplementedException("You can't call the original implementation of a method that does not have one (abstract or interface method).");
+            }
+        }
+    }
 }

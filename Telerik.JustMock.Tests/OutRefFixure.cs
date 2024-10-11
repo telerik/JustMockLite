@@ -48,163 +48,163 @@ using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFa
 
 namespace Telerik.JustMock.Tests
 {
-	[TestClass]
-	public class OutRefFixure
-	{
-		[TestMethod, TestCategory("Lite"), TestCategory("OutRef")]
-		public void ShouldExpectOutArgumets()
-		{
-			string expected = "ack";
+    [TestClass]
+    public class OutRefFixure
+    {
+        [TestMethod, TestCategory("Lite"), TestCategory("OutRef")]
+        public void ShouldExpectOutArgumets()
+        {
+            string expected = "ack";
 
-			var iFoo = Mock.Create<IFoo>();
+            var iFoo = Mock.Create<IFoo>();
 
-			Mock.Arrange(() => iFoo.Execute("ping", out expected)).Returns(true);
+            Mock.Arrange(() => iFoo.Execute("ping", out expected)).Returns(true);
 
-			string original;
+            string original;
 
-			Assert.True(iFoo.Execute("ping", out original));
-			Assert.Equal(original, expected);
-		}
+            Assert.True(iFoo.Execute("ping", out original));
+            Assert.Equal(original, expected);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("OutRef")]
-		public void ShouldAssertRefArguments()
-		{
-			string strToReturn = "abc";
+        [TestMethod, TestCategory("Lite"), TestCategory("OutRef")]
+        public void ShouldAssertRefArguments()
+        {
+            string strToReturn = "abc";
 
-			var iFoo = Mock.Create<IFoo>();
+            var iFoo = Mock.Create<IFoo>();
 
-			Mock.Arrange(() => iFoo.Execute(ref strToReturn)).DoNothing();
+            Mock.Arrange(() => iFoo.Execute(ref strToReturn)).DoNothing();
 
-			string original = string.Empty;
+            string original = string.Empty;
 
-			iFoo.Execute(ref original);
+            iFoo.Execute(ref original);
 
-			Assert.Equal(strToReturn, original);
-		}
+            Assert.Equal(strToReturn, original);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("OutRef")]
-		public void ShouldAssertGuidAsOutArgument()
-		{
-			var iFoo = Mock.Create<IFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("OutRef")]
+        public void ShouldAssertGuidAsOutArgument()
+        {
+            var iFoo = Mock.Create<IFoo>();
 
-			Guid expected = Guid.NewGuid();
+            Guid expected = Guid.NewGuid();
 
-			Mock.Arrange(() => iFoo.GuidMethod(out expected)).Returns(true);
+            Mock.Arrange(() => iFoo.GuidMethod(out expected)).Returns(true);
 
-			Guid original;
+            Guid original;
 
-			Assert.True(iFoo.GuidMethod(out original));
-			Assert.Equal(original, expected);
-		}
+            Assert.True(iFoo.GuidMethod(out original));
+            Assert.Equal(original, expected);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("OutRef")]
-		public void ShouldAssertIntRefArgument()
-		{
-			var foo = Mock.Create<IFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("OutRef")]
+        public void ShouldAssertIntRefArgument()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			var expected = 10;
+            var expected = 10;
 
-			Mock.Arrange(() => foo.IntMethod(ref expected)).Returns(true);
+            Mock.Arrange(() => foo.IntMethod(ref expected)).Returns(true);
 
-			var original = 0;
+            var original = 0;
 
-			Assert.True(foo.IntMethod(ref original));
-			Assert.Equal(original, 10);
-		}
+            Assert.True(foo.IntMethod(ref original));
+            Assert.Equal(original, 10);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("OutRef")]
-		public void ShouldAssertWhenExpectedOutIsNull()
-		{
-			var foo = Mock.Create<Foo>(Behavior.CallOriginal);
+        [TestMethod, TestCategory("Lite"), TestCategory("OutRef")]
+        public void ShouldAssertWhenExpectedOutIsNull()
+        {
+            var foo = Mock.Create<Foo>(Behavior.CallOriginal);
 
-			Token expected;
+            Token expected;
 
-			Mock.Arrange(() => foo.Execute(Arg.AnyString, out expected)).Returns(true);
+            Mock.Arrange(() => foo.Execute(Arg.AnyString, out expected)).Returns(true);
 
-			Assert.True(foo.Execute("xmas", out expected));
-		}
+            Assert.True(foo.Execute("xmas", out expected));
+        }
 
-		public class Token
-		{
+        public class Token
+        {
 
-		}
+        }
 
-		public class Foo
-		{
-			public virtual bool Execute(string arg, out Token token)
-			{
-				token = new Token();
-				return false;
-			}
-		}
+        public class Foo
+        {
+            public virtual bool Execute(string arg, out Token token)
+            {
+                token = new Token();
+                return false;
+            }
+        }
 
-		public interface IFoo
-		{
-			bool Execute(string arg1, out string arg2);
-			void Execute(ref string arg1);
-			bool GuidMethod(out Guid id);
-			bool IntMethod(ref int argument);
-		}
+        public interface IFoo
+        {
+            bool Execute(string arg1, out string arg2);
+            void Execute(ref string arg1);
+            bool GuidMethod(out Guid id);
+            bool IntMethod(ref int argument);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("OutRef")]
-		public void ShouldArrangeByRefValueMatcher()
-		{
-			var mock = Mock.Create<IFoo>();
-			Mock.Arrange(() => mock.IntMethod(ref Arg.Ref(100).Value)).Returns(true);
+        [TestMethod, TestCategory("Lite"), TestCategory("OutRef")]
+        public void ShouldArrangeByRefValueMatcher()
+        {
+            var mock = Mock.Create<IFoo>();
+            Mock.Arrange(() => mock.IntMethod(ref Arg.Ref(100).Value)).Returns(true);
 
-			int value = 100;
-			var actual = mock.IntMethod(ref value);
-			Assert.Equal(true, actual);
+            int value = 100;
+            var actual = mock.IntMethod(ref value);
+            Assert.Equal(true, actual);
 
-			value = 0;
-			actual = mock.IntMethod(ref value);
-			Assert.Equal(false, actual);
-		}
+            value = 0;
+            actual = mock.IntMethod(ref value);
+            Assert.Equal(false, actual);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("OutRef")]
-		public void ShouldArrangeByRefPredicatedMatcher()
-		{
-			var mock = Mock.Create<IFoo>();
-			Mock.Arrange(() => mock.IntMethod(ref Arg.Ref(Arg.IsInRange(0, 1000, RangeKind.Inclusive)).Value)).Returns(true);
+        [TestMethod, TestCategory("Lite"), TestCategory("OutRef")]
+        public void ShouldArrangeByRefPredicatedMatcher()
+        {
+            var mock = Mock.Create<IFoo>();
+            Mock.Arrange(() => mock.IntMethod(ref Arg.Ref(Arg.IsInRange(0, 1000, RangeKind.Inclusive)).Value)).Returns(true);
 
-			int value = 100;
-			var actual = mock.IntMethod(ref value);
-			Assert.Equal(true, actual);
+            int value = 100;
+            var actual = mock.IntMethod(ref value);
+            Assert.Equal(true, actual);
 
-			value = -100;
-			actual = mock.IntMethod(ref value);
-			Assert.Equal(false, actual);
+            value = -100;
+            actual = mock.IntMethod(ref value);
+            Assert.Equal(false, actual);
 
-			value = 10000;
-			actual = mock.IntMethod(ref value);
-			Assert.Equal(false, actual);
-		}
+            value = 10000;
+            actual = mock.IntMethod(ref value);
+            Assert.Equal(false, actual);
+        }
 
-		public interface IMixRefs
-		{
-			int Do(ref int a, ref int b);
-		}
+        public interface IMixRefs
+        {
+            int Do(ref int a, ref int b);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("OutRef")]
-		public void ShouldMatcherRefsCoexistWithReturnRefs()
-		{
-			var mock = Mock.Create<IMixRefs>();
+        [TestMethod, TestCategory("Lite"), TestCategory("OutRef")]
+        public void ShouldMatcherRefsCoexistWithReturnRefs()
+        {
+            var mock = Mock.Create<IMixRefs>();
 
-			int arrange_a = 100;
-			Mock.Arrange(() => mock.Do(ref arrange_a, ref Arg.Ref(500).Value)).Returns(10);
+            int arrange_a = 100;
+            Mock.Arrange(() => mock.Do(ref arrange_a, ref Arg.Ref(500).Value)).Returns(10);
 
-			int a = 0;
-			int b = 500;
-			mock.Do(ref a, ref b);
+            int a = 0;
+            int b = 500;
+            mock.Do(ref a, ref b);
 
-			Assert.Equal(100, a);
-			Assert.Equal(500, b);
+            Assert.Equal(100, a);
+            Assert.Equal(500, b);
 
-			int a2 = 0;
-			int c = 100;
-			mock.Do(ref a2, ref c);
-			Assert.Equal(0, a2);
-			Assert.Equal(100, c);
-		}
-	}
+            int a2 = 0;
+            int c = 100;
+            mock.Do(ref a2, ref c);
+            Assert.Equal(0, a2);
+            Assert.Equal(100, c);
+        }
+    }
 }

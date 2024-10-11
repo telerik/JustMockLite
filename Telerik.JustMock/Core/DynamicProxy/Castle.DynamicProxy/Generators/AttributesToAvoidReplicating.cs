@@ -14,57 +14,57 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System.Reflection;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
 
-	internal static class AttributesToAvoidReplicating
-	{
-		private static readonly object lockObject = new object();
+    internal static class AttributesToAvoidReplicating
+    {
+        private static readonly object lockObject = new object();
 
-		private static IList<Type> attributes;
+        private static IList<Type> attributes;
 
-		static AttributesToAvoidReplicating()
-		{
-			attributes = new List<Type>()
-			{
-				typeof(System.Runtime.InteropServices.ComImportAttribute),
-				typeof(System.Runtime.InteropServices.MarshalAsAttribute),
-				typeof(System.Runtime.InteropServices.TypeIdentifierAttribute),
+        static AttributesToAvoidReplicating()
+        {
+            attributes = new List<Type>()
+            {
+                typeof(System.Runtime.InteropServices.ComImportAttribute),
+                typeof(System.Runtime.InteropServices.MarshalAsAttribute),
+                typeof(System.Runtime.InteropServices.TypeIdentifierAttribute),
 #pragma warning disable SYSLIB0003
-				typeof(System.Security.Permissions.SecurityAttribute),
+                typeof(System.Security.Permissions.SecurityAttribute),
 #pragma warning restore SYSLIB0003
-			};
-		}
+            };
+        }
 
-		internal static void Add(Type attribute)
-		{
-			lock (lockObject)
-			{
-				attributes.Add(attribute);
-			}
-		}
+        internal static void Add(Type attribute)
+        {
+            lock (lockObject)
+            {
+                attributes.Add(attribute);
+            }
+        }
 
-		internal static void Add<T>()
-		{
-			Add(typeof(T));
-		}
+        internal static void Add<T>()
+        {
+            Add(typeof(T));
+        }
 
-		internal static bool Contains(Type attribute)
-		{
-			lock (lockObject)
-			{
-				return attributes.Any(attr => attr.IsAssignableFrom(attribute));
-			}
-		}
+        internal static bool Contains(Type attribute)
+        {
+            lock (lockObject)
+            {
+                return attributes.Any(attr => attr.IsAssignableFrom(attribute));
+            }
+        }
 
-		internal static bool ShouldAvoid(Type attribute)
-		{
-			lock (lockObject)
-			{
-				return attributes.Any(attr => attr.IsAssignableFrom(attribute));
-			}
-		}
-	}
+        internal static bool ShouldAvoid(Type attribute)
+        {
+            lock (lockObject)
+            {
+                return attributes.Any(attr => attr.IsAssignableFrom(attribute));
+            }
+        }
+    }
 }

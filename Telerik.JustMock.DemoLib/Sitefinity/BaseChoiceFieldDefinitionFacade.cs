@@ -20,18 +20,18 @@ using Telerik.Sitefinity.Web.UI.Fields.Config;
 
 namespace Telerik.Sitefinity
 {
-	/// <summary>
-	/// Base Fluent API for wrapping of ChoiceFieldElement
-	/// </summary>
-	/// <typeparam name="TParentFacade">Type of the parent facade</typeparam>
-	/// <typeparam name="TActualFacade">Type of the class implementing this abstract class</typeparam>
-	/// <typeparam name="TConfig">Type of the configuration element</typeparam>
-	public abstract class BaseChoiceFieldDefinitionFacade<TConfig, TActualFacade, TParentFacade>
-		: FieldControlDefinitionFacade<TConfig, TActualFacade, TParentFacade>
-		where TParentFacade : class
-		where TActualFacade : class
-		where TConfig : ChoiceFieldElement
-	{
-	}
+    /// <summary>
+    /// Base Fluent API for wrapping of ChoiceFieldElement
+    /// </summary>
+    /// <typeparam name="TParentFacade">Type of the parent facade</typeparam>
+    /// <typeparam name="TActualFacade">Type of the class implementing this abstract class</typeparam>
+    /// <typeparam name="TConfig">Type of the configuration element</typeparam>
+    public abstract class BaseChoiceFieldDefinitionFacade<TConfig, TActualFacade, TParentFacade>
+        : FieldControlDefinitionFacade<TConfig, TActualFacade, TParentFacade>
+        where TParentFacade : class
+        where TActualFacade : class
+        where TConfig : ChoiceFieldElement
+    {
+    }
 
 }

@@ -14,18 +14,18 @@
 
 namespace Telerik.JustMock.Core.Castle.Core
 {
-	/// <summary>
-	/// This interface should be implemented by classes
-	/// that are available in a bigger context, exposing
-	/// the container to different areas in the same application.
-	/// <para>
-	/// For example, in Web application, the (global) HttpApplication
-	/// subclasses should implement this interface to expose 
-	/// the configured container
-	/// </para>
-	/// </summary>
-	internal interface IServiceProviderExAccessor
-	{
-		IServiceProviderEx ServiceProvider { get; }
-	}
+    /// <summary>
+    /// This interface should be implemented by classes
+    /// that are available in a bigger context, exposing
+    /// the container to different areas in the same application.
+    /// <para>
+    /// For example, in Web application, the (global) HttpApplication
+    /// subclasses should implement this interface to expose 
+    /// the configured container
+    /// </para>
+    /// </summary>
+    internal interface IServiceProviderExAccessor
+    {
+        IServiceProviderEx ServiceProvider { get; }
+    }
 }

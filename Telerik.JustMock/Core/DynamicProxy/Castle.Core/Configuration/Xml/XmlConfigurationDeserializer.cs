@@ -14,67 +14,67 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Configuration.Xml
 {
-	using System.Text;
-	using System.Xml;
+    using System.Text;
+    using System.Xml;
 
-	internal class XmlConfigurationDeserializer
-	{
-		/// <summary>
-		///   Deserializes the specified node into an abstract representation of configuration.
-		/// </summary>
-		/// <param name = "node">The node.</param>
-		public IConfiguration Deserialize(XmlNode node)
-		{
-			return GetDeserializedNode(node);
-		}
+    internal class XmlConfigurationDeserializer
+    {
+        /// <summary>
+        ///   Deserializes the specified node into an abstract representation of configuration.
+        /// </summary>
+        /// <param name = "node">The node.</param>
+        public IConfiguration Deserialize(XmlNode node)
+        {
+            return GetDeserializedNode(node);
+        }
 
-		/// <summary>
-		///   If a config value is an empty string we return null, this is to keep
-		///   backward compatibility with old code
-		/// </summary>
-		public static string GetConfigValue(string value)
-		{
-			if (value == string.Empty)
-			{
-				return null;
-			}
-			return value;
-		}
+        /// <summary>
+        ///   If a config value is an empty string we return null, this is to keep
+        ///   backward compatibility with old code
+        /// </summary>
+        public static string GetConfigValue(string value)
+        {
+            if (value == string.Empty)
+            {
+                return null;
+            }
+            return value;
+        }
 
-		public static IConfiguration GetDeserializedNode(XmlNode node)
-		{
-			var configChilds = new ConfigurationCollection();
+        public static IConfiguration GetDeserializedNode(XmlNode node)
+        {
+            var configChilds = new ConfigurationCollection();
 
-			var configValue = new StringBuilder();
-			if (node.HasChildNodes)
-			{
-				foreach (XmlNode child in node.ChildNodes)
-				{
-					if (IsTextNode(child))
-					{
-						configValue.Append(child.Value);
-					}
-					else if (child.NodeType == XmlNodeType.Element)
-					{
-						configChilds.Add(GetDeserializedNode(child));
-					}
-				}
-			}
+            var configValue = new StringBuilder();
+            if (node.HasChildNodes)
+            {
+                foreach (XmlNode child in node.ChildNodes)
+                {
+                    if (IsTextNode(child))
+                    {
+                        configValue.Append(child.Value);
+                    }
+                    else if (child.NodeType == XmlNodeType.Element)
+                    {
+                        configChilds.Add(GetDeserializedNode(child));
+                    }
+                }
+            }
 
-			var config = new MutableConfiguration(node.Name, GetConfigValue(configValue.ToString()));
-			foreach (XmlAttribute attribute in node.Attributes)
-			{
-				config.Attributes.Add(attribute.Name, attribute.Value);
-			}
+            var config = new MutableConfiguration(node.Name, GetConfigValue(configValue.ToString()));
+            foreach (XmlAttribute attribute in node.Attributes)
+            {
+                config.Attributes.Add(attribute.Name, attribute.Value);
+            }
 
-			config.Children.AddRange(configChilds);
+            config.Children.AddRange(configChilds);
 
-			return config;
-		}
+            return config;
+        }
 
-		public static bool IsTextNode(XmlNode node)
-		{
-			return node.NodeType == XmlNodeType.Text || node.NodeType == XmlNodeType.CDATA;
-		}
-	}
+        public static bool IsTextNode(XmlNode node)
+        {
+            return node.NodeType == XmlNodeType.Text || node.NodeType == XmlNodeType.CDATA;
+        }
+    }
 }

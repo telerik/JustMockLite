@@ -22,7 +22,7 @@ using System.Text;
 
 namespace Telerik.JustMock.Core
 {
-	internal class MissingMethodException : Exception
-	{
-	}
+    internal class MissingMethodException : Exception
+    {
+    }
 }

@@ -22,61 +22,61 @@ using Telerik.JustMock.Core.Expressions;
 
 namespace Telerik.JustMock.Core.MatcherTree
 {
-	internal class PredicateMatcher<T> : CategoricalMatcherBase, IFunctionalMatcher
-	{
-		private readonly Predicate<T> predicate;
-		private readonly Expression predicateExpression;
+    internal class PredicateMatcher<T> : CategoricalMatcherBase, IFunctionalMatcher
+    {
+        private readonly Predicate<T> predicate;
+        private readonly Expression predicateExpression;
 
-		public Type Type { get { return typeof(T); } }
+        public Type Type { get { return typeof(T); } }
 
-		public override string DebugView
-		{
-			get { return predicateExpression.ToString(); }
-		}
-		
-		public PredicateMatcher(Expression<Predicate<T>> expression)
-		{
-			this.predicate = expression.Compile();
-			this.predicateExpression = expression;
-		}
+        public override string DebugView
+        {
+            get { return predicateExpression.ToString(); }
+        }
 
-		public override bool CanMatch(IMatcher matcher)
-		{
-			return matcher is IValueMatcher;
-		}
+        public PredicateMatcher(Expression<Predicate<T>> expression)
+        {
+            this.predicate = expression.Compile();
+            this.predicateExpression = expression;
+        }
 
-		protected override bool MatchesCore(IMatcher other)
-		{
-			var matcher = (IValueMatcher) other;
-			var value = matcher.Value;
+        public override bool CanMatch(IMatcher matcher)
+        {
+            return matcher is IValueMatcher;
+        }
 
-			if (value == null && typeof(T).IsValueType)
-				return false;
-			if (value != null && !typeof(T).IsAssignableFrom(matcher.Type))
-				return false;
+        protected override bool MatchesCore(IMatcher other)
+        {
+            var matcher = (IValueMatcher) other;
+            var value = matcher.Value;
 
-			return ProfilerInterceptor.GuardExternal(() => predicate((T)value));
-		}
+            if (value == null && typeof(T).IsValueType)
+                return false;
+            if (value != null && !typeof(T).IsAssignableFrom(matcher.Type))
+                return false;
 
-		public override bool Equals(IMatcher other)
-		{
-			var predicateMatcher = other as PredicateMatcher<T>;
-			if (predicateMatcher == null)
-				return false;
+            return ProfilerInterceptor.GuardExternal(() => predicate((T)value));
+        }
 
-			return ExpressionComparer.AreEqual(predicateExpression, predicateMatcher.predicateExpression);
-		}
+        public override bool Equals(IMatcher other)
+        {
+            var predicateMatcher = other as PredicateMatcher<T>;
+            if (predicateMatcher == null)
+                return false;
 
-		public override Expression ToExpression(Type argumentType)
-		{
-			return Expression.Call(null, typeof(PredicateMatcher<T>).GetMethod("Create"),
-				Expression.Constant(predicateExpression));
-		}
+            return ExpressionComparer.AreEqual(predicateExpression, predicateMatcher.predicateExpression);
+        }
 
-		[ArgMatcher(Matcher = typeof(PredicateMatcher<>))]
-		public static T Create(Expression<Predicate<T>> expression)
-		{
-			throw new NotSupportedException();
-		}
-	}
+        public override Expression ToExpression(Type argumentType)
+        {
+            return Expression.Call(null, typeof(PredicateMatcher<T>).GetMethod("Create"),
+                Expression.Constant(predicateExpression));
+        }
+
+        [ArgMatcher(Matcher = typeof(PredicateMatcher<>))]
+        public static T Create(Expression<Predicate<T>> expression)
+        {
+            throw new NotSupportedException();
+        }
+    }
 }

@@ -14,29 +14,29 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 {
-	using System;
-	using System.Reflection;
+    using System;
+    using System.Reflection;
 
-	using Castle.DynamicProxy.Generators;
-	using Castle.DynamicProxy.Internal;
+    using Castle.DynamicProxy.Generators;
+    using Castle.DynamicProxy.Internal;
 
-	internal sealed class DelegateTypeMembersCollector : MembersCollector
-	{
-		public DelegateTypeMembersCollector(Type delegateType)
-			: base(delegateType)
-		{
-		}
+    internal sealed class DelegateTypeMembersCollector : MembersCollector
+    {
+        public DelegateTypeMembersCollector(Type delegateType)
+            : base(delegateType)
+        {
+        }
 
-		protected override MetaMethod GetMethodToGenerate(MethodInfo method, IProxyGenerationHook hook, bool isStandalone)
-		{
-			if (method.Name == "Invoke" && method.DeclaringType.IsDelegateType())
-			{
-				return new MetaMethod(method, method, isStandalone, true, false);
-			}
-			else
-			{
-				return null;
-			}
-		}
-	}
+        protected override MetaMethod GetMethodToGenerate(MethodInfo method, IProxyGenerationHook hook, bool isStandalone)
+        {
+            if (method.Name == "Invoke" && method.DeclaringType.IsDelegateType())
+            {
+                return new MetaMethod(method, method, isStandalone, true, false);
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
 }

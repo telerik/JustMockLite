@@ -14,19 +14,19 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST
 {
-	using System.Reflection.Emit;
+    using System.Reflection.Emit;
 
-	internal class NullExpression : IExpression
-	{
-		public static readonly NullExpression Instance = new NullExpression();
+    internal class NullExpression : IExpression
+    {
+        public static readonly NullExpression Instance = new NullExpression();
 
-		protected NullExpression()
-		{
-		}
+        protected NullExpression()
+        {
+        }
 
-		public void Emit(ILGenerator gen)
-		{
-			gen.Emit(OpCodes.Ldnull);
-		}
-	}
+        public void Emit(ILGenerator gen)
+        {
+            gen.Emit(OpCodes.Ldnull);
+        }
+    }
 }

@@ -20,8 +20,8 @@ using System.Linq;
 
 namespace Telerik.JustMock.Core
 {
-	internal class ProxyFailureException : Exception
-	{
-		public ProxyFailureException(Exception innerException) : base("", innerException) { }
-	}
+    internal class ProxyFailureException : Exception
+    {
+        public ProxyFailureException(Exception innerException) : base("", innerException) { }
+    }
 }

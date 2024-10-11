@@ -21,18 +21,18 @@ using System.Runtime.CompilerServices;
 
 namespace Telerik.JustMock.Core
 {
-	internal sealed class ByRefComparer<T> : IEqualityComparer<T> where T : class
-	{
-		public static readonly ByRefComparer<T> Instance = new ByRefComparer<T>();
+    internal sealed class ByRefComparer<T> : IEqualityComparer<T> where T : class
+    {
+        public static readonly ByRefComparer<T> Instance = new ByRefComparer<T>();
 
-		public bool Equals(T x, T y)
-		{
-			return ReferenceEquals(x, y);
-		}
+        public bool Equals(T x, T y)
+        {
+            return ReferenceEquals(x, y);
+        }
 
-		public int GetHashCode(T obj)
-		{
-			return RuntimeHelpers.GetHashCode(obj);
-		}
-	}
+        public int GetHashCode(T obj)
+        {
+            return RuntimeHelpers.GetHashCode(obj);
+        }
+    }
 }

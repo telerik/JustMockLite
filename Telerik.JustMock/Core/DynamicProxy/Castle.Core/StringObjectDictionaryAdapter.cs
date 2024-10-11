@@ -14,214 +14,214 @@
 
 namespace Telerik.JustMock.Core.Castle.Core
 {
-	using System;
-	using System.Collections;
-	using System.Collections.Generic;
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
 
-	internal sealed class StringObjectDictionaryAdapter : IDictionary<string, object>
-	{
-		private readonly IDictionary dictionary;
+    internal sealed class StringObjectDictionaryAdapter : IDictionary<string, object>
+    {
+        private readonly IDictionary dictionary;
 
-		public StringObjectDictionaryAdapter(IDictionary dictionary)
-		{
-			this.dictionary = dictionary;
-		}
+        public StringObjectDictionaryAdapter(IDictionary dictionary)
+        {
+            this.dictionary = dictionary;
+        }
 
-		bool IDictionary<string, object>.ContainsKey(string key)
-		{
-			return dictionary.Contains(key);
-		}
+        bool IDictionary<string, object>.ContainsKey(string key)
+        {
+            return dictionary.Contains(key);
+        }
 
-		void IDictionary<string, object>.Add(string key, object value)
-		{
-			throw new NotImplementedException();
-		}
+        void IDictionary<string, object>.Add(string key, object value)
+        {
+            throw new NotImplementedException();
+        }
 
-		bool IDictionary<string, object>.Remove(string key)
-		{
-			throw new NotImplementedException();
-		}
+        bool IDictionary<string, object>.Remove(string key)
+        {
+            throw new NotImplementedException();
+        }
 
-		bool IDictionary<string, object>.TryGetValue(string key, out object value)
-		{
-			value = null;
-			if (dictionary.Contains(key))
-			{
-				value = dictionary[key];
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
+        bool IDictionary<string, object>.TryGetValue(string key, out object value)
+        {
+            value = null;
+            if (dictionary.Contains(key))
+            {
+                value = dictionary[key];
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
-		object IDictionary<string, object>.this[string key]
-		{
-			get { return dictionary[key]; }
-			set { throw new NotImplementedException(); }
-		}
+        object IDictionary<string, object>.this[string key]
+        {
+            get { return dictionary[key]; }
+            set { throw new NotImplementedException(); }
+        }
 
-		ICollection<string> IDictionary<string, object>.Keys
-		{
-			get
-			{
-				string[] keys = new string[Count];
-				dictionary.Keys.CopyTo(keys, 0);
-				return keys;
-			}
-		}
+        ICollection<string> IDictionary<string, object>.Keys
+        {
+            get
+            {
+                string[] keys = new string[Count];
+                dictionary.Keys.CopyTo(keys, 0);
+                return keys;
+            }
+        }
 
-		ICollection<object> IDictionary<string, object>.Values
-		{
-			get
-			{
-				object[] values = new object[Count];
-				dictionary.Values.CopyTo(values, 0);
-				return values;
-			}
-		}
+        ICollection<object> IDictionary<string, object>.Values
+        {
+            get
+            {
+                object[] values = new object[Count];
+                dictionary.Values.CopyTo(values, 0);
+                return values;
+            }
+        }
 
-		void ICollection<KeyValuePair<string, object>>.Add(KeyValuePair<string, object> item)
-		{
-			throw new NotImplementedException();
-		}
+        void ICollection<KeyValuePair<string, object>>.Add(KeyValuePair<string, object> item)
+        {
+            throw new NotImplementedException();
+        }
 
-		bool ICollection<KeyValuePair<string, object>>.Contains(KeyValuePair<string, object> item)
-		{
-			throw new NotImplementedException();
-		}
+        bool ICollection<KeyValuePair<string, object>>.Contains(KeyValuePair<string, object> item)
+        {
+            throw new NotImplementedException();
+        }
 
-		void ICollection<KeyValuePair<string, object>>.CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
-		{
-			throw new NotImplementedException();
-		}
+        void ICollection<KeyValuePair<string, object>>.CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
+        {
+            throw new NotImplementedException();
+        }
 
-		bool ICollection<KeyValuePair<string, object>>.Remove(KeyValuePair<string, object> item)
-		{
-			throw new NotImplementedException();
-		}
+        bool ICollection<KeyValuePair<string, object>>.Remove(KeyValuePair<string, object> item)
+        {
+            throw new NotImplementedException();
+        }
 
-		IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator()
-		{
-			return new EnumeratorAdapter(this);
-		}
+        IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator()
+        {
+            return new EnumeratorAdapter(this);
+        }
 
-		public bool Contains(object key)
-		{
-			return dictionary.Contains(key);
-		}
+        public bool Contains(object key)
+        {
+            return dictionary.Contains(key);
+        }
 
-		public void Add(object key, object value)
-		{
-			dictionary.Add(key, value);
-		}
+        public void Add(object key, object value)
+        {
+            dictionary.Add(key, value);
+        }
 
-		public void Clear()
-		{
-			dictionary.Clear();
-		}
+        public void Clear()
+        {
+            dictionary.Clear();
+        }
 
-		public void Remove(object key)
-		{
-			dictionary.Remove(key);
-		}
+        public void Remove(object key)
+        {
+            dictionary.Remove(key);
+        }
 
-		public object this[object key]
-		{
-			get { return dictionary[key]; }
-			set { dictionary[key] = value; }
-		}
+        public object this[object key]
+        {
+            get { return dictionary[key]; }
+            set { dictionary[key] = value; }
+        }
 
-		public ICollection Keys
-		{
-			get { return dictionary.Keys; }
-		}
+        public ICollection Keys
+        {
+            get { return dictionary.Keys; }
+        }
 
-		public ICollection Values
-		{
-			get { return dictionary.Values; }
-		}
+        public ICollection Values
+        {
+            get { return dictionary.Values; }
+        }
 
-		public bool IsReadOnly
-		{
-			get { return dictionary.IsReadOnly; }
-		}
+        public bool IsReadOnly
+        {
+            get { return dictionary.IsReadOnly; }
+        }
 
-		public bool IsFixedSize
-		{
-			get { return dictionary.IsFixedSize; }
-		}
+        public bool IsFixedSize
+        {
+            get { return dictionary.IsFixedSize; }
+        }
 
-		public void CopyTo(Array array, int index)
-		{
-			dictionary.CopyTo(array, index);
-		}
+        public void CopyTo(Array array, int index)
+        {
+            dictionary.CopyTo(array, index);
+        }
 
-		public int Count
-		{
-			get { return dictionary.Count; }
-		}
+        public int Count
+        {
+            get { return dictionary.Count; }
+        }
 
-		public object SyncRoot
-		{
-			get { return dictionary.SyncRoot; }
-		}
+        public object SyncRoot
+        {
+            get { return dictionary.SyncRoot; }
+        }
 
-		public bool IsSynchronized
-		{
-			get { return dictionary.IsSynchronized; }
-		}
+        public bool IsSynchronized
+        {
+            get { return dictionary.IsSynchronized; }
+        }
 
-		public IEnumerator GetEnumerator()
-		{
-			return ((IEnumerable) dictionary).GetEnumerator();
-		}
+        public IEnumerator GetEnumerator()
+        {
+            return ((IEnumerable) dictionary).GetEnumerator();
+        }
 
-		internal class EnumeratorAdapter : IEnumerator<KeyValuePair<string, object>>
-		{
-			private readonly StringObjectDictionaryAdapter adapter;
-			private IEnumerator<string> keyEnumerator;
-			private string currentKey;
-			private object currentValue;
+        internal class EnumeratorAdapter : IEnumerator<KeyValuePair<string, object>>
+        {
+            private readonly StringObjectDictionaryAdapter adapter;
+            private IEnumerator<string> keyEnumerator;
+            private string currentKey;
+            private object currentValue;
 
-			public EnumeratorAdapter(StringObjectDictionaryAdapter adapter)
-			{
-				this.adapter = adapter;
-				keyEnumerator = ((IDictionary<string, object>) adapter).Keys.GetEnumerator();
-			}
+            public EnumeratorAdapter(StringObjectDictionaryAdapter adapter)
+            {
+                this.adapter = adapter;
+                keyEnumerator = ((IDictionary<string, object>) adapter).Keys.GetEnumerator();
+            }
 
-			public bool MoveNext()
-			{
-				if (keyEnumerator.MoveNext())
-				{
-					currentKey = keyEnumerator.Current;
-					currentValue = adapter[currentKey];
-					return true;
-				}
+            public bool MoveNext()
+            {
+                if (keyEnumerator.MoveNext())
+                {
+                    currentKey = keyEnumerator.Current;
+                    currentValue = adapter[currentKey];
+                    return true;
+                }
 
-				return false;
-			}
+                return false;
+            }
 
-			public void Reset()
-			{
-				keyEnumerator.Reset();
-			}
+            public void Reset()
+            {
+                keyEnumerator.Reset();
+            }
 
-			public object Current
-			{
-				get { return new KeyValuePair<string, object>(currentKey, currentValue); }
-			}
+            public object Current
+            {
+                get { return new KeyValuePair<string, object>(currentKey, currentValue); }
+            }
 
-			KeyValuePair<string, object> IEnumerator<KeyValuePair<string, object>>.Current
-			{
-				get { return new KeyValuePair<string, object>(currentKey, currentValue); }
-			}
+            KeyValuePair<string, object> IEnumerator<KeyValuePair<string, object>>.Current
+            {
+                get { return new KeyValuePair<string, object>(currentKey, currentValue); }
+            }
 
-			public void Dispose()
-			{
-				GC.SuppressFinalize(this);
-			}
-		}
-	}
+            public void Dispose()
+            {
+                GC.SuppressFinalize(this);
+            }
+        }
+    }
 }

@@ -14,91 +14,91 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 {
-	using System;
-	using System.Reflection;
-	using System.Reflection.Emit;
+    using System;
+    using System.Reflection;
+    using System.Reflection.Emit;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 
-	internal class ConstructorEmitter : IMemberEmitter
-	{
-		private readonly ConstructorBuilder builder;
-		private readonly CodeBuilder codeBuilder;
-		private readonly AbstractTypeEmitter mainType;
+    internal class ConstructorEmitter : IMemberEmitter
+    {
+        private readonly ConstructorBuilder builder;
+        private readonly CodeBuilder codeBuilder;
+        private readonly AbstractTypeEmitter mainType;
 
-		protected internal ConstructorEmitter(AbstractTypeEmitter mainType, ConstructorBuilder builder)
-		{
-			this.mainType = mainType;
-			this.builder = builder;
-			codeBuilder = new CodeBuilder();
-		}
+        protected internal ConstructorEmitter(AbstractTypeEmitter mainType, ConstructorBuilder builder)
+        {
+            this.mainType = mainType;
+            this.builder = builder;
+            codeBuilder = new CodeBuilder();
+        }
 
-		internal ConstructorEmitter(AbstractTypeEmitter mainType, params ArgumentReference[] arguments)
-		{
-			this.mainType = mainType;
+        internal ConstructorEmitter(AbstractTypeEmitter mainType, params ArgumentReference[] arguments)
+        {
+            this.mainType = mainType;
 
-			var args = ArgumentsUtil.InitializeAndConvert(arguments);
+            var args = ArgumentsUtil.InitializeAndConvert(arguments);
 
-			builder = mainType.TypeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, args);
-			codeBuilder = new CodeBuilder();
+            builder = mainType.TypeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, args);
+            codeBuilder = new CodeBuilder();
 
-			// if we don't copy the parameter attributes, the default binder will fail
-			// when trying to resolve constructors from the passed argument values.
-			for (int i = 0; i < args.Length; ++i)
-			{
-				var arg = arguments[i];
-				var paramBuilder = builder.DefineParameter(i + 1, arg.ParameterAttributes, "param" + i);
-				if (arg.DefaultValue != DBNull.Value)
-					paramBuilder.SetConstant(arg.DefaultValue);
-			}
-		}
+            // if we don't copy the parameter attributes, the default binder will fail
+            // when trying to resolve constructors from the passed argument values.
+            for (int i = 0; i < args.Length; ++i)
+            {
+                var arg = arguments[i];
+                var paramBuilder = builder.DefineParameter(i + 1, arg.ParameterAttributes, "param" + i);
+                if (arg.DefaultValue != DBNull.Value)
+                    paramBuilder.SetConstant(arg.DefaultValue);
+            }
+        }
 
-		public CodeBuilder CodeBuilder
-		{
-			get { return codeBuilder; }
-		}
+        public CodeBuilder CodeBuilder
+        {
+            get { return codeBuilder; }
+        }
 
-		public ConstructorBuilder ConstructorBuilder
-		{
-			get { return builder; }
-		}
+        public ConstructorBuilder ConstructorBuilder
+        {
+            get { return builder; }
+        }
 
-		public MemberInfo Member
-		{
-			get { return builder; }
-		}
+        public MemberInfo Member
+        {
+            get { return builder; }
+        }
 
-		public Type ReturnType
-		{
-			get { return typeof(void); }
-		}
+        public Type ReturnType
+        {
+            get { return typeof(void); }
+        }
 
-		private bool ImplementedByRuntime
-		{
-			get
-			{
-				var attributes = builder.MethodImplementationFlags;
-				return (attributes & MethodImplAttributes.Runtime) != 0;
-			}
-		}
+        private bool ImplementedByRuntime
+        {
+            get
+            {
+                var attributes = builder.MethodImplementationFlags;
+                return (attributes & MethodImplAttributes.Runtime) != 0;
+            }
+        }
 
-		public virtual void EnsureValidCodeBlock()
-		{
-			if (ImplementedByRuntime == false && CodeBuilder.IsEmpty)
-			{
-				CodeBuilder.AddStatement(new ConstructorInvocationStatement(mainType.BaseType));
-				CodeBuilder.AddStatement(new ReturnStatement());
-			}
-		}
+        public virtual void EnsureValidCodeBlock()
+        {
+            if (ImplementedByRuntime == false && CodeBuilder.IsEmpty)
+            {
+                CodeBuilder.AddStatement(new ConstructorInvocationStatement(mainType.BaseType));
+                CodeBuilder.AddStatement(new ReturnStatement());
+            }
+        }
 
-		public virtual void Generate()
-		{
-			if (ImplementedByRuntime)
-			{
-				return;
-			}
+        public virtual void Generate()
+        {
+            if (ImplementedByRuntime)
+            {
+                return;
+            }
 
-			CodeBuilder.Generate(builder.GetILGenerator());
-		}
-	}
+            CodeBuilder.Generate(builder.GetILGenerator());
+        }
+    }
 }

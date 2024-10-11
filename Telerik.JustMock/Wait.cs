@@ -22,35 +22,35 @@ using Telerik.JustMock.Expectations.Abstraction;
 
 namespace Telerik.JustMock
 {
-	/// <summary>
-	/// Specifies the duration to wait before executing an event.
-	/// </summary>
-	public static class Wait
-	{
-		/// <summary>
-		/// Specifies the number of seconds to wait for executing an event.
-		/// </summary>
-		/// <param name="seconds">Seconds to wait</param>
-		/// <returns>IWaitDuration type</returns>
-		public static IWaitDuration For(int seconds)
-		{
-			return ProfilerInterceptor.GuardInternal(() =>
-			{
-				return For(TimeSpan.FromSeconds(seconds));
-			});
-		}
+    /// <summary>
+    /// Specifies the duration to wait before executing an event.
+    /// </summary>
+    public static class Wait
+    {
+        /// <summary>
+        /// Specifies the number of seconds to wait for executing an event.
+        /// </summary>
+        /// <param name="seconds">Seconds to wait</param>
+        /// <returns>IWaitDuration type</returns>
+        public static IWaitDuration For(int seconds)
+        {
+            return ProfilerInterceptor.GuardInternal(() =>
+            {
+                return For(TimeSpan.FromSeconds(seconds));
+            });
+        }
 
-		/// <summary>
-		/// Specifies the number of seconds to wait for executing an event.
-		/// </summary>
-		/// <param name="duration">Time duration to wait</param>
-		/// <returns>IWaitDuration type</returns>
-		public static IWaitDuration For(TimeSpan duration)
-		{
-			return ProfilerInterceptor.GuardInternal(() =>
-			{
-				return new EventWaitDuration((int)duration.TotalMilliseconds);
-			});
-		}
-	}
+        /// <summary>
+        /// Specifies the number of seconds to wait for executing an event.
+        /// </summary>
+        /// <param name="duration">Time duration to wait</param>
+        /// <returns>IWaitDuration type</returns>
+        public static IWaitDuration For(TimeSpan duration)
+        {
+            return ProfilerInterceptor.GuardInternal(() =>
+            {
+                return new EventWaitDuration((int)duration.TotalMilliseconds);
+            });
+        }
+    }
 }

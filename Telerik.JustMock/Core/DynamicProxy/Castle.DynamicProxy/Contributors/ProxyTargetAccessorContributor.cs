@@ -14,61 +14,61 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 {
-	using System;
+    using System;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 
-	/// <summary>
-	///   Adds an implementation for <see cref="IProxyTargetAccessor"/> to the proxy type.
-	/// </summary>
-	internal sealed class ProxyTargetAccessorContributor : ITypeContributor
-	{
-		private readonly Func<Reference> getTargetReference;
-		private readonly Type targetType;
+    /// <summary>
+    ///   Adds an implementation for <see cref="IProxyTargetAccessor"/> to the proxy type.
+    /// </summary>
+    internal sealed class ProxyTargetAccessorContributor : ITypeContributor
+    {
+        private readonly Func<Reference> getTargetReference;
+        private readonly Type targetType;
 
-		public ProxyTargetAccessorContributor(Func<Reference> getTargetReference, Type targetType)
-		{
-			this.getTargetReference = getTargetReference;
-			this.targetType = targetType;
-		}
+        public ProxyTargetAccessorContributor(Func<Reference> getTargetReference, Type targetType)
+        {
+            this.getTargetReference = getTargetReference;
+            this.targetType = targetType;
+        }
 
-		public void CollectElementsToProxy(IProxyGenerationHook hook, MetaType model)
-		{
-		}
+        public void CollectElementsToProxy(IProxyGenerationHook hook, MetaType model)
+        {
+        }
 
-		public void Generate(ClassEmitter emitter)
-		{
-			var interceptorsField = emitter.GetField("__interceptors");
-			var targetReference = getTargetReference();
+        public void Generate(ClassEmitter emitter)
+        {
+            var interceptorsField = emitter.GetField("__interceptors");
+            var targetReference = getTargetReference();
 
-			var dynProxyGetTarget = emitter.CreateMethod(nameof(IProxyTargetAccessor.DynProxyGetTarget), typeof(object));
+            var dynProxyGetTarget = emitter.CreateMethod(nameof(IProxyTargetAccessor.DynProxyGetTarget), typeof(object));
 
-			dynProxyGetTarget.CodeBuilder.AddStatement(
-				new ReturnStatement(new ConvertExpression(typeof(object), targetType, targetReference)));
+            dynProxyGetTarget.CodeBuilder.AddStatement(
+                new ReturnStatement(new ConvertExpression(typeof(object), targetType, targetReference)));
 
-			var dynProxySetTarget = emitter.CreateMethod(nameof(IProxyTargetAccessor.DynProxySetTarget), typeof(void), typeof(object));
+            var dynProxySetTarget = emitter.CreateMethod(nameof(IProxyTargetAccessor.DynProxySetTarget), typeof(void), typeof(object));
 
-			// we can only change the target of the interface proxy
-			if (targetReference is FieldReference targetField)
-			{
-				dynProxySetTarget.CodeBuilder.AddStatement(
-					new AssignStatement(targetField,
-						new ConvertExpression(targetField.FieldBuilder.FieldType, dynProxySetTarget.Arguments[0])));
-			}
-			else
-			{
-				dynProxySetTarget.CodeBuilder.AddStatement(
-					new ThrowStatement(typeof(InvalidOperationException), "Cannot change the target of the class proxy."));
-			}
+            // we can only change the target of the interface proxy
+            if (targetReference is FieldReference targetField)
+            {
+                dynProxySetTarget.CodeBuilder.AddStatement(
+                    new AssignStatement(targetField,
+                        new ConvertExpression(targetField.FieldBuilder.FieldType, dynProxySetTarget.Arguments[0])));
+            }
+            else
+            {
+                dynProxySetTarget.CodeBuilder.AddStatement(
+                    new ThrowStatement(typeof(InvalidOperationException), "Cannot change the target of the class proxy."));
+            }
 
-			dynProxySetTarget.CodeBuilder.AddStatement(new ReturnStatement());
+            dynProxySetTarget.CodeBuilder.AddStatement(new ReturnStatement());
 
-			var getInterceptors = emitter.CreateMethod(nameof(IProxyTargetAccessor.GetInterceptors), typeof(IInterceptor[]));
+            var getInterceptors = emitter.CreateMethod(nameof(IProxyTargetAccessor.GetInterceptors), typeof(IInterceptor[]));
 
-			getInterceptors.CodeBuilder.AddStatement(
-				new ReturnStatement(interceptorsField));
-		}
-	}
+            getInterceptors.CodeBuilder.AddStatement(
+                new ReturnStatement(interceptorsField));
+        }
+    }
 }

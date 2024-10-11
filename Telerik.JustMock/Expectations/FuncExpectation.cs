@@ -23,70 +23,70 @@ using Telerik.JustMock.Expectations.Abstraction;
 
 namespace Telerik.JustMock.Expectations
 {
-	/// <summary>
-	/// Defines the expectation for a specific method.
-	/// </summary>
-	public partial class FuncExpectation<TReturn> : CollectionExpectation<TReturn>, IFunc<TReturn>, IIgnorable<FuncExpectation<TReturn>>
-	{
-		internal FuncExpectation() {}
-	   
-		/// <summary>
-		/// Defines the return value for a specific method expectation.
-		/// </summary>
-		/// <param name="value">any object value</param>
-		/// <returns></returns>
-		public IAssertable Returns(TReturn value)
-		{
-			return ProfilerInterceptor.GuardInternal(() =>
-				{
-					this.ProcessReturnsValue(value);
-					return this;
-				});
-		}
+    /// <summary>
+    /// Defines the expectation for a specific method.
+    /// </summary>
+    public partial class FuncExpectation<TReturn> : CollectionExpectation<TReturn>, IFunc<TReturn>, IIgnorable<FuncExpectation<TReturn>>
+    {
+        internal FuncExpectation() {}
+       
+        /// <summary>
+        /// Defines the return value for a specific method expectation.
+        /// </summary>
+        /// <param name="value">any object value</param>
+        /// <returns></returns>
+        public IAssertable Returns(TReturn value)
+        {
+            return ProfilerInterceptor.GuardInternal(() =>
+                {
+                    this.ProcessReturnsValue(value);
+                    return this;
+                });
+        }
 
-		/// <summary>
-		/// Specifies the delegate to evaluate and return for the expected method.
-		/// </summary>
-		/// <param name="delegate">Target delegate to evaluate.</param>
-		/// <returns>Reference to <see cref="IAssertable"/> interface</returns>
-		public IAssertable Returns(Delegate @delegate)
-		{
-			return ProfilerInterceptor.GuardInternal(() =>
-			{
-				this.ProcessDoInstead(@delegate ?? new Func<TReturn>(() => default(TReturn)), false);
-				return this;
-			});
-		}
+        /// <summary>
+        /// Specifies the delegate to evaluate and return for the expected method.
+        /// </summary>
+        /// <param name="delegate">Target delegate to evaluate.</param>
+        /// <returns>Reference to <see cref="IAssertable"/> interface</returns>
+        public IAssertable Returns(Delegate @delegate)
+        {
+            return ProfilerInterceptor.GuardInternal(() =>
+            {
+                this.ProcessDoInstead(@delegate ?? new Func<TReturn>(() => default(TReturn)), false);
+                return this;
+            });
+        }
 
-		/// <summary>
-		/// Specifies the function to evaluate and return.
-		/// </summary>
-		/// <param name="func">Target function to evaluate</param>
-		/// <returns>Reference to <see cref="IAssertable"/> interface</returns>
-		public IAssertable Returns(Func<TReturn> func)
-		{
-			return ProfilerInterceptor.GuardInternal(() =>
-				{
-					this.ProcessDoInstead(func ?? new Func<TReturn>(() => default(TReturn)), false);
-					return this;
-				});
-		}
+        /// <summary>
+        /// Specifies the function to evaluate and return.
+        /// </summary>
+        /// <param name="func">Target function to evaluate</param>
+        /// <returns>Reference to <see cref="IAssertable"/> interface</returns>
+        public IAssertable Returns(Func<TReturn> func)
+        {
+            return ProfilerInterceptor.GuardInternal(() =>
+                {
+                    this.ProcessDoInstead(func ?? new Func<TReturn>(() => default(TReturn)), false);
+                    return this;
+                });
+        }
 
-		/// <summary>
-		/// Specifies the delegate that will execute and return the value for the expected member.
-		/// </summary>
-		/// <returns>Reference to <see cref="IAssertable"/> interface.</returns>
-		public IAssertable Returns(Func<TReturn, TReturn> func)
-		{
-			return ProfilerInterceptor.GuardInternal(() =>
-				{
-					this.ProcessDoInstead(func, false);
-					return this;
-				});
-		}
+        /// <summary>
+        /// Specifies the delegate that will execute and return the value for the expected member.
+        /// </summary>
+        /// <returns>Reference to <see cref="IAssertable"/> interface.</returns>
+        public IAssertable Returns(Func<TReturn, TReturn> func)
+        {
+            return ProfilerInterceptor.GuardInternal(() =>
+                {
+                    this.ProcessDoInstead(func, false);
+                    return this;
+                });
+        }
 
 #if !PORTABLE
-		public delegate ref TReturn RefDelegate();
+        public delegate ref TReturn RefDelegate();
 #endif
     }
 }

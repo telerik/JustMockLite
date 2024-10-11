@@ -25,70 +25,70 @@ using Telerik.JustMock.Expectations.Abstraction;
 
 namespace Telerik.JustMock.Expectations
 {
-	/// <summary>
-	/// Defines expectation for a <see cref="IQueryable"/> collection.
-	/// </summary>
-	public class CollectionExpectation<TReturn> : CommonExpectation<FuncExpectation<TReturn>>, IReturnCollection
-	{
-		internal CollectionExpectation() { }
+    /// <summary>
+    /// Defines expectation for a <see cref="IQueryable"/> collection.
+    /// </summary>
+    public class CollectionExpectation<TReturn> : CommonExpectation<FuncExpectation<TReturn>>, IReturnCollection
+    {
+        internal CollectionExpectation() { }
 
 #if !LITE_EDITION
 
-		/// <summary>
-		/// Returns a enumerable collection for the target query.
-		/// </summary>
-		/// <typeparam name="TArg">Argument type</typeparam>
-		/// <param name="collection">Enumerable collection</param>
-		/// <returns>Instance of <see cref="IAssertable"/></returns>
-		public IAssertable ReturnsCollection<TArg>(IEnumerable<TArg> collection)
-		{
-			ProfilerInterceptor.GuardInternal(() => ProcessReturnsCollection(collection));
-			return this;
-		}
+        /// <summary>
+        /// Returns a enumerable collection for the target query.
+        /// </summary>
+        /// <typeparam name="TArg">Argument type</typeparam>
+        /// <param name="collection">Enumerable collection</param>
+        /// <returns>Instance of <see cref="IAssertable"/></returns>
+        public IAssertable ReturnsCollection<TArg>(IEnumerable<TArg> collection)
+        {
+            ProfilerInterceptor.GuardInternal(() => ProcessReturnsCollection(collection));
+            return this;
+        }
 #endif
 
-		/// <summary>
-		/// Implementation detail.
-		/// </summary>
-		/// <param name="value"></param>
-		protected void ProcessReturnsValue(TReturn value)
-		{
-			this.CheckConstructorArrangement();
+        /// <summary>
+        /// Implementation detail.
+        /// </summary>
+        /// <param name="value"></param>
+        protected void ProcessReturnsValue(TReturn value)
+        {
+            this.CheckConstructorArrangement();
 
-			this.ProcessDoInstead(new Func<TReturn>(() => value), false);
+            this.ProcessDoInstead(new Func<TReturn>(() => value), false);
 
-			if ((object)value != null)
-			{
-				var mock = MocksRepository.GetMockMixin(value, typeof(TReturn));
-				if (mock != null && this.Mock != null)
-					this.Mock.DependentMocks.Add(value);
-			}
-		}
+            if ((object)value != null)
+            {
+                var mock = MocksRepository.GetMockMixin(value, typeof(TReturn));
+                if (mock != null && this.Mock != null)
+                    this.Mock.DependentMocks.Add(value);
+            }
+        }
 
-		private void ProcessReturnsCollection(IEnumerable collection)
-		{
-			this.CheckConstructorArrangement();
+        private void ProcessReturnsCollection(IEnumerable collection)
+        {
+            this.CheckConstructorArrangement();
 
-			var mock = (IMethodMock)this;
-			mock.Behaviors.Add(new MockCollectionBehavior(typeof(TReturn), mock.Repository, collection));
-		}
+            var mock = (IMethodMock)this;
+            mock.Behaviors.Add(new MockCollectionBehavior(typeof(TReturn), mock.Repository, collection));
+        }
 
-		private void CheckConstructorArrangement()
-		{
-			var mock = (IMethodMock)this;
-			var method = mock.CallPattern.Method;
-			if (!method.IsConstructor)
-				return;
+        private void CheckConstructorArrangement()
+        {
+            var mock = (IMethodMock)this;
+            var method = mock.CallPattern.Method;
+            if (!method.IsConstructor)
+                return;
 
-			if (method.GetParameters().Any(p => p.ParameterType == typeof(IntPtr)))
-			{
-				throw new MockException("Arranging the return value of a constructor that has an IntPtr argument is not supported.");
-			}
+            if (method.GetParameters().Any(p => p.ParameterType == typeof(IntPtr)))
+            {
+                throw new MockException("Arranging the return value of a constructor that has an IntPtr argument is not supported.");
+            }
 
-			if (method.DeclaringType.IsValueType)
-			{
-				throw new MockException("Arranging the return value of a constructor call is not supported for value types.");
-			}
-		}
-	}
+            if (method.DeclaringType.IsValueType)
+            {
+                throw new MockException("Arranging the return value of a constructor call is not supported for value types.");
+            }
+        }
+    }
 }

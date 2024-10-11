@@ -19,12 +19,12 @@ using Telerik.Sitefinity.Web.UI.Fields.Contracts;
 
 namespace Telerik.Sitefinity.Web.UI.Fields.Config
 {
-	public abstract class FieldControlDefinitionElement : FieldDefinitionElement, IFieldControlDefinition
-	{
-		public string ID
-		{
-			get;
-			set;
-		}
-	}
+    public abstract class FieldControlDefinitionElement : FieldDefinitionElement, IFieldControlDefinition
+    {
+        public string ID
+        {
+            get;
+            set;
+        }
+    }
 }

@@ -14,10 +14,10 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 {
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
 
-	internal interface IGenerator<T>
-	{
-		T Generate(ClassEmitter @class, INamingScope namingScope);
-	}
+    internal interface IGenerator<T>
+    {
+        T Generate(ClassEmitter @class, INamingScope namingScope);
+    }
 }

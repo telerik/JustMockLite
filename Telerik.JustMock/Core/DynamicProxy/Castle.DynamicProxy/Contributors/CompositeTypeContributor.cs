@@ -14,171 +14,171 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Diagnostics;
-	using System.Reflection;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Reflection;
 
-	using Telerik.JustMock.Core.Castle.Core.Logging;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
+    using Telerik.JustMock.Core.Castle.Core.Logging;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
 
-	internal abstract class CompositeTypeContributor : ITypeContributor
-	{
-		protected readonly INamingScope namingScope;
+    internal abstract class CompositeTypeContributor : ITypeContributor
+    {
+        protected readonly INamingScope namingScope;
 
-		protected readonly ICollection<Type> interfaces = new HashSet<Type>();
-		
-		private ILogger logger = NullLogger.Instance;
-		private readonly List<MetaProperty> properties = new List<MetaProperty>();
-		private readonly List<MetaEvent> events = new List<MetaEvent>();
-		private readonly List<MetaMethod> methods = new List<MetaMethod>();
+        protected readonly ICollection<Type> interfaces = new HashSet<Type>();
 
-		protected CompositeTypeContributor(INamingScope namingScope)
-		{
-			this.namingScope = namingScope;
-		}
+        private ILogger logger = NullLogger.Instance;
+        private readonly List<MetaProperty> properties = new List<MetaProperty>();
+        private readonly List<MetaEvent> events = new List<MetaEvent>();
+        private readonly List<MetaMethod> methods = new List<MetaMethod>();
 
-		public ILogger Logger
-		{
-			get { return logger; }
-			set { logger = value; }
-		}
+        protected CompositeTypeContributor(INamingScope namingScope)
+        {
+            this.namingScope = namingScope;
+        }
 
-		public void CollectElementsToProxy(IProxyGenerationHook hook, MetaType model)
-		{
-			Debug.Assert(hook != null);
-			Debug.Assert(model != null);
+        public ILogger Logger
+        {
+            get { return logger; }
+            set { logger = value; }
+        }
 
-			var sink = new MembersCollectorSink(model, this);
+        public void CollectElementsToProxy(IProxyGenerationHook hook, MetaType model)
+        {
+            Debug.Assert(hook != null);
+            Debug.Assert(model != null);
 
-			foreach (var collector in GetCollectors())
-			{
-				collector.CollectMembersToProxy(hook, sink);
-			}
-		}
+            var sink = new MembersCollectorSink(model, this);
 
-		protected abstract IEnumerable<MembersCollector> GetCollectors();
+            foreach (var collector in GetCollectors())
+            {
+                collector.CollectMembersToProxy(hook, sink);
+            }
+        }
 
-		public virtual void Generate(ClassEmitter @class)
-		{
-			foreach (var method in methods)
-			{
-				if (!method.Standalone)
-				{
-					continue;
-				}
+        protected abstract IEnumerable<MembersCollector> GetCollectors();
 
-				ImplementMethod(method,
-				                @class,
-				                @class.CreateMethod);
-			}
+        public virtual void Generate(ClassEmitter @class)
+        {
+            foreach (var method in methods)
+            {
+                if (!method.Standalone)
+                {
+                    continue;
+                }
 
-			foreach (var property in properties)
-			{
-				ImplementProperty(@class, property);
-			}
+                ImplementMethod(method,
+                                @class,
+                                @class.CreateMethod);
+            }
 
-			foreach (var @event in events)
-			{
-				ImplementEvent(@class, @event);
-			}
-		}
+            foreach (var property in properties)
+            {
+                ImplementProperty(@class, property);
+            }
 
-		public void AddInterfaceToProxy(Type @interface)
-		{
-			Debug.Assert(@interface != null, "@interface == null", "Shouldn't be adding empty interfaces...");
-			Debug.Assert(@interface.IsInterface || @interface.IsDelegateType(), "@interface.IsInterface || @interface.IsDelegateType()", "Should be adding interfaces or delegate types only...");
-			Debug.Assert(!interfaces.Contains(@interface), "!interfaces.ContainsKey(@interface)",
-			             "Shouldn't be adding same interface twice...");
+            foreach (var @event in events)
+            {
+                ImplementEvent(@class, @event);
+            }
+        }
 
-			interfaces.Add(@interface);
-		}
+        public void AddInterfaceToProxy(Type @interface)
+        {
+            Debug.Assert(@interface != null, "@interface == null", "Shouldn't be adding empty interfaces...");
+            Debug.Assert(@interface.IsInterface || @interface.IsDelegateType(), "@interface.IsInterface || @interface.IsDelegateType()", "Should be adding interfaces or delegate types only...");
+            Debug.Assert(!interfaces.Contains(@interface), "!interfaces.ContainsKey(@interface)",
+                         "Shouldn't be adding same interface twice...");
 
-		private void ImplementEvent(ClassEmitter emitter, MetaEvent @event)
-		{
-			@event.BuildEventEmitter(emitter);
-			ImplementMethod(@event.Adder, emitter, @event.Emitter.CreateAddMethod);
-			ImplementMethod(@event.Remover, emitter, @event.Emitter.CreateRemoveMethod);
-		}
+            interfaces.Add(@interface);
+        }
 
-		private void ImplementProperty(ClassEmitter emitter, MetaProperty property)
-		{
-			property.BuildPropertyEmitter(emitter);
-			if (property.CanRead)
-			{
-				ImplementMethod(property.Getter, emitter, property.Emitter.CreateGetMethod);
-			}
+        private void ImplementEvent(ClassEmitter emitter, MetaEvent @event)
+        {
+            @event.BuildEventEmitter(emitter);
+            ImplementMethod(@event.Adder, emitter, @event.Emitter.CreateAddMethod);
+            ImplementMethod(@event.Remover, emitter, @event.Emitter.CreateRemoveMethod);
+        }
 
-			if (property.CanWrite)
-			{
-				ImplementMethod(property.Setter, emitter, property.Emitter.CreateSetMethod);
-			}
-		}
+        private void ImplementProperty(ClassEmitter emitter, MetaProperty property)
+        {
+            property.BuildPropertyEmitter(emitter);
+            if (property.CanRead)
+            {
+                ImplementMethod(property.Getter, emitter, property.Emitter.CreateGetMethod);
+            }
 
-		protected abstract MethodGenerator GetMethodGenerator(MetaMethod method, ClassEmitter @class,
-		                                                      OverrideMethodDelegate overrideMethod);
+            if (property.CanWrite)
+            {
+                ImplementMethod(property.Setter, emitter, property.Emitter.CreateSetMethod);
+            }
+        }
 
-		private void ImplementMethod(MetaMethod method, ClassEmitter @class,
-		                             OverrideMethodDelegate overrideMethod)
-		{
-			{
-				var generator = GetMethodGenerator(method, @class, overrideMethod);
-				if (generator == null)
-				{
-					return;
-				}
-				var proxyMethod = generator.Generate(@class, namingScope);
-				foreach (var attribute in method.Method.GetNonInheritableAttributes())
-				{
-					proxyMethod.DefineCustomAttribute(attribute.Builder);
-				}
-			}
-		}
+        protected abstract MethodGenerator GetMethodGenerator(MetaMethod method, ClassEmitter @class,
+                                                              OverrideMethodDelegate overrideMethod);
 
-		private sealed class MembersCollectorSink : IMembersCollectorSink
-		{
-			private readonly MetaType model;
-			private readonly CompositeTypeContributor contributor;
+        private void ImplementMethod(MetaMethod method, ClassEmitter @class,
+                                     OverrideMethodDelegate overrideMethod)
+        {
+            {
+                var generator = GetMethodGenerator(method, @class, overrideMethod);
+                if (generator == null)
+                {
+                    return;
+                }
+                var proxyMethod = generator.Generate(@class, namingScope);
+                foreach (var attribute in method.Method.GetNonInheritableAttributes())
+                {
+                    proxyMethod.DefineCustomAttribute(attribute.Builder);
+                }
+            }
+        }
 
-			public MembersCollectorSink(MetaType model, CompositeTypeContributor contributor)
-			{
-				this.model = model;
-				this.contributor = contributor;
-			}
+        private sealed class MembersCollectorSink : IMembersCollectorSink
+        {
+            private readonly MetaType model;
+            private readonly CompositeTypeContributor contributor;
 
-			// You may have noticed that most contributors do not query `MetaType` at all,
-			// but only their own collections. So perhaps you are wondering why collected
-			// type elements are added to `model` at all, and not just to `contributor`?
-			//
-			// TL;DR: This prevents member name collisions in the generated proxy type.
-			//
-			// `MetaType` uses `MetaTypeElementCollection`s internally, which switches members
-			// to explicit implementation whenever a name collision with a previously added
-			// member occurs.
-			//
-			// It would be pointless to do this at the level of the individual contributor,
-			// because name collisions could still occur across several contributors. This
-			// is why they all share the same `MetaType` instance.
+            public MembersCollectorSink(MetaType model, CompositeTypeContributor contributor)
+            {
+                this.model = model;
+                this.contributor = contributor;
+            }
 
-			public void Add(MetaEvent @event)
-			{
-				model.AddEvent(@event);
-				contributor.events.Add(@event);
-			}
+            // You may have noticed that most contributors do not query `MetaType` at all,
+            // but only their own collections. So perhaps you are wondering why collected
+            // type elements are added to `model` at all, and not just to `contributor`?
+            //
+            // TL;DR: This prevents member name collisions in the generated proxy type.
+            //
+            // `MetaType` uses `MetaTypeElementCollection`s internally, which switches members
+            // to explicit implementation whenever a name collision with a previously added
+            // member occurs.
+            //
+            // It would be pointless to do this at the level of the individual contributor,
+            // because name collisions could still occur across several contributors. This
+            // is why they all share the same `MetaType` instance.
 
-			public void Add(MetaMethod method)
-			{
-				model.AddMethod(method);
-				contributor.methods.Add(method);
-			}
+            public void Add(MetaEvent @event)
+            {
+                model.AddEvent(@event);
+                contributor.events.Add(@event);
+            }
 
-			public void Add(MetaProperty property)
-			{
-				model.AddProperty(property);
-				contributor.properties.Add(property);
-			}
-		}
-	}
+            public void Add(MetaMethod method)
+            {
+                model.AddMethod(method);
+                contributor.methods.Add(method);
+            }
+
+            public void Add(MetaProperty property)
+            {
+                model.AddProperty(property);
+                contributor.properties.Add(property);
+            }
+        }
+    }
 }

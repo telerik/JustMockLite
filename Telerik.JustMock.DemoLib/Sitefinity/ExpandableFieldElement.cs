@@ -20,22 +20,22 @@ using Telerik.Sitefinity.Web.UI.Fields.Contracts;
 
 namespace Telerik.Sitefinity
 {
-	public class ExpandableFieldElement : FieldControlDefinitionElement, IExpandableFieldDefinition
-	{
-		public IChoiceFieldDefinition ExpandFieldDefinition
-		{
-			get { return null; }
-		}
-	}
+    public class ExpandableFieldElement : FieldControlDefinitionElement, IExpandableFieldDefinition
+    {
+        public IChoiceFieldDefinition ExpandFieldDefinition
+        {
+            get { return null; }
+        }
+    }
 
-	public interface IExpandableFieldDefinition : IFieldControlDefinition
-	{
-		/// <summary>
-		/// Gets the definition for the control that when clicked expands the hidden part of the whole 
-		/// control.
-		/// </summary>
-		/// <value>The expand control.</value>
-		IChoiceFieldDefinition ExpandFieldDefinition { get; }
-	}
+    public interface IExpandableFieldDefinition : IFieldControlDefinition
+    {
+        /// <summary>
+        /// Gets the definition for the control that when clicked expands the hidden part of the whole 
+        /// control.
+        /// </summary>
+        /// <value>The expand control.</value>
+        IChoiceFieldDefinition ExpandFieldDefinition { get; }
+    }
 
 }

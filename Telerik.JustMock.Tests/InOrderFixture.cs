@@ -46,142 +46,142 @@ using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFa
 
 namespace Telerik.JustMock.Tests
 {
-	[TestClass]
-	public class InOrderFixture
-	{
-		[TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
-		public void ShouldAssertCallMadeInOrderTheySetup()
-		{
-			var foo = Mock.Create<IFoo>();
+    [TestClass]
+    public class InOrderFixture
+    {
+        [TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
+        public void ShouldAssertCallMadeInOrderTheySetup()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			Mock.Arrange(() => foo.Save()).InOrder();
-			Mock.Arrange(() => foo.Update()).InOrder();
-			Mock.Arrange(() => foo.CommitChanges()).InOrder();
+            Mock.Arrange(() => foo.Save()).InOrder();
+            Mock.Arrange(() => foo.Update()).InOrder();
+            Mock.Arrange(() => foo.CommitChanges()).InOrder();
 
-			foo.Save();
-			foo.Update();
-			foo.CommitChanges();
+            foo.Save();
+            foo.Update();
+            foo.CommitChanges();
 
-			Mock.Assert(foo);
-		}
+            Mock.Assert(foo);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
-		public void ShouldThrowCallMadeInDifferentOrderFromSetup()
-		{
-			var foo = Mock.Create<IFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
+        public void ShouldThrowCallMadeInDifferentOrderFromSetup()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			Mock.Arrange(() => foo.Save()).InOrder();
-			Mock.Arrange(() => foo.Update()).InOrder();
-			Mock.Arrange(() => foo.CommitChanges()).InOrder();
+            Mock.Arrange(() => foo.Save()).InOrder();
+            Mock.Arrange(() => foo.Update()).InOrder();
+            Mock.Arrange(() => foo.CommitChanges()).InOrder();
 
-			Assert.Throws<AssertionException>(() => foo.Update());
-		}
+            Assert.Throws<AssertionException>(() => foo.Update());
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
-		public void ShouldThrowNotEveryMethodCalledInSetupOrder()
-		{
-			var foo = Mock.Create<IFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
+        public void ShouldThrowNotEveryMethodCalledInSetupOrder()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			Mock.Arrange(() => foo.Save()).InOrder();
-			Mock.Arrange(() => foo.Update()).InOrder();
-			Mock.Arrange(() => foo.CommitChanges()).InOrder();
+            Mock.Arrange(() => foo.Save()).InOrder();
+            Mock.Arrange(() => foo.Update()).InOrder();
+            Mock.Arrange(() => foo.CommitChanges()).InOrder();
 
-			foo.Save();
-			Assert.Throws<AssertionException>(() => foo.CommitChanges());
-		}
+            foo.Save();
+            Assert.Throws<AssertionException>(() => foo.CommitChanges());
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
-		public void ShouldThrowNotEveryMethodCalledInSetupOrderOnAssert()
-		{
-			var foo = Mock.Create<IFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
+        public void ShouldThrowNotEveryMethodCalledInSetupOrderOnAssert()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			Mock.Arrange(() => foo.Save()).InOrder();
-			Mock.Arrange(() => foo.Update()).InOrder();
-			Mock.Arrange(() => foo.CommitChanges()).InOrder();
+            Mock.Arrange(() => foo.Save()).InOrder();
+            Mock.Arrange(() => foo.Update()).InOrder();
+            Mock.Arrange(() => foo.CommitChanges()).InOrder();
 
-			foo.Save();
-			foo.Update();
-			Assert.Throws<AssertionException>(() => Mock.Assert(foo));
-		}
+            foo.Save();
+            foo.Update();
+            Assert.Throws<AssertionException>(() => Mock.Assert(foo));
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
-		public void ShouldAsserInOrderExecutionForPropertySet()
-		{
-			var foo = Mock.Create<IFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
+        public void ShouldAsserInOrderExecutionForPropertySet()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			Mock.ArrangeSet<IFoo>(() => foo.Value = 10).InOrder();
-			Mock.ArrangeSet<IFoo>(() => foo.Value = 11).InOrder();
+            Mock.ArrangeSet<IFoo>(() => foo.Value = 10).InOrder();
+            Mock.ArrangeSet<IFoo>(() => foo.Value = 11).InOrder();
 
-			foo.Value = 10;
-			foo.Value = 11;
+            foo.Value = 10;
+            foo.Value = 11;
 
-			Mock.Assert(foo);
-		}
+            Mock.Assert(foo);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
-		public void ShouldAssertOrderFlowWhenCombinedWithOcurrences()
-		{
-			var foo = Mock.Create<IFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
+        public void ShouldAssertOrderFlowWhenCombinedWithOcurrences()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			Mock.Arrange(() => foo.Save()).InOrder().OccursOnce();
-			Mock.Arrange(() => foo.Update()).InOrder().OccursOnce();
+            Mock.Arrange(() => foo.Save()).InOrder().OccursOnce();
+            Mock.Arrange(() => foo.Update()).InOrder().OccursOnce();
 
-			Assert.Throws<AssertionException>(() => foo.Update());
-		}
+            Assert.Throws<AssertionException>(() => foo.Update());
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
-		public void ShouldAssertOrderFlowWhenCombinedWithOcurrencesOnAssert()
-		{
-			var foo = Mock.Create<IFoo>();
+        [TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
+        public void ShouldAssertOrderFlowWhenCombinedWithOcurrencesOnAssert()
+        {
+            var foo = Mock.Create<IFoo>();
 
-			Mock.Arrange(() => foo.Save()).InOrder().OccursOnce();
-			Mock.Arrange(() => foo.Update()).InOrder().OccursOnce();
+            Mock.Arrange(() => foo.Save()).InOrder().OccursOnce();
+            Mock.Arrange(() => foo.Update()).InOrder().OccursOnce();
 
-			foo.Save();
+            foo.Save();
 
-			Assert.Throws<AssertionException>(() => Mock.Assert(foo));
-		}
+            Assert.Throws<AssertionException>(() => Mock.Assert(foo));
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
-		public void ShouldAssertInOrderForDifferentInstancesInTestMethodScope()
-		{
-			string userName = "Bob";
-			string password = "Password";
-			int userID = 5;
-			var cart = new List<string> { "Foo", "Bar" };
+        [TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
+        public void ShouldAssertInOrderForDifferentInstancesInTestMethodScope()
+        {
+            string userName = "Bob";
+            string password = "Password";
+            int userID = 5;
+            var cart = new List<string> { "Foo", "Bar" };
 
-			var userServiceMock = Mock.Create<IUserValidationService>();
-			var shoppingCartServiceMock = Mock.Create<IShoppingCartService>();
+            var userServiceMock = Mock.Create<IUserValidationService>();
+            var shoppingCartServiceMock = Mock.Create<IShoppingCartService>();
 
-			Mock.Arrange(() => userServiceMock.ValidateUser(userName, password)).Returns(userID).InOrder().OccursOnce();
-			Mock.Arrange(() => shoppingCartServiceMock.LoadCart(userID)).Returns(cart).InOrder().Occurs(1);
+            Mock.Arrange(() => userServiceMock.ValidateUser(userName, password)).Returns(userID).InOrder().OccursOnce();
+            Mock.Arrange(() => shoppingCartServiceMock.LoadCart(userID)).Returns(cart).InOrder().Occurs(1);
 
-			Assert.Throws<AssertionException>(() => shoppingCartServiceMock.LoadCart(userID));
-			Assert.Throws<AssertionException>(() => userServiceMock.ValidateUser(userName, password));
-		}
+            Assert.Throws<AssertionException>(() => shoppingCartServiceMock.LoadCart(userID));
+            Assert.Throws<AssertionException>(() => userServiceMock.ValidateUser(userName, password));
+        }
 
-		public interface IUserValidationService
-		{
-			int ValidateUser(string userName, string password);
-		}
+        public interface IUserValidationService
+        {
+            int ValidateUser(string userName, string password);
+        }
 
-		public interface IShoppingCartService
-		{
-			IList<string> LoadCart(int userID);
-		}
+        public interface IShoppingCartService
+        {
+            IList<string> LoadCart(int userID);
+        }
 
-		public interface IFoo
-		{
-			int Value { get; set; }
-			void Update();
-			void Save();
-			void CommitChanges();
-		}
+        public interface IFoo
+        {
+            int Value { get; set; }
+            void Update();
+            void Save();
+            void CommitChanges();
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
-		public void ShouldCreateInOrderArrangementOnNonMock()
-		{
-			Mock.Arrange(() => Arg.IsAny<List<string>>().Add("a")).InOrder();
-		}
-	}
+        [TestMethod, TestCategory("Lite"), TestCategory("InOrder")]
+        public void ShouldCreateInOrderArrangementOnNonMock()
+        {
+            Mock.Arrange(() => Arg.IsAny<List<string>>().Add("a")).InOrder();
+        }
+    }
 }

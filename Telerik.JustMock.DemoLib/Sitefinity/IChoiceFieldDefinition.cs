@@ -20,16 +20,16 @@ using Telerik.Sitefinity.Web.UI.Fields.Config;
 
 namespace Telerik.Sitefinity.Web.UI.Fields.Contracts
 {
-	public interface IChoiceFieldDefinition : IFieldControlDefinition
-	{
-		/// <summary>
-		/// Gets a collection of <see cref="IChoiceDefinition"/> objects, representing the choices
-		/// that the control ought to render.
-		/// </summary>
-		List<IChoiceDefinition> Choices { get; }
-	}
+    public interface IChoiceFieldDefinition : IFieldControlDefinition
+    {
+        /// <summary>
+        /// Gets a collection of <see cref="IChoiceDefinition"/> objects, representing the choices
+        /// that the control ought to render.
+        /// </summary>
+        List<IChoiceDefinition> Choices { get; }
+    }
 
-	public interface IChoiceDefinition : IDefinition
-	{
-	}
+    public interface IChoiceDefinition : IDefinition
+    {
+    }
 }

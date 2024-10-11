@@ -14,39 +14,39 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 {
-	using System;
-	using System.Reflection;
+    using System;
+    using System.Reflection;
 
-	public abstract class InheritanceInvocation : AbstractInvocation
-	{
-		private readonly Type targetType;
+    public abstract class InheritanceInvocation : AbstractInvocation
+    {
+        private readonly Type targetType;
 
-		protected InheritanceInvocation(
-			Type targetType,
-			object proxy,
-			IInterceptor[] interceptors,
-			MethodInfo proxiedMethod,
-			object[] arguments)
-			: base(proxy, interceptors, proxiedMethod, arguments)
-		{
-			this.targetType = targetType;
-		}
+        protected InheritanceInvocation(
+            Type targetType,
+            object proxy,
+            IInterceptor[] interceptors,
+            MethodInfo proxiedMethod,
+            object[] arguments)
+            : base(proxy, interceptors, proxiedMethod, arguments)
+        {
+            this.targetType = targetType;
+        }
 
-		public override object InvocationTarget
-		{
-			get { return Proxy; }
-		}
+        public override object InvocationTarget
+        {
+            get { return Proxy; }
+        }
 
-		public override MethodInfo MethodInvocationTarget
-		{
-			get { return InvocationHelper.GetMethodOnType(targetType, Method); }
-		}
+        public override MethodInfo MethodInvocationTarget
+        {
+            get { return InvocationHelper.GetMethodOnType(targetType, Method); }
+        }
 
-		public override Type TargetType
-		{
-			get { return targetType; }
-		}
+        public override Type TargetType
+        {
+            get { return targetType; }
+        }
 
-		protected abstract override void InvokeMethodOnTarget();
-	}
+        protected abstract override void InvokeMethodOnTarget();
+    }
 }

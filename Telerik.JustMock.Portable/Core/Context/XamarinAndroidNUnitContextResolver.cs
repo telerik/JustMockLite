@@ -19,24 +19,24 @@ using System;
 
 namespace Telerik.JustMock.Core.Context
 {
-	internal class XamarinAndroidNUnitContextResolver : HierarchicalTestFrameworkContextResolver
-	{
-		private const string NunitAssertionExceptionName = "NUnit.Framework.AssertionException, Xamarin.Android.NUnitLite";
+    internal class XamarinAndroidNUnitContextResolver : HierarchicalTestFrameworkContextResolver
+    {
+        private const string NunitAssertionExceptionName = "NUnit.Framework.AssertionException, Xamarin.Android.NUnitLite";
 
-		public XamarinAndroidNUnitContextResolver()
-			: base(NunitAssertionExceptionName)
-		{
-			this.SetupStandardHierarchicalTestStructure(
-				new[] { "NUnit.Framework.TestAttribute, Xamarin.Android.NUnitLite" },
-				new[] { "NUnit.Framework.SetUpAttribute, Xamarin.Android.NUnitLite", "NUnit.Framework.TearDownAttribute, Xamarin.Android.NUnitLite" },
-				new[] { "NUnit.Framework.TestFixtureSetUpAttribute, Xamarin.Android.NUnitLite", "NUnit.Framework.TestFixtureTearDownAttribute, Xamarin.Android.NUnitLite" },
-				null,
-				FixtureConstuctorSemantics.InstanceConstructorCalledOncePerFixture);
-		}
+        public XamarinAndroidNUnitContextResolver()
+            : base(NunitAssertionExceptionName)
+        {
+            this.SetupStandardHierarchicalTestStructure(
+                new[] { "NUnit.Framework.TestAttribute, Xamarin.Android.NUnitLite" },
+                new[] { "NUnit.Framework.SetUpAttribute, Xamarin.Android.NUnitLite", "NUnit.Framework.TearDownAttribute, Xamarin.Android.NUnitLite" },
+                new[] { "NUnit.Framework.TestFixtureSetUpAttribute, Xamarin.Android.NUnitLite", "NUnit.Framework.TestFixtureTearDownAttribute, Xamarin.Android.NUnitLite" },
+                null,
+                FixtureConstuctorSemantics.InstanceConstructorCalledOncePerFixture);
+        }
 
-		public static bool IsAvailable
-		{
-			get { return Type.GetType(NunitAssertionExceptionName) != null; }
-		}
-	}
+        public static bool IsAvailable
+        {
+            get { return Type.GetType(NunitAssertionExceptionName) != null; }
+        }
+    }
 }

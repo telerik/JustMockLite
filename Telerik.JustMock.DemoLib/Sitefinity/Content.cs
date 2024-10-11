@@ -20,19 +20,19 @@ using Telerik.Sitefinity.Model;
 
 namespace Telerik.Sitefinity.GenericContent.Model
 {
-	public abstract class Content
-		: IContent
-		, IHasTrackingContext
-	{
-		ITrackingContext IHasTrackingContext.TrackingContext
-		{
-			get { return new TrackingContext(); }
-		}
+    public abstract class Content
+        : IContent
+        , IHasTrackingContext
+    {
+        ITrackingContext IHasTrackingContext.TrackingContext
+        {
+            get { return new TrackingContext(); }
+        }
 
-		public DateTime DateCreated
-		{
-			get;
-			set;
-		}
-	}
+        public DateTime DateCreated
+        {
+            get;
+            set;
+        }
+    }
 }

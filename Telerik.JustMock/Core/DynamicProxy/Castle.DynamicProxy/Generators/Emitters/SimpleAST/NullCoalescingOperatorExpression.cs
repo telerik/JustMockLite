@@ -14,39 +14,39 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST
 {
-	using System;
-	using System.Reflection.Emit;
+    using System;
+    using System.Reflection.Emit;
 
-	internal class NullCoalescingOperatorExpression : IExpression
-	{
-		private readonly IExpression @default;
-		private readonly IExpression expression;
+    internal class NullCoalescingOperatorExpression : IExpression
+    {
+        private readonly IExpression @default;
+        private readonly IExpression expression;
 
-		public NullCoalescingOperatorExpression(IExpression expression, IExpression @default)
-		{
-			if (expression == null)
-			{
-				throw new ArgumentNullException(nameof(expression));
-			}
+        public NullCoalescingOperatorExpression(IExpression expression, IExpression @default)
+        {
+            if (expression == null)
+            {
+                throw new ArgumentNullException(nameof(expression));
+            }
 
-			if (@default == null)
-			{
-				throw new ArgumentNullException(nameof(@default));
-			}
+            if (@default == null)
+            {
+                throw new ArgumentNullException(nameof(@default));
+            }
 
-			this.expression = expression;
-			this.@default = @default;
-		}
+            this.expression = expression;
+            this.@default = @default;
+        }
 
-		public void Emit(ILGenerator gen)
-		{
-			expression.Emit(gen);
-			gen.Emit(OpCodes.Dup);
-			var label = gen.DefineLabel();
-			gen.Emit(OpCodes.Brtrue_S, label);
-			gen.Emit(OpCodes.Pop);
-			@default.Emit(gen);
-			gen.MarkLabel(label);
-		}
-	}
+        public void Emit(ILGenerator gen)
+        {
+            expression.Emit(gen);
+            gen.Emit(OpCodes.Dup);
+            var label = gen.DefineLabel();
+            gen.Emit(OpCodes.Brtrue_S, label);
+            gen.Emit(OpCodes.Pop);
+            @default.Emit(gen);
+            gen.MarkLabel(label);
+        }
+    }
 }

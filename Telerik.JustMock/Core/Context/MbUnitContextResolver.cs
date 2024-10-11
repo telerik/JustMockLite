@@ -19,26 +19,26 @@ using System;
 
 namespace Telerik.JustMock.Core.Context
 {
-	internal class MbUnitContextResolver : HierarchicalTestFrameworkContextResolver
-	{
-		private const string MbUnitTestFixtureAttributeName = "MbUnit.FrameworkTestFixtureAttribute, mbunit";
-		private const string GalioAssertionFailedName = "Gallio.Framework.Assertions.AssertionException, gallio";
+    internal class MbUnitContextResolver : HierarchicalTestFrameworkContextResolver
+    {
+        private const string MbUnitTestFixtureAttributeName = "MbUnit.FrameworkTestFixtureAttribute, mbunit";
+        private const string GalioAssertionFailedName = "Gallio.Framework.Assertions.AssertionException, gallio";
 
-		public MbUnitContextResolver()
-			: base(GalioAssertionFailedName)
-		{
-			SetupStandardHierarchicalTestStructure(
-				new[] { "Gallio.Framework.Pattern.TestMethodPatternAttribute, gallio" },
-				new[] { "MbUnit.Framework.SetUpAttribute, mbunit", "MbUnit.Framework.TearDownAttribute, mbunit" },
-				new[] { "MbUnit.Framework.FixtureSetUpAttribute, mbunit", "MbUnit.Framework.FixtureTearDownAttribute, mbunit" },
-				null,
-				FixtureConstuctorSemantics.InstanceConstructorCalledOncePerFixture);
-		}
+        public MbUnitContextResolver()
+            : base(GalioAssertionFailedName)
+        {
+            SetupStandardHierarchicalTestStructure(
+                new[] { "Gallio.Framework.Pattern.TestMethodPatternAttribute, gallio" },
+                new[] { "MbUnit.Framework.SetUpAttribute, mbunit", "MbUnit.Framework.TearDownAttribute, mbunit" },
+                new[] { "MbUnit.Framework.FixtureSetUpAttribute, mbunit", "MbUnit.Framework.FixtureTearDownAttribute, mbunit" },
+                null,
+                FixtureConstuctorSemantics.InstanceConstructorCalledOncePerFixture);
+        }
 
-		public static bool IsAvailable
-		{
-			get { return FindType(MbUnitTestFixtureAttributeName, false) != null
-					&& FindType(GalioAssertionFailedName, false) != null; }
-		}
-	}
+        public static bool IsAvailable
+        {
+            get { return FindType(MbUnitTestFixtureAttributeName, false) != null
+                    && FindType(GalioAssertionFailedName, false) != null; }
+        }
+    }
 }

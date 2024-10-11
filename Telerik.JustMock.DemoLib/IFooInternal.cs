@@ -18,8 +18,8 @@
 
 namespace Telerik.JustMock.DemoLib
 {
-	internal interface IFooInternal
-	{
-		int Echo(int arg);
-	}
+    internal interface IFooInternal
+    {
+        int Echo(int arg);
+    }
 }

@@ -26,93 +26,93 @@ using Telerik.JustMock.Core;
 
 namespace Telerik.JustMock.Setup
 {
-	internal class FluentConfig<T> : FluentConfig, IFluentConfig<T>
-	{
-		private readonly List<Type> implementedInterfaces = new List<Type>();
+    internal class FluentConfig<T> : FluentConfig, IFluentConfig<T>
+    {
+        private readonly List<Type> implementedInterfaces = new List<Type>();
 
-		public IFluentConfig<T> Implements<TInterface>()
-		{
-			implementedInterfaces.Add(typeof(TInterface));
-			return this;
-		}
+        public IFluentConfig<T> Implements<TInterface>()
+        {
+            implementedInterfaces.Add(typeof(TInterface));
+            return this;
+        }
 
-		public IFluentConfig<T> CallConstructor(Expression<Func<T>> expression)
-		{
-			if (mockConstructor == true)
-			{
-				throw new MockException("The constructor is already configured to be mocked. Remove the previous call to MockConstructor() if you want to call a constructor.");
-			}
+        public IFluentConfig<T> CallConstructor(Expression<Func<T>> expression)
+        {
+            if (mockConstructor == true)
+            {
+                throw new MockException("The constructor is already configured to be mocked. Remove the previous call to MockConstructor() if you want to call a constructor.");
+            }
 
-			this.arguments = expression.GetArgumentsFromConstructorExpression();
-			return this;
-		}
+            this.arguments = expression.GetArgumentsFromConstructorExpression();
+            return this;
+        }
 
-		public override object CreateMock(Type mockType, MocksRepository repository)
-		{
-			MockCreationSettings settings = MockCreationSettings.GetSettings(this.arguments, this.behavior, this.implementedInterfaces.ToArray(),
-				this.mockConstructor, this.additionalProxyTypeAttributes, null, null, null, this.interceptorFilter);
+        public override object CreateMock(Type mockType, MocksRepository repository)
+        {
+            MockCreationSettings settings = MockCreationSettings.GetSettings(this.arguments, this.behavior, this.implementedInterfaces.ToArray(),
+                this.mockConstructor, this.additionalProxyTypeAttributes, null, null, null, this.interceptorFilter);
 
-			return repository.Create(mockType, settings);
-		}
-	}
+            return repository.Create(mockType, settings);
+        }
+    }
 
-	internal class FluentConfig : IFluentConfig
-	{
-		protected Behavior? behavior;
-		protected bool? mockConstructor;
-		protected List<CustomAttributeBuilder> additionalProxyTypeAttributes;
-		protected Expression<Predicate<MethodInfo>> interceptorFilter;
-		protected object[] arguments;
+    internal class FluentConfig : IFluentConfig
+    {
+        protected Behavior? behavior;
+        protected bool? mockConstructor;
+        protected List<CustomAttributeBuilder> additionalProxyTypeAttributes;
+        protected Expression<Predicate<MethodInfo>> interceptorFilter;
+        protected object[] arguments;
 
-		public IFluentConfig AddAttributeToProxy(CustomAttributeBuilder attributeBuilder)
-		{
-			if (additionalProxyTypeAttributes == null)
-				additionalProxyTypeAttributes = new List<CustomAttributeBuilder>();
-			additionalProxyTypeAttributes.Add(attributeBuilder);
-			return this;
-		}
+        public IFluentConfig AddAttributeToProxy(CustomAttributeBuilder attributeBuilder)
+        {
+            if (additionalProxyTypeAttributes == null)
+                additionalProxyTypeAttributes = new List<CustomAttributeBuilder>();
+            additionalProxyTypeAttributes.Add(attributeBuilder);
+            return this;
+        }
 
-		public IFluentConfig SetBehavior(Behavior behavior)
-		{
-			this.behavior = behavior;
-			return this;
-		}
+        public IFluentConfig SetBehavior(Behavior behavior)
+        {
+            this.behavior = behavior;
+            return this;
+        }
 
-		public IFluentConfig MockConstructor()
-		{
-			if (mockConstructor.HasValue && mockConstructor == false)
-			{
-				throw new MockException("A constructor is already configured to be called. Remove the previous call to CallConstructor() if you want to mock the constructor.");
-			}
+        public IFluentConfig MockConstructor()
+        {
+            if (mockConstructor.HasValue && mockConstructor == false)
+            {
+                throw new MockException("A constructor is already configured to be called. Remove the previous call to CallConstructor() if you want to mock the constructor.");
+            }
 
-			this.mockConstructor = true;
-			return this;
-		}
+            this.mockConstructor = true;
+            return this;
+        }
 
-		public virtual object CreateMock(Type mockType, MocksRepository repository)
-		{
-			MockCreationSettings settings = MockCreationSettings.GetSettings(this.arguments, this.behavior, null, this.mockConstructor,
-				this.additionalProxyTypeAttributes, null, null, null, this.interceptorFilter);
+        public virtual object CreateMock(Type mockType, MocksRepository repository)
+        {
+            MockCreationSettings settings = MockCreationSettings.GetSettings(this.arguments, this.behavior, null, this.mockConstructor,
+                this.additionalProxyTypeAttributes, null, null, null, this.interceptorFilter);
 
-			return repository.Create(mockType, settings);
-		}
+            return repository.Create(mockType, settings);
+        }
 
-		public IFluentConfig SetInterceptorFilter(Expression<Predicate<MethodInfo>> filter)
-		{
-			this.interceptorFilter = filter;
-			return this;
-		}
+        public IFluentConfig SetInterceptorFilter(Expression<Predicate<MethodInfo>> filter)
+        {
+            this.interceptorFilter = filter;
+            return this;
+        }
 
-		public IFluentConfig CallConstructor(object[] args)
-		{
-			if (mockConstructor.HasValue && mockConstructor == true)
-			{
-				throw new MockException("The constructor is already configured to be mocked. Remove the previous call to MockConstructor() if you want to call a constructor.");
-			}
+        public IFluentConfig CallConstructor(object[] args)
+        {
+            if (mockConstructor.HasValue && mockConstructor == true)
+            {
+                throw new MockException("The constructor is already configured to be mocked. Remove the previous call to MockConstructor() if you want to call a constructor.");
+            }
 
-			this.mockConstructor = false;
-			this.arguments = args;
-			return this;
-		}
-	}
+            this.mockConstructor = false;
+            this.arguments = args;
+            return this;
+        }
+    }
 }

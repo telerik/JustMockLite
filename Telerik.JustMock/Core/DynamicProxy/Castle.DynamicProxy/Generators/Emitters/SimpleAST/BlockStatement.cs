@@ -14,24 +14,24 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST
 {
-	using System.Collections.Generic;
-	using System.Reflection.Emit;
+    using System.Collections.Generic;
+    using System.Reflection.Emit;
 
-	internal class BlockStatement : IStatement
-	{
-		private readonly List<IStatement> statements = new List<IStatement>();
+    internal class BlockStatement : IStatement
+    {
+        private readonly List<IStatement> statements = new List<IStatement>();
 
-		public void AddStatement(IStatement statement)
-		{
-			statements.Add(statement);
-		}
+        public void AddStatement(IStatement statement)
+        {
+            statements.Add(statement);
+        }
 
-		public void Emit(ILGenerator gen)
-		{
-			foreach (var s in statements)
-			{
-				s.Emit(gen);
-			}
-		}
-	}
+        public void Emit(ILGenerator gen)
+        {
+            foreach (var s in statements)
+            {
+                s.Emit(gen);
+            }
+        }
+    }
 }

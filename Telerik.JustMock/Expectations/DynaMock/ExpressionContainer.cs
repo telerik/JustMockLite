@@ -21,20 +21,20 @@ using Telerik.JustMock.Expectations.Abstraction;
 
 namespace Telerik.JustMock.Expectations.DynaMock
 {
-	internal sealed class ExpressionContainer : IDynamicMetaObjectProvider, IExpressionContainer
-	{
-		public Expression Expression { get; set; }
+    internal sealed class ExpressionContainer : IDynamicMetaObjectProvider, IExpressionContainer
+    {
+        public Expression Expression { get; set; }
 
-		public bool IsStatic { get; set; }
+        public bool IsStatic { get; set; }
 
-		public ExpressionContainer(Expression expression)
-		{
-			this.Expression = expression;
-		}
+        public ExpressionContainer(Expression expression)
+        {
+            this.Expression = expression;
+        }
 
-		DynamicMetaObject IDynamicMetaObjectProvider.GetMetaObject(Expression parameter)
-		{
-			return new ExpressionRecorder(parameter, BindingRestrictions.Empty, this);
-		}
-	}
+        DynamicMetaObject IDynamicMetaObjectProvider.GetMetaObject(Expression parameter)
+        {
+            return new ExpressionRecorder(parameter, BindingRestrictions.Empty, this);
+        }
+    }
 }

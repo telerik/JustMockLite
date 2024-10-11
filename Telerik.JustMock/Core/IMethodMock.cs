@@ -21,17 +21,17 @@ using Telerik.JustMock.Core.Behaviors;
 
 namespace Telerik.JustMock.Core
 {
-	internal interface IMethodMock
-	{
-		MocksRepository Repository { get; set; }
-		IMockMixin Mock { get; set; }
-		CallPattern CallPattern { get; set; }
-		ICollection<IBehavior> Behaviors { get; }
-		InvocationOccurrenceBehavior OccurencesBehavior { get; }
-		string ArrangementExpression { get; set; }
-		bool IsSequential { get; set; }
-		bool IsInOrder { get; set; }
-		bool IsUsed { get; set; }
-		ImplementationOverrideBehavior AcceptCondition { get; set; }
-	}
+    internal interface IMethodMock
+    {
+        MocksRepository Repository { get; set; }
+        IMockMixin Mock { get; set; }
+        CallPattern CallPattern { get; set; }
+        ICollection<IBehavior> Behaviors { get; }
+        InvocationOccurrenceBehavior OccurencesBehavior { get; }
+        string ArrangementExpression { get; set; }
+        bool IsSequential { get; set; }
+        bool IsInOrder { get; set; }
+        bool IsUsed { get; set; }
+        ImplementationOverrideBehavior AcceptCondition { get; set; }
+    }
 }

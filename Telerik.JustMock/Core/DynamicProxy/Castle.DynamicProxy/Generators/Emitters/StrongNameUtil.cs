@@ -14,48 +14,48 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System.Reflection;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
 
-	internal static class StrongNameUtil
-	{
-		private static readonly IDictionary<Assembly, bool> signedAssemblyCache = new Dictionary<Assembly, bool>();
-		private static readonly object lockObject = new object();
+    internal static class StrongNameUtil
+    {
+        private static readonly IDictionary<Assembly, bool> signedAssemblyCache = new Dictionary<Assembly, bool>();
+        private static readonly object lockObject = new object();
 
-		public static bool IsAssemblySigned(this Assembly assembly)
-		{
-			lock (lockObject)
-			{
-				if (signedAssemblyCache.TryGetValue(assembly, out var isSigned) == false)
-				{
-					isSigned = assembly.ContainsPublicKey();
-					signedAssemblyCache.Add(assembly, isSigned);
-				}
-				return isSigned;
-			}
-		}
+        public static bool IsAssemblySigned(this Assembly assembly)
+        {
+            lock (lockObject)
+            {
+                if (signedAssemblyCache.TryGetValue(assembly, out var isSigned) == false)
+                {
+                    isSigned = assembly.ContainsPublicKey();
+                    signedAssemblyCache.Add(assembly, isSigned);
+                }
+                return isSigned;
+            }
+        }
 
-		private static bool ContainsPublicKey(this Assembly assembly)
-		{
-			// Pulled from a comment on http://www.flawlesscode.com/post/2008/08/Mocking-and-IOC-in-Silverlight-2-Castle-Project-and-Moq-ports.aspx
-			return assembly.FullName != null && !assembly.FullName.Contains("PublicKeyToken=null");
-		}
+        private static bool ContainsPublicKey(this Assembly assembly)
+        {
+            // Pulled from a comment on http://www.flawlesscode.com/post/2008/08/Mocking-and-IOC-in-Silverlight-2-Castle-Project-and-Moq-ports.aspx
+            return assembly.FullName != null && !assembly.FullName.Contains("PublicKeyToken=null");
+        }
 
-		public static bool IsAnyTypeFromUnsignedAssembly(IEnumerable<Type> types)
-		{
-			return types.Any(t => t.Assembly.IsAssemblySigned() == false);
-		}
+        public static bool IsAnyTypeFromUnsignedAssembly(IEnumerable<Type> types)
+        {
+            return types.Any(t => t.Assembly.IsAssemblySigned() == false);
+        }
 
-		public static bool IsAnyTypeFromUnsignedAssembly(Type baseType, IEnumerable<Type> interfaces)
-		{
-			if (baseType != null && baseType.Assembly.IsAssemblySigned() == false)
-			{
-				return true;
-			}
+        public static bool IsAnyTypeFromUnsignedAssembly(Type baseType, IEnumerable<Type> interfaces)
+        {
+            if (baseType != null && baseType.Assembly.IsAssemblySigned() == false)
+            {
+                return true;
+            }
 
-			return IsAnyTypeFromUnsignedAssembly(interfaces);
-		}
-	}
+            return IsAnyTypeFromUnsignedAssembly(interfaces);
+        }
+    }
 }

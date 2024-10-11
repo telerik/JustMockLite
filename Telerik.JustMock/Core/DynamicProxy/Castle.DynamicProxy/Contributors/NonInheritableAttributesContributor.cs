@@ -14,34 +14,34 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 {
-	using System;
+    using System;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
 
-	/// <summary>
-	///   Reproduces the proxied type's non-inheritable custom attributes on the proxy type.
-	/// </summary>
-	internal sealed class NonInheritableAttributesContributor : ITypeContributor
-	{
-		private readonly Type targetType;
+    /// <summary>
+    ///   Reproduces the proxied type's non-inheritable custom attributes on the proxy type.
+    /// </summary>
+    internal sealed class NonInheritableAttributesContributor : ITypeContributor
+    {
+        private readonly Type targetType;
 
-		public NonInheritableAttributesContributor(Type targetType)
-		{
-			this.targetType = targetType;
-		}
+        public NonInheritableAttributesContributor(Type targetType)
+        {
+            this.targetType = targetType;
+        }
 
-		public void Generate(ClassEmitter emitter)
-		{
-			foreach (var attribute in targetType.GetNonInheritableAttributes())
-			{
-				emitter.DefineCustomAttribute(attribute.Builder);
-			}
-		}
+        public void Generate(ClassEmitter emitter)
+        {
+            foreach (var attribute in targetType.GetNonInheritableAttributes())
+            {
+                emitter.DefineCustomAttribute(attribute.Builder);
+            }
+        }
 
-		public void CollectElementsToProxy(IProxyGenerationHook hook, MetaType model)
-		{
-		}
-	}
+        public void CollectElementsToProxy(IProxyGenerationHook hook, MetaType model)
+        {
+        }
+    }
 }

@@ -14,45 +14,45 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Configuration
 {
-	using System;
-	using System.Collections.Generic;
+    using System;
+    using System.Collections.Generic;
 
-	/// <summary>
-	/// A collection of <see cref="IConfiguration"/> objects.
-	/// </summary>
+    /// <summary>
+    /// A collection of <see cref="IConfiguration"/> objects.
+    /// </summary>
 #if FEATURE_SERIALIZATION
-	[Serializable]
+    [Serializable]
 #endif
-	internal class ConfigurationCollection : List<IConfiguration>
-	{
-		/// <summary>
-		/// Creates a new instance of <c>ConfigurationCollection</c>.
-		/// </summary>
-		public ConfigurationCollection()
-		{
-		}
+    internal class ConfigurationCollection : List<IConfiguration>
+    {
+        /// <summary>
+        /// Creates a new instance of <c>ConfigurationCollection</c>.
+        /// </summary>
+        public ConfigurationCollection()
+        {
+        }
 
-		/// <summary>
-		/// Creates a new instance of <c>ConfigurationCollection</c>.
-		/// </summary>
-		public ConfigurationCollection(IEnumerable<IConfiguration> value) : base(value)
-		{
-		}
+        /// <summary>
+        /// Creates a new instance of <c>ConfigurationCollection</c>.
+        /// </summary>
+        public ConfigurationCollection(IEnumerable<IConfiguration> value) : base(value)
+        {
+        }
 
-		public IConfiguration this[string name]
-		{
-			get
-			{
-				foreach(IConfiguration config in this)
-				{
-					if (name.Equals(config.Name))
-					{
-						return config;
-					}
-				}
+        public IConfiguration this[string name]
+        {
+            get
+            {
+                foreach(IConfiguration config in this)
+                {
+                    if (name.Equals(config.Name))
+                    {
+                        return config;
+                    }
+                }
 
-				return null;
-			}
-		}
-	}
+                return null;
+            }
+        }
+    }
 }

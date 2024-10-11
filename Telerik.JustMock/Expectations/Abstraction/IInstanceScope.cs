@@ -17,14 +17,14 @@
 
 namespace Telerik.JustMock.Expectations.Abstraction
 {
-	/// <summary>
-	/// Specifies instance scope for the expectation.
-	/// </summary>
-	public interface IInstanceScope<TContainer>
-	{
-		/// <summary>
-		/// Defines that the expectation should occur for all instance.
-		/// </summary>
-		TContainer IgnoreInstance();
-	}
+    /// <summary>
+    /// Specifies instance scope for the expectation.
+    /// </summary>
+    public interface IInstanceScope<TContainer>
+    {
+        /// <summary>
+        /// Defines that the expectation should occur for all instance.
+        /// </summary>
+        TContainer IgnoreInstance();
+    }
 }

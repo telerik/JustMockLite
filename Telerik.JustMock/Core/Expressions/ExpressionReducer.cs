@@ -22,75 +22,75 @@ using System.Linq.Expressions;
 
 namespace Telerik.JustMock.Core.Expressions
 {
-	internal class ExpressionReducer : ExpressionVisitor
-	{
-		public static Expression Reduce(Expression expression)
-		{
-			var depAnalyzer = new ParameterDependencyAnalyzer();
-			depAnalyzer.Visit(expression);
+    internal class ExpressionReducer : ExpressionVisitor
+    {
+        public static Expression Reduce(Expression expression)
+        {
+            var depAnalyzer = new ParameterDependencyAnalyzer();
+            depAnalyzer.Visit(expression);
 
-			var reducer = new ExpressionReducer(depAnalyzer.DependentExpressions);
-			return reducer.Visit(expression);
-		}
+            var reducer = new ExpressionReducer(depAnalyzer.DependentExpressions);
+            return reducer.Visit(expression);
+        }
 
-		private readonly HashSet<Expression> dependentExpressions;
+        private readonly HashSet<Expression> dependentExpressions;
 
-		private ExpressionReducer(HashSet<Expression> dependentExpressions)
-		{
-			this.dependentExpressions = dependentExpressions;
-		}
+        private ExpressionReducer(HashSet<Expression> dependentExpressions)
+        {
+            this.dependentExpressions = dependentExpressions;
+        }
 
-		public override Expression Visit(Expression exp)
-		{
-			if (exp != null && !this.dependentExpressions.Contains(exp) && !(exp is LambdaExpression))
-			{
-				return Expression.Constant(exp.EvaluateExpression());
-			}
-			else
-			{
-				return base.Visit(exp);
-			}
-		}
+        public override Expression Visit(Expression exp)
+        {
+            if (exp != null && !this.dependentExpressions.Contains(exp) && !(exp is LambdaExpression))
+            {
+                return Expression.Constant(exp.EvaluateExpression());
+            }
+            else
+            {
+                return base.Visit(exp);
+            }
+        }
 
-		private class ParameterDependencyAnalyzer : ExpressionVisitor
-		{
-			public readonly HashSet<Expression> DependentExpressions = new HashSet<Expression>();
+        private class ParameterDependencyAnalyzer : ExpressionVisitor
+        {
+            public readonly HashSet<Expression> DependentExpressions = new HashSet<Expression>();
 
-			private readonly Stack<bool> walkStack = new Stack<bool>();
+            private readonly Stack<bool> walkStack = new Stack<bool>();
 
-			public override Expression Visit(Expression exp)
-			{
-				if (exp == null)
-					return null;
+            public override Expression Visit(Expression exp)
+            {
+                if (exp == null)
+                    return null;
 
-				if (exp is ParameterExpression)
-				{
-					DependentExpressions.Add(exp);
-					walkStack.Push(true);
-					return exp;
-				}
+                if (exp is ParameterExpression)
+                {
+                    DependentExpressions.Add(exp);
+                    walkStack.Push(true);
+                    return exp;
+                }
 
-				walkStack.Push(false);
+                walkStack.Push(false);
 
-				var count = walkStack.Count;
-				var ret = base.Visit(exp);
+                var count = walkStack.Count;
+                var ret = base.Visit(exp);
 
-				if (count < walkStack.Count)
-				{
-					bool isDependent = false;
-					while (walkStack.Count > count)
-						isDependent = walkStack.Pop() || isDependent;
+                if (count < walkStack.Count)
+                {
+                    bool isDependent = false;
+                    while (walkStack.Count > count)
+                        isDependent = walkStack.Pop() || isDependent;
 
-					if (isDependent)
-					{
-						DependentExpressions.Add(exp);
-						walkStack.Pop();
-						walkStack.Push(true);
-					}
-				}
+                    if (isDependent)
+                    {
+                        DependentExpressions.Add(exp);
+                        walkStack.Pop();
+                        walkStack.Push(true);
+                    }
+                }
 
-				return ret;
-			}
-		}
-	}
+                return ret;
+            }
+        }
+    }
 }

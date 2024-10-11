@@ -19,8 +19,8 @@ using System;
 
 namespace Telerik.JustMock.Core.MatcherTree
 {
-	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-	internal sealed class OutArgAttribute : ArgMatcherAttribute
-	{
-	}
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
+    internal sealed class OutArgAttribute : ArgMatcherAttribute
+    {
+    }
 }

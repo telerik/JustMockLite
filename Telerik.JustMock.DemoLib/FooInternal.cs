@@ -19,11 +19,11 @@ using System;
 
 namespace Telerik.JustMock.DemoLib
 {
-	internal class FooInternal
-	{
-		internal virtual int Echo(int arg)
-		{
-			throw new NotImplementedException();
-		}
-	}
+    internal class FooInternal
+    {
+        internal virtual int Echo(int arg)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

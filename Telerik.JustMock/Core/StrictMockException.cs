@@ -20,14 +20,14 @@ using System.Reflection;
 
 namespace Telerik.JustMock.Core
 {
-	/// <summary>
-	/// Thrown when a strict mock is accessed inappropriately.
-	/// </summary>
-	public sealed class StrictMockException : MockException
-	{
-		internal StrictMockException(string strictnessViolationMessage)
-			: base(strictnessViolationMessage.Trim())
-		{
-		}
-	}
+    /// <summary>
+    /// Thrown when a strict mock is accessed inappropriately.
+    /// </summary>
+    public sealed class StrictMockException : MockException
+    {
+        internal StrictMockException(string strictnessViolationMessage)
+            : base(strictnessViolationMessage.Trim())
+        {
+        }
+    }
 }

@@ -14,17 +14,17 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 {
-	using System;
-	using System.Reflection;
+    using System;
+    using System.Reflection;
 
-	internal interface IMemberEmitter
-	{
-		MemberInfo Member { get; }
+    internal interface IMemberEmitter
+    {
+        MemberInfo Member { get; }
 
-		Type ReturnType { get; }
+        Type ReturnType { get; }
 
-		void EnsureValidCodeBlock();
+        void EnsureValidCodeBlock();
 
-		void Generate();
-	}
+        void Generate();
+    }
 }

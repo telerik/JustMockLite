@@ -20,16 +20,16 @@ using System.Reflection;
 
 namespace Telerik.JustMock.Core.Behaviors
 {
-	internal class StaticConstructorMockBehavior : IBehavior
-	{
-		public void Process(Invocation invocation)
-		{
-			var method = invocation.Method;
-			if (method is ConstructorInfo && method.IsPrivate && method.IsStatic)
-			{
-				var mixin = invocation.MockMixin;
-				invocation.CallOriginal = mixin == null || !mixin.IsStaticConstructorMocked;
-			}
-		}
-	}
+    internal class StaticConstructorMockBehavior : IBehavior
+    {
+        public void Process(Invocation invocation)
+        {
+            var method = invocation.Method;
+            if (method is ConstructorInfo && method.IsPrivate && method.IsStatic)
+            {
+                var mixin = invocation.MockMixin;
+                invocation.CallOriginal = mixin == null || !mixin.IsStaticConstructorMocked;
+            }
+        }
+    }
 }

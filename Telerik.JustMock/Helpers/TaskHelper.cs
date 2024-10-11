@@ -22,12 +22,12 @@ using Telerik.JustMock.Expectations.Abstraction;
 
 namespace Telerik.JustMock
 {
-	public static class TaskHelper
-	{
+    public static class TaskHelper
+    {
         [Obsolete("This method is obsolete. Use ReturnAsync instead.", false)]
         public static IAssertable TaskResult<T>(this IFunc<Task<T>> expectation, T result)
-		{
-			return ProfilerInterceptor.GuardInternal(() => expectation.Returns(MockingUtil.TaskFromResult(result)));
-		}
-	}
+        {
+            return ProfilerInterceptor.GuardInternal(() => expectation.Returns(MockingUtil.TaskFromResult(result)));
+        }
+    }
 }

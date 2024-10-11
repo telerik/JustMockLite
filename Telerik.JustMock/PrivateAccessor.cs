@@ -608,7 +608,7 @@ namespace Telerik.JustMock
         private static bool CheckReflectionPermission()
         {
 #if (COREFX)
-			return false;
+            return false;
 #else
             try
             {

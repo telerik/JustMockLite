@@ -14,35 +14,35 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
-	using System;
-	using System.IO;
-	using System.Text;
+    using System;
+    using System.IO;
+    using System.Text;
 
-	/// <summary>
-	/// Adapts a static string content as an <see cref="IResource"/>
-	/// </summary>
-	internal class StaticContentResource : AbstractResource
-	{
-		private readonly string contents;
+    /// <summary>
+    /// Adapts a static string content as an <see cref="IResource"/>
+    /// </summary>
+    internal class StaticContentResource : AbstractResource
+    {
+        private readonly string contents;
 
-		public StaticContentResource(string contents)
-		{
-			this.contents = contents;
-		}
+        public StaticContentResource(string contents)
+        {
+            this.contents = contents;
+        }
 
-		public override TextReader GetStreamReader()
-		{
-			return new StringReader(contents);
-		}
+        public override TextReader GetStreamReader()
+        {
+            return new StringReader(contents);
+        }
 
-		public override TextReader GetStreamReader(Encoding encoding)
-		{
-			throw new NotImplementedException();
-		}
+        public override TextReader GetStreamReader(Encoding encoding)
+        {
+            throw new NotImplementedException();
+        }
 
-		public override IResource CreateRelative(string relativePath)
-		{
-			throw new NotImplementedException();
-		}
-	}
+        public override IResource CreateRelative(string relativePath)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

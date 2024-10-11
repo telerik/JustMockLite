@@ -19,15 +19,15 @@ using System;
 
 namespace Telerik.JustMock.Expectations.Abstraction
 {
-	/// <summary>
-	/// Defines an operation that marks a expectation as must.
-	/// </summary>
-	public interface IMustBeCalled
-	{
-		/// <summary>
-		/// Specifies that the mock call should be invoked to pass <see cref="Mock.Assert{T}(T)"/>
-		/// </summary>
-		/// <returns>Disposable object that can be used to disable this arrangement.</returns>
-		IDisposable MustBeCalled(string message = null);
-	}
+    /// <summary>
+    /// Defines an operation that marks a expectation as must.
+    /// </summary>
+    public interface IMustBeCalled
+    {
+        /// <summary>
+        /// Specifies that the mock call should be invoked to pass <see cref="Mock.Assert{T}(T)"/>
+        /// </summary>
+        /// <returns>Disposable object that can be used to disable this arrangement.</returns>
+        IDisposable MustBeCalled(string message = null);
+    }
 }

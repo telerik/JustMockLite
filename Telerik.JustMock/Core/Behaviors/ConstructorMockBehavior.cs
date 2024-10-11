@@ -21,35 +21,35 @@ using Telerik.JustMock.Core.MatcherTree;
 
 namespace Telerik.JustMock.Core.Behaviors
 {
-	internal sealed class ConstructorMockBehavior : IBehavior
-	{
-		public void Process(Invocation invocation)
-		{
-			var mockMixin = invocation.MockMixin;
-			if (mockMixin == null)
-			{
+    internal sealed class ConstructorMockBehavior : IBehavior
+    {
+        public void Process(Invocation invocation)
+        {
+            var mockMixin = invocation.MockMixin;
+            if (mockMixin == null)
+            {
                 MockCreationSettings settings = MockCreationSettings.GetSettings(Behavior.CallOriginal);
                 mockMixin = invocation.Repository.CreateExternalMockMixin(null, invocation.Instance, settings);
-				mockMixin.IsInstanceConstructorMocked = true;
-			}
+                mockMixin.IsInstanceConstructorMocked = true;
+            }
 
-			invocation.CallOriginal = !mockMixin.IsInstanceConstructorMocked;
-		}
+            invocation.CallOriginal = !mockMixin.IsInstanceConstructorMocked;
+        }
 
-		public static void Attach(IMethodMock methodMock)
-		{
-			var callPattern = methodMock.CallPattern;
-			if (!(callPattern.Method is ConstructorInfo)
-				|| callPattern.Method.IsStatic
-				|| !(callPattern.InstanceMatcher is AnyMatcher)
-				|| typeof(string) == callPattern.Method.DeclaringType
+        public static void Attach(IMethodMock methodMock)
+        {
+            var callPattern = methodMock.CallPattern;
+            if (!(callPattern.Method is ConstructorInfo)
+                || callPattern.Method.IsStatic
+                || !(callPattern.InstanceMatcher is AnyMatcher)
+                || typeof(string) == callPattern.Method.DeclaringType
 #if !COREFX
-				|| typeof(ContextBoundObject).IsAssignableFrom(callPattern.Method.DeclaringType)
+                || typeof(ContextBoundObject).IsAssignableFrom(callPattern.Method.DeclaringType)
 #endif
-				)
-				return;
+                )
+                return;
 
-			methodMock.Behaviors.Add(new ConstructorMockBehavior());
-		}
-	}
+            methodMock.Behaviors.Add(new ConstructorMockBehavior());
+        }
+    }
 }

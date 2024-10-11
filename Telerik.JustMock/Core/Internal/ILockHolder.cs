@@ -17,10 +17,10 @@
 
 namespace Telerik.JustMock.Core.Internal
 {
-	using System;
+    using System;
 
-	internal interface ILockHolder:IDisposable
-	{
-		bool LockAcquired { get; }
-	}
+    internal interface ILockHolder:IDisposable
+    {
+        bool LockAcquired { get; }
+    }
 }

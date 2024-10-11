@@ -21,11 +21,11 @@ using System.Linq;
 
 namespace Telerik.JustMock.Core.MatcherTree
 {
-	internal interface IMatcherTreeNode
-	{
-		IMatcherTreeNode Parent { get; set; }
-		IMatcher Matcher { get; set; }
-		List<IMatcherTreeNode> Children { get;}
-		IMatcherTreeNode Clone();
-	}
+    internal interface IMatcherTreeNode
+    {
+        IMatcherTreeNode Parent { get; set; }
+        IMatcher Matcher { get; set; }
+        List<IMatcherTreeNode> Children { get;}
+        IMatcherTreeNode Clone();
+    }
 }
