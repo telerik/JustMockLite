@@ -18,7 +18,7 @@
 
 namespace Telerik.JustMock.DemoLib.Objects
 {
-	public class Configuration
-	{
-	}
+    public class Configuration
+    {
+    }
 }

@@ -19,7 +19,7 @@ using Telerik.Sitefinity.GenericContent.Model;
 
 namespace Telerik.Sitefinity.News.Model
 {
-	public class NewsItem : Content
-	{
-	}
+    public class NewsItem : Content
+    {
+    }
 }

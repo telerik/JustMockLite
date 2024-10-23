@@ -6,7 +6,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-	 http://www.apache.org/licenses/LICENSE-2.0
+     http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -53,534 +53,534 @@ using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFa
 
 namespace Telerik.JustMock.Tests
 {
-	[TestClass]
-	public class NinjectAutoMockFixture
-	{
-		public interface IFileSystem
-		{
-			void Refresh();
-			bool Exists(string file);
-		}
+    [TestClass]
+    public class NinjectAutoMockFixture
+    {
+        public interface IFileSystem
+        {
+            void Refresh();
+            bool Exists(string file);
+        }
 
-		public interface ICalendar
-		{
-			DateTime Now { get; }
-		}
+        public interface ICalendar
+        {
+            DateTime Now { get; }
+        }
 
-		public class FileLog
-		{
-			private readonly IFileSystem fs;
-			private readonly ICalendar calendar;
+        public class FileLog
+        {
+            private readonly IFileSystem fs;
+            private readonly ICalendar calendar;
 
-			public FileLog(IFileSystem fs, ICalendar calendar)
-			{
-				this.fs = fs;
-				this.calendar = calendar;
-			}
+            public FileLog(IFileSystem fs, ICalendar calendar)
+            {
+                this.fs = fs;
+                this.calendar = calendar;
+            }
 
-			public bool LogExists()
-			{
-				fs.Refresh();
-				return fs.Exists(calendar.Now.Ticks.ToString());
-			}
-		}
+            public bool LogExists()
+            {
+                fs.Refresh();
+                return fs.Exists(calendar.Now.Ticks.ToString());
+            }
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
-		public void ShouldCreateMocksOfDependencies()
-		{
-			var container = new MockingContainer<FileLog>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+        public void ShouldCreateMocksOfDependencies()
+        {
+            var container = new MockingContainer<FileLog>();
 
-			container.Arrange<IFileSystem>(x => x.Exists("123")).Returns(true);
-			container.Arrange<ICalendar>(x => x.Now).Returns(new DateTime(123));
+            container.Arrange<IFileSystem>(x => x.Exists("123")).Returns(true);
+            container.Arrange<ICalendar>(x => x.Now).Returns(new DateTime(123));
 
-			Assert.True(container.Instance.LogExists());
-		}
+            Assert.True(container.Instance.LogExists());
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
-		public void ShouldAssertArrangedExpectations()
-		{
-			var container = new MockingContainer<FileLog>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+        public void ShouldAssertArrangedExpectations()
+        {
+            var container = new MockingContainer<FileLog>();
 
-			container.Arrange<IFileSystem>(x => x.Refresh()).MustBeCalled();
-			container.Arrange<IFileSystem>(x => x.Exists("123")).Returns(true).MustBeCalled();
-			container.Arrange<ICalendar>(x => x.Now).Returns(new DateTime(123)).MustBeCalled();
+            container.Arrange<IFileSystem>(x => x.Refresh()).MustBeCalled();
+            container.Arrange<IFileSystem>(x => x.Exists("123")).Returns(true).MustBeCalled();
+            container.Arrange<ICalendar>(x => x.Now).Returns(new DateTime(123)).MustBeCalled();
 
-			Assert.Throws<AssertionException>(() => container.Assert());
+            Assert.Throws<AssertionException>(() => container.Assert());
 
-			container.Instance.LogExists();
+            container.Instance.LogExists();
 
-			container.Assert();
-		}
+            container.Assert();
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
-		public void ShouldAssertDependenciesDirectly()
-		{
-			var container = new MockingContainer<FileLog>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+        public void ShouldAssertDependenciesDirectly()
+        {
+            var container = new MockingContainer<FileLog>();
 
-			container.Arrange<ICalendar>(x => x.Now).Returns(new DateTime(123));
+            container.Arrange<ICalendar>(x => x.Now).Returns(new DateTime(123));
 
-			Assert.Throws<AssertionException>(() => container.Assert<IFileSystem>(x => x.Refresh(), Occurs.Once()));
-			Assert.Throws<AssertionException>(() => container.Assert<IFileSystem>(x => x.Exists("123"), Occurs.Once()));
-			Assert.Throws<AssertionException>(() => container.Assert<ICalendar>(x => x.Now, Occurs.Once()));
+            Assert.Throws<AssertionException>(() => container.Assert<IFileSystem>(x => x.Refresh(), Occurs.Once()));
+            Assert.Throws<AssertionException>(() => container.Assert<IFileSystem>(x => x.Exists("123"), Occurs.Once()));
+            Assert.Throws<AssertionException>(() => container.Assert<ICalendar>(x => x.Now, Occurs.Once()));
 
-			container.Instance.LogExists();
+            container.Instance.LogExists();
 
-			container.Assert<IFileSystem>(x => x.Refresh(), Occurs.Once());
-			container.Assert<IFileSystem>(x => x.Exists("123"), Occurs.Once());
-			container.Assert<ICalendar>(x => x.Now, Occurs.Once());
-		}
+            container.Assert<IFileSystem>(x => x.Refresh(), Occurs.Once());
+            container.Assert<IFileSystem>(x => x.Exists("123"), Occurs.Once());
+            container.Assert<ICalendar>(x => x.Now, Occurs.Once());
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
-		public void ShouldSpecifyDependencyBehavior()
-		{
-			var container = new MockingContainer<FileLog>(new AutoMockSettings { MockBehavior = Behavior.Strict });
+        [TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+        public void ShouldSpecifyDependencyBehavior()
+        {
+            var container = new MockingContainer<FileLog>(new AutoMockSettings { MockBehavior = Behavior.Strict });
 
-			Assert.Throws<StrictMockException>(() => container.Instance.LogExists());
-		}
+            Assert.Throws<StrictMockException>(() => container.Instance.LogExists());
+        }
 
-		public interface IAccount
-		{
-			int Id { get; }
-			void Withdraw(decimal amount);
-			void Deposit(decimal amount);
-		}
+        public interface IAccount
+        {
+            int Id { get; }
+            void Withdraw(decimal amount);
+            void Deposit(decimal amount);
+        }
 
-		public class TransactionService
-		{
-			public readonly IAccount From;
-			public readonly IAccount To;
+        public class TransactionService
+        {
+            public readonly IAccount From;
+            public readonly IAccount To;
 
-			public TransactionService(IAccount fromAccount, IAccount toAccount)
-			{
-				this.From = fromAccount;
-				this.To = toAccount;
-			}
+            public TransactionService(IAccount fromAccount, IAccount toAccount)
+            {
+                this.From = fromAccount;
+                this.To = toAccount;
+            }
 
-			[Inject]
-			public IAccount BillingAccount { get; set; }
+            [Inject]
+            public IAccount BillingAccount { get; set; }
 
-			public void TransferFunds(decimal amount)
-			{
-				const decimal Fee = 1;
-				From.Withdraw(amount + Fee);
-				To.Deposit(amount);
-				BillingAccount.Deposit(Fee);
-			}
-		}
+            public void TransferFunds(decimal amount)
+            {
+                const decimal Fee = 1;
+                From.Withdraw(amount + Fee);
+                To.Deposit(amount);
+                BillingAccount.Deposit(Fee);
+            }
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
-		public void ShouldArrangeSingletonInstances()
-		{
-			var container = new MockingContainer<TransactionService>();
-			container.Arrange<IAccount>(x => x.Id).Returns(10);
+        [TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+        public void ShouldArrangeSingletonInstances()
+        {
+            var container = new MockingContainer<TransactionService>();
+            container.Arrange<IAccount>(x => x.Id).Returns(10);
 
-			var inst = container.Instance;
-			Assert.NotNull(inst.From);
-			Assert.Same(inst.From, inst.To);
-			Assert.Same(inst.From, inst.BillingAccount);
-		}
+            var inst = container.Instance;
+            Assert.NotNull(inst.From);
+            Assert.Same(inst.From, inst.To);
+            Assert.Same(inst.From, inst.BillingAccount);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
-		public void ShouldArrangeMultipleInstancesSeparatelyByParameterName()
-		{
-			var container = new MockingContainer<TransactionService>();
-			container.Bind<IAccount>().ToMock().InjectedIntoParameter("fromAccount").AndArrange(x => Mock.Arrange(() => x.Id).Returns(10));
-			container.Bind<IAccount>().ToMock().InjectedIntoParameter("toAccount").AndArrange(x => Mock.Arrange(() => x.Id).Returns(20));
-			container.Bind<IAccount>().ToMock().InjectedIntoProperty((TransactionService s) => s.BillingAccount).AndArrange(x => Mock.Arrange(() => x.Id).Returns(30));
+        [TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+        public void ShouldArrangeMultipleInstancesSeparatelyByParameterName()
+        {
+            var container = new MockingContainer<TransactionService>();
+            container.Bind<IAccount>().ToMock().InjectedIntoParameter("fromAccount").AndArrange(x => Mock.Arrange(() => x.Id).Returns(10));
+            container.Bind<IAccount>().ToMock().InjectedIntoParameter("toAccount").AndArrange(x => Mock.Arrange(() => x.Id).Returns(20));
+            container.Bind<IAccount>().ToMock().InjectedIntoProperty((TransactionService s) => s.BillingAccount).AndArrange(x => Mock.Arrange(() => x.Id).Returns(30));
 
-			var inst = container.Instance;
-			Assert.Equal(10, inst.From.Id);
-			Assert.Equal(20, inst.To.Id);
-			Assert.Equal(30, inst.BillingAccount.Id);
-		}
+            var inst = container.Instance;
+            Assert.Equal(10, inst.From.Id);
+            Assert.Equal(20, inst.To.Id);
+            Assert.Equal(30, inst.BillingAccount.Id);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
-		public void ShouldArrangeMultipleInstancesSeparatelyByPropertyName()
-		{
-			var container = new MockingContainer<TransactionService>();
-			container.Bind<IAccount>().ToMock().InjectedIntoProperty("BillingAccount").AndArrange(x => Mock.Arrange(() => x.Id).Returns(30));
+        [TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+        public void ShouldArrangeMultipleInstancesSeparatelyByPropertyName()
+        {
+            var container = new MockingContainer<TransactionService>();
+            container.Bind<IAccount>().ToMock().InjectedIntoProperty("BillingAccount").AndArrange(x => Mock.Arrange(() => x.Id).Returns(30));
 
-			var inst = container.Instance;
-			Assert.Equal(30, inst.BillingAccount.Id);
-		}
+            var inst = container.Instance;
+            Assert.Equal(30, inst.BillingAccount.Id);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
-		public void ShouldAssertMultipleInstancesByName()
-		{
-			var container = new MockingContainer<TransactionService>();
-			container.Bind<IAccount>().ToMock().InjectedIntoParameter("fromAccount").Named("from")
-				.AndArrange(x => Mock.Arrange(() => x.Id).Returns(10));
-			container.Bind<IAccount>().ToMock().InjectedIntoParameter("toAccount").Named("to")
-				.AndArrange(x => Mock.Arrange(() => x.Id).Returns(20));
-			container.Bind<IAccount>().ToMock().InjectedIntoProperty((TransactionService s) => s.BillingAccount).Named("bill")
-				.AndArrange(x => Mock.Arrange(() => x.Id).Returns(30));
+        [TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+        public void ShouldAssertMultipleInstancesByName()
+        {
+            var container = new MockingContainer<TransactionService>();
+            container.Bind<IAccount>().ToMock().InjectedIntoParameter("fromAccount").Named("from")
+                .AndArrange(x => Mock.Arrange(() => x.Id).Returns(10));
+            container.Bind<IAccount>().ToMock().InjectedIntoParameter("toAccount").Named("to")
+                .AndArrange(x => Mock.Arrange(() => x.Id).Returns(20));
+            container.Bind<IAccount>().ToMock().InjectedIntoProperty((TransactionService s) => s.BillingAccount).Named("bill")
+                .AndArrange(x => Mock.Arrange(() => x.Id).Returns(30));
 
-			var inst = container.Instance;
+            var inst = container.Instance;
 
-			inst.TransferFunds(10);
+            inst.TransferFunds(10);
 
-			container.Assert<IAccount>("from", x => x.Withdraw(11), Occurs.Once());
-			container.Assert<IAccount>("to", x => x.Deposit(10), Occurs.Once());
-			container.Assert<IAccount>("bill", x => x.Deposit(1), Occurs.Once());
-		}
+            container.Assert<IAccount>("from", x => x.Withdraw(11), Occurs.Once());
+            container.Assert<IAccount>("to", x => x.Deposit(10), Occurs.Once());
+            container.Assert<IAccount>("bill", x => x.Deposit(1), Occurs.Once());
+        }
 
-		public class VariousCtors
-		{
-			public VariousCtors(IFileSystem fs)
-			{
-			}
+        public class VariousCtors
+        {
+            public VariousCtors(IFileSystem fs)
+            {
+            }
 
-			public VariousCtors(IFileSystem fs, ICalendar calendar)
-			{
-				throw new InvalidOperationException();
-			}
-		}
+            public VariousCtors(IFileSystem fs, ICalendar calendar)
+            {
+                throw new InvalidOperationException();
+            }
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
-		public void ShouldSelectConstructorBasedOnSettings()
-		{
-			// assert the default NInject behavior that injects into the constructor with most parameters
-			var container = new MockingContainer<VariousCtors>();
-			Assert.Throws<InvalidOperationException>(() => { var inst = container.Instance; });
+        [TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+        public void ShouldSelectConstructorBasedOnSettings()
+        {
+            // assert the default NInject behavior that injects into the constructor with most parameters
+            var container = new MockingContainer<VariousCtors>();
+            Assert.Throws<InvalidOperationException>(() => { var inst = container.Instance; });
 
-			// assert the overriden constructor lookup behavior
-			var container2 = new MockingContainer<VariousCtors>(new AutoMockSettings { ConstructorArgTypes = new[] { typeof(IFileSystem) } });
-			Assert.NotNull(container2.Instance);
+            // assert the overriden constructor lookup behavior
+            var container2 = new MockingContainer<VariousCtors>(new AutoMockSettings { ConstructorArgTypes = new[] { typeof(IFileSystem) } });
+            Assert.NotNull(container2.Instance);
 
-			// assert that specifying an invalid constructor throws
-			Assert.Throws<MockException>(() => new MockingContainer<VariousCtors>(new AutoMockSettings { ConstructorArgTypes = new[] { typeof(ICalendar) } }));
-		}
+            // assert that specifying an invalid constructor throws
+            Assert.Throws<MockException>(() => new MockingContainer<VariousCtors>(new AutoMockSettings { ConstructorArgTypes = new[] { typeof(ICalendar) } }));
+        }
 
-		public interface IService
-		{
-			int Value { get; set; }
-		}
+        public interface IService
+        {
+            int Value { get; set; }
+        }
 
-		public class Module
-		{
-			public IService service;
+        public class Module
+        {
+            public IService service;
 
-			public Module(IService service)
-			{
-				this.service = service;
-			}
-		}
+            public Module(IService service)
+            {
+                this.service = service;
+            }
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
-		public void ShouldMakeSingletonExplicitlyRequestedServices()
-		{
-			var container = new MockingContainer<Module>();
-			var s1 = container.Get<IService>();
-			var s2 = container.Instance.service;
-			Assert.Same(s1, s2);
-		}
+        [TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+        public void ShouldMakeSingletonExplicitlyRequestedServices()
+        {
+            var container = new MockingContainer<Module>();
+            var s1 = container.Get<IService>();
+            var s2 = container.Instance.service;
+            Assert.Same(s1, s2);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
-		public void ShouldArrangePropertySet()
-		{
-			// Arrange
-			var container = new MockingContainer<Module>();
-			container.ArrangeSet<IService>(x => x.Value = 99).MustBeCalled();
-			var service = container.Get<IService>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+        public void ShouldArrangePropertySet()
+        {
+            // Arrange
+            var container = new MockingContainer<Module>();
+            container.ArrangeSet<IService>(x => x.Value = 99).MustBeCalled();
+            var service = container.Get<IService>();
 
-			// Act 
-			service.Value = 99;
+            // Act 
+            service.Value = 99;
 
-			// Assert
-			container.Assert<IService>();
-		}
+            // Assert
+            container.Assert<IService>();
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
-		public void ShouldArrangePropertySetWithMatcher()
-		{
-			// Arrange
-			var container = new MockingContainer<Module>();
-			container.ArrangeSet<IService>(x => x.Value = Arg.AnyInt).MustBeCalled();
-			var service = container.Get<IService>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+        public void ShouldArrangePropertySetWithMatcher()
+        {
+            // Arrange
+            var container = new MockingContainer<Module>();
+            container.ArrangeSet<IService>(x => x.Value = Arg.AnyInt).MustBeCalled();
+            var service = container.Get<IService>();
 
-			// Act 
-			service.Value = 99;
+            // Act 
+            service.Value = 99;
 
-			// Assert
-			container.Assert<IService>();
-		}
+            // Assert
+            container.Assert<IService>();
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
-		public void ShouldAssertPropertySet()
-		{
-			// Arrange
-			var container = new MockingContainer<Module>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+        public void ShouldAssertPropertySet()
+        {
+            // Arrange
+            var container = new MockingContainer<Module>();
 
-			// Act 
-			container.Get<IService>().Value = 99;
+            // Act 
+            container.Get<IService>().Value = 99;
 
-			// Assert
-			container.AssertSet<IService>(x => x.Value = 99);
-		}
+            // Assert
+            container.AssertSet<IService>(x => x.Value = 99);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
-		public void ShouldAssertPropertySetWithMatcher()
-		{
-			// Arrange
-			var container = new MockingContainer<Module>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+        public void ShouldAssertPropertySetWithMatcher()
+        {
+            // Arrange
+            var container = new MockingContainer<Module>();
 
-			// Act 
-			container.Get<IService>().Value = 99;
+            // Act 
+            container.Get<IService>().Value = 99;
 
-			// Assert
-			container.AssertSet<IService>(x => x.Value = Arg.AnyInt);
-		}
+            // Assert
+            container.AssertSet<IService>(x => x.Value = Arg.AnyInt);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
-		public void ShouldAssertPropertySetNegative()
-		{
+        [TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+        public void ShouldAssertPropertySetNegative()
+        {
             DebugView.IsTraceEnabled = true;
 
-			// Arrange
-			var container = new MockingContainer<Module>();
+            // Arrange
+            var container = new MockingContainer<Module>();
 
-			// Assert
-			container.AssertSet<IService>(x => x.Value = 99, Occurs.Never());
-		}
+            // Assert
+            container.AssertSet<IService>(x => x.Value = 99, Occurs.Never());
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
-		public void ShouldAssertPropertySetNegativeWithMatcher()
-		{
-			// Arrange
-			var container = new MockingContainer<Module>();
+        [TestMethod, TestCategory("Lite"), TestCategory("Ninject")]
+        public void ShouldAssertPropertySetNegativeWithMatcher()
+        {
+            // Arrange
+            var container = new MockingContainer<Module>();
 
-			// Assert
-			container.AssertSet<IService>(x => x.Value = Arg.AnyInt, Occurs.Never());
-		}
+            // Assert
+            container.AssertSet<IService>(x => x.Value = Arg.AnyInt, Occurs.Never());
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
-		public void ShouldAssertRaisesAgainstMethod()
-		{
-			var container = new MockingContainer<Executor>();
+        [TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+        public void ShouldAssertRaisesAgainstMethod()
+        {
+            var container = new MockingContainer<Executor>();
 
-			bool raised = false;
+            bool raised = false;
 
-			container.Arrange<IExecutor>(x => x.Submit()).Raises(() => container.Get<IExecutor>().Done += null, EventArgs.Empty);
+            container.Arrange<IExecutor>(x => x.Submit()).Raises(() => container.Get<IExecutor>().Done += null, EventArgs.Empty);
 
-			container.Get<IExecutor>().Done += delegate { raised = true; };
+            container.Get<IExecutor>().Done += delegate { raised = true; };
 
-			container.Instance.Submit();
+            container.Instance.Submit();
 
-			Assert.True(raised);
-		}
+            Assert.True(raised);
+        }
 
-		public class Executor
-		{
-			public Executor(IExecutor executor)
-			{
-				this.executor = executor;
-			}
+        public class Executor
+        {
+            public Executor(IExecutor executor)
+            {
+                this.executor = executor;
+            }
 
-			public void Submit()
-			{
-				this.executor.Submit();
-			}
+            public void Submit()
+            {
+                this.executor.Submit();
+            }
 
-			private IExecutor executor;
-		}
+            private IExecutor executor;
+        }
 
-		public interface IExecutor
-		{
-			event EventHandler<EventArgs> Done;
-			event EventHandler Executed;
-			void Submit();
-		}
+        public interface IExecutor
+        {
+            event EventHandler<EventArgs> Done;
+            event EventHandler Executed;
+            void Submit();
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
-		public void ShouldAssertMockingNestedDependency()
-		{
-			var container = new MockingContainer<Foo>();
-			container.Bind<Bar>().ToSelf();
+        [TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+        public void ShouldAssertMockingNestedDependency()
+        {
+            var container = new MockingContainer<Foo>();
+            container.Bind<Bar>().ToSelf();
 
-			container.Arrange<IUnitOfWork>(uow => uow.DoWork()).MustBeCalled();
+            container.Arrange<IUnitOfWork>(uow => uow.DoWork()).MustBeCalled();
 
-			Assert.Throws<AssertionException>(() => container.Assert());
+            Assert.Throws<AssertionException>(() => container.Assert());
 
-			container.Instance.DoWork();
+            container.Instance.DoWork();
 
-			container.Assert();
-		}
+            container.Assert();
+        }
 
-		public class Foo
-		{
-			public Foo(Bar bar)
-			{
-				this.bar = bar;
-			}
+        public class Foo
+        {
+            public Foo(Bar bar)
+            {
+                this.bar = bar;
+            }
 
-			public void DoWork()
-			{
-				this.bar.DoWork();
-			}
+            public void DoWork()
+            {
+                this.bar.DoWork();
+            }
 
-			private readonly Bar bar;
-		}
+            private readonly Bar bar;
+        }
 
-		public class Bar
-		{
-			public Bar(IUnitOfWork unitOfWork)
-			{
-				this.unitOfWork = unitOfWork;
-			}
+        public class Bar
+        {
+            public Bar(IUnitOfWork unitOfWork)
+            {
+                this.unitOfWork = unitOfWork;
+            }
 
-			public void DoWork()
-			{
-				this.unitOfWork.DoWork();
-			}
+            public void DoWork()
+            {
+                this.unitOfWork.DoWork();
+            }
 
-			private readonly IUnitOfWork unitOfWork;
-		}
+            private readonly IUnitOfWork unitOfWork;
+        }
 
-		public interface IUnitOfWork
-		{
-			void DoWork();
-		}
+        public interface IUnitOfWork
+        {
+            void DoWork();
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
-		public void ShouldResolveTargetTypeWithInterfaceAndConcreteDependencies()
-		{
-			var container = new MockingContainer<Unit>();
+        [TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+        public void ShouldResolveTargetTypeWithInterfaceAndConcreteDependencies()
+        {
+            var container = new MockingContainer<Unit>();
 
-			container.Arrange<IUnitOfWork>(uow => uow.DoWork()).MustBeCalled();
+            container.Arrange<IUnitOfWork>(uow => uow.DoWork()).MustBeCalled();
 
-			// this is where it resolves.
-			container.Instance.DoWork();
+            // this is where it resolves.
+            container.Instance.DoWork();
 
-			container.Assert();
-		}
+            container.Assert();
+        }
 
-		public class Unit
-		{
-			public Unit(IUnitOfWork unitOfWork, WorkItem workItem)
-			{
-				this.unitOfWork = unitOfWork;
-				this.workItem = workItem;
-			}
+        public class Unit
+        {
+            public Unit(IUnitOfWork unitOfWork, WorkItem workItem)
+            {
+                this.unitOfWork = unitOfWork;
+                this.workItem = workItem;
+            }
 
-			public void DoWork()
-			{
-				workItem.DoWork();
-				unitOfWork.DoWork();
-			}
+            public void DoWork()
+            {
+                workItem.DoWork();
+                unitOfWork.DoWork();
+            }
 
-			private readonly IUnitOfWork unitOfWork;
-			private readonly WorkItem workItem;
-		}
+            private readonly IUnitOfWork unitOfWork;
+            private readonly WorkItem workItem;
+        }
 
-		public class WorkItem
-		{
-			public void DoWork()
-			{
+        public class WorkItem
+        {
+            public void DoWork()
+            {
 
-			}
-		}
+            }
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
-		public void ShouldAssertOccurrenceFromContainerWithoutPriorArrangement()
-		{
-			var c = new MockingContainer<Unit>();
-			c.Instance.DoWork();
-			c.Assert<IUnitOfWork>(x => x.DoWork());
-		}
+        [TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+        public void ShouldAssertOccurrenceFromContainerWithoutPriorArrangement()
+        {
+            var c = new MockingContainer<Unit>();
+            c.Instance.DoWork();
+            c.Assert<IUnitOfWork>(x => x.DoWork());
+        }
 
-		public class DisposableContainer : IDisposable
-		{
-			public IList<IDisposable> Disposables;
+        public class DisposableContainer : IDisposable
+        {
+            public IList<IDisposable> Disposables;
 
-			public DisposableContainer(IList<IDisposable> disposables)
-			{
-				this.Disposables = disposables;
-			}
+            public DisposableContainer(IList<IDisposable> disposables)
+            {
+                this.Disposables = disposables;
+            }
 
-			public void Dispose()
-			{
-				this.Disposables.Clear();
-			}
-		}
+            public void Dispose()
+            {
+                this.Disposables.Clear();
+            }
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
-		public void ShouldInjectContainers()
-		{
-			var c = new MockingContainer<DisposableContainer>();
-			var disposables = new List<IDisposable> { Mock.Create<IDisposable>(), Mock.Create<IDisposable>() };
-			var i = c.Get<DisposableContainer>(new ConstructorArgument("disposables", disposables));
-			i.Dispose();
+        [TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+        public void ShouldInjectContainers()
+        {
+            var c = new MockingContainer<DisposableContainer>();
+            var disposables = new List<IDisposable> { Mock.Create<IDisposable>(), Mock.Create<IDisposable>() };
+            var i = c.Get<DisposableContainer>(new ConstructorArgument("disposables", disposables));
+            i.Dispose();
 
-			Assert.Equal(0, disposables.Count);
-		}
+            Assert.Equal(0, disposables.Count);
+        }
 
-		public abstract class DependencyBase
-		{
-			public IDisposable Dep { get; set; }
+        public abstract class DependencyBase
+        {
+            public IDisposable Dep { get; set; }
 
-			protected DependencyBase(IDisposable dep)
-			{
-				this.Dep = dep;
-			}
+            protected DependencyBase(IDisposable dep)
+            {
+                this.Dep = dep;
+            }
 
-			public abstract int Value { get; }
-			public abstract string Name { get; set; }
+            public abstract int Value { get; }
+            public abstract string Name { get; set; }
 
-			public int baseValue;
-			public virtual int BaseValue
-			{
-				get { return baseValue; }
-				set { baseValue = value; }
-			}
-		}
+            public int baseValue;
+            public virtual int BaseValue
+            {
+                get { return baseValue; }
+                set { baseValue = value; }
+            }
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
-		public void ShouldInjectAbstractType()
-		{
-			var c = new MockingContainer<DependencyBase>();
-			var obj = c.Instance;
-			Assert.NotNull(obj.Dep);
-		}
+        [TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+        public void ShouldInjectAbstractType()
+        {
+            var c = new MockingContainer<DependencyBase>();
+            var obj = c.Instance;
+            Assert.NotNull(obj.Dep);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
-		public void ShouldArrangeMethodsOnInjectedAbstractType()
-		{
-			var c = new MockingContainer<DependencyBase>();
-			var obj = c.Instance;
-			Mock.Arrange(() => obj.Value).Returns(5);
-			Assert.Equal(5, obj.Value);
-		}
+        [TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+        public void ShouldArrangeMethodsOnInjectedAbstractType()
+        {
+            var c = new MockingContainer<DependencyBase>();
+            var obj = c.Instance;
+            Mock.Arrange(() => obj.Value).Returns(5);
+            Assert.Equal(5, obj.Value);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
-		public void ShouldCheckPropertyMixinOnNonabstractPropertyOnInjectedAbstractType()
-		{
-			var c = new MockingContainer<DependencyBase>();
-			var obj = c.Instance;
-			obj.BaseValue = 10;
-			Assert.Equal(10, obj.baseValue);
-		}
+        [TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+        public void ShouldCheckPropertyMixinOnNonabstractPropertyOnInjectedAbstractType()
+        {
+            var c = new MockingContainer<DependencyBase>();
+            var obj = c.Instance;
+            obj.BaseValue = 10;
+            Assert.Equal(10, obj.baseValue);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
-		public void ShouldInjectAbstractTypeWithSpecifiedCtor()
-		{
-			var c = new MockingContainer<DependencyBase>(
-				new AutoMockSettings { ConstructorArgTypes = new[] { typeof(IDisposable) } });
-			var obj = c.Instance;
-			Assert.NotNull(obj.Dep);
-		}
+        [TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+        public void ShouldInjectAbstractTypeWithSpecifiedCtor()
+        {
+            var c = new MockingContainer<DependencyBase>(
+                new AutoMockSettings { ConstructorArgTypes = new[] { typeof(IDisposable) } });
+            var obj = c.Instance;
+            Assert.NotNull(obj.Dep);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
-		public void ShouldIncludeAssertionMessageWhenAssertingContainer()
-		{
-			var c = new MockingContainer<FileLog>();
-			c.Arrange<ICalendar>(x => x.Now).MustBeCalled("Calendar must be used!");
-			c.Arrange<IFileSystem>(x => x.Refresh()).MustBeCalled("Should use latest data!");
+        [TestMethod, TestCategory("Lite"), TestCategory("AutoMock")]
+        public void ShouldIncludeAssertionMessageWhenAssertingContainer()
+        {
+            var c = new MockingContainer<FileLog>();
+            c.Arrange<ICalendar>(x => x.Now).MustBeCalled("Calendar must be used!");
+            c.Arrange<IFileSystem>(x => x.Refresh()).MustBeCalled("Should use latest data!");
 
-			var ex = Assert.Throws<AssertionException>(() => c.Assert("Container must be alright!"));
+            var ex = Assert.Throws<AssertionException>(() => c.Assert("Container must be alright!"));
 
-			Assert.True(ex.Message.Contains("Calendar must be used!"));
-			Assert.True(ex.Message.Contains("Should use latest data!"));
-			Assert.True(ex.Message.Contains("Container must be alright!"));
-		}
-	}
+            Assert.True(ex.Message.Contains("Calendar must be used!"));
+            Assert.True(ex.Message.Contains("Should use latest data!"));
+            Assert.True(ex.Message.Contains("Container must be alright!"));
+        }
+    }
 }

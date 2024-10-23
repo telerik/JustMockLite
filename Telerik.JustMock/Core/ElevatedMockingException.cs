@@ -20,47 +20,47 @@ using System.Reflection;
 
 namespace Telerik.JustMock.Core
 {
-	/// <summary>
-	/// Thrown when the JustMock profiler is required but not present.
-	/// </summary>
-	[Serializable]
-	public sealed class ElevatedMockingException : MockException
-	{
-		private const string ProfilerNeededMessage =
+    /// <summary>
+    /// Thrown when the JustMock profiler is required but not present.
+    /// </summary>
+    [Serializable]
+    public sealed class ElevatedMockingException : MockException
+    {
+        private const string ProfilerNeededMessage =
 #if LITE_EDITION
  " JustMock Lite can only mock interface members, virtual/abstract members in non-sealed classes, delegates and all members on classes derived from MarshalByRefObject on instances created with Mock.Create or Mock.CreateLike. For any other scenario you need to use the full version of JustMock.";
 #else
-			" The profiler must be enabled to mock, arrange or execute the specified target.";
+            " The profiler must be enabled to mock, arrange or execute the specified target.";
 #endif
 
-		internal ElevatedMockingException(MemberInfo target)
-			: this(String.Format("Cannot mock '{0}'.", target))
-		{ }
+        internal ElevatedMockingException(MemberInfo target)
+            : this(String.Format("Cannot mock '{0}'.", target))
+        { }
 
-		internal ElevatedMockingException()
-			: this((string)null)
-		{ }
+        internal ElevatedMockingException()
+            : this((string)null)
+        { }
 
-		private ElevatedMockingException(string details)
-			: base(ConstructMessage(details))
-		{
-		}
+        private ElevatedMockingException(string details)
+            : base(ConstructMessage(details))
+        {
+        }
 
-		private static string ConstructMessage(string details)
-		{
-			var message = details + ProfilerNeededMessage;
+        private static string ConstructMessage(string details)
+        {
+            var message = details + ProfilerNeededMessage;
 #if !LITE_EDITION
 #if !SILVERLIGHT
-			var detectedProfilers = ClrProfilerSetupHelper.GetEnabledProfilersLocations();
-			if (!String.IsNullOrEmpty(detectedProfilers))
-			{
-				message += "\nDetected active third-party profilers:" + detectedProfilers + "\nDisable the profilers or link them from the JustMock configuration utility. Restart the test runner and, if necessary, Visual Studio after linking.";
-			}
+            var detectedProfilers = ClrProfilerSetupHelper.GetEnabledProfilersLocations();
+            if (!String.IsNullOrEmpty(detectedProfilers))
+            {
+                message += "\nDetected active third-party profilers:" + detectedProfilers + "\nDisable the profilers or link them from the JustMock configuration utility. Restart the test runner and, if necessary, Visual Studio after linking.";
+            }
 #else
-			message += " If you have enabled other profiler-based tools (e.g. code coverage, performance or memory profilers, mocking tools, debugging tools), either disable them or link them from the JustMock configuration utility. Restart the test runner and, if necessary, Visual Studio after linking.";
+            message += " If you have enabled other profiler-based tools (e.g. code coverage, performance or memory profilers, mocking tools, debugging tools), either disable them or link them from the JustMock configuration utility. Restart the test runner and, if necessary, Visual Studio after linking.";
 #endif
 #endif
-			return message;
-		}
-	}
+            return message;
+        }
+    }
 }

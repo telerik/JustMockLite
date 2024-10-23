@@ -20,14 +20,14 @@ using System.Reflection;
 
 namespace Telerik.JustMock.Core.Context
 {
-	internal interface IMockingContextResolver
-	{
-		MocksRepository ResolveRepository(UnresolvedContextBehavior unresolvedContextBehavior);
+    internal interface IMockingContextResolver
+    {
+        MocksRepository ResolveRepository(UnresolvedContextBehavior unresolvedContextBehavior);
 
-		bool RetireRepository();
+        bool RetireRepository();
 
-		Action<string, Exception> GetFailMethod();
+        Action<string, Exception> GetFailMethod();
 
         MethodBase GetTestMethod();
-	}
+    }
 }

@@ -21,37 +21,37 @@ using System.Linq.Expressions;
 
 namespace Telerik.JustMock.Core.MatcherTree
 {
-	internal class AnyMatcher : CategoricalMatcherBase, IUniverseMatcher
-	{
-		public override string DebugView
-		{
-			get { return "any"; }
-		}
+    internal class AnyMatcher : CategoricalMatcherBase, IUniverseMatcher
+    {
+        public override string DebugView
+        {
+            get { return "any"; }
+        }
 
-		public override bool CanMatch(IMatcher other)
-		{
-			return true;
-		}
+        public override bool CanMatch(IMatcher other)
+        {
+            return true;
+        }
 
-		protected override bool MatchesCore(IMatcher other)
-		{
-			return true;
-		}
+        protected override bool MatchesCore(IMatcher other)
+        {
+            return true;
+        }
 
-		public override bool Equals(IMatcher other)
-		{
-			return other is AnyMatcher;
-		}
+        public override bool Equals(IMatcher other)
+        {
+            return other is AnyMatcher;
+        }
 
-		public override Expression ToExpression(Type argumentType)
-		{
-			return Expression.Call(null, typeof(AnyMatcher).GetMethod("Create").MakeGenericMethod(argumentType));
-		}
+        public override Expression ToExpression(Type argumentType)
+        {
+            return Expression.Call(null, typeof(AnyMatcher).GetMethod("Create").MakeGenericMethod(argumentType));
+        }
 
-		[ArgMatcher(Matcher = typeof(AnyMatcher))]
-		public static T Create<T>()
-		{
-			throw new NotSupportedException();
-		}
-	}
+        [ArgMatcher(Matcher = typeof(AnyMatcher))]
+        public static T Create<T>()
+        {
+            throw new NotSupportedException();
+        }
+    }
 }

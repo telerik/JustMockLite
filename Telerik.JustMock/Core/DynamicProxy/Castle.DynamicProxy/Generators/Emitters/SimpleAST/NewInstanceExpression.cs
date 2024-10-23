@@ -14,38 +14,38 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST
 {
-	using System;
-	using System.Reflection;
-	using System.Reflection.Emit;
+    using System;
+    using System.Reflection;
+    using System.Reflection.Emit;
 
-	internal class NewInstanceExpression : IExpression
-	{
-		private readonly IExpression[] arguments;
-		private ConstructorInfo constructor;
+    internal class NewInstanceExpression : IExpression
+    {
+        private readonly IExpression[] arguments;
+        private ConstructorInfo constructor;
 
-		public NewInstanceExpression(ConstructorInfo constructor, params IExpression[] args)
-		{
-			this.constructor = constructor ?? throw new ArgumentNullException(nameof(constructor));
-			arguments = args;
-		}
+        public NewInstanceExpression(ConstructorInfo constructor, params IExpression[] args)
+        {
+            this.constructor = constructor ?? throw new ArgumentNullException(nameof(constructor));
+            arguments = args;
+        }
 
-		public NewInstanceExpression(Type target)
-		{
-			constructor = target.GetConstructor(Type.EmptyTypes) ?? throw new MissingMethodException("Could not find default constructor.");
-			arguments = null;
-		}
+        public NewInstanceExpression(Type target)
+        {
+            constructor = target.GetConstructor(Type.EmptyTypes) ?? throw new MissingMethodException("Could not find default constructor.");
+            arguments = null;
+        }
 
-		public void Emit(ILGenerator gen)
-		{
-			if (arguments != null)
-			{
-				foreach (var exp in arguments)
-				{
-					exp.Emit(gen);
-				}
-			}
+        public void Emit(ILGenerator gen)
+        {
+            if (arguments != null)
+            {
+                foreach (var exp in arguments)
+                {
+                    exp.Emit(gen);
+                }
+            }
 
-			gen.Emit(OpCodes.Newobj, constructor);
-		}
-	}
+            gen.Emit(OpCodes.Newobj, constructor);
+        }
+    }
 }

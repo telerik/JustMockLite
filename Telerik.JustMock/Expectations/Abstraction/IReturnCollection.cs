@@ -21,19 +21,19 @@ using System.Linq;
 
 namespace Telerik.JustMock.Expectations.Abstraction
 {
-	/// <summary>
-	/// Defines member for mocking <see cref="IQueryable"/> collection.
-	/// </summary>
-	public interface IReturnCollection
-	{
+    /// <summary>
+    /// Defines member for mocking <see cref="IQueryable"/> collection.
+    /// </summary>
+    public interface IReturnCollection
+    {
 #if !LITE_EDITION
-		/// <summary>
-		/// Returns a enumerable collection for the target query.
-		/// </summary>
-		/// <typeparam name="TArg">Argument type</typeparam>
-		/// <param name="collection">Enumerable collection</param>
-		/// <returns>Instance of <see cref="IAssertable"/></returns>
-		IAssertable ReturnsCollection<TArg>(IEnumerable<TArg> collection);
+        /// <summary>
+        /// Returns a enumerable collection for the target query.
+        /// </summary>
+        /// <typeparam name="TArg">Argument type</typeparam>
+        /// <param name="collection">Enumerable collection</param>
+        /// <returns>Instance of <see cref="IAssertable"/></returns>
+        IAssertable ReturnsCollection<TArg>(IEnumerable<TArg> collection);
 #endif
-	}
+    }
 }

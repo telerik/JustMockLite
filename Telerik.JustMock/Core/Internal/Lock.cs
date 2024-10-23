@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2023 Progress Software Corporation
+ Copyright Â© 2023 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -18,25 +18,25 @@
 namespace Telerik.JustMock.Core.Internal
 {
     internal abstract class Lock
-	{
-		public abstract IUpgradeableLockHolder ForReadingUpgradeable();
-		public abstract ILockHolder ForReading();
-		public abstract ILockHolder ForWriting();
+    {
+        public abstract IUpgradeableLockHolder ForReadingUpgradeable();
+        public abstract ILockHolder ForReading();
+        public abstract ILockHolder ForWriting();
 
-		public abstract IUpgradeableLockHolder ForReadingUpgradeable(bool waitForLock);
-		public abstract ILockHolder ForReading(bool waitForLock);
-		public abstract ILockHolder ForWriting(bool waitForLock);
+        public abstract IUpgradeableLockHolder ForReadingUpgradeable(bool waitForLock);
+        public abstract ILockHolder ForReading(bool waitForLock);
+        public abstract ILockHolder ForWriting(bool waitForLock);
 
-		/// <summary>
-		/// Creates a new lock.
-		/// </summary>
-		/// <returns></returns>
-		public static Lock Create()
-		{
+        /// <summary>
+        /// Creates a new lock.
+        /// </summary>
+        /// <returns></returns>
+        public static Lock Create()
+        {
 #if COREFX
             return new MonitorLock();
 #else
-			return new SlimReadWriteLock();
+            return new SlimReadWriteLock();
 #endif
         }
     }

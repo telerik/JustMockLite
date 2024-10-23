@@ -28,67 +28,67 @@ using Telerik.JustMock.Core.Context;
 
 namespace Telerik.JustMock.AutoMock
 {
-	internal interface IMockResolver : INinjectComponent
-	{
-		void ForEachMock(Action<object> action);
-		void AttachToBinding(IBindingConfiguration binding, Type type);
-	}
+    internal interface IMockResolver : INinjectComponent
+    {
+        void ForEachMock(Action<object> action);
+        void AttachToBinding(IBindingConfiguration binding, Type type);
+    }
 
-	internal sealed class MockResolver : IMissingBindingResolver, IMockResolver
-	{
-		private sealed class MockProvider : IProvider
-		{
-			private readonly Behavior behavior;
-			public Type Type { get; private set; }
+    internal sealed class MockResolver : IMissingBindingResolver, IMockResolver
+    {
+        private sealed class MockProvider : IProvider
+        {
+            private readonly Behavior behavior;
+            public Type Type { get; private set; }
 
-			public MockProvider(Type type, Behavior behavior)
-			{
-				this.Type = type;
-				this.behavior = behavior;
-			}
+            public MockProvider(Type type, Behavior behavior)
+            {
+                this.Type = type;
+                this.behavior = behavior;
+            }
 
-			public object Create(IContext context)
-			{
-				return Mock.Create(Type, behavior);
-			}
-		}
+            public object Create(IContext context)
+            {
+                return Mock.Create(Type, behavior);
+            }
+        }
 
-		private readonly List<object> mocks = new List<object>();
+        private readonly List<object> mocks = new List<object>();
 
-		public void Dispose()
-		{
-		}
+        public void Dispose()
+        {
+        }
 
-		public IEnumerable<IBinding> Resolve(Multimap<Type, IBinding> bindings, IRequest request)
-		{
-			var binding = new Binding(request.Service);
-			AttachToBinding(binding, request.Service);
-			binding.ScopeCallback = StandardScopeCallbacks.Singleton;
-			binding.IsImplicit = true;
-			return new[] { binding };
-		}
+        public IEnumerable<IBinding> Resolve(Multimap<Type, IBinding> bindings, IRequest request)
+        {
+            var binding = new Binding(request.Service);
+            AttachToBinding(binding, request.Service);
+            binding.ScopeCallback = StandardScopeCallbacks.Singleton;
+            binding.IsImplicit = true;
+            return new[] { binding };
+        }
 
-		public void AttachToBinding(IBindingConfiguration binding, Type type)
-		{
-			binding.ProviderCallback = ctx => new MockProvider(type, MockBehavior);
-			binding.ActivationActions.Add((context, obj) => mocks.Add(obj));
-			binding.DeactivationActions.Add((context, obj) => mocks.Remove(obj));
-		}
+        public void AttachToBinding(IBindingConfiguration binding, Type type)
+        {
+            binding.ProviderCallback = ctx => new MockProvider(type, MockBehavior);
+            binding.ActivationActions.Add((context, obj) => mocks.Add(obj));
+            binding.DeactivationActions.Add((context, obj) => mocks.Remove(obj));
+        }
 
-		public void ForEachMock(Action<object> action)
-		{
-			using (MockingContext.BeginFailureAggregation(null))
-			{
-				foreach (var mock in this.mocks)
-					action(mock);
-			}
-		}
+        public void ForEachMock(Action<object> action)
+        {
+            using (MockingContext.BeginFailureAggregation(null))
+            {
+                foreach (var mock in this.mocks)
+                    action(mock);
+            }
+        }
 
-		public Behavior MockBehavior
-		{
-			get { return ((AutoMockSettings)Settings).MockBehavior; }
-		}
+        public Behavior MockBehavior
+        {
+            get { return ((AutoMockSettings)Settings).MockBehavior; }
+        }
 
-		public INinjectSettings Settings { get; set; }
-	}
+        public INinjectSettings Settings { get; set; }
+    }
 }

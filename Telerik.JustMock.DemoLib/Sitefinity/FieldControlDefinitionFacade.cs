@@ -19,10 +19,10 @@ using Telerik.Sitefinity.Web.UI.Fields.Config;
 
 namespace Telerik.Sitefinity.Fluent.Definitions.Fields
 {
-	public abstract class FieldControlDefinitionFacade<TElement, TActualFacade, TParentFacade> : FieldDefinitionFacade<TElement, TActualFacade, TParentFacade>
-		where TElement : FieldControlDefinitionElement
-		where TActualFacade : class
-		where TParentFacade : class
-	{
-	}
+    public abstract class FieldControlDefinitionFacade<TElement, TActualFacade, TParentFacade> : FieldDefinitionFacade<TElement, TActualFacade, TParentFacade>
+        where TElement : FieldControlDefinitionElement
+        where TActualFacade : class
+        where TParentFacade : class
+    {
+    }
 }

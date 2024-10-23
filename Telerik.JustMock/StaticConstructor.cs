@@ -19,20 +19,20 @@
 
 namespace Telerik.JustMock
 {
-	/// <summary>
-	/// Defines behavior of the static constructor.
-	/// </summary>
-	public enum StaticConstructor
-	{
-		/// <summary>
-		/// Defines that the static constructor is not mocked.
-		/// </summary>
-		NonMocked,
-		/// <summary>
-		/// Defines that is static constructor is mocked.
-		/// </summary>
-		Mocked
-	}
+    /// <summary>
+    /// Defines behavior of the static constructor.
+    /// </summary>
+    public enum StaticConstructor
+    {
+        /// <summary>
+        /// Defines that the static constructor is not mocked.
+        /// </summary>
+        NonMocked,
+        /// <summary>
+        /// Defines that is static constructor is mocked.
+        /// </summary>
+        Mocked
+    }
 }
 
 #endif

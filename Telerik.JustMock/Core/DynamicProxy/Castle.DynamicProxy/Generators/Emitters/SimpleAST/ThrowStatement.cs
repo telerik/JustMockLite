@@ -14,31 +14,31 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST
 {
-	using System;
-	using System.Reflection;
-	using System.Reflection.Emit;
+    using System;
+    using System.Reflection;
+    using System.Reflection.Emit;
 
-	internal class ThrowStatement : IStatement
-	{
-		private readonly string errorMessage;
-		private readonly Type exceptionType;
+    internal class ThrowStatement : IStatement
+    {
+        private readonly string errorMessage;
+        private readonly Type exceptionType;
 
-		public ThrowStatement(Type exceptionType, string errorMessage)
-		{
-			this.exceptionType = exceptionType;
-			this.errorMessage = errorMessage;
-		}
+        public ThrowStatement(Type exceptionType, string errorMessage)
+        {
+            this.exceptionType = exceptionType;
+            this.errorMessage = errorMessage;
+        }
 
-		public void Emit(ILGenerator gen)
-		{
-			var ci = exceptionType.GetConstructor(new[] { typeof(string) });
-			var message = new LiteralStringExpression(errorMessage);
+        public void Emit(ILGenerator gen)
+        {
+            var ci = exceptionType.GetConstructor(new[] { typeof(string) });
+            var message = new LiteralStringExpression(errorMessage);
 
-			var creationStmt = new NewInstanceExpression(ci, message);
+            var creationStmt = new NewInstanceExpression(ci, message);
 
-			creationStmt.Emit(gen);
+            creationStmt.Emit(gen);
 
-			gen.Emit(OpCodes.Throw);
-		}
-	}
+            gen.Emit(OpCodes.Throw);
+        }
+    }
 }

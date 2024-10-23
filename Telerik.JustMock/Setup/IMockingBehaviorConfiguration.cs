@@ -22,14 +22,14 @@ using Telerik.JustMock.Core.Behaviors;
 
 namespace Telerik.JustMock.Setup
 {
-	internal class MockingBehaviorConfiguration : IMockReplicator
-	{
-		public Behavior Behavior { get; set; }
-		
-		public object CreateSimilarMock(MocksRepository repository, Type mockType, object[] constructorArgs, bool mockConstructorCall, Type[] additionalMockedInterfaces)
-		{
+    internal class MockingBehaviorConfiguration : IMockReplicator
+    {
+        public Behavior Behavior { get; set; }
+
+        public object CreateSimilarMock(MocksRepository repository, Type mockType, object[] constructorArgs, bool mockConstructorCall, Type[] additionalMockedInterfaces)
+        {
             MockCreationSettings settings = MockCreationSettings.GetSettings(constructorArgs, this.Behavior, additionalMockedInterfaces, mockConstructorCall);
             return repository.Create(mockType, settings);
-		}
-	}
+        }
+    }
 }

@@ -19,18 +19,18 @@ using Telerik.Sitefinity.Web.UI.Fields.Config;
 
 namespace Telerik.Sitefinity.Web.UI.Fields.Contracts
 {
-	/// <summary>
-	/// Defines the mandated members that need to be implemented by every type that
-	/// represents a field definition for the controls that implements <see cref="IField"/> interface.
-	/// </summary>
-	public interface IFieldControlDefinition : IFieldDefinition
-	{
-		/// <summary>
-		/// Gets or sets the programmatic identifier assigned to the field control.
-		/// </summary>
-		/// <returns>
-		/// The programmatic identifier assigned to the field control.
-		/// </returns>
-		string ID { get; set; }
-	}
+    /// <summary>
+    /// Defines the mandated members that need to be implemented by every type that
+    /// represents a field definition for the controls that implements <see cref="IField"/> interface.
+    /// </summary>
+    public interface IFieldControlDefinition : IFieldDefinition
+    {
+        /// <summary>
+        /// Gets or sets the programmatic identifier assigned to the field control.
+        /// </summary>
+        /// <returns>
+        /// The programmatic identifier assigned to the field control.
+        /// </returns>
+        string ID { get; set; }
+    }
 }

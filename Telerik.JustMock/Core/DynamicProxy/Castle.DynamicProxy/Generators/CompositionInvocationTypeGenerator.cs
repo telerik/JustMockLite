@@ -14,58 +14,58 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 {
-	using System;
-	using System.Reflection;
+    using System;
+    using System.Reflection;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Tokens;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Tokens;
 
-	internal class CompositionInvocationTypeGenerator : InvocationTypeGenerator
-	{
-		public static readonly Type BaseType = typeof(CompositionInvocation);
+    internal class CompositionInvocationTypeGenerator : InvocationTypeGenerator
+    {
+        public static readonly Type BaseType = typeof(CompositionInvocation);
 
-		public CompositionInvocationTypeGenerator(Type target, MetaMethod method, MethodInfo callback, bool canChangeTarget,
-		                                          IInvocationCreationContributor contributor)
-			: base(target, method, callback, canChangeTarget, contributor)
-		{
-		}
+        public CompositionInvocationTypeGenerator(Type target, MetaMethod method, MethodInfo callback, bool canChangeTarget,
+                                                  IInvocationCreationContributor contributor)
+            : base(target, method, callback, canChangeTarget, contributor)
+        {
+        }
 
-		protected override ArgumentReference[] GetBaseCtorArguments(Type targetFieldType,
-		                                                            out ConstructorInfo baseConstructor)
-		{
-			baseConstructor = InvocationMethods.CompositionInvocationConstructor;
-			return new[]
-			{
-				new ArgumentReference(targetFieldType),
-				new ArgumentReference(typeof(object)),
-				new ArgumentReference(typeof(IInterceptor[])),
-				new ArgumentReference(typeof(MethodInfo)),
-				new ArgumentReference(typeof(object[])),
-			};
-		}
+        protected override ArgumentReference[] GetBaseCtorArguments(Type targetFieldType,
+                                                                    out ConstructorInfo baseConstructor)
+        {
+            baseConstructor = InvocationMethods.CompositionInvocationConstructor;
+            return new[]
+            {
+                new ArgumentReference(targetFieldType),
+                new ArgumentReference(typeof(object)),
+                new ArgumentReference(typeof(IInterceptor[])),
+                new ArgumentReference(typeof(MethodInfo)),
+                new ArgumentReference(typeof(object[])),
+            };
+        }
 
-		protected override Type GetBaseType()
-		{
-			return BaseType;
-		}
+        protected override Type GetBaseType()
+        {
+            return BaseType;
+        }
 
-		protected override FieldReference GetTargetReference()
-		{
-			return new FieldReference(InvocationMethods.CompositionInvocationTarget);
-		}
+        protected override FieldReference GetTargetReference()
+        {
+            return new FieldReference(InvocationMethods.CompositionInvocationTarget);
+        }
 
-		protected override void ImplementInvokeMethodOnTarget(AbstractTypeEmitter invocation, ParameterInfo[] parameters,
-		                                                      MethodEmitter invokeMethodOnTarget, Reference targetField)
-		{
-			invokeMethodOnTarget.CodeBuilder.AddStatement(
-				new MethodInvocationExpression(
-					SelfReference.Self,
-					InvocationMethods.CompositionInvocationEnsureValidTarget));
+        protected override void ImplementInvokeMethodOnTarget(AbstractTypeEmitter invocation, ParameterInfo[] parameters,
+                                                              MethodEmitter invokeMethodOnTarget, Reference targetField)
+        {
+            invokeMethodOnTarget.CodeBuilder.AddStatement(
+                new MethodInvocationExpression(
+                    SelfReference.Self,
+                    InvocationMethods.CompositionInvocationEnsureValidTarget));
 
-			base.ImplementInvokeMethodOnTarget(invocation, parameters, invokeMethodOnTarget, targetField);
-		}
-	}
+            base.ImplementInvokeMethodOnTarget(invocation, parameters, invokeMethodOnTarget, targetField);
+        }
+    }
 }

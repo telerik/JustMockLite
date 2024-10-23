@@ -14,26 +14,26 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy
 {
-	using System;
-	using System.Runtime.Serialization;
+    using System;
+    using System.Runtime.Serialization;
 
-	// NOTE TO MAINTAINERS:
-	// Prefer throwing Base Class Library exception types wherever appropriate.
-	// This exception type is to be used mostly when something inside DynamicProxy goes wrong.
-	// Think of it as a "failed assertion" / "bug" exception.
-	[Serializable]
-	internal sealed class DynamicProxyException : Exception
-	{
-		internal DynamicProxyException(string message) : base(message)
-		{
-		}
+    // NOTE TO MAINTAINERS:
+    // Prefer throwing Base Class Library exception types wherever appropriate.
+    // This exception type is to be used mostly when something inside DynamicProxy goes wrong.
+    // Think of it as a "failed assertion" / "bug" exception.
+    [Serializable]
+    internal sealed class DynamicProxyException : Exception
+    {
+        internal DynamicProxyException(string message) : base(message)
+        {
+        }
 
-		internal DynamicProxyException(string message, Exception innerException) : base(message, innerException)
-		{
-		}
+        internal DynamicProxyException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
 
-		internal DynamicProxyException(SerializationInfo info, StreamingContext context) : base(info, context)
-		{
-		}
-	}
+        internal DynamicProxyException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
+    }
 }

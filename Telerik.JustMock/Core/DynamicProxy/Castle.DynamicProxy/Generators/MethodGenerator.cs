@@ -14,46 +14,46 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 {
-	using System.Reflection;
+    using System.Reflection;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
 
-	internal abstract class MethodGenerator : IGenerator<MethodEmitter>
-	{
-		private readonly MetaMethod method;
-		private readonly OverrideMethodDelegate overrideMethod;
+    internal abstract class MethodGenerator : IGenerator<MethodEmitter>
+    {
+        private readonly MetaMethod method;
+        private readonly OverrideMethodDelegate overrideMethod;
 
-		protected MethodGenerator(MetaMethod method, OverrideMethodDelegate overrideMethod)
-		{
-			this.method = method;
-			this.overrideMethod = overrideMethod;
-		}
+        protected MethodGenerator(MetaMethod method, OverrideMethodDelegate overrideMethod)
+        {
+            this.method = method;
+            this.overrideMethod = overrideMethod;
+        }
 
-		protected MethodInfo MethodOnTarget
-		{
-			get { return method.MethodOnTarget; }
-		}
+        protected MethodInfo MethodOnTarget
+        {
+            get { return method.MethodOnTarget; }
+        }
 
-		protected MethodInfo MethodToOverride
-		{
-			get { return method.Method; }
-		}
+        protected MethodInfo MethodToOverride
+        {
+            get { return method.Method; }
+        }
 
-		protected abstract MethodEmitter BuildProxiedMethodBody(MethodEmitter emitter, ClassEmitter @class,
-		                                                        INamingScope namingScope);
+        protected abstract MethodEmitter BuildProxiedMethodBody(MethodEmitter emitter, ClassEmitter @class,
+                                                                INamingScope namingScope);
 
-		public MethodEmitter Generate(ClassEmitter @class, INamingScope namingScope)
-		{
-			var methodEmitter = overrideMethod(method.Name, method.Attributes, MethodToOverride);
-			var proxiedMethod = BuildProxiedMethodBody(methodEmitter, @class, namingScope);
+        public MethodEmitter Generate(ClassEmitter @class, INamingScope namingScope)
+        {
+            var methodEmitter = overrideMethod(method.Name, method.Attributes, MethodToOverride);
+            var proxiedMethod = BuildProxiedMethodBody(methodEmitter, @class, namingScope);
 
-			if (MethodToOverride.DeclaringType.IsInterface)
-			{
-				@class.TypeBuilder.DefineMethodOverride(proxiedMethod.MethodBuilder, MethodToOverride);
-			}
+            if (MethodToOverride.DeclaringType.IsInterface)
+            {
+                @class.TypeBuilder.DefineMethodOverride(proxiedMethod.MethodBuilder, MethodToOverride);
+            }
 
-			return proxiedMethod;
-		}
-	}
+            return proxiedMethod;
+        }
+    }
 }

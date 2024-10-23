@@ -51,249 +51,249 @@ using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFa
 
 namespace Telerik.JustMock.Tests
 {
-	[TestClass]
-	public class DynamicFixture
-	{
-		public class TestBed
-		{
-			protected virtual int Value
-			{
-				get { throw new NotImplementedException(); }
-				set { throw new NotImplementedException(); }
-			}
+    [TestClass]
+    public class DynamicFixture
+    {
+        public class TestBed
+        {
+            protected virtual int Value
+            {
+                get { throw new NotImplementedException(); }
+                set { throw new NotImplementedException(); }
+            }
 
-			protected virtual int Get(int x, string y)
-			{
-				throw new NotImplementedException();
-			}
+            protected virtual int Get(int x, string y)
+            {
+                throw new NotImplementedException();
+            }
 
-			protected virtual int this[string x]
-			{
-				get { throw new NotImplementedException(); }
-				set { throw new NotImplementedException(); }
-			}
+            protected virtual int this[string x]
+            {
+                get { throw new NotImplementedException(); }
+                set { throw new NotImplementedException(); }
+            }
 
-			protected virtual INode Root
-			{
-				get { throw new NotImplementedException(); }
-				set { throw new NotImplementedException(); }
-			}
+            protected virtual INode Root
+            {
+                get { throw new NotImplementedException(); }
+                set { throw new NotImplementedException(); }
+            }
 
-			protected virtual T Get<T>()
-			{
-				throw new NotImplementedException();
-			}
+            protected virtual T Get<T>()
+            {
+                throw new NotImplementedException();
+            }
 
-			protected virtual ICollection<T> Digest<T>(IList<T> value)
-			{
-				return value;
-			}
+            protected virtual ICollection<T> Digest<T>(IList<T> value)
+            {
+                return value;
+            }
 
-			public class Accessor
-			{
-				private readonly TestBed testBed;
+            public class Accessor
+            {
+                private readonly TestBed testBed;
 
-				public Accessor(TestBed testBed)
-				{
-					this.testBed = testBed;
-				}
+                public Accessor(TestBed testBed)
+                {
+                    this.testBed = testBed;
+                }
 
-				public int Value
-				{
-					get { return this.testBed.Value; }
-					set { this.testBed.Value = value; }
-				}
+                public int Value
+                {
+                    get { return this.testBed.Value; }
+                    set { this.testBed.Value = value; }
+                }
 
-				public int Get(int x, string y)
-				{
-					return this.testBed.Get(x, y);
-				}
+                public int Get(int x, string y)
+                {
+                    return this.testBed.Get(x, y);
+                }
 
-				public T Get<T>()
-				{
-					return this.testBed.Get<T>();
-				}
+                public T Get<T>()
+                {
+                    return this.testBed.Get<T>();
+                }
 
-				public ICollection<T> Digest<T>(IList<T> x)
-				{
-					return this.testBed.Digest(x);
-				}
+                public ICollection<T> Digest<T>(IList<T> x)
+                {
+                    return this.testBed.Digest(x);
+                }
 
-				public int this[string x]
-				{
-					get { return this.testBed[x]; }
-					set { this.testBed[x] = value; }
-				}
+                public int this[string x]
+                {
+                    get { return this.testBed[x]; }
+                    set { this.testBed[x] = value; }
+                }
 
-				public INode Root
-				{
-					get { return this.testBed.Root; }
-					set { this.testBed.Root = value; }
-				}
-			}
-		}
+                public INode Root
+                {
+                    get { return this.testBed.Root; }
+                    set { this.testBed.Root = value; }
+                }
+            }
+        }
 
-		public interface INode
-		{
-			string Name { get; }
-			INode Left { get; }
-			INode Right { get; }
-		}
+        public interface INode
+        {
+            string Name { get; }
+            INode Left { get; }
+            INode Right { get; }
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
-		public void ShouldArrangeNonPublicGetterViaDynaMock()
-		{
-			var mock = Mock.Create<TestBed>();
-			dynamic wrapper = Mock.NonPublic.Wrap(mock);
-			var acc = new TestBed.Accessor(mock);
+        [TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+        public void ShouldArrangeNonPublicGetterViaDynaMock()
+        {
+            var mock = Mock.Create<TestBed>();
+            dynamic wrapper = Mock.NonPublic.Wrap(mock);
+            var acc = new TestBed.Accessor(mock);
 
-			Mock.NonPublic.Arrange<int>(wrapper.Value).Returns(123);
+            Mock.NonPublic.Arrange<int>(wrapper.Value).Returns(123);
 
-			Assert.Equal(123, acc.Value);
-		}
+            Assert.Equal(123, acc.Value);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
-		public void ShouldArrangeNonPublicSetterViaDynaMock()
-		{
-			var mock = Mock.Create<TestBed>();
-			dynamic wrapper = Mock.NonPublic.Wrap(mock);
-			var acc = new TestBed.Accessor(mock);
+        [TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+        public void ShouldArrangeNonPublicSetterViaDynaMock()
+        {
+            var mock = Mock.Create<TestBed>();
+            dynamic wrapper = Mock.NonPublic.Wrap(mock);
+            var acc = new TestBed.Accessor(mock);
 
-			Mock.NonPublic.Arrange(wrapper.Value = 123).MustBeCalled();
+            Mock.NonPublic.Arrange(wrapper.Value = 123).MustBeCalled();
 
-			acc.Value = 100;
-			Assert.Throws<AssertionException>(() => Mock.Assert(mock));
+            acc.Value = 100;
+            Assert.Throws<AssertionException>(() => Mock.Assert(mock));
 
-			acc.Value = 123;
+            acc.Value = 123;
 
-			Mock.Assert(mock);
-		}
+            Mock.Assert(mock);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
-		public void ShouldArrangeNonPublicSetterWithMatchersViaDynaMock()
-		{
-			var mock = Mock.Create<TestBed>();
-			dynamic wrapper = Mock.NonPublic.Wrap(mock);
-			var acc = new TestBed.Accessor(mock);
+        [TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+        public void ShouldArrangeNonPublicSetterWithMatchersViaDynaMock()
+        {
+            var mock = Mock.Create<TestBed>();
+            dynamic wrapper = Mock.NonPublic.Wrap(mock);
+            var acc = new TestBed.Accessor(mock);
 
-			Mock.NonPublic.Arrange(wrapper.Value = Arg.Expr.IsAny<int>()).MustBeCalled();
-			Assert.Throws<AssertionException>(() => Mock.Assert(mock));
+            Mock.NonPublic.Arrange(wrapper.Value = Arg.Expr.IsAny<int>()).MustBeCalled();
+            Assert.Throws<AssertionException>(() => Mock.Assert(mock));
 
-			acc.Value = 77;
+            acc.Value = 77;
 
-			Mock.Assert(mock);
-		}
+            Mock.Assert(mock);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
-		public void ShouldArrangeNonPublicMethodViaDynaMock()
-		{
-			var mock = Mock.Create<TestBed>();
-			dynamic wrapper = Mock.NonPublic.Wrap(mock);
-			var acc = new TestBed.Accessor(mock);
+        [TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+        public void ShouldArrangeNonPublicMethodViaDynaMock()
+        {
+            var mock = Mock.Create<TestBed>();
+            dynamic wrapper = Mock.NonPublic.Wrap(mock);
+            var acc = new TestBed.Accessor(mock);
 
-			Mock.NonPublic.Arrange<int>(wrapper.Get(10, "ss")).Returns(123);
+            Mock.NonPublic.Arrange<int>(wrapper.Get(10, "ss")).Returns(123);
 
-			Assert.Equal(0, acc.Get(20, "dd"));
-			Assert.Equal(123, acc.Get(10, "ss"));
-		}
+            Assert.Equal(0, acc.Get(20, "dd"));
+            Assert.Equal(123, acc.Get(10, "ss"));
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
-		public void ShouldArrangeNonPublicMethodWithMatchersViaDynaMock()
-		{
-			var mock = Mock.Create<TestBed>();
-			dynamic wrapper = Mock.NonPublic.Wrap(mock);
-			var acc = new TestBed.Accessor(mock);
+        [TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+        public void ShouldArrangeNonPublicMethodWithMatchersViaDynaMock()
+        {
+            var mock = Mock.Create<TestBed>();
+            dynamic wrapper = Mock.NonPublic.Wrap(mock);
+            var acc = new TestBed.Accessor(mock);
 
-			Mock.NonPublic.Arrange<int>(wrapper.Get(Arg.Expr.Matches<int>(x => x > 40), Arg.Expr.IsAny<string>())).Returns(123);
+            Mock.NonPublic.Arrange<int>(wrapper.Get(Arg.Expr.Matches<int>(x => x > 40), Arg.Expr.IsAny<string>())).Returns(123);
 
-			Assert.Equal(0, acc.Get(20, "ss"));
-			Assert.Equal(123, acc.Get(50, "dd"));
-		}
+            Assert.Equal(0, acc.Get(20, "ss"));
+            Assert.Equal(123, acc.Get(50, "dd"));
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
-		public void ShouldArrangeNonPublicIndexerGetterViaDynaMock()
-		{
-			var mock = Mock.Create<TestBed>();
-			dynamic wrapper = Mock.NonPublic.Wrap(mock);
-			var acc = new TestBed.Accessor(mock);
+        [TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+        public void ShouldArrangeNonPublicIndexerGetterViaDynaMock()
+        {
+            var mock = Mock.Create<TestBed>();
+            dynamic wrapper = Mock.NonPublic.Wrap(mock);
+            var acc = new TestBed.Accessor(mock);
 
-			Mock.NonPublic.Arrange<int>(wrapper["sss"]).Returns(123);
+            Mock.NonPublic.Arrange<int>(wrapper["sss"]).Returns(123);
 
-			Assert.Equal(0, acc["ssd"]);
-			Assert.Equal(123, acc["sss"]);
-		}
+            Assert.Equal(0, acc["ssd"]);
+            Assert.Equal(123, acc["sss"]);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
-		public void ShouldArrangeNonPublicIndexerSetterViaDynaMock()
-		{
-			var mock = Mock.Create<TestBed>();
-			dynamic wrapper = Mock.NonPublic.Wrap(mock);
-			var acc = new TestBed.Accessor(mock);
+        [TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+        public void ShouldArrangeNonPublicIndexerSetterViaDynaMock()
+        {
+            var mock = Mock.Create<TestBed>();
+            dynamic wrapper = Mock.NonPublic.Wrap(mock);
+            var acc = new TestBed.Accessor(mock);
 
-			Mock.NonPublic.Arrange<int>(wrapper["sss"] = 1000).MustBeCalled();
+            Mock.NonPublic.Arrange<int>(wrapper["sss"] = 1000).MustBeCalled();
 
-			Assert.Throws<AssertionException>(() => Mock.Assert(mock));
-			acc["sss"] = 123;
-			Assert.Throws<AssertionException>(() => Mock.Assert(mock));
-			acc["aaa"] = 1000;
-			Assert.Throws<AssertionException>(() => Mock.Assert(mock));
-			acc["sss"] = 1000;
-			Mock.Assert(mock);
-		}
+            Assert.Throws<AssertionException>(() => Mock.Assert(mock));
+            acc["sss"] = 123;
+            Assert.Throws<AssertionException>(() => Mock.Assert(mock));
+            acc["aaa"] = 1000;
+            Assert.Throws<AssertionException>(() => Mock.Assert(mock));
+            acc["sss"] = 1000;
+            Mock.Assert(mock);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
-		public void ShouldArrangeNonPublicMemberRecursivelyViaDynaMock()
-		{
-			var mock = Mock.Create<TestBed>();
-			dynamic wrapper = Mock.NonPublic.Wrap(mock);
-			var acc = new TestBed.Accessor(mock);
+        [TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+        public void ShouldArrangeNonPublicMemberRecursivelyViaDynaMock()
+        {
+            var mock = Mock.Create<TestBed>();
+            dynamic wrapper = Mock.NonPublic.Wrap(mock);
+            var acc = new TestBed.Accessor(mock);
 
-			Mock.NonPublic.Arrange<string>(wrapper.Root.Left.Left.Right.Name).Returns("abc");
+            Mock.NonPublic.Arrange<string>(wrapper.Root.Left.Left.Right.Name).Returns("abc");
 
-			Assert.Equal("", acc.Root.Left.Name);
-			Assert.Equal("abc", acc.Root.Left.Left.Right.Name);
-		}
+            Assert.Equal("", acc.Root.Left.Name);
+            Assert.Equal("abc", acc.Root.Left.Left.Right.Name);
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
-		public void ShouldAssertNonPublicMethodViaDynaMock()
-		{
-			var mock = Mock.Create<TestBed>();
-			dynamic wrapper = Mock.NonPublic.Wrap(mock);
-			var acc = new TestBed.Accessor(mock);
+        [TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+        public void ShouldAssertNonPublicMethodViaDynaMock()
+        {
+            var mock = Mock.Create<TestBed>();
+            dynamic wrapper = Mock.NonPublic.Wrap(mock);
+            var acc = new TestBed.Accessor(mock);
 
-			Assert.Throws<AssertionException>(() => Mock.NonPublic.Assert(wrapper.Value = 123, Occurs.Once()));
-			Assert.Throws<AssertionException>(() => Mock.NonPublic.Assert(wrapper.Value = Arg.Expr.IsAny<int>(), Occurs.Once()));
+            Assert.Throws<AssertionException>(() => Mock.NonPublic.Assert(wrapper.Value = 123, Occurs.Once()));
+            Assert.Throws<AssertionException>(() => Mock.NonPublic.Assert(wrapper.Value = Arg.Expr.IsAny<int>(), Occurs.Once()));
 
-			acc.Value = 123;
+            acc.Value = 123;
 
-			Mock.NonPublic.Assert(wrapper.Value = 123, Occurs.Once());
-			Mock.NonPublic.Assert(wrapper.Value = Arg.Expr.IsAny<int>(), Occurs.Once());
-		}
+            Mock.NonPublic.Assert(wrapper.Value = 123, Occurs.Once());
+            Mock.NonPublic.Assert(wrapper.Value = Arg.Expr.IsAny<int>(), Occurs.Once());
+        }
 
 #if !COREFX
-		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
-		public void ShouldArrangeNonPublicGenericMethodWithExplicitTypeArgumentsViaDynaMock()
-		{
-			var mock = Mock.Create<TestBed>();
-			dynamic wrapper = Mock.NonPublic.Wrap(mock);
-			var acc = new TestBed.Accessor(mock);
+        [TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+        public void ShouldArrangeNonPublicGenericMethodWithExplicitTypeArgumentsViaDynaMock()
+        {
+            var mock = Mock.Create<TestBed>();
+            dynamic wrapper = Mock.NonPublic.Wrap(mock);
+            var acc = new TestBed.Accessor(mock);
 
-			Mock.NonPublic.Arrange<int>(wrapper.Get<int>()).Returns(123);
+            Mock.NonPublic.Arrange<int>(wrapper.Get<int>()).Returns(123);
 
-			Assert.Equal(123, acc.Get<int>());
-		}
+            Assert.Equal(123, acc.Get<int>());
+        }
 #endif
 
-		[TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
-		public void ShouldArrangeNonPublicGenericMethodViaDynaMock()
-		{
-			var mock = Mock.Create<TestBed>();
-			dynamic wrapper = Mock.NonPublic.Wrap(mock);
-			var acc = new TestBed.Accessor(mock);
+        [TestMethod, TestCategory("Lite"), TestCategory("NonPublic"), TestCategory("DynaMock")]
+        public void ShouldArrangeNonPublicGenericMethodViaDynaMock()
+        {
+            var mock = Mock.Create<TestBed>();
+            dynamic wrapper = Mock.NonPublic.Wrap(mock);
+            var acc = new TestBed.Accessor(mock);
 
-			Mock.NonPublic.Arrange<ICollection<int>>(wrapper.Digest(new[] { 123 })).Returns(new[] { 321 });
+            Mock.NonPublic.Arrange<ICollection<int>>(wrapper.Digest(new[] { 123 })).Returns(new[] { 321 });
 
-			Assert.Equal(321, acc.Digest(new[] { 123 }).First());
-		}
-	}
+            Assert.Equal(321, acc.Digest(new[] { 123 }).First());
+        }
+    }
 }

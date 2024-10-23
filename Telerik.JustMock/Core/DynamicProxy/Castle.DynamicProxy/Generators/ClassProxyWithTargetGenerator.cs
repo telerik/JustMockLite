@@ -14,67 +14,67 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Reflection;
+    using System;
+    using System.Collections.Generic;
+    using System.Reflection;
 
 #if FEATURE_SERIALIZATION
-	using System.Xml.Serialization;
+    using System.Xml.Serialization;
 #endif
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Serialization;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Serialization;
 
-	internal sealed class ClassProxyWithTargetGenerator : BaseClassProxyGenerator
-	{
-		private FieldReference targetField;
+    internal sealed class ClassProxyWithTargetGenerator : BaseClassProxyGenerator
+    {
+        private FieldReference targetField;
 
-		public ClassProxyWithTargetGenerator(ModuleScope scope, Type targetType, Type[] interfaces,
-		                                     ProxyGenerationOptions options)
-			: base(scope, targetType, interfaces, options)
-		{
-		}
+        public ClassProxyWithTargetGenerator(ModuleScope scope, Type targetType, Type[] interfaces,
+                                             ProxyGenerationOptions options)
+            : base(scope, targetType, interfaces, options)
+        {
+        }
 
-		protected override FieldReference TargetField => targetField;
+        protected override FieldReference TargetField => targetField;
 
-		protected override CacheKey GetCacheKey()
-		{
-			return new CacheKey(targetType, targetType, interfaces, ProxyGenerationOptions);
-		}
+        protected override CacheKey GetCacheKey()
+        {
+            return new CacheKey(targetType, targetType, interfaces, ProxyGenerationOptions);
+        }
 
-		protected override void CreateFields(ClassEmitter emitter)
-		{
-			base.CreateFields(emitter);
-			CreateTargetField(emitter);
-		}
+        protected override void CreateFields(ClassEmitter emitter)
+        {
+            base.CreateFields(emitter);
+            CreateTargetField(emitter);
+        }
 
 #if FEATURE_SERIALIZATION
-		protected override SerializableContributor GetSerializableContributor()
-		{
-			return new ClassProxySerializableContributor(targetType, interfaces, ProxyTypeConstants.ClassWithTarget);
-		}
+        protected override SerializableContributor GetSerializableContributor()
+        {
+            return new ClassProxySerializableContributor(targetType, interfaces, ProxyTypeConstants.ClassWithTarget);
+        }
 #endif
 
-		protected override CompositeTypeContributor GetProxyTargetContributor(INamingScope namingScope)
-		{
-			return new ClassProxyWithTargetTargetContributor(targetType, namingScope) { Logger = Logger };
-		}
+        protected override CompositeTypeContributor GetProxyTargetContributor(INamingScope namingScope)
+        {
+            return new ClassProxyWithTargetTargetContributor(targetType, namingScope) { Logger = Logger };
+        }
 
-		protected override ProxyTargetAccessorContributor GetProxyTargetAccessorContributor()
-		{
-			return new ProxyTargetAccessorContributor(
-				getTargetReference: () => targetField,
-				targetType);
-		}
+        protected override ProxyTargetAccessorContributor GetProxyTargetAccessorContributor()
+        {
+            return new ProxyTargetAccessorContributor(
+                getTargetReference: () => targetField,
+                targetType);
+        }
 
-		private void CreateTargetField(ClassEmitter emitter)
-		{
-			targetField = emitter.CreateField("__target", targetType);
+        private void CreateTargetField(ClassEmitter emitter)
+        {
+            targetField = emitter.CreateField("__target", targetType);
 #if FEATURE_SERIALIZATION
-			emitter.DefineCustomAttributeFor<XmlIgnoreAttribute>(targetField);
+            emitter.DefineCustomAttributeFor<XmlIgnoreAttribute>(targetField);
 #endif
-		}
-	}
+        }
+    }
 }

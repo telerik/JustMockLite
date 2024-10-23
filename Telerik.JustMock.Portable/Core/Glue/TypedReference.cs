@@ -22,7 +22,7 @@ using System.Text;
 
 namespace Telerik.JustMock.Core
 {
-	internal class TypedReference
-	{
-	}
+    internal class TypedReference
+    {
+    }
 }

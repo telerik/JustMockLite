@@ -20,20 +20,20 @@ using System.Net;
 
 namespace Telerik.JustMock.DemoLib
 {
-	public class ChannelManager
-	{
-		internal static IPAddress Address { get; set; }
+    public class ChannelManager
+    {
+        internal static IPAddress Address { get; set; }
 
-		public static void Open()
-		{
-			ChannelManager.Address = IPAddress.Parse("10.10.1.1");
+        public static void Open()
+        {
+            ChannelManager.Address = IPAddress.Parse("10.10.1.1");
 
-			var address = ChannelManager.Address;
+            var address = ChannelManager.Address;
 
-			if (address != null)
-			{
-				throw new Exception("Invalid IP address");
-			}
-		}
-	}
+            if (address != null)
+            {
+                throw new Exception("Invalid IP address");
+            }
+        }
+    }
 }

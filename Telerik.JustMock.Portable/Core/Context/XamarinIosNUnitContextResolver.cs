@@ -20,27 +20,27 @@ using System.Diagnostics;
 
 namespace Telerik.JustMock.Core.Context
 {
-	internal class XamarinIosNUnitContextResolver : HierarchicalTestFrameworkContextResolver
-	{
-		private const string NunitAssertionExceptionName = "NUnit.Framework.AssertionException, MonoTouch.NUnitLite";
+    internal class XamarinIosNUnitContextResolver : HierarchicalTestFrameworkContextResolver
+    {
+        private const string NunitAssertionExceptionName = "NUnit.Framework.AssertionException, MonoTouch.NUnitLite";
 
-		public XamarinIosNUnitContextResolver()
-			: base(NunitAssertionExceptionName)
-		{
-			this.SetupStandardHierarchicalTestStructure(
-				new[] { "NUnit.Framework.TestAttribute, MonoTouch.NUnitLite", "NUnit.Framework.TestCaseAttribute, MonoTouch.NUnitLite", "NUnit.Framework.TestCaseSourceAttribute, MonoTouch.NUnitLite" },
-				new[] { "NUnit.Framework.SetUpAttribute, MonoTouch.NUnitLite", "NUnit.Framework.TearDownAttribute, MonoTouch.NUnitLite" },
-				new[] { "NUnit.Framework.TestFixtureSetUpAttribute, MonoTouch.NUnitLite", "NUnit.Framework.TestFixtureTearDownAttribute, MonoTouch.NUnitLite" },
-				null,
-				FixtureConstuctorSemantics.InstanceConstructorCalledOncePerFixture);
-		}
+        public XamarinIosNUnitContextResolver()
+            : base(NunitAssertionExceptionName)
+        {
+            this.SetupStandardHierarchicalTestStructure(
+                new[] { "NUnit.Framework.TestAttribute, MonoTouch.NUnitLite", "NUnit.Framework.TestCaseAttribute, MonoTouch.NUnitLite", "NUnit.Framework.TestCaseSourceAttribute, MonoTouch.NUnitLite" },
+                new[] { "NUnit.Framework.SetUpAttribute, MonoTouch.NUnitLite", "NUnit.Framework.TearDownAttribute, MonoTouch.NUnitLite" },
+                new[] { "NUnit.Framework.TestFixtureSetUpAttribute, MonoTouch.NUnitLite", "NUnit.Framework.TestFixtureTearDownAttribute, MonoTouch.NUnitLite" },
+                null,
+                FixtureConstuctorSemantics.InstanceConstructorCalledOncePerFixture);
+        }
 
-		public static bool IsAvailable
-		{
-			get
-			{
-				return Type.GetType(NunitAssertionExceptionName) != null;
-			}
-		}
-	}
+        public static bool IsAvailable
+        {
+            get
+            {
+                return Type.GetType(NunitAssertionExceptionName) != null;
+            }
+        }
+    }
 }

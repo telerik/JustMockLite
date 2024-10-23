@@ -19,72 +19,72 @@ using System;
 
 namespace Telerik.JustMock.Expectations.Abstraction
 {
-	/// <summary>
-	/// Defines common expectations.
-	/// </summary>
-	public interface IAction<TContainer> : IDoInstead<TContainer>, IThrows<TContainer>, IAssertable
-	{
-		///<summary>
-		/// Raises the expected with specific arguments
-		///</summary>
-		///<param name="eventExpression"></param>
-		///<param name="args"></param>
-		///<returns></returns>
-		///<exception cref="InvalidOperationException"></exception>
-		TContainer Raises(Action eventExpression, params object[] args);
+    /// <summary>
+    /// Defines common expectations.
+    /// </summary>
+    public interface IAction<TContainer> : IDoInstead<TContainer>, IThrows<TContainer>, IAssertable
+    {
+        ///<summary>
+        /// Raises the expected with specific arguments
+        ///</summary>
+        ///<param name="eventExpression"></param>
+        ///<param name="args"></param>
+        ///<returns></returns>
+        ///<exception cref="InvalidOperationException"></exception>
+        TContainer Raises(Action eventExpression, params object[] args);
 
-		///<summary>
-		/// Raises the expected with specific arguments
-		///</summary>
-		///<param name="eventExpression"></param>
-		///<param name="args">Event arguments</param>
-		///<returns></returns>
-		///<exception cref="InvalidOperationException"></exception>
-		TContainer Raises(Action eventExpression, EventArgs args);
+        ///<summary>
+        /// Raises the expected with specific arguments
+        ///</summary>
+        ///<param name="eventExpression"></param>
+        ///<param name="args">Event arguments</param>
+        ///<returns></returns>
+        ///<exception cref="InvalidOperationException"></exception>
+        TContainer Raises(Action eventExpression, EventArgs args);
 
-		///<summary>
-		/// Raises the expected event for the setup.
-		///</summary>
-		///<param name="eventExpression"></param>
-		///<param name="func">An function that will be used to construct event arguments</param>
-		///<returns></returns>
-		///<exception cref="InvalidOperationException"></exception>
-		TContainer Raises<T1>(Action eventExpression, Func<T1, EventArgs> func);
+        ///<summary>
+        /// Raises the expected event for the setup.
+        ///</summary>
+        ///<param name="eventExpression"></param>
+        ///<param name="func">An function that will be used to construct event arguments</param>
+        ///<returns></returns>
+        ///<exception cref="InvalidOperationException"></exception>
+        TContainer Raises<T1>(Action eventExpression, Func<T1, EventArgs> func);
 
-		///<summary>
-		/// Raises the expected event for the setup.
-		///</summary>
-		///<param name="eventExpression"></param>
-		///<param name="func">An function that will be used to construct event arguments</param>
-		///<returns></returns>
-		///<exception cref="InvalidOperationException"></exception>
-		TContainer Raises<T1, T2>(Action eventExpression, Func<T1, T2, EventArgs> func);
+        ///<summary>
+        /// Raises the expected event for the setup.
+        ///</summary>
+        ///<param name="eventExpression"></param>
+        ///<param name="func">An function that will be used to construct event arguments</param>
+        ///<returns></returns>
+        ///<exception cref="InvalidOperationException"></exception>
+        TContainer Raises<T1, T2>(Action eventExpression, Func<T1, T2, EventArgs> func);
 
-		///<summary>
-		/// Raises the expected event for the setup.
-		///</summary>
-		///<param name="eventExpression"></param>
-		///<param name="func">An function that will be used to construct event arguments</param>
-		///<returns></returns>
-		///<exception cref="InvalidOperationException"></exception>
-		TContainer Raises<T1, T2, T3>(Action eventExpression, Func<T1, T2, T3, EventArgs> func);
+        ///<summary>
+        /// Raises the expected event for the setup.
+        ///</summary>
+        ///<param name="eventExpression"></param>
+        ///<param name="func">An function that will be used to construct event arguments</param>
+        ///<returns></returns>
+        ///<exception cref="InvalidOperationException"></exception>
+        TContainer Raises<T1, T2, T3>(Action eventExpression, Func<T1, T2, T3, EventArgs> func);
 
-		///<summary>
-		/// Raises the expected event for the setup.
-		///</summary>
-		///<param name="eventExpression"></param>
-		///<param name="func">An function that will be used to construct event arguments</param>
-		///<returns></returns>
-		///<exception cref="InvalidOperationException"></exception>
-		TContainer Raises<T1, T2, T3, T4>(Action eventExpression, Func<T1, T2, T3, T4, EventArgs> func);
+        ///<summary>
+        /// Raises the expected event for the setup.
+        ///</summary>
+        ///<param name="eventExpression"></param>
+        ///<param name="func">An function that will be used to construct event arguments</param>
+        ///<returns></returns>
+        ///<exception cref="InvalidOperationException"></exception>
+        TContainer Raises<T1, T2, T3, T4>(Action eventExpression, Func<T1, T2, T3, T4, EventArgs> func);
 
-		/// <summary>
-		///  Specifies call a to step over (loose mocks only).
-		/// </summary>
-		/// <remarks>
-		/// For loose mocks by default the behavior is step over.
-		/// </remarks>
-		/// <returns>Reference to <see cref="IAssertable"/></returns>
-		IAssertable DoNothing();
-	}
+        /// <summary>
+        ///  Specifies call a to step over (loose mocks only).
+        /// </summary>
+        /// <remarks>
+        /// For loose mocks by default the behavior is step over.
+        /// </remarks>
+        /// <returns>Reference to <see cref="IAssertable"/></returns>
+        IAssertable DoNothing();
+    }
 }

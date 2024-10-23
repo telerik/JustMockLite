@@ -14,24 +14,24 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 {
-	using System;
-	using System.Collections.Generic;
+    using System;
+    using System.Collections.Generic;
 
-	internal class FieldReferenceComparer : IComparer<Type>
-	{
-		public int Compare(Type x, Type y)
-		{
-			if (x == null)
-			{
-				throw new ArgumentNullException(nameof(x));
-			}
+    internal class FieldReferenceComparer : IComparer<Type>
+    {
+        public int Compare(Type x, Type y)
+        {
+            if (x == null)
+            {
+                throw new ArgumentNullException(nameof(x));
+            }
 
-			if (y == null)
-			{
-				throw new ArgumentNullException(nameof(y));
-			}
+            if (y == null)
+            {
+                throw new ArgumentNullException(nameof(y));
+            }
 
-			return string.CompareOrdinal(x.FullName, y.FullName);
-		}
-	}
+            return string.CompareOrdinal(x.FullName, y.FullName);
+        }
+    }
 }

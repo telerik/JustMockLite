@@ -17,36 +17,36 @@
 
 namespace Telerik.JustMock.Core.Internal
 {
-	using System.Threading;
+    using System.Threading;
 
-	internal class SlimWriteLockHolder : ILockHolder
-	{
-		private readonly ReaderWriterLockSlim locker;
+    internal class SlimWriteLockHolder : ILockHolder
+    {
+        private readonly ReaderWriterLockSlim locker;
 
-		private bool lockAcquired;
+        private bool lockAcquired;
 
-		public SlimWriteLockHolder(ReaderWriterLockSlim locker, bool waitForLock)
-		{
-			this.locker = locker;
-			if(waitForLock)
-			{
-				locker.EnterWriteLock();
-				lockAcquired = true;
-				return;
-			}
-			lockAcquired = locker.TryEnterWriteLock(0);
-		}
+        public SlimWriteLockHolder(ReaderWriterLockSlim locker, bool waitForLock)
+        {
+            this.locker = locker;
+            if(waitForLock)
+            {
+                locker.EnterWriteLock();
+                lockAcquired = true;
+                return;
+            }
+            lockAcquired = locker.TryEnterWriteLock(0);
+        }
 
-		public void Dispose()
-		{
-			if(!LockAcquired) return;
-			locker.ExitWriteLock();
-			lockAcquired = false;
-		}
+        public void Dispose()
+        {
+            if(!LockAcquired) return;
+            locker.ExitWriteLock();
+            lockAcquired = false;
+        }
 
-		public bool LockAcquired
-		{
-			get { return lockAcquired; }
-		}
-	}
+        public bool LockAcquired
+        {
+            get { return lockAcquired; }
+        }
+    }
 }

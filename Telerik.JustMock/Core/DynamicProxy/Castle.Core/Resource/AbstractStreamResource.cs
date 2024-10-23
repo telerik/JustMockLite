@@ -14,41 +14,41 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
-	using System.IO;
-	using System.Text;
+    using System.IO;
+    using System.Text;
 
-	internal delegate Stream StreamFactory();
+    internal delegate Stream StreamFactory();
 
-	/// <summary>
-	/// 
-	/// </summary>
-	internal abstract class AbstractStreamResource : AbstractResource
-	{
-		/// <summary>
-		/// This returns a new stream instance each time it is called.
-		/// It is the responsibility of the caller to dispose of this stream
-		/// </summary>
-		private StreamFactory createStream;
+    /// <summary>
+    /// 
+    /// </summary>
+    internal abstract class AbstractStreamResource : AbstractResource
+    {
+        /// <summary>
+        /// This returns a new stream instance each time it is called.
+        /// It is the responsibility of the caller to dispose of this stream
+        /// </summary>
+        private StreamFactory createStream;
 
-		~AbstractStreamResource()
-		{
-			Dispose(false);
-		}
+        ~AbstractStreamResource()
+        {
+            Dispose(false);
+        }
 
-		public StreamFactory CreateStream
-		{
-			get { return createStream; }
-			set { createStream = value; }
-		}
+        public StreamFactory CreateStream
+        {
+            get { return createStream; }
+            set { createStream = value; }
+        }
 
-		public override TextReader GetStreamReader()
-		{
-			return new StreamReader(CreateStream());
-		}
+        public override TextReader GetStreamReader()
+        {
+            return new StreamReader(CreateStream());
+        }
 
-		public override TextReader GetStreamReader(Encoding encoding)
-		{
-			return new StreamReader(CreateStream(), encoding);
-		}
-	}
+        public override TextReader GetStreamReader(Encoding encoding)
+        {
+            return new StreamReader(CreateStream(), encoding);
+        }
+    }
 }

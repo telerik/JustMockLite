@@ -19,15 +19,15 @@ using System;
 
 namespace Telerik.JustMock.Expectations.Abstraction
 {
-	/// <summary>
-	/// Mark the statement as assertable in <see cref="Mock.Assert{T}(T)"/>.
-	/// </summary>
-	public interface IAssertable : IMustBeCalled, ISetupBehavior, IOccurrence, IOrder, IPrerequisite, IDisposable
-	{
-		/// <summary>
-		/// Use it to call the real implementation.
-		/// </summary>
-		/// <returns></returns>
-		IAssertable CallOriginal();
-	}
+    /// <summary>
+    /// Mark the statement as assertable in <see cref="Mock.Assert{T}(T)"/>.
+    /// </summary>
+    public interface IAssertable : IMustBeCalled, ISetupBehavior, IOccurrence, IOrder, IPrerequisite, IDisposable
+    {
+        /// <summary>
+        /// Use it to call the real implementation.
+        /// </summary>
+        /// <returns></returns>
+        IAssertable CallOriginal();
+    }
 }

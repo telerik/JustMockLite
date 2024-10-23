@@ -14,60 +14,60 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST
 {
-	using System;
-	using System.Reflection;
-	using System.Reflection.Emit;
+    using System;
+    using System.Reflection;
+    using System.Reflection.Emit;
 
-	internal class ReferencesToObjectArrayExpression : IExpression
-	{
-		private readonly TypeReference[] args;
+    internal class ReferencesToObjectArrayExpression : IExpression
+    {
+        private readonly TypeReference[] args;
 
-		public ReferencesToObjectArrayExpression(params TypeReference[] args)
-		{
-			this.args = args;
-		}
+        public ReferencesToObjectArrayExpression(params TypeReference[] args)
+        {
+            this.args = args;
+        }
 
-		public void Emit(ILGenerator gen)
-		{
-			var local = gen.DeclareLocal(typeof(object[]));
+        public void Emit(ILGenerator gen)
+        {
+            var local = gen.DeclareLocal(typeof(object[]));
 
-			gen.Emit(OpCodes.Ldc_I4, args.Length);
-			gen.Emit(OpCodes.Newarr, typeof(object));
-			gen.Emit(OpCodes.Stloc, local);
+            gen.Emit(OpCodes.Ldc_I4, args.Length);
+            gen.Emit(OpCodes.Newarr, typeof(object));
+            gen.Emit(OpCodes.Stloc, local);
 
-			for (var i = 0; i < args.Length; i++)
-			{
-				gen.Emit(OpCodes.Ldloc, local);
-				gen.Emit(OpCodes.Ldc_I4, i);
+            for (var i = 0; i < args.Length; i++)
+            {
+                gen.Emit(OpCodes.Ldloc, local);
+                gen.Emit(OpCodes.Ldc_I4, i);
 
-				var reference = args[i];
+                var reference = args[i];
 
-				ArgumentsUtil.EmitLoadOwnerAndReference(reference, gen);
+                ArgumentsUtil.EmitLoadOwnerAndReference(reference, gen);
 
-				if (reference.Type.IsByRef)
-				{
-					throw new NotSupportedException();
-				}
+                if (reference.Type.IsByRef)
+                {
+                    throw new NotSupportedException();
+                }
 
-				if (reference.Type.GetTypeInfo().IsPointer)
-				{
-					gen.Emit(OpCodes.Call, ArgumentsUtil.IntPtrFromPointer());
-					gen.Emit(OpCodes.Box, typeof(IntPtr));
-				}
+                if (reference.Type.GetTypeInfo().IsPointer)
+                {
+                    gen.Emit(OpCodes.Call, ArgumentsUtil.IntPtrFromPointer());
+                    gen.Emit(OpCodes.Box, typeof(IntPtr));
+                }
 
-				if (reference.Type.IsValueType)
-				{
-					gen.Emit(OpCodes.Box, reference.Type);
-				}
-				else if (reference.Type.IsGenericParameter)
-				{
-					gen.Emit(OpCodes.Box, reference.Type);
-				}
+                if (reference.Type.IsValueType)
+                {
+                    gen.Emit(OpCodes.Box, reference.Type);
+                }
+                else if (reference.Type.IsGenericParameter)
+                {
+                    gen.Emit(OpCodes.Box, reference.Type);
+                }
 
-				gen.Emit(OpCodes.Stelem_Ref);
-			}
+                gen.Emit(OpCodes.Stelem_Ref);
+            }
 
-			gen.Emit(OpCodes.Ldloc, local);
-		}
-	}
+            gen.Emit(OpCodes.Ldloc, local);
+        }
+    }
 }

@@ -14,23 +14,23 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
 {
-	using System;
-	using System.ComponentModel;
-	using System.Diagnostics;
-	using System.Reflection;
+    using System;
+    using System.ComponentModel;
+    using System.Diagnostics;
+    using System.Reflection;
 
 #if FEATURE_SERIALIZATION
-	[Serializable]
+    [Serializable]
 #endif
-	[EditorBrowsable(EditorBrowsableState.Never)]
-	public sealed class InheritanceInvocationWithoutTarget : InheritanceInvocation
-	{
-		public InheritanceInvocationWithoutTarget(Type targetType, object proxy, IInterceptor[] interceptors, MethodInfo proxiedMethod, object[] arguments)
-			: base(targetType, proxy, interceptors, proxiedMethod, arguments)
-		{
-			Debug.Assert(proxiedMethod.IsAbstract, $"{nameof(InheritanceInvocationWithoutTarget)} does not support non-abstract methods.");
-		}
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public sealed class InheritanceInvocationWithoutTarget : InheritanceInvocation
+    {
+        public InheritanceInvocationWithoutTarget(Type targetType, object proxy, IInterceptor[] interceptors, MethodInfo proxiedMethod, object[] arguments)
+            : base(targetType, proxy, interceptors, proxiedMethod, arguments)
+        {
+            Debug.Assert(proxiedMethod.IsAbstract, $"{nameof(InheritanceInvocationWithoutTarget)} does not support non-abstract methods.");
+        }
 
-		protected override void InvokeMethodOnTarget() => ThrowOnNoTarget();
-	}
+        protected override void InvokeMethodOnTarget() => ThrowOnNoTarget();
+    }
 }

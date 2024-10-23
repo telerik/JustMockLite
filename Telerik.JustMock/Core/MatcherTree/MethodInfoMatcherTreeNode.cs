@@ -22,57 +22,57 @@ using System.Reflection;
 
 namespace Telerik.JustMock.Core.MatcherTree
 {
-	internal class MethodInfoMatcherTreeNode : MatcherTreeNode
-	{
-		public MethodBase MethodInfo { get; private set; }
+    internal class MethodInfoMatcherTreeNode : MatcherTreeNode
+    {
+        public MethodBase MethodInfo { get; private set; }
 
-		public MethodInfoMatcherTreeNode(MethodBase m)
-			: base(null)
-		{
-			this.MethodInfo = m;
-		}
+        public MethodInfoMatcherTreeNode(MethodBase m)
+            : base(null)
+        {
+            this.MethodInfo = m;
+        }
 
-		public override IMatcherTreeNode Clone()
-		{
-			return new MethodInfoMatcherTreeNode(MethodInfo);
-		}
+        public override IMatcherTreeNode Clone()
+        {
+            return new MethodInfoMatcherTreeNode(MethodInfo);
+        }
 
-		public void AddChild(CallPattern callPattern, MethodMockMatcherTreeNode node)
-		{
-			AddChildInternal(callPattern, 0, node);
-		}
+        public void AddChild(CallPattern callPattern, MethodMockMatcherTreeNode node)
+        {
+            AddChildInternal(callPattern, 0, node);
+        }
 
-		public void AddChild(CallPattern callPattern, IMethodMock methodMock,int id)
-		{
-			var node = new MethodMockMatcherTreeNode(methodMock, id);
-			callPattern.MethodMockNode = node;
-			AddChildInternal(callPattern, 0, node);
-		}
+        public void AddChild(CallPattern callPattern, IMethodMock methodMock,int id)
+        {
+            var node = new MethodMockMatcherTreeNode(methodMock, id);
+            callPattern.MethodMockNode = node;
+            AddChildInternal(callPattern, 0, node);
+        }
 
-		public List<MethodMockMatcherTreeNode> GetAllMethodMocks(CallPattern callPattern)
-		{
-			List<MethodMockMatcherTreeNode> results = new List<MethodMockMatcherTreeNode>();
-			GetMethodMockInternal(callPattern, 0, results, MatchingOptions.Concretizing);
-			return results;
-		}
+        public List<MethodMockMatcherTreeNode> GetAllMethodMocks(CallPattern callPattern)
+        {
+            List<MethodMockMatcherTreeNode> results = new List<MethodMockMatcherTreeNode>();
+            GetMethodMockInternal(callPattern, 0, results, MatchingOptions.Concretizing);
+            return results;
+        }
 
-		public List<MethodMockMatcherTreeNode> GetMethodMock(CallPattern callPattern)
-		{
-			List<MethodMockMatcherTreeNode> results = new List<MethodMockMatcherTreeNode>();
-			GetMethodMockInternal(callPattern, 0, results, MatchingOptions.Generalizing);
-			return results;
-		}
+        public List<MethodMockMatcherTreeNode> GetMethodMock(CallPattern callPattern)
+        {
+            List<MethodMockMatcherTreeNode> results = new List<MethodMockMatcherTreeNode>();
+            GetMethodMockInternal(callPattern, 0, results, MatchingOptions.Generalizing);
+            return results;
+        }
 
-		public void AddOrUpdateOccurence(CallPattern callPattern, IMethodMock mock)
-		{
-			AddOrUpdateOccurenceInternal(callPattern, 0, mock);
-		}
+        public void AddOrUpdateOccurence(CallPattern callPattern, IMethodMock mock)
+        {
+            AddOrUpdateOccurenceInternal(callPattern, 0, mock);
+        }
 
-		public List<OccurrencesMatcherTreeNode> GetOccurences(CallPattern callPattern)
-		{
-			List<OccurrencesMatcherTreeNode> results = new List<OccurrencesMatcherTreeNode>();
-			GetOccurencesInternal(callPattern, 0, results);
-			return results;
-		}
-	}
+        public List<OccurrencesMatcherTreeNode> GetOccurences(CallPattern callPattern)
+        {
+            List<OccurrencesMatcherTreeNode> results = new List<OccurrencesMatcherTreeNode>();
+            GetOccurencesInternal(callPattern, 0, results);
+            return results;
+        }
+    }
 }

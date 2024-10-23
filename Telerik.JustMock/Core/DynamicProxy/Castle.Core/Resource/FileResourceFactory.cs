@@ -14,33 +14,33 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
-	using System;
+    using System;
 
-	/// <summary>
-	/// 
-	/// </summary>
-	internal class FileResourceFactory : IResourceFactory
-	{
-		public FileResourceFactory()
-		{
-		}
+    /// <summary>
+    /// 
+    /// </summary>
+    internal class FileResourceFactory : IResourceFactory
+    {
+        public FileResourceFactory()
+        {
+        }
 
-		public bool Accept(CustomUri uri)
-		{
-			return "file".Equals(uri.Scheme);
-		}
+        public bool Accept(CustomUri uri)
+        {
+            return "file".Equals(uri.Scheme);
+        }
 
-		public IResource Create(CustomUri uri)
-		{
-			return Create(uri, null);
-		}
+        public IResource Create(CustomUri uri)
+        {
+            return Create(uri, null);
+        }
 
-		public IResource Create(CustomUri uri, string basePath)
-		{
-			if (basePath != null)
-				return new FileResource(uri, basePath);
-			else
-				return new FileResource(uri);
-		}
-	}
+        public IResource Create(CustomUri uri, string basePath)
+        {
+            if (basePath != null)
+                return new FileResource(uri, basePath);
+            else
+                return new FileResource(uri);
+        }
+    }
 }

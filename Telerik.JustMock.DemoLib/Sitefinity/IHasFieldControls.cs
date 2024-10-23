@@ -21,20 +21,20 @@ using Telerik.Sitefinity.Web.UI.Fields.Enums;
 
 namespace Telerik.Sitefinity.Fluent.Definitions
 {
-	public interface IHasFieldControls<TActualFacade>
-		where TActualFacade : class
-	{
-		/// <summary>
-		/// Add a choice field and specify the type of the control that will use this settings to render it
-		/// </summary>
-		/// <typeparam name="TFieldControl">Field control inheriting <c>ChoiceField</c> that will use this settings to render the field</typeparam>
-		/// <param name="fieldName">Name of the field to bind to</param>
-		/// <param name="renderAs">Specify how the control will be rendered</param>
-		/// <returns>Child facade for further customization of the choice field</returns>
-		/// <remarks>Sets both FieldName and DataFieldName to the value of <paramref name="fieldName"/></remarks>
-		/// <exception cref="ArgumentNullException">When <paramref name="fieldName"/> is null or empty</exception>
-		ChoiceFieldDefinitionFacade<TActualFacade> AddChoiceField<TFieldControl>(string fieldName, RenderChoicesAs renderAs)
-			where TFieldControl : Telerik.Sitefinity.Web.UI.Fields.ChoiceField
-		;
-	}
+    public interface IHasFieldControls<TActualFacade>
+        where TActualFacade : class
+    {
+        /// <summary>
+        /// Add a choice field and specify the type of the control that will use this settings to render it
+        /// </summary>
+        /// <typeparam name="TFieldControl">Field control inheriting <c>ChoiceField</c> that will use this settings to render the field</typeparam>
+        /// <param name="fieldName">Name of the field to bind to</param>
+        /// <param name="renderAs">Specify how the control will be rendered</param>
+        /// <returns>Child facade for further customization of the choice field</returns>
+        /// <remarks>Sets both FieldName and DataFieldName to the value of <paramref name="fieldName"/></remarks>
+        /// <exception cref="ArgumentNullException">When <paramref name="fieldName"/> is null or empty</exception>
+        ChoiceFieldDefinitionFacade<TActualFacade> AddChoiceField<TFieldControl>(string fieldName, RenderChoicesAs renderAs)
+            where TFieldControl : Telerik.Sitefinity.Web.UI.Fields.ChoiceField
+        ;
+    }
 }

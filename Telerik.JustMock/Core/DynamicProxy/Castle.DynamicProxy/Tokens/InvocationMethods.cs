@@ -14,90 +14,90 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Tokens
 {
-	using System;
-	using System.Reflection;
+    using System;
+    using System.Reflection;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
 
-	/// <summary>
-	///   Holds <see cref = "MethodInfo" /> objects representing methods of <see cref = "AbstractInvocation" /> class.
-	/// </summary>
-	internal static class InvocationMethods
-	{
-		public static readonly ConstructorInfo CompositionInvocationConstructor =
-			typeof(CompositionInvocation).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null,
-			                                             new[]
-			                                             {
-			                                             	typeof(object),
-			                                             	typeof(object),
-			                                             	typeof(IInterceptor[]),
-			                                             	typeof(MethodInfo),
-			                                             	typeof(object[])
-			                                             },
-			                                             null);
+    /// <summary>
+    ///   Holds <see cref = "MethodInfo" /> objects representing methods of <see cref = "AbstractInvocation" /> class.
+    /// </summary>
+    internal static class InvocationMethods
+    {
+        public static readonly ConstructorInfo CompositionInvocationConstructor =
+            typeof(CompositionInvocation).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null,
+                                                         new[]
+                                                         {
+                                                            typeof(object),
+                                                            typeof(object),
+                                                            typeof(IInterceptor[]),
+                                                            typeof(MethodInfo),
+                                                            typeof(object[])
+                                                         },
+                                                         null);
 
-		public static readonly MethodInfo CompositionInvocationEnsureValidTarget =
-			typeof(CompositionInvocation).GetMethod("EnsureValidTarget", BindingFlags.Instance | BindingFlags.NonPublic);
+        public static readonly MethodInfo CompositionInvocationEnsureValidTarget =
+            typeof(CompositionInvocation).GetMethod("EnsureValidTarget", BindingFlags.Instance | BindingFlags.NonPublic);
 
-		public static readonly MethodInfo GetArgumentValue =
-			typeof(AbstractInvocation).GetMethod("GetArgumentValue");
+        public static readonly MethodInfo GetArgumentValue =
+            typeof(AbstractInvocation).GetMethod("GetArgumentValue");
 
-		public static readonly MethodInfo GetArguments =
-			typeof(AbstractInvocation).GetMethod("get_Arguments");
+        public static readonly MethodInfo GetArguments =
+            typeof(AbstractInvocation).GetMethod("get_Arguments");
 
-		public static readonly MethodInfo GetReturnValue =
-			typeof(AbstractInvocation).GetMethod("get_ReturnValue");
+        public static readonly MethodInfo GetReturnValue =
+            typeof(AbstractInvocation).GetMethod("get_ReturnValue");
 
-		public static readonly ConstructorInfo InheritanceInvocationConstructor =
-			typeof(InheritanceInvocation).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null,
-			                                             new[]
-			                                             {
-			                                             	typeof(Type),
-			                                             	typeof(object),
-			                                             	typeof(IInterceptor[]),
-			                                             	typeof(MethodInfo),
-			                                             	typeof(object[])
-			                                             },
-			                                             null);
+        public static readonly ConstructorInfo InheritanceInvocationConstructor =
+            typeof(InheritanceInvocation).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null,
+                                                         new[]
+                                                         {
+                                                            typeof(Type),
+                                                            typeof(object),
+                                                            typeof(IInterceptor[]),
+                                                            typeof(MethodInfo),
+                                                            typeof(object[])
+                                                         },
+                                                         null);
 
-		public static readonly ConstructorInfo InheritanceInvocationConstructorWithSelector =
-			typeof(InheritanceInvocation).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null,
-			                                             new[]
-			                                             {
-			                                             	typeof(Type),
-			                                             	typeof(object),
-			                                             	typeof(IInterceptor[]),
-			                                             	typeof(MethodInfo),
-			                                             	typeof(object[]),
-			                                             	typeof(IInterceptorSelector),
-			                                             	typeof(IInterceptor[]).MakeByRefType()
-			                                             },
-			                                             null);
+        public static readonly ConstructorInfo InheritanceInvocationConstructorWithSelector =
+            typeof(InheritanceInvocation).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null,
+                                                         new[]
+                                                         {
+                                                            typeof(Type),
+                                                            typeof(object),
+                                                            typeof(IInterceptor[]),
+                                                            typeof(MethodInfo),
+                                                            typeof(object[]),
+                                                            typeof(IInterceptorSelector),
+                                                            typeof(IInterceptor[]).MakeByRefType()
+                                                         },
+                                                         null);
 
-		public static readonly MethodInfo Proceed =
-			typeof(AbstractInvocation).GetMethod("Proceed", BindingFlags.Instance | BindingFlags.Public);
+        public static readonly MethodInfo Proceed =
+            typeof(AbstractInvocation).GetMethod("Proceed", BindingFlags.Instance | BindingFlags.Public);
 
-		public static readonly FieldInfo ProxyObject =
-			typeof(AbstractInvocation).GetField("proxyObject", BindingFlags.Instance | BindingFlags.NonPublic);
+        public static readonly FieldInfo ProxyObject =
+            typeof(AbstractInvocation).GetField("proxyObject", BindingFlags.Instance | BindingFlags.NonPublic);
 
-		public static readonly MethodInfo SetArgumentValue =
-			typeof(AbstractInvocation).GetMethod("SetArgumentValue");
+        public static readonly MethodInfo SetArgumentValue =
+            typeof(AbstractInvocation).GetMethod("SetArgumentValue");
 
-		public static readonly MethodInfo SetGenericMethodArguments =
-			typeof(AbstractInvocation).GetMethod("SetGenericMethodArguments", new[] { typeof(Type[]) });
+        public static readonly MethodInfo SetGenericMethodArguments =
+            typeof(AbstractInvocation).GetMethod("SetGenericMethodArguments", new[] { typeof(Type[]) });
 
-		public static readonly MethodInfo SetReturnValue =
-			typeof(AbstractInvocation).GetMethod("set_ReturnValue");
+        public static readonly MethodInfo SetReturnValue =
+            typeof(AbstractInvocation).GetMethod("set_ReturnValue");
 
-		public static readonly FieldInfo CompositionInvocationTarget =
-			typeof(CompositionInvocation).GetField("target", BindingFlags.Instance | BindingFlags.NonPublic);
+        public static readonly FieldInfo CompositionInvocationTarget =
+            typeof(CompositionInvocation).GetField("target", BindingFlags.Instance | BindingFlags.NonPublic);
 
-		public static readonly MethodInfo ThrowOnNoTarget =
-			typeof(AbstractInvocation).GetMethod("ThrowOnNoTarget", BindingFlags.Instance | BindingFlags.NonPublic);
+        public static readonly MethodInfo ThrowOnNoTarget =
+            typeof(AbstractInvocation).GetMethod("ThrowOnNoTarget", BindingFlags.Instance | BindingFlags.NonPublic);
 
-		// The following two fields are not used internally, but kept for back-compatibility
-		// because we renamed the public fields `EnsureValidTarget` and `Target`:
-		public static readonly MethodInfo EnsureValidTarget = CompositionInvocationEnsureValidTarget;
-		public static readonly FieldInfo Target = CompositionInvocationTarget;
-	}
+        // The following two fields are not used internally, but kept for back-compatibility
+        // because we renamed the public fields `EnsureValidTarget` and `Target`:
+        public static readonly MethodInfo EnsureValidTarget = CompositionInvocationEnsureValidTarget;
+        public static readonly FieldInfo Target = CompositionInvocationTarget;
+    }
 }

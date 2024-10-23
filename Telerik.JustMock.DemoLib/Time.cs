@@ -20,11 +20,11 @@ using Telerik.JustMock.DemoLib.Objects;
 
 namespace Telerik.JustMock.DemoLib
 {
-	public class Time
-	{
-		public DateTime GetTime(User user)
-		{
-			return DateTime.Now;
-		}
-	}
+    public class Time
+    {
+        public DateTime GetTime(User user)
+        {
+            return DateTime.Now;
+        }
+    }
 }
