@@ -162,12 +162,9 @@ namespace Telerik.JustMock.Core
             else
             {
                 var newObjInterceptionOnOverwriteEnabledEnv = Environment.GetEnvironmentVariable("JUSTMOCK_NEWOBJ_INTERCEPTION_ON_OVERWRITE_ENABLED");
-                NewObjInterceptionOnOverwriteEnabled =
-                    !string.IsNullOrEmpty(newObjInterceptionOnOverwriteEnabledEnv)
-                        ?
-                            newObjInterceptionOnOverwriteEnabledEnv == "1"
-                            :
-                            true;
+                NewObjInterceptionOnOverwriteEnabled = string.IsNullOrEmpty(newObjInterceptionOnOverwriteEnabledEnv)
+                                                         ? false
+                                                         : newObjInterceptionOnOverwriteEnabledEnv == "1";
 
                 bridge = bridge.MakeGenericType(typeof(object));
 
