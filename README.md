@@ -4,7 +4,7 @@ JustMock Lite
 [![nuget](https://img.shields.io/nuget/v/JustMock.svg?label=nuget)](https://www.nuget.org/packages/JustMock/)
 [![license](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/telerik/JustMockLite/blob/master/LICENSE/)
 
-**JustMock Lite by Telerik** is for developers who practice unit testing and want to deliver exceptional software. JustMock Lite is the superior free mocking framework that makes unit testing simpler for SOLID testable projects. It is also an open source product that is easy to use, feature rich, with great power and flexibility, making it the superior choice. JustMock Lite cuts your development time and helps you create better unit tests. It enables you to perform fast and controlled tests that are independent of external dependencies like databases, web services or proprietary code. For more information, refer to our <a href="http://www.telerik.com/justmock/free-mocking" target="_blank">JustMock Lite website</a>.
+**JustMock Lite by Telerik** is for developers who practice unit testing and want to deliver exceptional software. JustMock Lite is the superior free mocking framework that makes unit testing simpler for SOLID testable projects. It is also an open source product that is easy to use, feature rich, with great power and flexibility, making it the superior choice. JustMock Lite cuts your development time and helps you create better unit tests. It enables you to perform fast and controlled tests that are independent of external dependencies like databases, web services or proprietary code. For more information, refer to our [JustMock Lite website](http://www.telerik.com/justmock/free-mocking).
 
 ### JustMock Lite Key Features
 - **AAA pattern** – JustMockLite uses the Arrange Act Assert (AAA) pattern.
@@ -68,16 +68,15 @@ public void TestBookService()
 }
 ```
 
-### Supported Frameworks
-- .Net Framework 4.5+ and later.
-- .NET 5, .NET 6 preview 2
-- .Net Core 2.0 and later.
+### Supported .NET Frameworks
+- .NET Framework 4.7.2 and later
+- .NET LTS/STS versions via .NET Standard 2.1
 
 ### Documentation
-JustMock Lite and JustMock are coming with extensive <a href="http://docs.telerik.com/devtools/justmock/introduction.html" target="_blank">Documentation</a> and examples that will help you quickly get started with the framework.
+JustMock Lite and JustMock are coming with extensive [Documentation](http://docs.telerik.com/devtools/justmock/introduction.html) and examples that will help you quickly get started with the framework.
 
 ### Feedback
-JustMock Lite is constantly improved through customer interaction and feedback. If you want to suggest a new feature, bug report or vote for a popular one, please visit our <a href="https://feedback.telerik.com/Project/105" target="_blank">Feedback Portal</a>.
+JustMock Lite is constantly improved through customer interaction and feedback. If you want to suggest a new feature, bug report or vote for a popular one, please visit our [Feedback Portal](https://feedback.telerik.com/Project/105).
 
 
 ### Happy mocking!
