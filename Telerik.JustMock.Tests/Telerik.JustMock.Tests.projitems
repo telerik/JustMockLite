@@ -47,6 +47,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)MatchersFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MiscFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MockFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MockResetFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NinjectAutoMockFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NonPublicFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OccurrenceFixture.cs" />
