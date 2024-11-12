@@ -14,33 +14,33 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 {
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 
-	internal class ForwardingMethodGenerator : MethodGenerator
-	{
-		private readonly GetTargetReferenceDelegate getTargetReference;
+    internal class ForwardingMethodGenerator : MethodGenerator
+    {
+        private readonly GetTargetReferenceDelegate getTargetReference;
 
-		public ForwardingMethodGenerator(MetaMethod method, OverrideMethodDelegate overrideMethod,
-		                                 GetTargetReferenceDelegate getTargetReference)
-			: base(method, overrideMethod)
-		{
-			this.getTargetReference = getTargetReference;
-		}
+        public ForwardingMethodGenerator(MetaMethod method, OverrideMethodDelegate overrideMethod,
+                                         GetTargetReferenceDelegate getTargetReference)
+            : base(method, overrideMethod)
+        {
+            this.getTargetReference = getTargetReference;
+        }
 
-		protected override MethodEmitter BuildProxiedMethodBody(MethodEmitter emitter, ClassEmitter @class,
-		                                                        INamingScope namingScope)
-		{
-			var targetReference = getTargetReference(@class, MethodToOverride);
-			var arguments = ArgumentsUtil.ConvertToArgumentReferenceExpression(MethodToOverride.GetParameters());
+        protected override MethodEmitter BuildProxiedMethodBody(MethodEmitter emitter, ClassEmitter @class,
+                                                                INamingScope namingScope)
+        {
+            var targetReference = getTargetReference(@class, MethodToOverride);
+            var arguments = ArgumentsUtil.ConvertToArgumentReferenceExpression(MethodToOverride.GetParameters());
 
-			emitter.CodeBuilder.AddStatement(new ReturnStatement(
-			                                 	new MethodInvocationExpression(
-			                                 		targetReference,
-			                                 		MethodToOverride,
-			                                 		arguments) { VirtualCall = true }));
-			return emitter;
-		}
-	}
+            emitter.CodeBuilder.AddStatement(new ReturnStatement(
+                                                new MethodInvocationExpression(
+                                                    targetReference,
+                                                    MethodToOverride,
+                                                    arguments) { VirtualCall = true }));
+            return emitter;
+        }
+    }
 }

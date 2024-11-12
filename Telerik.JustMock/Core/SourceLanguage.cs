@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Telerik.JustMock.Core
 {
-	internal enum SourceLanguage
-	{
-		CSharp,
-		VisualBasic
-	}
+    internal enum SourceLanguage
+    {
+        CSharp,
+        VisualBasic
+    }
 }

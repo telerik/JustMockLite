@@ -27,95 +27,95 @@ using Telerik.JustMock.Core.Castle.DynamicProxy;
 namespace Telerik.JustMock.Core.TransparentProxy
 {
 #if !NETCORE
-	internal sealed class ProxyInvocation : IInvocation
-	{
-		private readonly IMethodCallMessage message;
-		private readonly MockingProxy proxy;
-		private readonly object[] args;
+    internal sealed class ProxyInvocation : IInvocation
+    {
+        private readonly IMethodCallMessage message;
+        private readonly MockingProxy proxy;
+        private readonly object[] args;
 
-		public ProxyInvocation(MockingProxy proxy, IMethodCallMessage message)
-		{
-			this.message = message;
-			this.proxy = proxy;
-			this.args = message.Args;
-		}
+        public ProxyInvocation(MockingProxy proxy, IMethodCallMessage message)
+        {
+            this.message = message;
+            this.proxy = proxy;
+            this.args = message.Args;
+        }
 
-		public object[] Arguments
-		{
-			get { return this.args; }
-		}
+        public object[] Arguments
+        {
+            get { return this.args; }
+        }
 
-		public object Proxy
-		{
-			get { return this.proxy.GetTransparentProxy(); }
-		}
+        public object Proxy
+        {
+            get { return this.proxy.GetTransparentProxy(); }
+        }
 
-		public object ReturnValue { get; set; }
+        public object ReturnValue { get; set; }
 
-		public Exception Exception { get; set; }
+        public Exception Exception { get; set; }
 
-		public MethodInfo GetConcreteMethod()
-		{
-			var method = (MethodInfo)this.message.MethodBase;
-			return method.DeclaringType.IsProxy() ? (MethodInfo)method.GetInheritanceChain().Skip(1).First() : method;
-		}
+        public MethodInfo GetConcreteMethod()
+        {
+            var method = (MethodInfo)this.message.MethodBase;
+            return method.DeclaringType.IsProxy() ? (MethodInfo)method.GetInheritanceChain().Skip(1).First() : method;
+        }
 
-		public void Proceed()
-		{
-			var method = this.message.MethodBase;
-			var signature = this.message.MethodSignature as Type[];
-			if (method.Name == "Equals" && signature.Length == 1 && signature[0] == typeof(object))
-			{
-				this.ReturnValue = ReferenceEquals(this.proxy.GetTransparentProxy(), this.message.Args[0]);
-				return;
-			}
+        public void Proceed()
+        {
+            var method = this.message.MethodBase;
+            var signature = this.message.MethodSignature as Type[];
+            if (method.Name == "Equals" && signature.Length == 1 && signature[0] == typeof(object))
+            {
+                this.ReturnValue = ReferenceEquals(this.proxy.GetTransparentProxy(), this.message.Args[0]);
+                return;
+            }
 
-			var returnMsg = RemotingServices.ExecuteMessage(this.proxy.WrappedInstance, this.message);
-			if (returnMsg.Exception != null)
-			{
-				this.Exception = returnMsg.Exception;
-			}
-			else
-			{
-				returnMsg.Args.CopyTo(this.args, 0);
-				this.ReturnValue = returnMsg.ReturnValue;
-			}
-		}
+            var returnMsg = RemotingServices.ExecuteMessage(this.proxy.WrappedInstance, this.message);
+            if (returnMsg.Exception != null)
+            {
+                this.Exception = returnMsg.Exception;
+            }
+            else
+            {
+                returnMsg.Args.CopyTo(this.args, 0);
+                this.ReturnValue = returnMsg.ReturnValue;
+            }
+        }
 
-		public object GetArgumentValue(int index)
-		{
-			throw new NotSupportedException();
-		}
+        public object GetArgumentValue(int index)
+        {
+            throw new NotSupportedException();
+        }
 
-		public MethodInfo GetConcreteMethodInvocationTarget()
-		{
-			throw new NotSupportedException();
-		}
+        public MethodInfo GetConcreteMethodInvocationTarget()
+        {
+            throw new NotSupportedException();
+        }
 
-		public Type[] GenericArguments
-		{
-			get { throw new NotSupportedException(); }
-		}
+        public Type[] GenericArguments
+        {
+            get { throw new NotSupportedException(); }
+        }
 
-		public object InvocationTarget
-		{
-			get { throw new NotSupportedException(); }
-		}
+        public object InvocationTarget
+        {
+            get { throw new NotSupportedException(); }
+        }
 
-		public MethodInfo Method
-		{
-			get { throw new NotSupportedException(); }
-		}
+        public MethodInfo Method
+        {
+            get { throw new NotSupportedException(); }
+        }
 
-		public MethodInfo MethodInvocationTarget
-		{
-			get { throw new NotSupportedException(); }
-		}
+        public MethodInfo MethodInvocationTarget
+        {
+            get { throw new NotSupportedException(); }
+        }
 
-		public void SetArgumentValue(int index, object value)
-		{
-			throw new NotSupportedException();
-		}
+        public void SetArgumentValue(int index, object value)
+        {
+            throw new NotSupportedException();
+        }
 
         public IInvocationProceedInfo CaptureProceedInfo()
         {
@@ -123,9 +123,9 @@ namespace Telerik.JustMock.Core.TransparentProxy
         }
 
         public Type TargetType
-		{
-			get { throw new NotSupportedException(); }
-		}
-	}
+        {
+            get { throw new NotSupportedException(); }
+        }
+    }
 #endif
 }

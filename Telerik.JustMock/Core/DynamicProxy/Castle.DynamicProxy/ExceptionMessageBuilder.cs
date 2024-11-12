@@ -14,74 +14,74 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy
 {
-	using System;
-	using System.Linq;
-	using System.Reflection;
+    using System;
+    using System.Linq;
+    using System.Reflection;
 
-	using Telerik.JustMock.Core.Castle.Core.Internal;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+    using Telerik.JustMock.Core.Castle.Core.Internal;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
 
-	internal static class ExceptionMessageBuilder
-	{
-		/// <summary>
-		/// Provides instructions that a user could follow to make a type or method in <paramref name="targetAssembly"/>
-		/// visible to DynamicProxy.</summary>
-		/// <param name="targetAssembly">The assembly containing the type or method.</param>
-		/// <returns>Instructions that a user could follow to make a type or method visible to DynamicProxy.</returns>
-		internal static string CreateInstructionsToMakeVisible(Assembly targetAssembly)
-		{
-			string strongNamedOrNotIndicator = " not"; // assume not strong-named
-			string assemblyToBeVisibleTo = "\"DynamicProxyGenAssembly2\""; // appropriate for non-strong-named
+    internal static class ExceptionMessageBuilder
+    {
+        /// <summary>
+        /// Provides instructions that a user could follow to make a type or method in <paramref name="targetAssembly"/>
+        /// visible to DynamicProxy.</summary>
+        /// <param name="targetAssembly">The assembly containing the type or method.</param>
+        /// <returns>Instructions that a user could follow to make a type or method visible to DynamicProxy.</returns>
+        internal static string CreateInstructionsToMakeVisible(Assembly targetAssembly)
+        {
+            string strongNamedOrNotIndicator = " not"; // assume not strong-named
+            string assemblyToBeVisibleTo = "\"DynamicProxyGenAssembly2\""; // appropriate for non-strong-named
 
-			if (targetAssembly.IsAssemblySigned())
-			{
-				strongNamedOrNotIndicator = "";
-				assemblyToBeVisibleTo = ReferencesCastleCore(targetAssembly)
-					? "InternalsVisible.ToDynamicProxyGenAssembly2"
-					: '"' + InternalsVisible.ToDynamicProxyGenAssembly2 + '"';
-			}
+            if (targetAssembly.IsAssemblySigned())
+            {
+                strongNamedOrNotIndicator = "";
+                assemblyToBeVisibleTo = ReferencesCastleCore(targetAssembly)
+                    ? "InternalsVisible.ToDynamicProxyGenAssembly2"
+                    : '"' + InternalsVisible.ToDynamicProxyGenAssembly2 + '"';
+            }
 
-			var instructionsFormat =
-				"Make it public, or internal and mark your assembly with " +
-				"[assembly: InternalsVisibleTo({0})] attribute, because assembly {1} " +
-				"is{2} strong-named.";
+            var instructionsFormat =
+                "Make it public, or internal and mark your assembly with " +
+                "[assembly: InternalsVisibleTo({0})] attribute, because assembly {1} " +
+                "is{2} strong-named.";
 
-			var instructions = string.Format(instructionsFormat,
-				assemblyToBeVisibleTo,
-				targetAssembly.GetName().Name,
-				strongNamedOrNotIndicator);
-			return instructions;
+            var instructions = string.Format(instructionsFormat,
+                assemblyToBeVisibleTo,
+                targetAssembly.GetName().Name,
+                strongNamedOrNotIndicator);
+            return instructions;
 
-			bool ReferencesCastleCore(Assembly ia)
-			{
-				return ia.GetReferencedAssemblies()
-					.Any(r => r.FullName == Assembly.GetExecutingAssembly().FullName);
-			}
-		}
+            bool ReferencesCastleCore(Assembly ia)
+            {
+                return ia.GetReferencedAssemblies()
+                    .Any(r => r.FullName == Assembly.GetExecutingAssembly().FullName);
+            }
+        }
 
-		/// <summary>
-		/// Creates a message to inform clients that a proxy couldn't be created due to reliance on an
-		/// inaccessible type (perhaps itself).
-		/// </summary>
-		/// <param name="inaccessibleType">the inaccessible type that prevents proxy creation</param>
-		/// <param name="typeToProxy">the type that couldn't be proxied</param>
-		public static string CreateMessageForInaccessibleType(Type inaccessibleType, Type typeToProxy)
-		{
-			var targetAssembly = typeToProxy.Assembly;
+        /// <summary>
+        /// Creates a message to inform clients that a proxy couldn't be created due to reliance on an
+        /// inaccessible type (perhaps itself).
+        /// </summary>
+        /// <param name="inaccessibleType">the inaccessible type that prevents proxy creation</param>
+        /// <param name="typeToProxy">the type that couldn't be proxied</param>
+        public static string CreateMessageForInaccessibleType(Type inaccessibleType, Type typeToProxy)
+        {
+            var targetAssembly = typeToProxy.Assembly;
 
-			string inaccessibleTypeDescription = inaccessibleType == typeToProxy
-				? "it"
-				: "type " + inaccessibleType.GetBestName();
+            string inaccessibleTypeDescription = inaccessibleType == typeToProxy
+                ? "it"
+                : "type " + inaccessibleType.GetBestName();
 
-			var messageFormat = "Can not create proxy for type {0} because {1} is not accessible. ";
+            var messageFormat = "Can not create proxy for type {0} because {1} is not accessible. ";
 
-			var message = string.Format(messageFormat,
-				typeToProxy.GetBestName(),
-				inaccessibleTypeDescription);
+            var message = string.Format(messageFormat,
+                typeToProxy.GetBestName(),
+                inaccessibleTypeDescription);
 
-			var instructions = CreateInstructionsToMakeVisible(targetAssembly);
+            var instructions = CreateInstructionsToMakeVisible(targetAssembly);
 
-			return message + instructions;
-		}
-	}
+            return message + instructions;
+        }
+    }
 }

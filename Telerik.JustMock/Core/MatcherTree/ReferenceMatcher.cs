@@ -22,69 +22,69 @@ using Telerik.JustMock.Core.TransparentProxy;
 
 namespace Telerik.JustMock.Core.MatcherTree
 {
-	internal class ReferenceMatcher : CategoricalMatcherBase, IValueMatcher
-	{
-		private readonly object reference;
+    internal class ReferenceMatcher : CategoricalMatcherBase, IValueMatcher
+    {
+        private readonly object reference;
 
-		public object Value { get { return reference; } }
+        public object Value { get { return reference; } }
 
-		public Type Type { get { return this.Value != null ? this.Value.GetType() : null; } }
+        public Type Type { get { return this.Value != null ? this.Value.GetType() : null; } }
 
-		public override string DebugView
-		{
-			get { return "ByRef " + ValueMatcher.FormatValue(Value); }
-		}
+        public override string DebugView
+        {
+            get { return "ByRef " + ValueMatcher.FormatValue(Value); }
+        }
 
-		public ReferenceMatcher(object reference)
-		{
-			this.reference = reference;
-		}
+        public ReferenceMatcher(object reference)
+        {
+            this.reference = reference;
+        }
 
-		public override bool CanMatch(IMatcher matcher)
-		{
-			return matcher is IValueMatcher;
-		}
+        public override bool CanMatch(IMatcher matcher)
+        {
+            return matcher is IValueMatcher;
+        }
 
-		public override bool Equals(IMatcher other)
-		{
-			var referenceMatcher = other as ReferenceMatcher;
-			if (referenceMatcher == null)
-				return false;
+        public override bool Equals(IMatcher other)
+        {
+            var referenceMatcher = other as ReferenceMatcher;
+            if (referenceMatcher == null)
+                return false;
 
-			return CompareValueTo(other);
-		}
+            return CompareValueTo(other);
+        }
 
-		protected override bool MatchesCore(IMatcher other)
-		{
-			return CompareValueTo(other);
-		}
+        protected override bool MatchesCore(IMatcher other)
+        {
+            return CompareValueTo(other);
+        }
 
-		private bool CompareValueTo(IMatcher other)
-		{
-			var valueMatcher = other as IValueMatcher;
-			if (valueMatcher == null)
-				return false;
+        private bool CompareValueTo(IMatcher other)
+        {
+            var valueMatcher = other as IValueMatcher;
+            if (valueMatcher == null)
+                return false;
 
-			if (this.IsValueType)
-				return Equals(this.reference, valueMatcher.Value);
-			return ReferenceEquals(MockingProxy.Unwrap(this.reference), MockingProxy.Unwrap(valueMatcher.Value));
-		}
+            if (this.IsValueType)
+                return Equals(this.reference, valueMatcher.Value);
+            return ReferenceEquals(MockingProxy.Unwrap(this.reference), MockingProxy.Unwrap(valueMatcher.Value));
+        }
 
-		private bool IsValueType
-		{
-			get { return reference != null && reference.GetType().IsValueType; }
-		}
+        private bool IsValueType
+        {
+            get { return reference != null && reference.GetType().IsValueType; }
+        }
 
-		public override Expression ToExpression(Type argumentType)
-		{
-			return Expression.Call(null, typeof(ReferenceMatcher).GetMethod("Create"),
-				Expression.Constant(this.Value));
-		}
+        public override Expression ToExpression(Type argumentType)
+        {
+            return Expression.Call(null, typeof(ReferenceMatcher).GetMethod("Create"),
+                Expression.Constant(this.Value));
+        }
 
-		[ArgMatcher(Matcher = typeof(ReferenceMatcher))]
-		public static object Create(object value)
-		{
-			throw new NotSupportedException();
-		}
-	}
+        [ArgMatcher(Matcher = typeof(ReferenceMatcher))]
+        public static object Create(object value)
+        {
+            throw new NotSupportedException();
+        }
+    }
 }

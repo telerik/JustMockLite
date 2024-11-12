@@ -14,143 +14,143 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
-	using System;
-	using System.Globalization;
-	using System.IO;
-	using System.Reflection;
+    using System;
+    using System.Globalization;
+    using System.IO;
+    using System.Reflection;
 
-	internal class AssemblyResource : AbstractStreamResource
-	{
-		private string assemblyName;
-		private string resourcePath;
-		private string basePath;
+    internal class AssemblyResource : AbstractStreamResource
+    {
+        private string assemblyName;
+        private string resourcePath;
+        private string basePath;
 
-		public AssemblyResource(CustomUri resource)
-		{
-			CreateStream = delegate
-			{
-				return CreateResourceFromUri(resource, null);
-			};
-		}
+        public AssemblyResource(CustomUri resource)
+        {
+            CreateStream = delegate
+            {
+                return CreateResourceFromUri(resource, null);
+            };
+        }
 
-		public AssemblyResource(CustomUri resource, string basePath)
-		{
-			CreateStream = delegate
-			{
-				return CreateResourceFromUri(resource, basePath);
-			};
-		}
+        public AssemblyResource(CustomUri resource, string basePath)
+        {
+            CreateStream = delegate
+            {
+                return CreateResourceFromUri(resource, basePath);
+            };
+        }
 
-		public AssemblyResource(string resource)
-		{
-			CreateStream = delegate
-			{
-				return CreateResourceFromPath(resource, basePath);
-			};
-		}
+        public AssemblyResource(string resource)
+        {
+            CreateStream = delegate
+            {
+                return CreateResourceFromPath(resource, basePath);
+            };
+        }
 
-		public override IResource CreateRelative(string relativePath)
-		{
-			throw new NotImplementedException();
-		}
+        public override IResource CreateRelative(string relativePath)
+        {
+            throw new NotImplementedException();
+        }
 
-		public override string ToString()
-		{
-			return string.Format(CultureInfo.CurrentCulture, "AssemblyResource: [{0}] [{1}]", assemblyName, resourcePath);
-		}
+        public override string ToString()
+        {
+            return string.Format(CultureInfo.CurrentCulture, "AssemblyResource: [{0}] [{1}]", assemblyName, resourcePath);
+        }
 
-		private Stream CreateResourceFromPath(string resource, string path)
-		{
-			if (!resource.StartsWith("assembly" + CustomUri.SchemeDelimiter, StringComparison.CurrentCulture))
-			{
-				resource = "assembly" + CustomUri.SchemeDelimiter + resource;
-			}
+        private Stream CreateResourceFromPath(string resource, string path)
+        {
+            if (!resource.StartsWith("assembly" + CustomUri.SchemeDelimiter, StringComparison.CurrentCulture))
+            {
+                resource = "assembly" + CustomUri.SchemeDelimiter + resource;
+            }
 
-			return CreateResourceFromUri(new CustomUri(resource), path);
-		}
+            return CreateResourceFromUri(new CustomUri(resource), path);
+        }
 
-		private Stream CreateResourceFromUri(CustomUri resourcex, string path)
-		{
-			if (resourcex == null) throw new ArgumentNullException(nameof(resourcex));
+        private Stream CreateResourceFromUri(CustomUri resourcex, string path)
+        {
+            if (resourcex == null) throw new ArgumentNullException(nameof(resourcex));
 
-			assemblyName = resourcex.Host;
-			resourcePath = ConvertToResourceName(assemblyName, resourcex.Path);
+            assemblyName = resourcex.Host;
+            resourcePath = ConvertToResourceName(assemblyName, resourcex.Path);
 
-			Assembly assembly = ObtainAssembly(assemblyName);
+            Assembly assembly = ObtainAssembly(assemblyName);
 
-			string[] names = assembly.GetManifestResourceNames();
+            string[] names = assembly.GetManifestResourceNames();
 
-			string nameFound = GetNameFound(names);
+            string nameFound = GetNameFound(names);
 
-			if (nameFound == null)
-			{
-				resourcePath = resourcex.Path.Replace('/', '.').Substring(1);
-				nameFound = GetNameFound(names);
-			}
+            if (nameFound == null)
+            {
+                resourcePath = resourcex.Path.Replace('/', '.').Substring(1);
+                nameFound = GetNameFound(names);
+            }
 
-			if (nameFound == null)
-			{
-				string message = string.Format(CultureInfo.InvariantCulture, "The assembly resource {0} could not be located", resourcePath);
-				throw new ResourceException(message);
-			}
+            if (nameFound == null)
+            {
+                string message = string.Format(CultureInfo.InvariantCulture, "The assembly resource {0} could not be located", resourcePath);
+                throw new ResourceException(message);
+            }
 
-			basePath = ConvertToPath(resourcePath);
+            basePath = ConvertToPath(resourcePath);
 
-			return assembly.GetManifestResourceStream(nameFound);
-		}
+            return assembly.GetManifestResourceStream(nameFound);
+        }
 
-		private string GetNameFound(string[] names)
-		{
-			string nameFound = null;
-			foreach(string name in names)
-			{
-				if (string.Compare(resourcePath, name, StringComparison.OrdinalIgnoreCase) == 0)
-				{
-					nameFound = name;
-					break;
-				}
-			}
-			return nameFound;
-		}
+        private string GetNameFound(string[] names)
+        {
+            string nameFound = null;
+            foreach(string name in names)
+            {
+                if (string.Compare(resourcePath, name, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    nameFound = name;
+                    break;
+                }
+            }
+            return nameFound;
+        }
 
-		private string ConvertToResourceName(string assembly, string resource)
-		{
-			assembly = GetSimpleName(assembly);
-			// TODO: use path for relative name construction
-			return string.Format(CultureInfo.CurrentCulture, "{0}{1}", assembly, resource.Replace('/', '.'));
-		}
+        private string ConvertToResourceName(string assembly, string resource)
+        {
+            assembly = GetSimpleName(assembly);
+            // TODO: use path for relative name construction
+            return string.Format(CultureInfo.CurrentCulture, "{0}{1}", assembly, resource.Replace('/', '.'));
+        }
 
-		private string GetSimpleName(string assembly)
-		{
-			int indexOfComma = assembly.IndexOf(',');
-			if(indexOfComma<0)
-			{
-				return assembly;
-			}
-			return assembly.Substring(0, indexOfComma);
-		}
+        private string GetSimpleName(string assembly)
+        {
+            int indexOfComma = assembly.IndexOf(',');
+            if(indexOfComma<0)
+            {
+                return assembly;
+            }
+            return assembly.Substring(0, indexOfComma);
+        }
 
-		private string ConvertToPath(string resource)
-		{
-			string path = resource.Replace('.', '/');
-			if (path[0] != '/')
-			{
-				path = string.Format(CultureInfo.CurrentCulture, "/{0}", path);
-			}
-			return path;
-		}
+        private string ConvertToPath(string resource)
+        {
+            string path = resource.Replace('.', '/');
+            if (path[0] != '/')
+            {
+                path = string.Format(CultureInfo.CurrentCulture, "/{0}", path);
+            }
+            return path;
+        }
 
-		private static Assembly ObtainAssembly(string assemblyName)
-		{
-			try
-			{
-				return Assembly.Load(new AssemblyName(assemblyName));
-			}
-			catch (Exception ex)
-			{
-				string message = string.Format(CultureInfo.InvariantCulture, "The assembly {0} could not be loaded", assemblyName);
-				throw new ResourceException(message, ex);
-			}
-		}
-	}
+        private static Assembly ObtainAssembly(string assemblyName)
+        {
+            try
+            {
+                return Assembly.Load(new AssemblyName(assemblyName));
+            }
+            catch (Exception ex)
+            {
+                string message = string.Format(CultureInfo.InvariantCulture, "The assembly {0} could not be loaded", assemblyName);
+                throw new ResourceException(message, ex);
+            }
+        }
+    }
 }

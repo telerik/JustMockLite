@@ -19,25 +19,25 @@ using System;
 
 namespace Telerik.JustMock.Core
 {
-	internal class Lazy<T>
-	{
-		private readonly Func<T> initializer;
-		private bool initialized;
-		private T value;
+    internal class Lazy<T>
+    {
+        private readonly Func<T> initializer;
+        private bool initialized;
+        private T value;
 
-		public Lazy(Func<T> initializer)
-		{
-			this.initializer = initializer;
-		}
+        public Lazy(Func<T> initializer)
+        {
+            this.initializer = initializer;
+        }
 
-		public static implicit operator T(Lazy<T> lazy)
-		{
-			if (!lazy.initialized)
-			{
-				lazy.initialized = true;
-				lazy.value = ProfilerInterceptor.GuardExternal(lazy.initializer);
-			}
-			return lazy.value;
-		}
-	}
+        public static implicit operator T(Lazy<T> lazy)
+        {
+            if (!lazy.initialized)
+            {
+                lazy.initialized = true;
+                lazy.value = ProfilerInterceptor.GuardExternal(lazy.initializer);
+            }
+            return lazy.value;
+        }
+    }
 }

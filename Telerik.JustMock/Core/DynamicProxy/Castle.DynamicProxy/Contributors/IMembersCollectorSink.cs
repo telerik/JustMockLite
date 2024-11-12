@@ -14,12 +14,12 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 {
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
 
-	internal interface IMembersCollectorSink
-	{
-		void Add(MetaEvent @event);
-		void Add(MetaMethod method);
-		void Add(MetaProperty property);
-	}
+    internal interface IMembersCollectorSink
+    {
+        void Add(MetaEvent @event);
+        void Add(MetaMethod method);
+        void Add(MetaProperty property);
+    }
 }

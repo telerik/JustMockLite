@@ -21,23 +21,23 @@ using System.Reflection;
 
 namespace System
 {
-	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Delegate, Inherited = false)]
-	public sealed class SerializableAttribute : Attribute
-	{
-		public SerializableAttribute()
-		{
-		}
-	}
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Delegate, Inherited = false)]
+    public sealed class SerializableAttribute : Attribute
+    {
+        public SerializableAttribute()
+        {
+        }
+    }
 }
 
 namespace Microsoft.VisualStudio.TestTools.UnitTesting
 {
-	[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-	public sealed class TestCategoryAttribute : Attribute
-	{
-		public TestCategoryAttribute(string testCategory)
-		{
-		}
-	}
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    public sealed class TestCategoryAttribute : Attribute
+    {
+        public TestCategoryAttribute(string testCategory)
+        {
+        }
+    }
 }
 

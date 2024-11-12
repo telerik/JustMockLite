@@ -46,102 +46,102 @@ using AssertionException = Microsoft.VisualStudio.TestTools.UnitTesting.AssertFa
 
 namespace Telerik.JustMock.Tests
 {
-	[TestClass]
-	public class ConstructorFixture
-	{
-		[TestMethod, TestCategory("Lite"), TestCategory("Constructor")]
-		public void ShouldCallBaseCtorWhenNotMocked()
-		{
-			Assert.Throws<ArgumentException>(() =>
-			{
-				Mock.Create<Foo>(Constructor.NotMocked);
-			});
-		}
+    [TestClass]
+    public class ConstructorFixture
+    {
+        [TestMethod, TestCategory("Lite"), TestCategory("Constructor")]
+        public void ShouldCallBaseCtorWhenNotMocked()
+        {
+            Assert.Throws<ArgumentException>(() =>
+            {
+                Mock.Create<Foo>(Constructor.NotMocked);
+            });
+        }
 
 #if !(COREFX && LITE_EDITION)
-		[TestMethod, TestCategory("Lite"), TestCategory("Constructor")]
+        [TestMethod, TestCategory("Lite"), TestCategory("Constructor")]
 #if SILVERLIGHT
-		[Ignore, Description("SL instance constructor mocking not implemented")]
+        [Ignore, Description("SL instance constructor mocking not implemented")]
 #endif
-		public void ShouldSkipBaseConstructorWhenMocked()
-		{
-			Assert.NotNull(Mock.Create<Foo>());
-		}
+        public void ShouldSkipBaseConstructorWhenMocked()
+        {
+            Assert.NotNull(Mock.Create<Foo>());
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Constructor")]
+        [TestMethod, TestCategory("Lite"), TestCategory("Constructor")]
 #if SILVERLIGHT
-		[Ignore, Description("SL instance constructor mocking not implemented")]
+        [Ignore, Description("SL instance constructor mocking not implemented")]
 #endif
-		public void ShouldSkipBaseConstructorOfAbstractClassWhenMocked()
-		{
-			Assert.NotNull(Mock.Create<AbstractFoo>());
-		}
+        public void ShouldSkipBaseConstructorOfAbstractClassWhenMocked()
+        {
+            Assert.NotNull(Mock.Create<AbstractFoo>());
+        }
 #endif
 
 #if !LITE_EDITION
-		[TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
-		public void ShouldCreateMockForFrameWorkClassWithInternalCtor()
-		{
-			var downloadDateCompleted = Mock.Create<System.IO.IsolatedStorage.IsolatedStorageFile>();
-			Assert.NotNull(downloadDateCompleted != null);
-		}
+        [TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
+        public void ShouldCreateMockForFrameWorkClassWithInternalCtor()
+        {
+            var downloadDateCompleted = Mock.Create<System.IO.IsolatedStorage.IsolatedStorageFile>();
+            Assert.NotNull(downloadDateCompleted != null);
+        }
 
-		[TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
-		public void ShouldFutureMockConstructorWithArg()
-		{
-			long? arg = null;
-			Mock.Arrange(() => new CtorLongArg(Arg.AnyLong)).DoInstead<long>(x => arg = x);
+        [TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
+        public void ShouldFutureMockConstructorWithArg()
+        {
+            long? arg = null;
+            Mock.Arrange(() => new CtorLongArg(Arg.AnyLong)).DoInstead<long>(x => arg = x);
 
-			new CtorLongArg(100);
-			Assert.True(arg.Value == 100);
-		}
+            new CtorLongArg(100);
+            Assert.True(arg.Value == 100);
+        }
 
 #endif
 
-		public class Foo
-		{
-			public Foo()
-			{
-				throw new ArgumentException("Failed");
-			}
-		}
+        public class Foo
+        {
+            public Foo()
+            {
+                throw new ArgumentException("Failed");
+            }
+        }
 
-		public abstract class AbstractFoo
-		{
-			public AbstractFoo()
-			{
-				throw new ArgumentException("Failed");
-			}
+        public abstract class AbstractFoo
+        {
+            public AbstractFoo()
+            {
+                throw new ArgumentException("Failed");
+            }
 
-			public abstract int Id { get; set; }
-		}
+            public abstract int Id { get; set; }
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Constructor")]
-		public void ShouldCallConstructorRequiringPrimitiveArgumentConversions()
-		{
-			Mock.Create<CtorLongArg>(Behavior.CallOriginal, 0);
-		}
+        [TestMethod, TestCategory("Lite"), TestCategory("Constructor")]
+        public void ShouldCallConstructorRequiringPrimitiveArgumentConversions()
+        {
+            Mock.Create<CtorLongArg>(Behavior.CallOriginal, 0);
+        }
 
-		public class CtorLongArg
-		{
-			public CtorLongArg(long l) { }
-		}
+        public class CtorLongArg
+        {
+            public CtorLongArg(long l) { }
+        }
 
-		public class CallsCtor
-		{
-			public bool ok;
+        public class CallsCtor
+        {
+            public bool ok;
 
-			public CallsCtor()
-			{
-				ok = true;
-			}
-		}
+            public CallsCtor()
+            {
+                ok = true;
+            }
+        }
 
-		[TestMethod, TestCategory("Lite"), TestCategory("Constructor")]
-		public void ShouldCallDefaultConstructorWhenExplicitlyGivenNoArguments()
-		{
-			var mock = Mock.Create<CallsCtor>(new object[0]);
-			Assert.True(mock.ok);
-		}
-	}
+        [TestMethod, TestCategory("Lite"), TestCategory("Constructor")]
+        public void ShouldCallDefaultConstructorWhenExplicitlyGivenNoArguments()
+        {
+            var mock = Mock.Create<CallsCtor>(new object[0]);
+            Assert.True(mock.ok);
+        }
+    }
 }

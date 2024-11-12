@@ -14,31 +14,31 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy
 {
-	using System;
+    using System;
 
 #if FEATURE_SERIALIZATION
-	[Serializable]
+    [Serializable]
 #endif
-	internal class StandardInterceptor : IInterceptor
-	{
-		public void Intercept(IInvocation invocation)
-		{
-			PreProceed(invocation);
-			PerformProceed(invocation);
-			PostProceed(invocation);
-		}
+    internal class StandardInterceptor : IInterceptor
+    {
+        public void Intercept(IInvocation invocation)
+        {
+            PreProceed(invocation);
+            PerformProceed(invocation);
+            PostProceed(invocation);
+        }
 
-		protected virtual void PerformProceed(IInvocation invocation)
-		{
-			invocation.Proceed();
-		}
+        protected virtual void PerformProceed(IInvocation invocation)
+        {
+            invocation.Proceed();
+        }
 
-		protected virtual void PreProceed(IInvocation invocation)
-		{
-		}
+        protected virtual void PreProceed(IInvocation invocation)
+        {
+        }
 
-		protected virtual void PostProceed(IInvocation invocation)
-		{
-		}
-	}
+        protected virtual void PostProceed(IInvocation invocation)
+        {
+        }
+    }
 }

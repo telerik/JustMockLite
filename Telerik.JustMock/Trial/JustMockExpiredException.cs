@@ -21,15 +21,15 @@ using Telerik.JustMock.Core;
 
 namespace Telerik.JustMock.Trial
 {
-	/// <summary>
-	/// The exception that is thrown when the trial of JustMock has expired.
-	/// </summary>
-	[Serializable]
-	public sealed class JustMockExpiredException : MockException
-	{
-		internal JustMockExpiredException()
-			: base("The trial of this version of JustMock has expired!")
-		{
-		}
-	}
+    /// <summary>
+    /// The exception that is thrown when the trial of JustMock has expired.
+    /// </summary>
+    [Serializable]
+    public sealed class JustMockExpiredException : MockException
+    {
+        internal JustMockExpiredException()
+            : base("The trial of this version of JustMock has expired!")
+        {
+        }
+    }
 }

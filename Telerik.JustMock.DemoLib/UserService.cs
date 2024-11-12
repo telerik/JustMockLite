@@ -19,19 +19,19 @@ using Telerik.JustMock.DemoLib.Objects;
 
 namespace Telerik.JustMock.DemoLib
 {
-	public class UserService
-	{
-		public static string Username { get; set; }
+    public class UserService
+    {
+        public static string Username { get; set; }
 
-		public static User GetLoggedInUser()
-		{
-			return null;
-		}
+        public static User GetLoggedInUser()
+        {
+            return null;
+        }
 
-		public void ValidateUser(User user)
-		{
+        public void ValidateUser(User user)
+        {
 
-		}
-	}
+        }
+    }
 
 }

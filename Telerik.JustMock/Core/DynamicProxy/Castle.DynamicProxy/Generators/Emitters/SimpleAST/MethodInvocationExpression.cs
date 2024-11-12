@@ -14,56 +14,56 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST
 {
-	using System.Reflection;
-	using System.Reflection.Emit;
+    using System.Reflection;
+    using System.Reflection.Emit;
 
-	internal class MethodInvocationExpression : IExpression, IStatement
-	{
-		protected readonly IExpression[] args;
-		protected readonly MethodInfo method;
-		protected readonly Reference owner;
+    internal class MethodInvocationExpression : IExpression, IStatement
+    {
+        protected readonly IExpression[] args;
+        protected readonly MethodInfo method;
+        protected readonly Reference owner;
 
-		public MethodInvocationExpression(MethodInfo method, params IExpression[] args) :
-			this(SelfReference.Self, method, args)
-		{
-		}
+        public MethodInvocationExpression(MethodInfo method, params IExpression[] args) :
+            this(SelfReference.Self, method, args)
+        {
+        }
 
-		public MethodInvocationExpression(MethodEmitter method, params IExpression[] args) :
-			this(SelfReference.Self, method.MethodBuilder, args)
-		{
-		}
+        public MethodInvocationExpression(MethodEmitter method, params IExpression[] args) :
+            this(SelfReference.Self, method.MethodBuilder, args)
+        {
+        }
 
-		public MethodInvocationExpression(Reference owner, MethodEmitter method, params IExpression[] args) :
-			this(owner, method.MethodBuilder, args)
-		{
-		}
+        public MethodInvocationExpression(Reference owner, MethodEmitter method, params IExpression[] args) :
+            this(owner, method.MethodBuilder, args)
+        {
+        }
 
-		public MethodInvocationExpression(Reference owner, MethodInfo method, params IExpression[] args)
-		{
-			this.owner = owner;
-			this.method = method;
-			this.args = args;
-		}
+        public MethodInvocationExpression(Reference owner, MethodInfo method, params IExpression[] args)
+        {
+            this.owner = owner;
+            this.method = method;
+            this.args = args;
+        }
 
-		public bool VirtualCall { get; set; }
+        public bool VirtualCall { get; set; }
 
-		public void Emit(ILGenerator gen)
-		{
-			ArgumentsUtil.EmitLoadOwnerAndReference(owner, gen);
+        public void Emit(ILGenerator gen)
+        {
+            ArgumentsUtil.EmitLoadOwnerAndReference(owner, gen);
 
-			foreach (var exp in args)
-			{
-				exp.Emit(gen);
-			}
+            foreach (var exp in args)
+            {
+                exp.Emit(gen);
+            }
 
-			if (VirtualCall)
-			{
-				gen.Emit(OpCodes.Callvirt, method);
-			}
-			else
-			{
-				gen.Emit(OpCodes.Call, method);
-			}
-		}
-	}
+            if (VirtualCall)
+            {
+                gen.Emit(OpCodes.Callvirt, method);
+            }
+            else
+            {
+                gen.Emit(OpCodes.Call, method);
+            }
+        }
+    }
 }

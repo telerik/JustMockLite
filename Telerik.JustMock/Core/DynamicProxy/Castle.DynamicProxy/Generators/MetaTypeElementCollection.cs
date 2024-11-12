@@ -14,55 +14,55 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 {
-	using System;
-	using System.Collections;
-	using System.Collections.Generic;
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
 
-	internal class MetaTypeElementCollection<TElement> : IEnumerable<TElement>
-		where TElement : MetaTypeElement, IEquatable<TElement>
-	{
-		private readonly ICollection<TElement> items = new List<TElement>();
+    internal class MetaTypeElementCollection<TElement> : IEnumerable<TElement>
+        where TElement : MetaTypeElement, IEquatable<TElement>
+    {
+        private readonly ICollection<TElement> items = new List<TElement>();
 
-		public void Add(TElement item)
-		{
-			if (item.CanBeImplementedExplicitly == false)
-			{
-				items.Add(item);
-				return;
-			}
-			if (Contains(item))
-			{
-				item.SwitchToExplicitImplementation();
-				if (Contains(item))
-				{
-					// there is something *really* wrong going on here
-					throw new DynamicProxyException("Duplicate element: " + item);
-				}
-			}
-			items.Add(item);
-		}
+        public void Add(TElement item)
+        {
+            if (item.CanBeImplementedExplicitly == false)
+            {
+                items.Add(item);
+                return;
+            }
+            if (Contains(item))
+            {
+                item.SwitchToExplicitImplementation();
+                if (Contains(item))
+                {
+                    // there is something *really* wrong going on here
+                    throw new DynamicProxyException("Duplicate element: " + item);
+                }
+            }
+            items.Add(item);
+        }
 
-		public bool Contains(TElement item)
-		{
-			foreach (var element in items)
-			{
-				if (element.Equals(item))
-				{
-					return true;
-				}
-			}
+        public bool Contains(TElement item)
+        {
+            foreach (var element in items)
+            {
+                if (element.Equals(item))
+                {
+                    return true;
+                }
+            }
 
-			return false;
-		}
+            return false;
+        }
 
-		public IEnumerator<TElement> GetEnumerator()
-		{
-			return items.GetEnumerator();
-		}
+        public IEnumerator<TElement> GetEnumerator()
+        {
+            return items.GetEnumerator();
+        }
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-	}
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+    }
 }

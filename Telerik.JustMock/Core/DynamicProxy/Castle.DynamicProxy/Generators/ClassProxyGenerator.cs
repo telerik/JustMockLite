@@ -14,45 +14,45 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Reflection;
+    using System;
+    using System.Collections.Generic;
+    using System.Reflection;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Serialization;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Serialization;
 
-	internal sealed class ClassProxyGenerator : BaseClassProxyGenerator
-	{
-		public ClassProxyGenerator(ModuleScope scope, Type targetType, Type[] interfaces, ProxyGenerationOptions options)
-			: base(scope, targetType, interfaces, options)
-		{
-		}
+    internal sealed class ClassProxyGenerator : BaseClassProxyGenerator
+    {
+        public ClassProxyGenerator(ModuleScope scope, Type targetType, Type[] interfaces, ProxyGenerationOptions options)
+            : base(scope, targetType, interfaces, options)
+        {
+        }
 
-		protected override FieldReference TargetField => null;
+        protected override FieldReference TargetField => null;
 
-		protected override CacheKey GetCacheKey()
-		{
-			return new CacheKey(targetType, interfaces, ProxyGenerationOptions);
-		}
+        protected override CacheKey GetCacheKey()
+        {
+            return new CacheKey(targetType, interfaces, ProxyGenerationOptions);
+        }
 
 #if FEATURE_SERIALIZATION
-		protected override SerializableContributor GetSerializableContributor()
-		{
-			return new ClassProxySerializableContributor(targetType, interfaces, ProxyTypeConstants.Class);
-		}
+        protected override SerializableContributor GetSerializableContributor()
+        {
+            return new ClassProxySerializableContributor(targetType, interfaces, ProxyTypeConstants.Class);
+        }
 #endif
 
-		protected override CompositeTypeContributor GetProxyTargetContributor(INamingScope namingScope)
-		{
-			return new ClassProxyTargetContributor(targetType, namingScope) { Logger = Logger };
-		}
+        protected override CompositeTypeContributor GetProxyTargetContributor(INamingScope namingScope)
+        {
+            return new ClassProxyTargetContributor(targetType, namingScope) { Logger = Logger };
+        }
 
-		protected override ProxyTargetAccessorContributor GetProxyTargetAccessorContributor()
-		{
-			return new ProxyTargetAccessorContributor(
-				getTargetReference: () => SelfReference.Self,
-				targetType);
-		}
-	}
+        protected override ProxyTargetAccessorContributor GetProxyTargetAccessorContributor()
+        {
+            return new ProxyTargetAccessorContributor(
+                getTargetReference: () => SelfReference.Self,
+                targetType);
+        }
+    }
 }

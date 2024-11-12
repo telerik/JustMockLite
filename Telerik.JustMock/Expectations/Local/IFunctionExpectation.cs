@@ -23,7 +23,7 @@ namespace Telerik.JustMock.Expectations.Abstraction.Local.Function
     /// <summary>
     /// Interface used to arrange and call local functions.
     /// </summary>
-	public interface IFunctionExpectation
+    public interface IFunctionExpectation
     {
         /// <summary>
         /// Arranges a local function for mocking.

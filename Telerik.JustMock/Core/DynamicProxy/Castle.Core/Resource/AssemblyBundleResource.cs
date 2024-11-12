@@ -14,59 +14,59 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Resource
 {
-	using System;
-	using System.Globalization;
-	using System.IO;
-	using System.Reflection;
-	using System.Resources;
-	using System.Text;
+    using System;
+    using System.Globalization;
+    using System.IO;
+    using System.Reflection;
+    using System.Resources;
+    using System.Text;
 
-	internal class AssemblyBundleResource : AbstractResource
-	{
-		private readonly CustomUri resource;
+    internal class AssemblyBundleResource : AbstractResource
+    {
+        private readonly CustomUri resource;
 
-		public AssemblyBundleResource(CustomUri resource)
-		{
-			this.resource = resource;
-		}
+        public AssemblyBundleResource(CustomUri resource)
+        {
+            this.resource = resource;
+        }
 
-		public override TextReader GetStreamReader()
-		{
-			var assembly = ObtainAssembly(resource.Host);
+        public override TextReader GetStreamReader()
+        {
+            var assembly = ObtainAssembly(resource.Host);
 
-			var paths = resource.Path.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
-			if (paths.Length != 2)
-			{
-				throw new ResourceException("AssemblyBundleResource does not support paths with more than 2 levels in depth. See " +
-				                            resource.Path);
-			}
+            var paths = resource.Path.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
+            if (paths.Length != 2)
+            {
+                throw new ResourceException("AssemblyBundleResource does not support paths with more than 2 levels in depth. See " +
+                                            resource.Path);
+            }
 
-			var rm = new ResourceManager(paths[0], assembly);
+            var rm = new ResourceManager(paths[0], assembly);
 
-			return new StringReader(rm.GetString(paths[1]));
-		}
+            return new StringReader(rm.GetString(paths[1]));
+        }
 
-		public override TextReader GetStreamReader(Encoding encoding)
-		{
-			return GetStreamReader();
-		}
+        public override TextReader GetStreamReader(Encoding encoding)
+        {
+            return GetStreamReader();
+        }
 
-		public override IResource CreateRelative(string relativePath)
-		{
-			throw new NotImplementedException();
-		}
+        public override IResource CreateRelative(string relativePath)
+        {
+            throw new NotImplementedException();
+        }
 
-		private static Assembly ObtainAssembly(string assemblyName)
-		{
-			try
-			{
-				return Assembly.Load(new AssemblyName(assemblyName));
-			}
-			catch (Exception ex)
-			{
-				var message = string.Format(CultureInfo.InvariantCulture, "The assembly {0} could not be loaded", assemblyName);
-				throw new ResourceException(message, ex);
-			}
-		}
-	}
+        private static Assembly ObtainAssembly(string assemblyName)
+        {
+            try
+            {
+                return Assembly.Load(new AssemblyName(assemblyName));
+            }
+            catch (Exception ex)
+            {
+                var message = string.Format(CultureInfo.InvariantCulture, "The assembly {0} could not be loaded", assemblyName);
+                throw new ResourceException(message, ex);
+            }
+        }
+    }
 }

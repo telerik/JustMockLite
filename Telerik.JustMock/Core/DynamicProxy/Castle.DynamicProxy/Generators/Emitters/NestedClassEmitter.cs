@@ -14,39 +14,39 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters
 {
-	using System;
-	using System.Reflection;
-	using System.Reflection.Emit;
+    using System;
+    using System.Reflection;
+    using System.Reflection.Emit;
 
-	internal class NestedClassEmitter : AbstractTypeEmitter
-	{
-		public NestedClassEmitter(AbstractTypeEmitter mainType, string name, Type baseType, Type[] interfaces)
-			: this(
-				mainType,
-				CreateTypeBuilder(mainType, name, TypeAttributes.Sealed | TypeAttributes.NestedPublic | TypeAttributes.Class,
-				                  baseType, interfaces))
-		{
-		}
+    internal class NestedClassEmitter : AbstractTypeEmitter
+    {
+        public NestedClassEmitter(AbstractTypeEmitter mainType, string name, Type baseType, Type[] interfaces)
+            : this(
+                mainType,
+                CreateTypeBuilder(mainType, name, TypeAttributes.Sealed | TypeAttributes.NestedPublic | TypeAttributes.Class,
+                                  baseType, interfaces))
+        {
+        }
 
-		public NestedClassEmitter(AbstractTypeEmitter mainType, string name, TypeAttributes attributes, Type baseType,
-		                          Type[] interfaces)
-			: this(mainType, CreateTypeBuilder(mainType, name, attributes, baseType, interfaces))
-		{
-		}
+        public NestedClassEmitter(AbstractTypeEmitter mainType, string name, TypeAttributes attributes, Type baseType,
+                                  Type[] interfaces)
+            : this(mainType, CreateTypeBuilder(mainType, name, attributes, baseType, interfaces))
+        {
+        }
 
-		public NestedClassEmitter(AbstractTypeEmitter mainType, TypeBuilder typeBuilder)
-			: base(typeBuilder)
-		{
-			mainType.AddNestedClass(this);
-		}
+        public NestedClassEmitter(AbstractTypeEmitter mainType, TypeBuilder typeBuilder)
+            : base(typeBuilder)
+        {
+            mainType.AddNestedClass(this);
+        }
 
-		private static TypeBuilder CreateTypeBuilder(AbstractTypeEmitter mainType, string name, TypeAttributes attributes,
-		                                             Type baseType, Type[] interfaces)
-		{
-			return mainType.TypeBuilder.DefineNestedType(
-				name,
-				attributes,
-				baseType, interfaces);
-		}
-	}
+        private static TypeBuilder CreateTypeBuilder(AbstractTypeEmitter mainType, string name, TypeAttributes attributes,
+                                                     Type baseType, Type[] interfaces)
+        {
+            return mainType.TypeBuilder.DefineNestedType(
+                name,
+                attributes,
+                baseType, interfaces);
+        }
+    }
 }

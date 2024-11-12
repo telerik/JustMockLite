@@ -20,87 +20,87 @@ using Microsoft.Win32;
 
 namespace Telerik.JustMock.Core
 {
-	/// <summary>
-	/// Implementation detail.
-	/// </summary>
-	public delegate bool GetValueImplDelegate(bool currentUser, string keyName, string valueName, StringBuilder outValue, int outValueByteCount);
-	/// <summary>
-	/// Implementation detail.
-	/// </summary>
-	public delegate bool SetValueImplDelegate(bool currentUser, string keyName, string valueName, string value);
+    /// <summary>
+    /// Implementation detail.
+    /// </summary>
+    public delegate bool GetValueImplDelegate(bool currentUser, string keyName, string valueName, StringBuilder outValue, int outValueByteCount);
+    /// <summary>
+    /// Implementation detail.
+    /// </summary>
+    public delegate bool SetValueImplDelegate(bool currentUser, string keyName, string valueName, string value);
 
-	internal static class SecuredRegistryMethods
-	{
-		private static readonly GetValueImplDelegate getValue;
-		private static readonly SetValueImplDelegate setValue;
+    internal static class SecuredRegistryMethods
+    {
+        private static readonly GetValueImplDelegate getValue;
+        private static readonly SetValueImplDelegate setValue;
 
-		static SecuredRegistryMethods()
-		{
+        static SecuredRegistryMethods()
+        {
 #if !NETCORE
             if (ProfilerInterceptor.IsProfilerAttached)
-			{
-				ProfilerInterceptor.WrapCallToDelegate("SetRegistryValue", out setValue);
-				ProfilerInterceptor.WrapCallToDelegate("GetRegistryValue", out getValue);
-			}
-			else
-			{
+            {
+                ProfilerInterceptor.WrapCallToDelegate("SetRegistryValue", out setValue);
+                ProfilerInterceptor.WrapCallToDelegate("GetRegistryValue", out getValue);
+            }
+            else
+            {
 #endif
                 getValue = (currentUser, keyName, valueName, outValue, outValueByteCount) => GetRegistryValue(currentUser, keyName, valueName, outValue);
-				setValue = (currentUser, keyName, valueName, value) => SetRegistryValue(currentUser, keyName, valueName, value);
+                setValue = (currentUser, keyName, valueName, value) => SetRegistryValue(currentUser, keyName, valueName, value);
 #if !NETCORE
             }
 #endif
         }
 
         public static string GetValue(bool currentUser, string keyName, string valueName)
-		{
-			StringBuilder outValue = new StringBuilder(256);
-			if (!getValue(currentUser, keyName, valueName, outValue, outValue.Capacity * sizeof(char)))
-				return null;
-			return outValue.ToString();
-		}
+        {
+            StringBuilder outValue = new StringBuilder(256);
+            if (!getValue(currentUser, keyName, valueName, outValue, outValue.Capacity * sizeof(char)))
+                return null;
+            return outValue.ToString();
+        }
 
-		public static bool SetValue(bool currentUser, string keyName, string valueName, string value)
-		{
-			return setValue(currentUser, keyName, valueName, value);
-		}
+        public static bool SetValue(bool currentUser, string keyName, string valueName, string value)
+        {
+            return setValue(currentUser, keyName, valueName, value);
+        }
 
-		private static bool GetRegistryValue(bool currentUser, string keyName, string valueName, StringBuilder outValue)
-		{
+        private static bool GetRegistryValue(bool currentUser, string keyName, string valueName, StringBuilder outValue)
+        {
 #if (!SILVERLIGHT && !NETCORE)
-			using (RegistryKey registryKey = currentUser ? Registry.CurrentUser : Registry.LocalMachine)
-			{
-				using (var key = registryKey.OpenSubKey(keyName))
-				{
-					if (key != null)
-					{
-						var filePath = key.GetValue(valueName);
-						outValue.Append(filePath);
+            using (RegistryKey registryKey = currentUser ? Registry.CurrentUser : Registry.LocalMachine)
+            {
+                using (var key = registryKey.OpenSubKey(keyName))
+                {
+                    if (key != null)
+                    {
+                        var filePath = key.GetValue(valueName);
+                        outValue.Append(filePath);
 
-						return true;
-					}
-				}
-			}
+                        return true;
+                    }
+                }
+            }
 #endif
-			return false;
-		}
+            return false;
+        }
 
-		private static bool SetRegistryValue(bool currentUser, string keyName, string valueName, string value)
-		{
+        private static bool SetRegistryValue(bool currentUser, string keyName, string valueName, string value)
+        {
 #if (!SILVERLIGHT && !NETCORE)
-			using (RegistryKey registryKey = currentUser ? Registry.CurrentUser : Registry.LocalMachine)
-			{
-				using (var key = registryKey.OpenSubKey(keyName, true))
-				{
-					if (key != null)
-					{
-						key.SetValue(valueName, value);
-						return true;
-					}
-				}
-			}
+            using (RegistryKey registryKey = currentUser ? Registry.CurrentUser : Registry.LocalMachine)
+            {
+                using (var key = registryKey.OpenSubKey(keyName, true))
+                {
+                    if (key != null)
+                    {
+                        key.SetValue(valueName, value);
+                        return true;
+                    }
+                }
+            }
 #endif
-			return false;
-		}
-	}
+            return false;
+        }
+    }
 }

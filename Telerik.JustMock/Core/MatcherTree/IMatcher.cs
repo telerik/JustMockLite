@@ -21,12 +21,12 @@ using System.Linq.Expressions;
 
 namespace Telerik.JustMock.Core.MatcherTree
 {
-	internal interface IMatcher : IEquatable<IMatcher>
-	{
-		bool Matches(IMatcher other);
-		bool CanMatch(IMatcher matcher);
-		Expression ToExpression(Type argumentType);
-		bool ProtectRefOut { get; set; }
-		string DebugView { get; }
-	}
+    internal interface IMatcher : IEquatable<IMatcher>
+    {
+        bool Matches(IMatcher other);
+        bool CanMatch(IMatcher matcher);
+        Expression ToExpression(Type argumentType);
+        bool ProtectRefOut { get; set; }
+        string DebugView { get; }
+    }
 }

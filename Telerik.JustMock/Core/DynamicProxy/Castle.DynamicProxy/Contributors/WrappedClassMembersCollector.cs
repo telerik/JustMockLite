@@ -14,69 +14,69 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 {
-	using System;
-	using System.Reflection;
-	using System.Runtime.CompilerServices;
+    using System;
+    using System.Reflection;
+    using System.Runtime.CompilerServices;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
 
-	internal class WrappedClassMembersCollector : ClassMembersCollector
-	{
-		public WrappedClassMembersCollector(Type type) : base(type)
-		{
-		}
+    internal class WrappedClassMembersCollector : ClassMembersCollector
+    {
+        public WrappedClassMembersCollector(Type type) : base(type)
+        {
+        }
 
-		public override void CollectMembersToProxy(IProxyGenerationHook hook, IMembersCollectorSink sink)
-		{
-			base.CollectMembersToProxy(hook, sink);
-			CollectFields(hook);
-			// TODO: perhaps we should also look for nested classes...
-		}
+        public override void CollectMembersToProxy(IProxyGenerationHook hook, IMembersCollectorSink sink)
+        {
+            base.CollectMembersToProxy(hook, sink);
+            CollectFields(hook);
+            // TODO: perhaps we should also look for nested classes...
+        }
 
-		protected override MetaMethod GetMethodToGenerate(MethodInfo method, IProxyGenerationHook hook, bool isStandalone)
-		{
-			if (ProxyUtil.IsAccessibleMethod(method) == false)
-			{
-				return null;
-			}
+        protected override MetaMethod GetMethodToGenerate(MethodInfo method, IProxyGenerationHook hook, bool isStandalone)
+        {
+            if (ProxyUtil.IsAccessibleMethod(method) == false)
+            {
+                return null;
+            }
 
-			var interceptable = AcceptMethodPreScreen(method, true, hook);
-			if (!interceptable)
-			{
-				//we don't need to do anything...
-				return null;
-			}
+            var interceptable = AcceptMethodPreScreen(method, true, hook);
+            if (!interceptable)
+            {
+                //we don't need to do anything...
+                return null;
+            }
 
-			var accepted = hook.ShouldInterceptMethod(type, method);
+            var accepted = hook.ShouldInterceptMethod(type, method);
 
-			return new MetaMethod(method, method, isStandalone, accepted, hasTarget: true);
-		}
+            return new MetaMethod(method, method, isStandalone, accepted, hasTarget: true);
+        }
 
-		protected bool IsGeneratedByTheCompiler(FieldInfo field)
-		{
-			// for example fields backing autoproperties
-			return field.IsDefined(typeof(CompilerGeneratedAttribute));
-		}
+        protected bool IsGeneratedByTheCompiler(FieldInfo field)
+        {
+            // for example fields backing autoproperties
+            return field.IsDefined(typeof(CompilerGeneratedAttribute));
+        }
 
-		protected virtual bool IsOKToBeOnProxy(FieldInfo field)
-		{
-			return IsGeneratedByTheCompiler(field);
-		}
+        protected virtual bool IsOKToBeOnProxy(FieldInfo field)
+        {
+            return IsGeneratedByTheCompiler(field);
+        }
 
-		private void CollectFields(IProxyGenerationHook hook)
-		{
-			var fields = type.GetAllFields();
-			foreach (var field in fields)
-			{
-				if (IsOKToBeOnProxy(field))
-				{
-					continue;
-				}
+        private void CollectFields(IProxyGenerationHook hook)
+        {
+            var fields = type.GetAllFields();
+            foreach (var field in fields)
+            {
+                if (IsOKToBeOnProxy(field))
+                {
+                    continue;
+                }
 
-				hook.NonProxyableMemberNotification(type, field);
-			}
-		}
-	}
+                hook.NonProxyableMemberNotification(type, field);
+            }
+        }
+    }
 }

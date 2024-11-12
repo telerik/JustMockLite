@@ -21,64 +21,64 @@ using System.Linq.Expressions;
 
 namespace Telerik.JustMock.Core.MatcherTree
 {
-	internal interface IUniverseMatcher
-	{ }
+    internal interface IUniverseMatcher
+    { }
 
-	internal interface ITypedMatcher : IUniverseMatcher
-	{
-		Type Type { get; }
-	}
+    internal interface ITypedMatcher : IUniverseMatcher
+    {
+        Type Type { get; }
+    }
 
-	internal interface IFunctionalMatcher : ITypedMatcher
-	{ }
+    internal interface IFunctionalMatcher : ITypedMatcher
+    { }
 
-	internal interface ICompositeMatcher : IUniverseMatcher
-	{ }
+    internal interface ICompositeMatcher : IUniverseMatcher
+    { }
 
-	internal interface IValueMatcher : IFunctionalMatcher, ICompositeMatcher
-	{
-		object Value { get; }
-	}
+    internal interface IValueMatcher : IFunctionalMatcher, ICompositeMatcher
+    {
+        object Value { get; }
+    }
 
-	internal interface IContainerMatcher
-	{
-		IMatcher[] Matchers { get; }
-	}
+    internal interface IContainerMatcher
+    {
+        IMatcher[] Matchers { get; }
+    }
 
-	internal abstract class CategoricalMatcherBase : IMatcher
-	{
-		public bool ProtectRefOut { get; set; }
+    internal abstract class CategoricalMatcherBase : IMatcher
+    {
+        public bool ProtectRefOut { get; set; }
 
-		public abstract bool CanMatch(IMatcher matcher);
+        public abstract bool CanMatch(IMatcher matcher);
 
-		public abstract bool Equals(IMatcher other);
+        public abstract bool Equals(IMatcher other);
 
-		public abstract Expression ToExpression(Type argumentType);
+        public abstract Expression ToExpression(Type argumentType);
 
-		public abstract string DebugView { get; }
+        public abstract string DebugView { get; }
 
-		protected abstract bool MatchesCore(IMatcher other);
+        protected abstract bool MatchesCore(IMatcher other);
 
-		public bool Matches(IMatcher other)
-		{
-			if (this.Equals(other))
-				return true;
+        public bool Matches(IMatcher other)
+        {
+            if (this.Equals(other))
+                return true;
 
-			if (!this.CanMatch(other))
-				return false;
+            if (!this.CanMatch(other))
+                return false;
 
-			return this.MatchesCore(other);
-		}
+            return this.MatchesCore(other);
+        }
 
-		public override bool Equals(object obj)
-		{
-			var matcher = obj as IMatcher;
-			return matcher != null && this.Equals(matcher);
-		}
+        public override bool Equals(object obj)
+        {
+            var matcher = obj as IMatcher;
+            return matcher != null && this.Equals(matcher);
+        }
 
-		public override int GetHashCode()
-		{
-			throw new NotSupportedException();
-		}
-	}
+        public override int GetHashCode()
+        {
+            throw new NotSupportedException();
+        }
+    }
 }

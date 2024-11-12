@@ -23,56 +23,56 @@ using System.Reflection.Emit;
 
 namespace Telerik.JustMock.Core.Context
 {
-	internal abstract class XUnitMockingContextResolver : HierarchicalTestFrameworkContextResolver
-	{
-		private Type exceptionType = typeof(XUnit.AssertFailedException);
+    internal abstract class XUnitMockingContextResolver : HierarchicalTestFrameworkContextResolver
+    {
+        private Type exceptionType = typeof(XUnit.AssertFailedException);
 
-		protected XUnitMockingContextResolver(string exceptionName)
-			: base(exceptionName)
-		{
-		}
+        protected XUnitMockingContextResolver(string exceptionName)
+            : base(exceptionName)
+        {
+        }
 
-		protected override Expression<Func<string, Exception, Exception>> CreateExceptionFactory()
-		{
-			return this.CreateExceptionFactory(this.exceptionType);
-		}
-	}
+        protected override Expression<Func<string, Exception, Exception>> CreateExceptionFactory()
+        {
+            return this.CreateExceptionFactory(this.exceptionType);
+        }
+    }
 
-	internal class XUnit1xMockingContextResolver : XUnitMockingContextResolver
-	{
-		private const string XunitAssertionExceptionName = "Xunit.Sdk.AssertActualExpectedException, xunit";
+    internal class XUnit1xMockingContextResolver : XUnitMockingContextResolver
+    {
+        private const string XunitAssertionExceptionName = "Xunit.Sdk.AssertActualExpectedException, xunit";
 
-		public static bool IsAvailable
-		{
-			get { return FindType(XunitAssertionExceptionName, false) != null; }
-		}
+        public static bool IsAvailable
+        {
+            get { return FindType(XunitAssertionExceptionName, false) != null; }
+        }
 
-		public XUnit1xMockingContextResolver()
-			: base(XunitAssertionExceptionName)
-		{
-			SetupStandardHierarchicalTestStructure(
-				new[] { "Xunit.FactAttribute, xunit" },
-				null, null, null,
-				FixtureConstuctorSemantics.InstanceConstructorCalledOncePerTest);
-		}
-	}
+        public XUnit1xMockingContextResolver()
+            : base(XunitAssertionExceptionName)
+        {
+            SetupStandardHierarchicalTestStructure(
+                new[] { "Xunit.FactAttribute, xunit" },
+                null, null, null,
+                FixtureConstuctorSemantics.InstanceConstructorCalledOncePerTest);
+        }
+    }
 
-	internal class XUnit2xMockingContextResolver : XUnitMockingContextResolver
-	{
-		private const string XunitAssertionExceptionName = "Xunit.Sdk.XunitException, xunit.assert";
+    internal class XUnit2xMockingContextResolver : XUnitMockingContextResolver
+    {
+        private const string XunitAssertionExceptionName = "Xunit.Sdk.XunitException, xunit.assert";
 
-		public static bool IsAvailable
-		{
-			get { return FindType(XunitAssertionExceptionName, false, true) != null; }
-		}
+        public static bool IsAvailable
+        {
+            get { return FindType(XunitAssertionExceptionName, false, true) != null; }
+        }
 
-		public XUnit2xMockingContextResolver()
-			: base(XunitAssertionExceptionName)
-		{
-			SetupStandardHierarchicalTestStructure(
-				new[] { "Xunit.FactAttribute, xunit.core", "Xunit.TheoryAttribute, xunit.core" },
-				null, null, null,
-				FixtureConstuctorSemantics.InstanceConstructorCalledOncePerTest);
-		}
-	}
+        public XUnit2xMockingContextResolver()
+            : base(XunitAssertionExceptionName)
+        {
+            SetupStandardHierarchicalTestStructure(
+                new[] { "Xunit.FactAttribute, xunit.core", "Xunit.TheoryAttribute, xunit.core" },
+                null, null, null,
+                FixtureConstuctorSemantics.InstanceConstructorCalledOncePerTest);
+        }
+    }
 }

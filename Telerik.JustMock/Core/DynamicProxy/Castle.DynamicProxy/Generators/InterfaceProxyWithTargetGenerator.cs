@@ -14,55 +14,55 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Serialization;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Serialization;
 
-	internal sealed class InterfaceProxyWithTargetGenerator : BaseInterfaceProxyGenerator
-	{
-		public InterfaceProxyWithTargetGenerator(ModuleScope scope, Type targetType, Type[] interfaces,
-		                                         Type proxyTargetType, ProxyGenerationOptions options)
-			: base(scope, targetType, interfaces, proxyTargetType, options)
-		{ }
+    internal sealed class InterfaceProxyWithTargetGenerator : BaseInterfaceProxyGenerator
+    {
+        public InterfaceProxyWithTargetGenerator(ModuleScope scope, Type targetType, Type[] interfaces,
+                                                 Type proxyTargetType, ProxyGenerationOptions options)
+            : base(scope, targetType, interfaces, proxyTargetType, options)
+        { }
 
-		protected override bool AllowChangeTarget => false;
+        protected override bool AllowChangeTarget => false;
 
-		protected override string GeneratorType => ProxyTypeConstants.InterfaceWithTarget;
+        protected override string GeneratorType => ProxyTypeConstants.InterfaceWithTarget;
 
-		protected override CompositeTypeContributor GetProxyTargetContributor(Type proxyTargetType, INamingScope namingScope)
-		{
-			return new InterfaceProxyTargetContributor(proxyTargetType, AllowChangeTarget, namingScope) { Logger = Logger };
-		}
+        protected override CompositeTypeContributor GetProxyTargetContributor(Type proxyTargetType, INamingScope namingScope)
+        {
+            return new InterfaceProxyTargetContributor(proxyTargetType, AllowChangeTarget, namingScope) { Logger = Logger };
+        }
 
-		protected override ProxyTargetAccessorContributor GetProxyTargetAccessorContributor()
-		{
-			return new ProxyTargetAccessorContributor(
-				getTargetReference: () => targetField,
-				proxyTargetType);
-		}
+        protected override ProxyTargetAccessorContributor GetProxyTargetAccessorContributor()
+        {
+            return new ProxyTargetAccessorContributor(
+                getTargetReference: () => targetField,
+                proxyTargetType);
+        }
 
-		protected override void AddMappingForAdditionalInterfaces(CompositeTypeContributor contributor, Type[] proxiedInterfaces,
-		                                                          IDictionary<Type, ITypeContributor> typeImplementerMapping,
-		                                                          ICollection<Type> targetInterfaces)
-		{
-			foreach (var @interface in interfaces)
-			{
-				if (!ImplementedByTarget(targetInterfaces, @interface) || proxiedInterfaces.Contains(@interface))
-				{
-					continue;
-				}
+        protected override void AddMappingForAdditionalInterfaces(CompositeTypeContributor contributor, Type[] proxiedInterfaces,
+                                                                  IDictionary<Type, ITypeContributor> typeImplementerMapping,
+                                                                  ICollection<Type> targetInterfaces)
+        {
+            foreach (var @interface in interfaces)
+            {
+                if (!ImplementedByTarget(targetInterfaces, @interface) || proxiedInterfaces.Contains(@interface))
+                {
+                    continue;
+                }
 
-				contributor.AddInterfaceToProxy(@interface);
-				AddMappingNoCheck(@interface, contributor, typeImplementerMapping);
-			}
-		}
+                contributor.AddInterfaceToProxy(@interface);
+                AddMappingNoCheck(@interface, contributor, typeImplementerMapping);
+            }
+        }
 
-		private bool ImplementedByTarget(ICollection<Type> targetInterfaces, Type @interface)
-		{
-			return targetInterfaces.Contains(@interface);
-		}
-	}
+        private bool ImplementedByTarget(ICollection<Type> targetInterfaces, Type @interface)
+        {
+            return targetInterfaces.Contains(@interface);
+        }
+    }
 }

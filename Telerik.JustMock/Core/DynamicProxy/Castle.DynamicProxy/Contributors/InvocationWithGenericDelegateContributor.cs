@@ -14,75 +14,75 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 {
-	using System;
-	using System.Diagnostics;
-	using System.Linq;
-	using System.Reflection;
+    using System;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Reflection;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Tokens;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Tokens;
 
-	internal class InvocationWithGenericDelegateContributor : IInvocationCreationContributor
-	{
-		private readonly Type delegateType;
-		private readonly MetaMethod method;
-		private readonly Reference targetReference;
+    internal class InvocationWithGenericDelegateContributor : IInvocationCreationContributor
+    {
+        private readonly Type delegateType;
+        private readonly MetaMethod method;
+        private readonly Reference targetReference;
 
-		public InvocationWithGenericDelegateContributor(Type delegateType, MetaMethod method, Reference targetReference)
-		{
-			Debug.Assert(delegateType.IsGenericType, "delegateType.IsGenericType");
-			this.delegateType = delegateType;
-			this.method = method;
-			this.targetReference = targetReference;
-		}
+        public InvocationWithGenericDelegateContributor(Type delegateType, MetaMethod method, Reference targetReference)
+        {
+            Debug.Assert(delegateType.IsGenericType, "delegateType.IsGenericType");
+            this.delegateType = delegateType;
+            this.method = method;
+            this.targetReference = targetReference;
+        }
 
-		public ConstructorEmitter CreateConstructor(ArgumentReference[] baseCtorArguments, AbstractTypeEmitter invocation)
-		{
-			return invocation.CreateConstructor(baseCtorArguments);
-		}
+        public ConstructorEmitter CreateConstructor(ArgumentReference[] baseCtorArguments, AbstractTypeEmitter invocation)
+        {
+            return invocation.CreateConstructor(baseCtorArguments);
+        }
 
-		public MethodInfo GetCallbackMethod()
-		{
-			return delegateType.GetMethod("Invoke");
-		}
+        public MethodInfo GetCallbackMethod()
+        {
+            return delegateType.GetMethod("Invoke");
+        }
 
-		public MethodInvocationExpression GetCallbackMethodInvocation(AbstractTypeEmitter invocation, IExpression[] args,
-		                                                              Reference targetField,
-		                                                              MethodEmitter invokeMethodOnTarget)
-		{
-			var @delegate = GetDelegate(invocation, invokeMethodOnTarget);
-			return new MethodInvocationExpression(@delegate, GetCallbackMethod(), args);
-		}
+        public MethodInvocationExpression GetCallbackMethodInvocation(AbstractTypeEmitter invocation, IExpression[] args,
+                                                                      Reference targetField,
+                                                                      MethodEmitter invokeMethodOnTarget)
+        {
+            var @delegate = GetDelegate(invocation, invokeMethodOnTarget);
+            return new MethodInvocationExpression(@delegate, GetCallbackMethod(), args);
+        }
 
-		public IExpression[] GetConstructorInvocationArguments(IExpression[] arguments, ClassEmitter proxy)
-		{
-			return arguments;
-		}
+        public IExpression[] GetConstructorInvocationArguments(IExpression[] arguments, ClassEmitter proxy)
+        {
+            return arguments;
+        }
 
-		private Reference GetDelegate(AbstractTypeEmitter invocation, MethodEmitter invokeMethodOnTarget)
-		{
-			var genericTypeParameters = invocation.GenericTypeParams.AsTypeArray();
-			var closedDelegateType = delegateType.MakeGenericType(genericTypeParameters);
-			var localReference = invokeMethodOnTarget.CodeBuilder.DeclareLocal(closedDelegateType);
-			var closedMethodOnTarget = method.MethodOnTarget.MakeGenericMethod(genericTypeParameters);
-			invokeMethodOnTarget.CodeBuilder.AddStatement(
-				SetDelegate(localReference, targetReference, closedDelegateType, closedMethodOnTarget));
-			return localReference;
-		}
+        private Reference GetDelegate(AbstractTypeEmitter invocation, MethodEmitter invokeMethodOnTarget)
+        {
+            var genericTypeParameters = invocation.GenericTypeParams.AsTypeArray();
+            var closedDelegateType = delegateType.MakeGenericType(genericTypeParameters);
+            var localReference = invokeMethodOnTarget.CodeBuilder.DeclareLocal(closedDelegateType);
+            var closedMethodOnTarget = method.MethodOnTarget.MakeGenericMethod(genericTypeParameters);
+            invokeMethodOnTarget.CodeBuilder.AddStatement(
+                SetDelegate(localReference, targetReference, closedDelegateType, closedMethodOnTarget));
+            return localReference;
+        }
 
-		private AssignStatement SetDelegate(LocalReference localDelegate, Reference localTarget,
-		                                    Type closedDelegateType, MethodInfo closedMethodOnTarget)
-		{
-			var delegateCreateDelegate = new MethodInvocationExpression(
-				null,
-				DelegateMethods.CreateDelegate,
-				new TypeTokenExpression(closedDelegateType),
-				localTarget,
-				new MethodTokenExpression(closedMethodOnTarget));
-			return new AssignStatement(localDelegate, new ConvertExpression(closedDelegateType, delegateCreateDelegate));
-		}
-	}
+        private AssignStatement SetDelegate(LocalReference localDelegate, Reference localTarget,
+                                            Type closedDelegateType, MethodInfo closedMethodOnTarget)
+        {
+            var delegateCreateDelegate = new MethodInvocationExpression(
+                null,
+                DelegateMethods.CreateDelegate,
+                new TypeTokenExpression(closedDelegateType),
+                localTarget,
+                new MethodTokenExpression(closedMethodOnTarget));
+            return new AssignStatement(localDelegate, new ConvertExpression(closedDelegateType, delegateCreateDelegate));
+        }
+    }
 }

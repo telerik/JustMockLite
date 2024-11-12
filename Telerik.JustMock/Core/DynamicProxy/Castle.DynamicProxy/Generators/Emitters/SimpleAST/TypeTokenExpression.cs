@@ -14,24 +14,24 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST
 {
-	using System;
-	using System.Reflection.Emit;
+    using System;
+    using System.Reflection.Emit;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Tokens;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Tokens;
 
-	internal class TypeTokenExpression : IExpression
-	{
-		private readonly Type type;
+    internal class TypeTokenExpression : IExpression
+    {
+        private readonly Type type;
 
-		public TypeTokenExpression(Type type)
-		{
-			this.type = type;
-		}
+        public TypeTokenExpression(Type type)
+        {
+            this.type = type;
+        }
 
-		public void Emit(ILGenerator gen)
-		{
-			gen.Emit(OpCodes.Ldtoken, type);
-			gen.Emit(OpCodes.Call, TypeMethods.GetTypeFromHandle);
-		}
-	}
+        public void Emit(ILGenerator gen)
+        {
+            gen.Emit(OpCodes.Ldtoken, type);
+            gen.Emit(OpCodes.Call, TypeMethods.GetTypeFromHandle);
+        }
+    }
 }

@@ -15,24 +15,24 @@
 namespace Telerik.JustMock.Core.Castle.Core.Configuration
 {
 #if FEATURE_SERIALIZATION
-	using System;
-	using System.Runtime.Serialization;
+    using System;
+    using System.Runtime.Serialization;
 #endif
 
 #if FEATURE_SERIALIZATION
-	[Serializable]
+    [Serializable]
 #endif
-	internal class ConfigurationAttributeCollection
-		: System.Collections.Specialized.NameValueCollection
-	{
-		public ConfigurationAttributeCollection()
-		{
-		}
+    internal class ConfigurationAttributeCollection
+        : System.Collections.Specialized.NameValueCollection
+    {
+        public ConfigurationAttributeCollection()
+        {
+        }
 
 #if FEATURE_SERIALIZATION
-		protected ConfigurationAttributeCollection(SerializationInfo info, StreamingContext context) : base(info, context)
-		{
-		}
+        protected ConfigurationAttributeCollection(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
 #endif
-	}
+    }
 }

@@ -22,14 +22,14 @@ using System.Text;
 
 namespace Telerik.JustMock.Core.MatcherTree
 {
-	internal class MatcherNodeAndParent
-	{
-		public IMatcherTreeNode Node { get; private set; }
-		public IMatcherTreeNode Parent { get; private set; }
-		public MatcherNodeAndParent(IMatcherTreeNode node, IMatcherTreeNode parent)
-		{
-			this.Node = node;
-			this.Parent = parent;
-		}
-	}
+    internal class MatcherNodeAndParent
+    {
+        public IMatcherTreeNode Node { get; private set; }
+        public IMatcherTreeNode Parent { get; private set; }
+        public MatcherNodeAndParent(IMatcherTreeNode node, IMatcherTreeNode parent)
+        {
+            this.Node = node;
+            this.Parent = parent;
+        }
+    }
 }

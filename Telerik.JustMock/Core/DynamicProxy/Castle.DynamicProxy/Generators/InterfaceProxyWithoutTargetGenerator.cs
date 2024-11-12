@@ -14,46 +14,46 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 {
-	using System;
-	using System.Collections.Generic;
+    using System;
+    using System.Collections.Generic;
 
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
-	using Telerik.JustMock.Core.Castle.DynamicProxy.Serialization;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Contributors;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Serialization;
 
-	internal sealed class InterfaceProxyWithoutTargetGenerator : BaseInterfaceProxyGenerator
-	{
-		public InterfaceProxyWithoutTargetGenerator(ModuleScope scope, Type targetType, Type[] interfaces,
-		                                            Type proxyTargetType, ProxyGenerationOptions options)
-			: base(scope, targetType, interfaces, proxyTargetType, options)
-		{
-		}
+    internal sealed class InterfaceProxyWithoutTargetGenerator : BaseInterfaceProxyGenerator
+    {
+        public InterfaceProxyWithoutTargetGenerator(ModuleScope scope, Type targetType, Type[] interfaces,
+                                                    Type proxyTargetType, ProxyGenerationOptions options)
+            : base(scope, targetType, interfaces, proxyTargetType, options)
+        {
+        }
 
-		protected override bool AllowChangeTarget => false;
+        protected override bool AllowChangeTarget => false;
 
-		protected override string GeneratorType => ProxyTypeConstants.InterfaceWithoutTarget;
+        protected override string GeneratorType => ProxyTypeConstants.InterfaceWithoutTarget;
 
-		protected override CompositeTypeContributor GetProxyTargetContributor(Type proxyTargetType, INamingScope namingScope)
-		{
-			return new InterfaceProxyWithoutTargetContributor(namingScope, (c, m) => NullExpression.Instance) { Logger = Logger };
-		}
+        protected override CompositeTypeContributor GetProxyTargetContributor(Type proxyTargetType, INamingScope namingScope)
+        {
+            return new InterfaceProxyWithoutTargetContributor(namingScope, (c, m) => NullExpression.Instance) { Logger = Logger };
+        }
 
-		protected override ProxyTargetAccessorContributor GetProxyTargetAccessorContributor()
-		{
-			return new ProxyTargetAccessorContributor(
-				getTargetReference: () => targetField,
-				proxyTargetType);
-		}
+        protected override ProxyTargetAccessorContributor GetProxyTargetAccessorContributor()
+        {
+            return new ProxyTargetAccessorContributor(
+                getTargetReference: () => targetField,
+                proxyTargetType);
+        }
 
-		protected override void AddMappingForAdditionalInterfaces(CompositeTypeContributor contributor, Type[] proxiedInterfaces,
-		                                                          IDictionary<Type, ITypeContributor> typeImplementerMapping,
-		                                                          ICollection<Type> targetInterfaces)
-		{
-		}
+        protected override void AddMappingForAdditionalInterfaces(CompositeTypeContributor contributor, Type[] proxiedInterfaces,
+                                                                  IDictionary<Type, ITypeContributor> typeImplementerMapping,
+                                                                  ICollection<Type> targetInterfaces)
+        {
+        }
 
-		protected override IEnumerable<Type> GetTypeImplementerMapping(Type _, out IEnumerable<ITypeContributor> contributors, INamingScope namingScope)
-		{
-			return base.GetTypeImplementerMapping(proxyTargetType: targetType, out contributors, namingScope);
-		}
-	}
+        protected override IEnumerable<Type> GetTypeImplementerMapping(Type _, out IEnumerable<ITypeContributor> contributors, INamingScope namingScope)
+        {
+            return base.GetTypeImplementerMapping(proxyTargetType: targetType, out contributors, namingScope);
+        }
+    }
 }

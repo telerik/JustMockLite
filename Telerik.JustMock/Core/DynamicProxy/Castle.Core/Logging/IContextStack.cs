@@ -14,16 +14,16 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Logging
 {
-	using System;
+    using System;
 
-	internal interface IContextStack
-	{
-		int Count { get; }
+    internal interface IContextStack
+    {
+        int Count { get; }
 
-		void Clear();
+        void Clear();
 
-		string Pop();
+        string Pop();
 
-		IDisposable Push(string message);
-	}
+        IDisposable Push(string message);
+    }
 }

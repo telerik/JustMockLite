@@ -19,43 +19,43 @@ using System;
 
 namespace Telerik.Sitefinity.Web.UI.Fields.Config
 {
-	public abstract class FieldDefinitionElement : IFieldDefinition
-	{
-		public string ControlDefinitionName
-		{
-			get;
-			set;
-		}
+    public abstract class FieldDefinitionElement : IFieldDefinition
+    {
+        public string ControlDefinitionName
+        {
+            get;
+            set;
+        }
 
-		public string ViewName
-		{
-			get;
-			set;
-		}
+        public string ViewName
+        {
+            get;
+            set;
+        }
 
-		public DefinitionBase GetDefinition()
-		{
-			throw new NotImplementedException();
-		}
-	}
+        public DefinitionBase GetDefinition()
+        {
+            throw new NotImplementedException();
+        }
+    }
 
-	public interface IFieldDefinition : IDefinition
-	{
-		string ControlDefinitionName { get; set; }
+    public interface IFieldDefinition : IDefinition
+    {
+        string ControlDefinitionName { get; set; }
 
-		string ViewName { get; set; }
-	}
+        string ViewName { get; set; }
+    }
 
-	public interface IDefinition
-	{
-		DefinitionBase GetDefinition();
-	}
+    public interface IDefinition
+    {
+        DefinitionBase GetDefinition();
+    }
 
-	public abstract class DefinitionBase : IDefinition
-	{
-		public DefinitionBase GetDefinition()
-		{
-			return null;
-		}
-	}
+    public abstract class DefinitionBase : IDefinition
+    {
+        public DefinitionBase GetDefinition()
+        {
+            return null;
+        }
+    }
 }

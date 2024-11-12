@@ -18,11 +18,11 @@
 
 namespace Telerik.JustMock.DemoLib
 {
-	public abstract class ExpressionNodeVisitor
-	{
-		protected internal virtual ExpressionNode VisitExtension(ExpressionNode node)
-		{
-			return node.VisitChildren(this);
-		}
-	}
+    public abstract class ExpressionNodeVisitor
+    {
+        protected internal virtual ExpressionNode VisitExtension(ExpressionNode node)
+        {
+            return node.VisitChildren(this);
+        }
+    }
 }

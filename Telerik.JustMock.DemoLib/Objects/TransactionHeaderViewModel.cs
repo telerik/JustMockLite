@@ -18,24 +18,24 @@
 
 namespace Telerik.JustMock.DemoLib.Objects
 {
-	public class TransactionHeaderViewModel
-	{
-		public void SetLineNumbers()
-		{
+    public class TransactionHeaderViewModel
+    {
+        public void SetLineNumbers()
+        {
 
-		}
+        }
 
-		public void SaveTicket()
-		{
-		}
+        public void SaveTicket()
+        {
+        }
 
-		public void SetPaidAmount()
-		{
+        public void SetPaidAmount()
+        {
 
-		}
+        }
 
-		public string OperatorId { get; set; }
-		public int ReservationNumber { get; set; }
+        public string OperatorId { get; set; }
+        public int ReservationNumber { get; set; }
 
-	}
+    }
 }

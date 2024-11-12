@@ -14,32 +14,32 @@
 
 namespace Telerik.JustMock.Core.Castle.Core.Internal
 {
-	using System;
+    using System;
 
-	internal sealed class WeakKey : WeakReference
-	{
-		private readonly int hashCode;
+    internal sealed class WeakKey : WeakReference
+    {
+        private readonly int hashCode;
 
-		public WeakKey(object target, int hashCode)
-			: base(target)
-		{
-			this.hashCode = hashCode;
-		}
+        public WeakKey(object target, int hashCode)
+            : base(target)
+        {
+            this.hashCode = hashCode;
+        }
 
-		public override object Target
-		{
-			get { return base.Target; }
-			set { throw new NotSupportedException("Dictionary keys are read-only."); }
-		}
+        public override object Target
+        {
+            get { return base.Target; }
+            set { throw new NotSupportedException("Dictionary keys are read-only."); }
+        }
 
-		public override int GetHashCode()
-		{
-			return hashCode;
-		}
+        public override int GetHashCode()
+        {
+            return hashCode;
+        }
 
-		public override bool Equals(object other)
-		{
-			return WeakKeyComparer<object>.Default.Equals(this, other);
-		}
-	}
+        public override bool Equals(object other)
+        {
+            return WeakKeyComparer<object>.Default.Equals(this, other);
+        }
+    }
 }

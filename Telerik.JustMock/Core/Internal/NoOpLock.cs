@@ -17,18 +17,18 @@
 
 namespace Telerik.JustMock.Core.Internal
 {
-	internal class NoOpLock : ILockHolder
-	{
-		public static readonly ILockHolder Lock = new NoOpLock();
+    internal class NoOpLock : ILockHolder
+    {
+        public static readonly ILockHolder Lock = new NoOpLock();
 
-		public void Dispose()
-		{
+        public void Dispose()
+        {
 
-		}
+        }
 
-		public bool LockAcquired
-		{
-			get { return true; }
-		}
-	}
+        public bool LockAcquired
+        {
+            get { return true; }
+        }
+    }
 }

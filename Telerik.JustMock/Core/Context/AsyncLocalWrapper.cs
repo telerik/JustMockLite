@@ -30,12 +30,12 @@ namespace Telerik.JustMock.Core.Context
         public void CaptureContext()
         {
             MethodBase testMethod = MockingContext.GetTestMethod();
-			asyncCallPattern.Value = testMethod;
+            asyncCallPattern.Value = testMethod;
         }
 
         public MethodBase GetContext()
         {
-			return asyncCallPattern.Value;
+            return asyncCallPattern.Value;
         }
     }
 }

@@ -19,50 +19,50 @@ using System;
 
 namespace Telerik.JustMock.Expectations.Abstraction
 {
-	/// <summary>
-	/// Throws() methods.
-	/// </summary>
-	/// <typeparam name="TContainer"></typeparam>
-	public interface IThrows<TContainer>
-	{
-		/// <summary>
-		/// Throws a the specified exception for target call.
-		/// </summary>
-		/// <param name="exception"></param>
-		/// <returns></returns>
-		IAssertable Throws(Exception exception);
+    /// <summary>
+    /// Throws() methods.
+    /// </summary>
+    /// <typeparam name="TContainer"></typeparam>
+    public interface IThrows<TContainer>
+    {
+        /// <summary>
+        /// Throws a the specified exception for target call.
+        /// </summary>
+        /// <param name="exception"></param>
+        /// <returns></returns>
+        IAssertable Throws(Exception exception);
 
-		/// <summary>
-		/// Throws a the specified exception for target call.
-		/// </summary>
-		/// <returns></returns>
-		IAssertable Throws<TException>() where TException : Exception;
+        /// <summary>
+        /// Throws a the specified exception for target call.
+        /// </summary>
+        /// <returns></returns>
+        IAssertable Throws<TException>() where TException : Exception;
 
-		/// <summary>
-		/// Throws a the specified exception for target call.
-		/// </summary>
-		/// <returns></returns>
-		IAssertable Throws<TException>(params object[] args) where TException : Exception;
+        /// <summary>
+        /// Throws a the specified exception for target call.
+        /// </summary>
+        /// <returns></returns>
+        IAssertable Throws<TException>(params object[] args) where TException : Exception;
 
 #if !LITE_EDITION
-		/// <summary>
-		/// Throws a the specified exception for the target async call causing returned task to fail.
-		/// </summary>
-		/// <param name="exception"></param>
-		/// <returns></returns>
-		IAssertable ThrowsAsync(Exception exception);
+        /// <summary>
+        /// Throws a the specified exception for the target async call causing returned task to fail.
+        /// </summary>
+        /// <param name="exception"></param>
+        /// <returns></returns>
+        IAssertable ThrowsAsync(Exception exception);
 
-		/// <summary>
-		/// Throws a the specified exception for the target async call causing returned task to fail.
-		/// </summary>
-		/// <returns></returns>
-		IAssertable ThrowsAsync<TException>() where TException : Exception;
+        /// <summary>
+        /// Throws a the specified exception for the target async call causing returned task to fail.
+        /// </summary>
+        /// <returns></returns>
+        IAssertable ThrowsAsync<TException>() where TException : Exception;
 
-		/// <summary>
-		/// Throws a the specified exception for the target async call causing returned task to fail.
-		/// </summary>
-		/// <returns></returns>
-		IAssertable ThrowsAsync<TException>(params object[] args) where TException : Exception;
+        /// <summary>
+        /// Throws a the specified exception for the target async call causing returned task to fail.
+        /// </summary>
+        /// <returns></returns>
+        IAssertable ThrowsAsync<TException>(params object[] args) where TException : Exception;
 #endif
-	}
+    }
 }

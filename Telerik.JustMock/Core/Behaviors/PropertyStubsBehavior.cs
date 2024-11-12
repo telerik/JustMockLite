@@ -22,39 +22,39 @@ using System.Reflection;
 
 namespace Telerik.JustMock.Core.Behaviors
 {
-	internal class PropertyStubsBehavior : IBehavior
-	{
-		private readonly Dictionary<KeyValuePair<PropertyInfo, object>, object> store = new Dictionary<KeyValuePair<PropertyInfo, object>, object>();
+    internal class PropertyStubsBehavior : IBehavior
+    {
+        private readonly Dictionary<KeyValuePair<PropertyInfo, object>, object> store = new Dictionary<KeyValuePair<PropertyInfo, object>, object>();
 
-		public void Process(Invocation invocation)
-		{
-			var method = invocation.Method;
-			var property = method.GetPropertyFromGetOrSet();
-			if (property == null)
-				return;
+        public void Process(Invocation invocation)
+        {
+            var method = invocation.Method;
+            var property = method.GetPropertyFromGetOrSet();
+            if (property == null)
+                return;
 
-			var args = invocation.Args;
-			if (method == property.GetGetMethod(true))
-			{
-				object value;
-				if (this.TryGetValue(property, args.FirstOrDefault(), out value))
-					invocation.ReturnValue = value;
-			}
-			else
-			{
-				var index = args.Length == 2 ? args[0] : null;
-				this.SetValue(property, index, args.Last());
-			}
-		}
+            var args = invocation.Args;
+            if (method == property.GetGetMethod(true))
+            {
+                object value;
+                if (this.TryGetValue(property, args.FirstOrDefault(), out value))
+                    invocation.ReturnValue = value;
+            }
+            else
+            {
+                var index = args.Length == 2 ? args[0] : null;
+                this.SetValue(property, index, args.Last());
+            }
+        }
 
-		private void SetValue(PropertyInfo property, object index, object value)
-		{
-			store[new KeyValuePair<PropertyInfo, object>(property, index)] = value;
-		}
+        private void SetValue(PropertyInfo property, object index, object value)
+        {
+            store[new KeyValuePair<PropertyInfo, object>(property, index)] = value;
+        }
 
-		private bool TryGetValue(PropertyInfo property, object index, out object value)
-		{
-			return store.TryGetValue(new KeyValuePair<PropertyInfo, object>(property, index), out value);
-		}
-	}
+        private bool TryGetValue(PropertyInfo property, object index, out object value)
+        {
+            return store.TryGetValue(new KeyValuePair<PropertyInfo, object>(property, index), out value);
+        }
+    }
 }

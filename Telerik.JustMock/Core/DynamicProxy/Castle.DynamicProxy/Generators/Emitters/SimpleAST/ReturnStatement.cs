@@ -14,39 +14,39 @@
 
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST
 {
-	using System.Reflection.Emit;
+    using System.Reflection.Emit;
 
-	internal class ReturnStatement : IStatement
-	{
-		private readonly IExpression expression;
-		private readonly Reference reference;
+    internal class ReturnStatement : IStatement
+    {
+        private readonly IExpression expression;
+        private readonly Reference reference;
 
-		public ReturnStatement()
-		{
-		}
+        public ReturnStatement()
+        {
+        }
 
-		public ReturnStatement(Reference reference)
-		{
-			this.reference = reference;
-		}
+        public ReturnStatement(Reference reference)
+        {
+            this.reference = reference;
+        }
 
-		public ReturnStatement(IExpression expression)
-		{
-			this.expression = expression;
-		}
+        public ReturnStatement(IExpression expression)
+        {
+            this.expression = expression;
+        }
 
-		public void Emit(ILGenerator gen)
-		{
-			if (reference != null)
-			{
-				ArgumentsUtil.EmitLoadOwnerAndReference(reference, gen);
-			}
-			else if (expression != null)
-			{
-				expression.Emit(gen);
-			}
+        public void Emit(ILGenerator gen)
+        {
+            if (reference != null)
+            {
+                ArgumentsUtil.EmitLoadOwnerAndReference(reference, gen);
+            }
+            else if (expression != null)
+            {
+                expression.Emit(gen);
+            }
 
-			gen.Emit(OpCodes.Ret);
-		}
-	}
+            gen.Emit(OpCodes.Ret);
+        }
+    }
 }

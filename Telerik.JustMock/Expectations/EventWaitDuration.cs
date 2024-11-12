@@ -21,28 +21,28 @@ using Telerik.JustMock.Expectations.Abstraction;
 
 namespace Telerik.JustMock.Expectations
 {
-	/// <summary>
-	/// Defines the wait duration for a specific event.
-	/// </summary>
-	public sealed class EventWaitDuration : IWaitDuration
-	{
-		/// <summary>
-		/// Initializes a new instance of the <see cref="EventWaitDuration"/> class.
-		/// </summary>
-		/// <param name="miliSeconds">Time duration</param>
-		public EventWaitDuration(int miliSeconds)
-		{
-			this.miliSeconds = miliSeconds;
-		}
+    /// <summary>
+    /// Defines the wait duration for a specific event.
+    /// </summary>
+    public sealed class EventWaitDuration : IWaitDuration
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventWaitDuration"/> class.
+        /// </summary>
+        /// <param name="miliSeconds">Time duration</param>
+        public EventWaitDuration(int miliSeconds)
+        {
+            this.miliSeconds = miliSeconds;
+        }
 
-		/// <summary>
-		/// Number of milliseconds to wait for executing the event.
-		/// </summary>
-		public int Miliseconds
-		{
-			get { return miliSeconds; }
-		}
+        /// <summary>
+        /// Number of milliseconds to wait for executing the event.
+        /// </summary>
+        public int Miliseconds
+        {
+            get { return miliSeconds; }
+        }
 
-		private readonly int miliSeconds;
-	}
+        private readonly int miliSeconds;
+    }
 }
