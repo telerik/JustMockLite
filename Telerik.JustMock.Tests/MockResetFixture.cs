@@ -38,7 +38,7 @@ namespace Telerik.JustMock.Tests
     [TestClass]
     public class MockResetFixture
     {
-#if NUNIT && NUNIT3
+#if NUNIT3
         private static Foo staticFoo;
         [ClassInitialize]
         public static void ClassInitialize()
@@ -53,11 +53,10 @@ namespace Telerik.JustMock.Tests
             Mock.Reset();
             Assert.Throws<NotImplementedException>(() => staticFoo.FooNotImplemented());
         }
-#else
+#elif !NUNIT && !XUNIT
         private static Foo staticFoo;
         [ClassInitialize]
-        public static void ClassInitialize(TestContext ctx)
-        {
+        public static void ClassInitialize(TestContext ctx){
             staticFoo = Mock.Create<Foo>();
             Mock.Arrange(() => staticFoo.FooNotImplemented());
         }
@@ -68,6 +67,7 @@ namespace Telerik.JustMock.Tests
             Mock.Reset();
             Assert.Throws<NotImplementedException>(() => staticFoo.FooNotImplemented());
         }
+
 #endif
         private Foo myFoo;
         [TestInitialize]
