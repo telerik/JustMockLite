@@ -45,6 +45,12 @@ JustMock
 - **Mock Microsoft EntityFramework** - Allows you to easily create in-memory mocks of the DbSet and DbContext types.
 - And many more
 
+### Licensing
+
+Packaged distributions of Progress Telerik JustMock Lite obtained from NuGet are made available pursuant to the Progress Telerik JustMock EULA at https://www.telerik.com/purchase/license-agreements, unless you have entered into a separate MSA with the licensor.
+
+Source code obtained from the Progress Telerik JustMock Lite GitHub repository is made available under Apache-2.0.
+
 ### Examples
 
 ```csharp
