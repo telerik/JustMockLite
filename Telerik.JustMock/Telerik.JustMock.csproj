@@ -14,6 +14,7 @@
     <ProjectGuid>{0749EBC2-4E83-4960-BF28-1FF5C2DEB2B9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(PreviewTargetFramework)' != '' ">
     <TargetFrameworks>$(TargetFrameworks);$(PreviewTargetFramework)</TargetFrameworks>
