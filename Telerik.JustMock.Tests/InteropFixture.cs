@@ -81,7 +81,7 @@ namespace Telerik.JustMock.Tests
 
         public delegate void DoDelegate(ref IntPtr arg);
 
-#if NET70
+#if NET7_0 || NET7_0_OR_GREATER
 #if XUNIT
         [TestMethod(Skip = SkipReason.Value)]
 #elif NUNIT

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "JustMock.NonElevatedExamples.VS2022", "JustMock.NonElevatedExamples.VS2022\JustMock.NonElevatedExamples.VS2022.vbproj", "{9CA1E316-17AC-4085-B8A2-313D915B521E}"
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "JustMock.NonElevatedExamples.VS2022", "JustMock.NonElevatedExamples\JustMock.NonElevatedExamples.VS2022.vbproj", "{9CA1E316-17AC-4085-B8A2-313D915B521E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
