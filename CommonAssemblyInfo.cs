@@ -29,3 +29,5 @@ using System.Reflection;
 
 [assembly: AssemblyVersion("2013.3.1021.0")]
 [assembly: AssemblyFileVersion("2013.3.1021.0")]
+
+[assembly: AssemblyMetadata("BuildDate", "2013/10/21")]
