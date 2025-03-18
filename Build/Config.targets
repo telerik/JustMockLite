@@ -1,7 +1,7 @@
 <Project>
 	<PropertyGroup Condition="'$(DevEnvDir)' == '' ">
-		<VSProfessional>C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\Common7\IDE\</VSProfessional>
-		<VSEnterprise>C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\</VSEnterprise>
+		<VSProfessional>C:\Program Files\Microsoft Visual Studio\2022\Professional\Common7\IDE\</VSProfessional>
+		<VSEnterprise>C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\</VSEnterprise>
 		<DevEnvDir Condition="Exists('$(VSProfessional)') == 'true'">$(VSProfessional)</DevEnvDir>
 		<DevEnvDir Condition="'$(DevEnvDir)' == '' ">$(VSEnterprise)</DevEnvDir>
 	</PropertyGroup>
