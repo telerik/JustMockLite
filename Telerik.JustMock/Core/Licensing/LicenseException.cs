@@ -23,7 +23,7 @@ namespace Telerik.JustMock.Core.Licensing
     /// The exception that is thrown in case of licensing error
     /// </summary>
     [Serializable]
-    public class LicenseException : MockException
+    public sealed class LicenseException : MockException
     {
         public LicenseException() : base() { }
 
