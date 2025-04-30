@@ -31,7 +31,9 @@ using Telerik.JustMock.Core.Recording;
 using Telerik.JustMock.Core.TransparentProxy;
 using Telerik.JustMock.Diagnostics;
 using Telerik.JustMock.Expectations;
+#if FEATURE_LICENSING
 using Telerik.JustMock.Core.Licensing;
+#endif
 #if DEBUG
 using Telerik.JustMock.Helpers;
 #endif
@@ -134,10 +136,12 @@ namespace Telerik.JustMock.Core
 
         static MocksRepository()
         {
+#if FEATURE_LICENSING
             if (!Licensing.LicenseManager.IsLicenseValid)
             {
                 throw new Licensing.LicenseException(Licensing.LicenseManager.Message);
             }
+#endif
 
 #if !COREFX
             var badApples = new[]
