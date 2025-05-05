@@ -11,6 +11,7 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <EnableLicensing Condition=" $(EnableLicensing) == '' ">false</EnableLicensing>
     <ProjectGuid>{0749EBC2-4E83-4960-BF28-1FF5C2DEB2B9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -56,6 +57,11 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(EnableLicensing)' == 'true' ">
+    <DefineConstants>$(DefineConstants);FEATURE_LICENSING</DefineConstants>
+    <LicensingBasePath>..\..\CodeBase\Build\Licensing</LicensingBasePath>
+    <CallHomePath>..\..\call-home</CallHomePath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net472' ">
     <DefineConstants>$(DefineConstants);FEATURE_APPDOMAIN;FEATURE_ASSEMBLYBUILDER_SAVE</DefineConstants>
@@ -221,4 +227,5 @@
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
+  <Import Project="$(LicensingBasePath)\TelerikLicensing.targets" Condition=" '$(EnableLicensing)' == 'true' "/>
 </Project>
