@@ -137,9 +137,14 @@ namespace Telerik.JustMock.Core
         static MocksRepository()
         {
 #if FEATURE_LICENSING
-            if (!Licensing.LicenseManager.IsLicenseValid)
+            var message = string.Empty;
+            if (!Licensing.LicenseManager.ValidateLicense(ref message))
             {
-                throw new Licensing.LicenseException(Licensing.LicenseManager.Message);
+                throw new Licensing.LicenseException(message);
+            }
+            else if (!string.IsNullOrEmpty(message))
+            {
+                System.Diagnostics.Trace.WriteLine(message);
             }
 #endif
 
