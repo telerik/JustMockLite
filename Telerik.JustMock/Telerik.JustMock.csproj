@@ -59,7 +59,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(EnableLicensing)' == 'true' ">
-    <DefineConstants>$(DefineConstants);FEATURE_LICENSING</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_LICENSING;FEATURE_SEND_LICENSING_TELEMETRY_TOGGLE</DefineConstants>
     <LicensingBasePath>..\..\CodeBase\Build\Licensing</LicensingBasePath>
     <CallHomePath>..\..\call-home</CallHomePath>
   </PropertyGroup>
