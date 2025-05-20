@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015,2021-2023 Progress Software Corporation
+ Copyright © 2010-2015,2021-2023,2025 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -671,16 +671,13 @@ namespace Telerik.JustMock.Core
 
         public static void ThrowElevatedMockingException(MemberInfo member = null)
         {
-            var marker = typeof(object).Assembly.GetType("Telerik.JustMock.TrialExpiredMarker");
-            if (marker == null)
-            {
-                var ex = member != null ? new ElevatedMockingException(member) : new ElevatedMockingException();
-                throw ex;
-            }
-            else
-            {
-                throw new Trial.JustMockExpiredException();
-            }
+            var ex =
+                member != null
+                    ?
+                        new ElevatedMockingException(member)
+                        :
+                        new ElevatedMockingException();
+            throw ex;
         }
 
         public static bool IsProfilerAttached { [DebuggerHidden] get { return bridge != null; } }

@@ -1,6 +1,6 @@
 /*
  JustMock Lite
- Copyright © 2010-2015,2018-2019,2021-2022 Progress Software Corporation
+ Copyright © 2010-2015,2018-2019,2021-2022,2025 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -31,6 +31,9 @@ using Telerik.JustMock.Core.Recording;
 using Telerik.JustMock.Core.TransparentProxy;
 using Telerik.JustMock.Diagnostics;
 using Telerik.JustMock.Expectations;
+#if FEATURE_LICENSING
+using Telerik.JustMock.Core.Licensing;
+#endif
 #if DEBUG
 using Telerik.JustMock.Helpers;
 #endif
@@ -133,6 +136,13 @@ namespace Telerik.JustMock.Core
 
         static MocksRepository()
         {
+#if FEATURE_LICENSING
+            if (!Licensing.LicenseManager.IsLicenseValid)
+            {
+                throw new Licensing.LicenseException(Licensing.LicenseManager.Message);
+            }
+#endif
+
 #if !COREFX
             var badApples = new[]
             {
