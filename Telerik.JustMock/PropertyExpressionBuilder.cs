@@ -1,6 +1,6 @@
 ﻿/*
  JustMock Lite
- Copyright © 2022 Progress Software Corporation
+ Copyright © 2022,2025 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -34,22 +34,24 @@ namespace Telerik.JustMock
             this.propertyExpression = propertyExpression;
         }
 
-        /// <summary>
-        /// Builds and expresison for setting the vlaue of a property.
-        /// </summary>
-        /// <typeparam name="value">The value that should be set to the property.</typeparam>
         public Expression<Action> Set(T value)
         {
             return ProfilerInterceptor.GuardInternal(() =>
             {
                 return Expression.Lambda<Action>(
-                    Expression.Assign(this.propertyExpression, Expression.Constant(value)));
+                    Expression.Assign(this.propertyExpression, Expression.Constant(value, typeof(T))));
             });
         }
 
-        /// <summary>
-        /// Builds and expresison for getting the vlaue of a property.
-        /// </summary>
+        public Expression<Action> Set(Expression<Func<T>> expression)
+        {
+            return ProfilerInterceptor.GuardInternal(() =>
+            {
+                return Expression.Lambda<Action>(
+                    Expression.Assign(this.propertyExpression, expression.Body));
+            });
+        }
+
         public Expression<Func<T>> Get()
         {
             return ProfilerInterceptor.GuardInternal(() =>

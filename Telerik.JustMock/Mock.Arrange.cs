@@ -1,6 +1,6 @@
 ﻿/*
  JustMock Lite
- Copyright © 2010-2015,2018 Progress Software Corporation
+ Copyright © 2010-2015,2018,2025 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -158,13 +158,14 @@ namespace Telerik.JustMock
                 if (Mock.IsOnDemandEnabled)
                 {
                     var sb = new StringBuilder();
-                    sb.AppendLine("ArrangeSet(Action) is not avaiable with OnDemand option enabled.");
-                    sb.AppendLine("Please use Mock.ArrangeSet<OwnerTypeOfProperty>(Action). Or Mock.Arrange with appropriate expression for property set.");
-                    sb.AppendLine("-------------");
-                    sb.AppendLine("Example 1:");
-                    sb.AppendLine("Mock.ArrangeSet<TypeOfMockObject>(() => mockObject.SomeProperty = 5);");
-                    sb.AppendLine("Example 2:");
-                    sb.AppendLine("Mock.Arrange(Expr.Property(() => mockObject.SomeProperty).Set(5));");
+                    sb.AppendLine("ArrangeSet(Action) is not compatible with the OnDemand feature.");
+                    sb.AppendLine("Please use one of these alternatives:");
+                    sb.AppendLine("  1. Mock.ArrangeSet<OwnerTypeOfProperty>(Action)");
+                    sb.AppendLine("  2. Mock.Arrange(Expression) with a property set expression");
+                    sb.AppendLine();
+                    sb.AppendLine("Examples:");
+                    sb.AppendLine("  Mock.ArrangeSet<MockObject>(() => mockObject.SomeProperty = 5);");
+                    sb.AppendLine("  Mock.Arrange(Expr.Property(() => mockObject.SomeProperty).Set(5));");
 
                     throw new MockException(sb.ToString());
                 }
