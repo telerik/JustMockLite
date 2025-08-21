@@ -1,6 +1,6 @@
 ﻿/*
  JustMock Lite
- Copyright © 2022 Progress Software Corporation
+ Copyright © 2022,2025 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -24,15 +24,43 @@ namespace Telerik.JustMock
 {
 #if !PORTABLE
     /// <summary>
-    /// Defines helper methods used for easily building expressions.
+    /// Provides utility methods for simplifying the creation of expression trees used in mocking scenarios.
+    /// This class offers a fluent API for building property access expressions that can be used to configure
+    /// mock behavior for property getters and setters.
     /// </summary>
     public static class Expr
     {
         /// <summary>
-        /// Creates a <see cref="IPropertyExpressionBuilder<T>"/> from an expression.
-        /// Commonly used to easily build an expression for a property set.
+        /// Creates an <see cref="IPropertyExpressionBuilder{T}"/> for the specified property access expression.
+        /// This method analyzes a lambda expression that accesses a property and builds a property expression
+        /// that can be used to configure mock behavior for property getters or setters.
         /// </summary>
-        /// <typeparam name="T">The type of the property.</typeparam>
+        /// <typeparam name="T">The type of the property being accessed.</typeparam>
+        /// <param name="expression">
+        /// A lambda expression representing the property access, such as <c>() => obj.Property</c> for
+        /// instance properties or <c>() => Class.StaticProperty</c> for static properties.
+        /// </param>
+        /// <returns>
+        /// An <see cref="IPropertyExpressionBuilder{T}"/> that provides fluent methods for configuring
+        /// property getter and setter behavior in mock objects.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the provided expression is not a property access expression. The expression must
+        /// be in the form of accessing a property, such as <c>obj.Property</c> or <c>Class.StaticProperty</c>.
+        /// </exception>
+        /// <exception cref="MockException">
+        /// Thrown when attempting to mock a field instead of a property. JustMock only supports mocking
+        /// properties, not fields.
+        /// </exception>
+        /// <example>
+        /// <code>
+        /// // Setting up a mock for a property getter
+        /// Mock.Arrange(Expr.Property(() => mock.SomeProperty)).Returns(expectedValue);
+        /// 
+        /// // Setting up a mock for a property setter
+        /// Mock.Arrange(Expr.Property(() => mock.SomeProperty).Set(Arg.IsAny&lt;string&gt;).DoNothing();
+        /// </code>
+        /// </example>
         public static IPropertyExpressionBuilder<T> Property<T>(Expression<Func<T>> expression)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -41,8 +69,7 @@ namespace Telerik.JustMock
 
                 if (memberExpression.NodeType != ExpressionType.MemberAccess)
                 {
-                    throw new MockException("Wrong expression used, property access expression looks like obj.Property or Class.StaticProperty");
-
+                    throw new ArgumentException("Wrong expression used, property access expression looks like obj.Property or Class.StaticProperty", nameof(expression));
                 }
 
                 MemberExpression outerMemberExpression = (MemberExpression)memberExpression;

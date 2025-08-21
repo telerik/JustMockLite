@@ -1,6 +1,6 @@
 ﻿/*
  JustMock Lite
- Copyright © 2022 Progress Software Corporation
+ Copyright © 2022,2025 Progress Software Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -22,19 +22,39 @@ namespace Telerik.JustMock
 {
 #if !PORTABLE
     /// <summary>
-    /// Defines methods for setting and getting property values through an expression.
+    /// Defines methods for building LINQ expressions that represent property get and set operations.
+    /// This interface is used to facilitate setting up expectations and verifications for property
+    /// access. It provides a strongly-typed approach to creating expressions that can be used
+    /// to intercept, verify, and emulate property behavior during testing.
     /// </summary>
     public interface IPropertyExpressionBuilder<T>
     {
         /// <summary>
-        /// Builds and expresison for setting the vlaue of a property.
+        /// Builds an expression for property set arrangement with a specific value.
+        /// This method creates an expression that represents assigning the specified value to the property,
+        /// which can be used to verify that a property was set to a particular value or to arrange
+        /// behavior when such an assignment occurs.
         /// </summary>
-        /// <typeparam name="value">The value that should be set to the property.</typeparam>
+        /// <param name="value">The exact value to match when the property is set.</param>
+        /// <returns>An Action expression representing the property set operation.</returns>
         Expression<Action> Set(T value);
 
         /// <summary>
-        /// Builds and expresison for getting the vlaue of a property.
+        /// Builds an expression for property set arrangement using a lambda.
+        /// This method allows for more complex matching logic when arranging property set operations,
+        /// such as matching ranges of values or applying custom validation criteria.
         /// </summary>
+        /// <param name="expression">A lambda expression that produces the value to match when the property is set.</param>
+        /// <returns>An Action expression representing the property set operation with the specified matching logic.</returns>
+        Expression<Action> Set(Expression<Func<T>> expression);
+
+        /// <summary>
+        /// Builds an expression for property get arrangement.
+        /// This method creates an expression that represents retrieving the value of the property,
+        /// which can be used to arrange behavior when the property is accessed, such as returning
+        /// specific values or throwing exceptions.
+        /// </summary>
+        /// <returns>A Func expression representing the property get operation.</returns>
         Expression<Func<T>> Get();
     }
 #endif
