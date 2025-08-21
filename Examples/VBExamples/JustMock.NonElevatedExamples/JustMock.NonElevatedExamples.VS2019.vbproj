@@ -8,4 +8,8 @@
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(PreviewTargetFramework)' != '' ">
+    <TargetFrameworks>$(TargetFrameworks);$(PreviewTargetFramework)</TargetFrameworks>
+  </PropertyGroup>
+
 </Project>
