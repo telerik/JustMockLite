@@ -3,7 +3,7 @@
   <Import Project="..\..\JustMock.NonElevatedExamples.Common.proj"/>
 
   <PropertyGroup>
-    <TargetFrameworks>net472;net8.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>net472;net8.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
