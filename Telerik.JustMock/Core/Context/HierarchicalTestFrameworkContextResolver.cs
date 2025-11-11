@@ -30,6 +30,9 @@ namespace Telerik.JustMock.Core.Context
 {
     internal abstract class HierarchicalTestFrameworkContextResolver : MockingContextResolverBase
     {
+        private static bool useMsTest2RepositoryGuarding =
+            Environment.GetEnvironmentVariable("JUST_MOCK_USE_MSTEST2_REPOSITORY_GUARDING") == "1";
+
         private readonly List<RepositoryOperationsBase> repoOperations = new List<RepositoryOperationsBase>();
         private readonly Dictionary<Assembly, HashSet<Type>> knownTestClasses = new Dictionary<Assembly, HashSet<Type>>();
 
@@ -40,14 +43,28 @@ namespace Telerik.JustMock.Core.Context
 
         public override MocksRepository ResolveRepository(UnresolvedContextBehavior unresolvedContextBehavior)
         {
-            lock (this.repositorySync)
+            int repoIdx = 0;
+            RepositoryOperationsBase entryOps = null;
+            MethodBase testMethod = null;
+
+            if (!useMsTest2RepositoryGuarding)
             {
-                int repoIdx;
-                RepositoryOperationsBase entryOps = null;
-                var testMethod = FindTestMethod(out repoIdx, out entryOps);
-                if (testMethod == null || entryOps == null)
+                testMethod = FindTestMethod(out repoIdx, out entryOps);
+                if (testMethod == null)
                 {
                     return null;
+                }
+            }
+
+            lock (this.repositorySync)
+            {
+                if (useMsTest2RepositoryGuarding)
+                {
+                    testMethod = FindTestMethod(out repoIdx, out entryOps);
+                    if (testMethod == null)
+                    {
+                        return null;
+                    }
                 }
 
                 object entryKey = entryOps.GetKey(testMethod);
@@ -104,14 +121,28 @@ namespace Telerik.JustMock.Core.Context
 
         public override bool RetireRepository()
         {
-            lock (this.repositorySync)
+            int repoIdx = 0;
+            RepositoryOperationsBase entryOps = null;
+            MethodBase testMethod = null;
+
+            if (!useMsTest2RepositoryGuarding)
             {
-                RepositoryOperationsBase entryOps = null;
-                int repoIdx;
-                var testMethod = FindTestMethod(out repoIdx, out entryOps);
+                testMethod = FindTestMethod(out repoIdx, out entryOps);
                 if (testMethod == null)
                 {
                     return false;
+                }
+            }
+
+            lock (this.repositorySync)
+            {
+                if (useMsTest2RepositoryGuarding)
+                {
+                    testMethod = FindTestMethod(out repoIdx, out entryOps);
+                    if (testMethod == null)
+                    {
+                        return false;
+                    }
                 }
 
                 var entryKey = entryOps.GetKey(testMethod);
