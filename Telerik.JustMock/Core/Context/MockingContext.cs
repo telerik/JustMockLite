@@ -234,6 +234,8 @@ namespace Telerik.JustMock.Core.Context
                 registeredContextResolvers.Add(new MSTestMockingContextResolver());
             if (MSTestV2MockingContextResolver.IsAvailable)
                 registeredContextResolvers.Add(new MSTestV2MockingContextResolver());
+            if (MSTestV4MockingContextResolver.IsAvailable)
+                registeredContextResolvers.Add(new MSTestV4MockingContextResolver());
 #endif
 
             foreach (var resolver in registeredContextResolvers)
