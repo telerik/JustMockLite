@@ -48,12 +48,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAS
 
         public FieldBuilder FieldBuilder
         {
-            get { return fieldBuilder; }
+            get { return this.fieldBuilder; }
         }
 
         public FieldInfo Reference
         {
-            get { return field; }
+            get { return this.field; }
         }
 
         public override void LoadAddressOfReference(ILGenerator gen)
