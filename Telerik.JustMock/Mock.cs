@@ -29,7 +29,7 @@ using Telerik.JustMock.Expectations.Abstraction.Local;
 namespace Telerik.JustMock
 {
     /// <summary>
-    /// Entry point for setting up and asserting mocks.
+    /// Provides the main entry point for creating, arranging, and verifying mocks.
     /// </summary>
     public partial class Mock
     {
@@ -44,9 +44,9 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Gets a value indicating whether the JustMock profiler is enabled.
+        /// Gets a value that indicates whether the JustMock profiler is attached.
         /// </summary>
-        /// <returns>True if the profiler is enabled, otherwise false.</returns>
+        /// <returns><see langword="true"/> if the profiler is attached; otherwise - <see langword="false"/>.</returns>
         public static bool IsProfilerEnabled
         {
             get
@@ -57,9 +57,9 @@ namespace Telerik.JustMock
 
 #if !PORTABLE
         /// <summary>
-        /// Gets a value indicating whether the on demand optimization is enabled.
+        /// Gets a value that indicates whether On Demand optimization is enabled.
         /// </summary>
-        /// <returns>True if the On Demand optimization is enabled, otherwise false.</returns>
+        /// <returns><see langword="true"/> if On Demand optimization is enabled; otherwise - <see langword="false"/>.</returns>
         public static bool IsOnDemandEnabled
         {
             get
@@ -69,7 +69,7 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Arrange and assert expectations on non-public members.
+        /// Gets helpers that let you arrange and verify non-public members.
         /// </summary>
         public static INonPublicExpectation NonPublic
         {
@@ -80,7 +80,7 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Arrange and assert expectations on language features like C# 7 local functions.
+        /// Gets helpers that let you arrange and verify language features such as C# local functions.
         /// </summary>
         public static ILocalExpectation Local
         {
@@ -99,8 +99,8 @@ namespace Telerik.JustMock
         /// method, even with the profiler off. The type on which the event is defined may need to be pre-intercepted
         /// using <see cref="Intercept"/> before calling Raise.
         /// </summary>
-        /// <param name="eventExpression">Event expression</param>
-        /// <param name="args">Delegate arguments</param>
+        /// <param name="eventExpression">Expression that identifies the event to raise.</param>
+        /// <param name="args">Arguments to pass to the event handler delegate.</param>
         public static void Raise(Action eventExpression, params object[] args)
         {
             ProfilerInterceptor.GuardInternal(() =>
@@ -114,9 +114,12 @@ namespace Telerik.JustMock
 #endregion
 
         /// <summary>
-        /// Removes all existing arrangements within the current mocking context (e.g. current test method).
-        /// Arrangements made in parent mocking contexts (e.g. in fixture setup method) are preserved.
+        /// Removes all arrangements from the current mocking context.
         /// </summary>
+        /// <remarks>
+        /// Use this method to clear arrangements created in the current test scope without affecting arrangements
+        /// inherited from parent scopes such as fixture setup methods.
+        /// </remarks>
         public static void Reset()
         {
             ProfilerInterceptor.GuardInternal(() => MockingContext.RetireRepository());
@@ -135,29 +138,32 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Explicitly enables the interception of the given type by the profiler. Interception is usually enabled
-        /// implicitly by calls to <see cref="Mock.Create(Type)"/> or <see cref="Mock.Arrange"/>. This method is rarely needed in cases
-        /// where you're trying to arrange setters or raise events on a partial mock.
+        /// Enables profiler interception for the specified type.
         /// </summary>
-        /// <param name="typeToIntercept">The type to intercept</param>
+        /// <remarks>
+        /// JustMock usually enables interception for you when you call <see cref="Create(Type)"/> or one of the
+        /// <see cref="Arrange(System.Linq.Expressions.Expression{System.Action})"/> overloads. Call this method only when you need
+        /// interception before the first arrangement, for example when you raise events or arrange setters on a partial mock.
+        /// </remarks>
+        /// <param name="typeToIntercept">Type to intercept.</param>
         public static void Intercept(Type typeToIntercept)
         {
             ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.EnableInterception(typeToIntercept));
         }
 
         /// <summary>
-        /// Explicitly disables the interception of the given type by the profiler.
+        /// Disables profiler interception for the specified type.
         /// </summary>
-        /// <typeparam name="TTypeToIntercept">The type to intercept</typeparam>
+        /// <typeparam name="TTypeToIntercept">Type to intercept.</typeparam>
         public static void NotIntercept<TTypeToIntercept>()
         {
             ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.DisableInterception(typeof(TTypeToIntercept)));
         }
 
         /// <summary>
-        /// Explicitly disables the interception of the given type by the profiler.
+        /// Disables profiler interception for the specified type.
         /// </summary>
-        /// <param name="typeToIntercept">The type to intercept</param>
+        /// <param name="typeToIntercept">Type to stop intercepting.</param>
         public static void NotIntercept(Type typeToIntercept)
         {
             ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.DisableInterception(typeToIntercept));

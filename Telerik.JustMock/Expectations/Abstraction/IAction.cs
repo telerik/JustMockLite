@@ -20,71 +20,72 @@ using System;
 namespace Telerik.JustMock.Expectations.Abstraction
 {
     /// <summary>
-    /// Defines common expectations.
+    /// Exposes options for configuring what happens when an arranged void member is called.
     /// </summary>
     public interface IAction<TContainer> : IDoInstead<TContainer>, IThrows<TContainer>, IAssertable
     {
-        ///<summary>
-        /// Raises the expected with specific arguments
-        ///</summary>
-        ///<param name="eventExpression"></param>
-        ///<param name="args"></param>
-        ///<returns></returns>
-        ///<exception cref="InvalidOperationException"></exception>
+        /// <summary>
+        /// Raises the specified event when the arranged call occurs.
+        /// </summary>
+        /// <param name="eventExpression">Expression that identifies the event to raise.</param>
+        /// <param name="args">Arguments to pass to the event handler delegate.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when JustMock cannot resolve the event expression.</exception>
         TContainer Raises(Action eventExpression, params object[] args);
 
-        ///<summary>
-        /// Raises the expected with specific arguments
-        ///</summary>
-        ///<param name="eventExpression"></param>
-        ///<param name="args">Event arguments</param>
-        ///<returns></returns>
-        ///<exception cref="InvalidOperationException"></exception>
+        /// <summary>
+        /// Raises the specified event when the arranged call occurs.
+        /// </summary>
+        /// <param name="eventExpression">Expression that identifies the event to raise.</param>
+        /// <param name="args">Event arguments to pass to the handler.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when JustMock cannot resolve the event expression.</exception>
         TContainer Raises(Action eventExpression, EventArgs args);
 
-        ///<summary>
-        /// Raises the expected event for the setup.
-        ///</summary>
-        ///<param name="eventExpression"></param>
-        ///<param name="func">An function that will be used to construct event arguments</param>
-        ///<returns></returns>
-        ///<exception cref="InvalidOperationException"></exception>
+        /// <summary>
+        /// Raises the specified event when the arranged call occurs.
+        /// </summary>
+        /// <param name="eventExpression">Expression that identifies the event to raise.</param>
+        /// <param name="func">Function that creates the event arguments from the arranged call arguments.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when JustMock cannot resolve the event expression.</exception>
         TContainer Raises<T1>(Action eventExpression, Func<T1, EventArgs> func);
 
-        ///<summary>
-        /// Raises the expected event for the setup.
-        ///</summary>
-        ///<param name="eventExpression"></param>
-        ///<param name="func">An function that will be used to construct event arguments</param>
-        ///<returns></returns>
-        ///<exception cref="InvalidOperationException"></exception>
+        /// <summary>
+        /// Raises the specified event when the arranged call occurs.
+        /// </summary>
+        /// <param name="eventExpression">Expression that identifies the event to raise.</param>
+        /// <param name="func">Function that creates the event arguments from the arranged call arguments.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when JustMock cannot resolve the event expression.</exception>
         TContainer Raises<T1, T2>(Action eventExpression, Func<T1, T2, EventArgs> func);
 
-        ///<summary>
-        /// Raises the expected event for the setup.
-        ///</summary>
-        ///<param name="eventExpression"></param>
-        ///<param name="func">An function that will be used to construct event arguments</param>
-        ///<returns></returns>
-        ///<exception cref="InvalidOperationException"></exception>
+        /// <summary>
+        /// Raises the specified event when the arranged call occurs.
+        /// </summary>
+        /// <param name="eventExpression">Expression that identifies the event to raise.</param>
+        /// <param name="func">Function that creates the event arguments from the arranged call arguments.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when JustMock cannot resolve the event expression.</exception>
         TContainer Raises<T1, T2, T3>(Action eventExpression, Func<T1, T2, T3, EventArgs> func);
 
-        ///<summary>
-        /// Raises the expected event for the setup.
-        ///</summary>
-        ///<param name="eventExpression"></param>
-        ///<param name="func">An function that will be used to construct event arguments</param>
-        ///<returns></returns>
-        ///<exception cref="InvalidOperationException"></exception>
+        /// <summary>
+        /// Raises the specified event when the arranged call occurs.
+        /// </summary>
+        /// <param name="eventExpression">Expression that identifies the event to raise.</param>
+        /// <param name="func">Function that creates the event arguments from the arranged call arguments.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when JustMock cannot resolve the event expression.</exception>
         TContainer Raises<T1, T2, T3, T4>(Action eventExpression, Func<T1, T2, T3, T4, EventArgs> func);
 
         /// <summary>
-        ///  Specifies call a to step over (loose mocks only).
+        /// Leaves the arranged void call without additional behavior.
         /// </summary>
         /// <remarks>
-        /// For loose mocks by default the behavior is step over.
+        /// Use this method when you want the call to succeed without throwing or running custom logic. Loose mocks already behave
+        /// this way by default.
         /// </remarks>
-        /// <returns>Reference to <see cref="IAssertable"/></returns>
+        /// <returns>The current expectation so that you can continue the arrangement. Reference to <see cref="IAssertable"/></returns>
         IAssertable DoNothing();
     }
 }

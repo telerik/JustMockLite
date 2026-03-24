@@ -1,4 +1,4 @@
-/*
+﻿/*
  JustMock Lite
  Copyright © 2010-2015 Progress Software Corporation
 
@@ -24,8 +24,9 @@ namespace Telerik.JustMock.Core.Behaviors
     /// </summary>
     public interface IBehavior
     {
-        /// <summary> </summary>
-        /// <param name="invocation"></param>
+    /// <summary>
+    /// Processes the specified invocation by applying the behavior.
+    /// </summary>
         void Process(Invocation invocation);
     }
 

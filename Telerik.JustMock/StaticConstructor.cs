@@ -25,7 +25,7 @@ namespace Telerik.JustMock
     public enum StaticConstructor
     {
         /// <summary>
-        /// Defines that the static constructor is not mocked.
+        /// Runs the original static constructor.
         /// </summary>
         NonMocked,
         /// <summary>

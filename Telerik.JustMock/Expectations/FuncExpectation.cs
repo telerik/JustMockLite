@@ -33,8 +33,8 @@ namespace Telerik.JustMock.Expectations
         /// <summary>
         /// Defines the return value for a specific method expectation.
         /// </summary>
-        /// <param name="value">any object value</param>
-        /// <returns></returns>
+        /// <param name="value">Value to return.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public IAssertable Returns(TReturn value)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -45,10 +45,10 @@ namespace Telerik.JustMock.Expectations
         }
 
         /// <summary>
-        /// Specifies the delegate to evaluate and return for the expected method.
+        /// Specifies the return value for the arranged call by using the supplied delegate.
         /// </summary>
-        /// <param name="delegate">Target delegate to evaluate.</param>
-        /// <returns>Reference to <see cref="IAssertable"/> interface</returns>
+        /// <param name="delegate">Delegate to run when the arranged call occurs.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public IAssertable Returns(Delegate @delegate)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -59,10 +59,10 @@ namespace Telerik.JustMock.Expectations
         }
 
         /// <summary>
-        /// Specifies the function to evaluate and return.
+        /// Specifies the return value for the arranged call by using the supplied function.
         /// </summary>
-        /// <param name="func">Target function to evaluate</param>
-        /// <returns>Reference to <see cref="IAssertable"/> interface</returns>
+        /// <param name="func">Function to run when the arranged call occurs.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public IAssertable Returns(Func<TReturn> func)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -73,9 +73,10 @@ namespace Telerik.JustMock.Expectations
         }
 
         /// <summary>
-        /// Specifies the delegate that will execute and return the value for the expected member.
+        /// Specifies the return value by using the previously arranged return value as input.
         /// </summary>
-        /// <returns>Reference to <see cref="IAssertable"/> interface.</returns>
+        /// <param name="func">Function that transforms the arranged return value.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public IAssertable Returns(Func<TReturn, TReturn> func)
         {
             return ProfilerInterceptor.GuardInternal(() =>

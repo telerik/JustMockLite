@@ -28,11 +28,21 @@ namespace Telerik.JustMock
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     public static class AttributesToAvoidReplicating
     {
+        /// <summary>
+        /// Adds a specific attribute type to the list of attributes to avoid replicating 
+        /// when creating a proxy. Use this method when the attribute type is determined at runtime.
+        /// </summary>
+        /// <param name="attribute">The <see cref="Type"/> of the attribute to avoid replicating.</param>
         public static void Add(Type attribute)
         {
             Core.ProfilerInterceptor.GuardInternal(() => Core.Castle.DynamicProxy.Generators.AttributesToAvoidReplicating.Add(attribute));
         }
 
+        /// <summary>
+        /// Adds a specific attribute type to the list of attributes to avoid replicating 
+        /// when creating a proxy. This generic method is a type-safe alternative to the <see cref="Add(Type)"/> method.
+        /// </summary>
+        /// <typeparam name="T">The type of the attribute to avoid replicating.</typeparam>
         public static void Add<T>()
         {
             Core.ProfilerInterceptor.GuardInternal(() => Core.Castle.DynamicProxy.Generators.AttributesToAvoidReplicating.Add<T>());

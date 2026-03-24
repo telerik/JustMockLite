@@ -34,18 +34,22 @@ using Telerik.JustMock.Core.TransparentProxy;
 namespace Telerik.JustMock
 {
     /// <summary>
-    /// Gives access to the non-public members of a type or instance. This class provides functionality similar to the
-    /// one that exists in regular reflection classes with the added benefit that it can bypass essential security checks related
-    /// to accessing non-public members through reflection.
+    /// Gives access to the non-public members of a type or instance. 
+    /// Unlike standard reflection, this class can bypass essential security checks related to accessing non-public members through reflection.
     /// </summary>
     /// <remarks>
-    /// When the profiler is enabled, PrivateAccessor acquires additional power:
-    /// - It can even be used to access all kinds of non-public members in Silverlight (and when running in partial trust in general).
-    /// - All calls made through PrivateAccessor are always made with full trust (unrestricted) permissions.
-    /// 
-    /// You can assign a PrivateAccessor to a dynamic variable and access it as if you're referencing the original object:
+    /// <para>
+    /// Use <see cref="PrivateAccessor"/> when you need to call private members, read non-public properties, or set internal state in a test.
+    /// It behaves like reflection, but it can bypass security restrictions that standard reflection cannot bypass.
+    /// </para>
+    /// <para>
+    /// When the profiler is enabled, <see cref="PrivateAccessor"/> can access additional member types and runs calls with full trust.
+    /// </para>
+    /// <para>
+    /// You can also assign a <see cref="PrivateAccessor"/> to a <see langword="dynamic"/> variable and use member syntax directly:
     /// dynamic acc = new PrivateAccessor(myobj);
     /// acc.PrivateProperty = acc.PrivateMethod(123); // PrivateProperty and PrivateMethod are private members on myobj's type.
+    /// </para>
     /// </remarks>
     public sealed class PrivateAccessor : IDynamicMetaObjectProvider
     {
@@ -53,15 +57,20 @@ namespace Telerik.JustMock
         private readonly Type type;
 
         /// <summary>
-        /// Controls whether <see cref="TargetInvocationException"/> will be thrown, this is the default behavior, or
-        /// the original exception when an exception occur on using one of the CallMethod overloads.
+        /// Gets or sets a value that controls whether <see cref="CallMethod(string, object[])"/> rethrows the original exception.
         /// </summary>
+        /// <remarks>
+        /// By default, reflection wraps exceptions in <see cref="TargetInvocationException"/>. Set this property to
+        /// <see langword="true"/> if you want to receive the original exception instead.
+        /// </remarks>
         public bool RethrowOriginalOnCallMethod { get; set; }
 
         /// <summary>
-        /// Creates a new <see cref="PrivateAccessor"/> wrapping the given instance. Can be used to access both instance and static members.
+        /// Initializes a new <see cref="PrivateAccessor"/> that wraps the given object instance,
+        /// enabling access to both its instance and static non-public members.
         /// </summary>
-        /// <param name="instance">The instance to wrap.</param>
+        /// <param name="instance">The object whose non-public members you want to access. Must not be <see langword="null"/>.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="instance"/> is <see langword="null"/>.</exception>
         public PrivateAccessor(object instance)
             : this(instance, null)
         { }
@@ -69,8 +78,9 @@ namespace Telerik.JustMock
         /// <summary>
         /// Creates a new <see cref="PrivateAccessor"/> wrapping the given type. Can be used to access the static members of a type.
         /// </summary>
-        /// <param name="type">Targeted type.</param>
-        /// <returns>PrivateAccessor type.</returns>
+        /// <param name="type">The type whose static non-public members you want to access. Must not be <see langword="null"/>.</param>
+        /// <returns>A <see cref="PrivateAccessor"/> targeting the static members of <paramref name="type"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="type"/> is <see langword="null"/>.</exception>
         public static PrivateAccessor ForType(Type type)
         {
             return ProfilerInterceptor.GuardInternal(() => new PrivateAccessor(null, type));
@@ -124,7 +134,7 @@ namespace Telerik.JustMock
         /// <summary>
         /// Calls the specified method by name.
         /// </summary>
-        /// <param name="name">The name of the method to call.</param>
+        /// <param name="name">Name of the method to call.</param>
         /// <param name="args">Arguments to pass to the method.</param>
         /// <returns>The value returned by the specified method.</returns>
         public object CallMethod(string name, params object[] args)
@@ -148,23 +158,23 @@ namespace Telerik.JustMock
         /// <summary>
         /// Calls the specified method by name and given argument types and values.
         /// </summary>
-        /// <param name="name">The name of the method to call.</param>
-        /// <param name="argTypes">The method argument types.</param>
-        /// <param name="argModifiers">The argument type modifiers, such as out and ref.</param>
-        /// <param name="argValues">The argument values to pass to the method.</param>
-        /// <returns>The value returned by the specified method.</returns>
+        /// <param name="name">Name of the method to call.</param>
+        /// <param name="argTypes">Method parameter types.</param>
+        /// <param name="argModifiers">Parameter modifiers such as <c>ref</c> and <c>out</c>.</param>
+        /// <param name="argValues">Argument values to pass to the method.</param>
+        /// <returns>The value returned by the method.</returns>
         public object CallMethod(string name, ICollection<Type> argTypes, ParameterModifier argModifiers, object[] argValues)
         {
             return ProfilerInterceptor.GuardInternal(() => CallMethodInternal(name, argTypes, new[] { argModifiers }, argValues));
         }
 
         /// <summary>
-        /// Calls the specified method by name and given argument types and values.
+        /// Calls a non-public method by name and explicit parameter types.
         /// </summary>
-        /// <param name="name">The name of the method to call.</param>
-        /// <param name="argTypes">The method argument types.</param>
-        /// <param name="argValues">The argument values to pass to the method.</param>
-        /// <returns>The value returned by the specified method.</returns>
+        /// <param name="name">Name of the method to call.</param>
+        /// <param name="argTypes">Method parameter types.</param>
+        /// <param name="argValues">Argument values to pass to the method.</param>
+        /// <returns>The value returned by the method.</returns>
         public object CallMethod(string name, ICollection<Type> argTypes, object[] argValues)
         {
             return ProfilerInterceptor.GuardInternal(() => CallMethodInternal(name, argTypes, null, argValues));
@@ -212,8 +222,8 @@ namespace Telerik.JustMock
         /// <summary>
         /// Calls the specified generic method by name.
         /// </summary>
-        /// <param name="name">The name of the method to call.</param>
-        /// <param name="typeArguments">The type arguments to specialize the generic method.</param>
+        /// <param name="name">Name of the method to call.</param>
+        /// <param name="typeArguments">Type arguments to specialize the generic method.</param>
         /// <param name="args">Arguments to pass to the method.</param>
         /// <returns>The value returned by the specified method.</returns>
         public object CallMethodWithTypeArguments(string name, ICollection<Type> typeArguments, params object[] args)
@@ -238,7 +248,7 @@ namespace Telerik.JustMock
         /// <summary>
         /// Calls the specified method.
         /// </summary>
-        /// <param name="method">The method to call.</param>
+        /// <param name="method">Method to call.</param>
         /// <param name="args">Arguments to pass to the method.</param>
         /// <returns>Return value of the method.</returns>
         public object CallMethod(MethodBase method, params object[] args)
@@ -251,10 +261,9 @@ namespace Telerik.JustMock
         /// has already called it as part of type's initialization.
         /// </summary>
         /// <param name="forceCall">
-        /// When 'false', the static constructor will not be called if it has already run as part of
-        /// type initialization. When 'true', the static constructor will be called unconditionally.
-        /// If the type is not yet initialized and 'true' is given, the static constructor will be run
-        /// twice.
+        /// When this value is <see langword="false"/>, JustMock does not rerun a static constructor that has already executed.
+        /// When this value is <see langword="true"/>, JustMock calls the static constructor unconditionally. If the type is not
+        /// initialized yet, the static constructor can run twice.
         /// </param>
         public void CallStaticConstructor(bool forceCall)
         {
@@ -274,10 +283,10 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Gets the value returned by the indexer (<code>this[T index]</code> in C#) for the specified index value.
+        /// Gets the value returned by the indexer for the specified index.
         /// </summary>
-        /// <param name="index">The index argument to pass to the indexer.</param>
-        /// <returns>The value returned by the indexer.</returns>
+        /// <param name="index">Indexer argument.</param>
+        /// <returns>The indexer value.</returns>
         public object GetIndex(object index)
         {
             return ProfilerInterceptor.GuardInternal(() => GetProperty("Item", index));
@@ -286,9 +295,9 @@ namespace Telerik.JustMock
         /// <summary>
         /// Gets the value of a property by name.
         /// </summary>
-        /// <param name="name">The name of the property.</param>
-        /// <param name="indexArgs">Optional index arguments if the property has any.</param>
-        /// <returns>The value of the property.</returns>
+        /// <param name="name">Property name.</param>
+        /// <param name="indexArgs">Optional index arguments for indexed properties.</param>
+        /// <returns>The property value.</returns>
         public object GetProperty(string name, params object[] indexArgs)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -299,9 +308,9 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Sets a value to the indexer (<code>this[T index]</code> in C#) for the specified index value.
+        /// Sets the value of the indexer for the specified index.
         /// </summary>
-        /// <param name="index">The index argument to pass to the indexer.</param>
+        /// <param name="index">Indexer argument.</param>
         /// <param name="value">The value to give to the indexer.</param>
         public void SetIndex(object index, object value)
         {
@@ -311,9 +320,9 @@ namespace Telerik.JustMock
         /// <summary>
         /// Sets the value of a property by name.
         /// </summary>
-        /// <param name="name">The name of the property.</param>
+        /// <param name="name">Property name.</param>
         /// <param name="value">The value to set to the property.</param>
-        /// <param name="indexArgs">Optional index arguments if the property has any.</param>
+        /// <param name="indexArgs">Optional index arguments for indexed properties.</param>
         public void SetProperty(string name, object value, params object[] indexArgs)
         {
             ProfilerInterceptor.GuardInternal(() =>
@@ -324,10 +333,12 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Gets the value of a field.
+        /// Gets the value of a non-public field by name on the wrapped instance or type.
         /// </summary>
-        /// <param name="name">The name of the field.</param>
-        /// <returns>The value of the field</returns>
+        /// <param name="name">The exact name of the field to read.</param>
+        /// <returns>
+        /// The current value of the field, or <see langword="null"/> if the field holds a null reference.
+        /// </returns>
         public object GetField(string name)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -339,10 +350,13 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Sets the value of a field.
+        /// Sets the value of a non-public field by name on the wrapped instance or type.
         /// </summary>
-        /// <param name="name">The name of the field.</param>
-        /// <param name="value">The new value of the field.</param>
+        /// <param name="name">The exact name of the field to write.</param>
+        /// <param name="value">
+        /// The value to assign to the field. Must be assignable to the field's declared type,
+        /// or <see langword="null"/> for reference and nullable types.
+        /// </param>
         public void SetField(string name, object value)
         {
             ProfilerInterceptor.GuardInternal(() =>
@@ -354,10 +368,13 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Gets the value of a field or property.
+        /// Gets the value of a non-public field or property by name.
+        /// Fields are resolved first; if no matching field is found, the name is treated as a property.
         /// </summary>
-        /// <param name="name">Name of a field or property to get.</param>
-        /// <returns>The value of the field or property.</returns>
+        /// <param name="name">The name of the field or property to read.</param>
+        /// <returns>
+        /// The current value of the field or property, or <see langword="null"/> if the member holds a null reference.
+        /// </returns>
         public object GetMember(string name)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -368,10 +385,17 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Sets the value of a field or property.
+        /// Sets the value of a non-public field or property by name.
+        /// Fields are resolved first; if no matching field is found, the name is treated as a property.
         /// </summary>
-        /// <param name="name">The name of a field or property to set</param>
-        /// <param name="value">The new value of the field or property.</param>
+        /// <param name="name">The name of the field or property to write.</param>
+        /// <param name="value">The value to assign to the field or property.</param>
+        /// <exception cref="MissingMemberException">
+        /// Thrown when neither a field nor a property with the given <paramref name="name"/> exists on the target type.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="value"/> is not assignable to the member's declared type.
+        /// </exception>
         public void SetMember(string name, object value)
         {
             ProfilerInterceptor.GuardInternal(() =>
@@ -385,10 +409,13 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Raises the specified event passing the given arguments to the handlers.
+        /// Raises the specified event on the wrapped instance or type, invoking all currently subscribed handlers.
         /// </summary>
         /// <param name="name">The name of the event to raise.</param>
-        /// <param name="eventArgs">Arguments to pass to the event handlers. Must match the event handler signature exactly.</param>
+        /// <param name="eventArgs">
+        /// Arguments to pass to each event handler. The values must match the event delegate's
+        /// parameter list exactly (e.g., <c>sender</c> followed by the <see cref="EventArgs"/>-derived argument).
+        /// </param>
         public void RaiseEvent(string name, params object[] eventArgs)
         {
             ProfilerInterceptor.GuardInternal(() =>
@@ -399,8 +426,12 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// The wrapped instance.
+        /// Gets the object instance wrapped by this <see cref="PrivateAccessor"/>.
+        /// Returns <see langword="null"/> when this accessor was created via <see cref="ForType"/> for static member access.
         /// </summary>
+        /// <value>
+        /// The wrapped instance, or <see langword="null"/> for a type-only (static) accessor.
+        /// </value>
         public object Instance
         {
             get
@@ -411,8 +442,16 @@ namespace Telerik.JustMock
 
 #if !PORTABLE
         /// <summary>
-        /// Non public ref return interface for mocking.
+        /// Gets an <see cref="IPrivateRefReturnAccessor"/> that provides access to non-public members
+        /// with <see langword="ref"/> return values on the wrapped instance or type.
         /// </summary>
+        /// <remarks>
+        /// This property is only available when the JustMock profiler is attached, as intercepting
+        /// <see langword="ref"/>-returning members requires elevated (non-portable) mode.
+        /// </remarks>
+        /// <value>
+        /// An <see cref="IPrivateRefReturnAccessor"/> scoped to the same instance and type as this accessor.
+        /// </value>
         public IPrivateRefReturnAccessor RefReturn
         {
             get

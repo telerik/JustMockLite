@@ -23,12 +23,12 @@ namespace Telerik.JustMock
     public enum Constructor
     {
         /// <summary>
-        /// Specifies that the constructor should not be mocked. 
+        /// Calls the original constructor.
         /// </summary>
         NotMocked,
       
         /// <summary>
-        /// Specifies that the constructor should be mocked
+        /// Specifies that the constructor should be mocked.
         /// </summary>
         Mocked
     }

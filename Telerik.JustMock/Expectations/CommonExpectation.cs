@@ -158,10 +158,10 @@ namespace Telerik.JustMock.Expectations
         }
 
         /// <summary>
-        /// Defines the body of the expected method that will be executed instead of the orginal method body.
+        /// Runs the supplied delegate instead of the arranged member body.
         /// </summary>
-        /// <param name="action">delegate the method body</param>
-        /// <returns></returns>
+        /// <param name="action">Delegate to run when the arranged call occurs.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public TContainer DoInstead(Action action)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -172,9 +172,10 @@ namespace Telerik.JustMock.Expectations
         }
 
         /// <summary>
-        /// Specifies the delegate that will execute for the expected method.
+        /// Runs the supplied delegate instead of the arranged member body.
         /// </summary>
-        /// <param name="delegate">Target delegate to evaluate.</param>
+        /// <param name="delegate">Delegate to run when the arranged call occurs.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public TContainer DoInstead(Delegate @delegate)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -191,9 +192,12 @@ namespace Telerik.JustMock.Expectations
             this.behaviors.Add(new RaiseEventBehavior(instance, evt, eventArgumentsFactoryFactory(instance)));
         }
 
-        ///<summary>
-        /// Raises the expected with sepecic arguments
-        ///</summary>
+        /// <summary>
+        /// Raises the specified event when the arranged call occurs.
+        /// </summary>
+        /// <param name="eventExpression">Expression that identifies the event to raise.</param>
+        /// <param name="args">Arguments to pass to the event handler delegate.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public TContainer Raises(Action eventExpression, params object[] args)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -218,13 +222,13 @@ namespace Telerik.JustMock.Expectations
                 });
         }
 
-        ///<summary>
-        /// Raises the expected event with provided <see cref="EventArgs"/>.
-        ///</summary>
-        ///<param name="eventExpression"></param>
-        ///<param name="args">Event arguments</param>
-        ///<returns></returns>
-        ///<exception cref="InvalidOperationException"></exception>
+        /// <summary>
+        /// Raises the specified event when the arranged call occurs.
+        /// </summary>
+        /// <param name="eventExpression">Expression that identifies the event to raise.</param>
+        /// <param name="args">Event arguments to pass to the handler.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when JustMock cannot resolve the event expression.</exception>
         public TContainer Raises(Action eventExpression, EventArgs args)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -234,13 +238,13 @@ namespace Telerik.JustMock.Expectations
                 });
         }
 
-        ///<summary>
-        /// Raises the expected event for the setup.
-        ///</summary>
-        ///<param name="eventExpression"></param>
-        ///<param name="func">Function that will be used to construct event arguments</param>
-        ///<returns></returns>
-        ///<exception cref="InvalidOperationException"></exception>
+        /// <summary>
+        /// Raises the specified event when the arranged call occurs.
+        /// </summary>
+        /// <param name="eventExpression">Expression that identifies the event to raise.</param>
+        /// <param name="func">Function that creates the event arguments from the arranged call arguments.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when JustMock cannot resolve the event expression.</exception>
         public TContainer Raises<T1>(Action eventExpression, Func<T1, EventArgs> func)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -250,13 +254,13 @@ namespace Telerik.JustMock.Expectations
                 });
         }
 
-        ///<summary>
-        /// Raises the expected event for the setup.
-        ///</summary>
-        ///<param name="eventExpression"></param>
-        ///<param name="func">An function that will be used to construct event arguments</param>
-        ///<returns></returns>
-        ///<exception cref="InvalidOperationException"></exception>
+        /// <summary>
+        /// Raises the specified event when the arranged call occurs.
+        /// </summary>
+        /// <param name="eventExpression">Expression that identifies the event to raise.</param>
+        /// <param name="func">Function that creates the event arguments from the arranged call arguments.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when JustMock cannot resolve the event expression.</exception>
         public TContainer Raises<T1, T2>(Action eventExpression, Func<T1, T2, EventArgs> func)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -266,13 +270,13 @@ namespace Telerik.JustMock.Expectations
                 });
         }
 
-        ///<summary>
-        /// Raises the expected event for the setup.
-        ///</summary>
-        ///<param name="eventExpression"></param>
-        ///<param name="func">An function that will be used to construct event arguments</param>
-        ///<returns></returns>
-        ///<exception cref="InvalidOperationException"></exception>
+        /// <summary>
+        /// Raises the specified event when the arranged call occurs.
+        /// </summary>
+        /// <param name="eventExpression">Expression that identifies the event to raise.</param>
+        /// <param name="func">Function that creates the event arguments from the arranged call arguments.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when JustMock cannot resolve the event expression.</exception>
         public TContainer Raises<T1, T2, T3>(Action eventExpression, Func<T1, T2, T3, EventArgs> func)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -282,13 +286,13 @@ namespace Telerik.JustMock.Expectations
                 });
         }
 
-        ///<summary>
-        /// Raises the expected event for the setup.
-        ///</summary>
-        ///<param name="eventExpression"></param>
-        ///<param name="func">An function that will be used to construct event arguments</param>
-        ///<returns></returns>
-        ///<exception cref="InvalidOperationException"></exception>
+        /// <summary>
+        /// Raises the specified event when the arranged call occurs.
+        /// </summary>
+        /// <param name="eventExpression">Expression that identifies the event to raise.</param>
+        /// <param name="func">Function that creates the event arguments from the arranged call arguments.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when JustMock cannot resolve the event expression.</exception>
         public TContainer Raises<T1, T2, T3, T4>(Action eventExpression, Func<T1, T2, T3, T4, EventArgs> func)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -299,10 +303,10 @@ namespace Telerik.JustMock.Expectations
         }
 
         /// <summary>
-        /// Throws a the specified expection for target call.
+        /// Throws the specified exception when the arranged call occurs.
         /// </summary>
-        /// <param name="exception"></param>
-        /// <returns></returns>
+        /// <param name="exception">Exception instance to throw.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public IAssertable Throws(Exception exception)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -313,9 +317,9 @@ namespace Telerik.JustMock.Expectations
         }
 
         /// <summary>
-        /// Throws a the specified expection for target call.
+        /// Throws a new exception of the specified type when the arranged call occurs.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public IAssertable Throws<T>() where T : Exception
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -326,9 +330,10 @@ namespace Telerik.JustMock.Expectations
         }
 
         /// <summary>
-        /// Throws a the specified expection for target call.
+        /// Throws a new exception of the specified type when the arranged call occurs.
         /// </summary>
-        /// <returns></returns>
+        /// <param name="args">Arguments to pass to the exception constructor.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public IAssertable Throws<T>(params object[] args) where T : Exception
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -340,10 +345,10 @@ namespace Telerik.JustMock.Expectations
 
 #if !LITE_EDITION
         /// <summary>
-        /// Throws a the specified exception for the target async call causing returned task to fail.
+        /// Faults the returned task with the specified exception when the arranged async call occurs.
         /// </summary>
-        /// <param name="exception"></param>
-        /// <returns></returns>
+        /// <param name="exception">Exception instance to use for the faulted task.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public IAssertable ThrowsAsync(Exception exception)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -354,9 +359,9 @@ namespace Telerik.JustMock.Expectations
         }
 
         /// <summary>
-        /// Throws a the specified exception for the target async call causing returned task to fail.
+        /// Faults the returned task with a new exception of the specified type when the arranged async call occurs.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public IAssertable ThrowsAsync<T>() where T : Exception
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -367,9 +372,10 @@ namespace Telerik.JustMock.Expectations
         }
 
         /// <summary>
-        /// Throws a the specified exception for the target async call causing returned task to fail.
+        /// Faults the returned task with a new exception of the specified type when the arranged async call occurs.
         /// </summary>
-        /// <returns></returns>
+        /// <param name="args">Arguments to pass to the exception constructor.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public IAssertable ThrowsAsync<T>(params object[] args) where T : Exception
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -381,9 +387,9 @@ namespace Telerik.JustMock.Expectations
 #endif
 
         /// <summary>
-        /// Use it to call the real implementation.
+        /// Calls the original implementation when the arranged call occurs.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public IAssertable CallOriginal()
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -394,12 +400,13 @@ namespace Telerik.JustMock.Expectations
         }
 
         /// <summary>
-        ///  Specfies call a to step over.
+        /// Leaves the arranged void call without additional behavior.
         /// </summary>
         /// <remarks>
-        /// For loose mocks by default the behavior is step over.
+        /// Use this method when you want the call to succeed without throwing or running custom logic. Loose mocks already behave
+        /// this way by default.
         /// </remarks>
-        /// <returns>Refarence to <see cref="IAssertable"/></returns>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public IAssertable DoNothing()
         {
             return ProfilerInterceptor.GuardInternal(() =>

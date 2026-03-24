@@ -20,48 +20,48 @@ using System;
 namespace Telerik.JustMock.Expectations.Abstraction
 {
     /// <summary>
-    /// Throws() methods.
+    /// Provides methods for arranging exceptions to be thrown when a mocked member is called.
     /// </summary>
-    /// <typeparam name="TContainer"></typeparam>
+    /// <typeparam name="TContainer">Expectation type that continues the arrangement.</typeparam>
     public interface IThrows<TContainer>
     {
         /// <summary>
-        /// Throws a the specified exception for target call.
+        /// Throws the specified exception when the arranged call occurs.
         /// </summary>
-        /// <param name="exception"></param>
-        /// <returns></returns>
+        /// <param name="exception">Exception instance to throw.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         IAssertable Throws(Exception exception);
 
         /// <summary>
-        /// Throws a the specified exception for target call.
+        /// Throws a new exception of the specified type when the arranged call occurs.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         IAssertable Throws<TException>() where TException : Exception;
 
         /// <summary>
-        /// Throws a the specified exception for target call.
+        /// Throws a new exception of the specified type when the arranged call occurs.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         IAssertable Throws<TException>(params object[] args) where TException : Exception;
 
 #if !LITE_EDITION
         /// <summary>
-        /// Throws a the specified exception for the target async call causing returned task to fail.
+        /// Faults the returned task with the specified exception when the arranged async call occurs.
         /// </summary>
-        /// <param name="exception"></param>
-        /// <returns></returns>
+        /// <param name="exception">Exception instance to use for the faulted task.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         IAssertable ThrowsAsync(Exception exception);
 
         /// <summary>
-        /// Throws a the specified exception for the target async call causing returned task to fail.
+        /// Faults the returned task with a new exception of the specified type when the arranged async call occurs.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         IAssertable ThrowsAsync<TException>() where TException : Exception;
 
         /// <summary>
-        /// Throws a the specified exception for the target async call causing returned task to fail.
+        /// Faults the returned task with a new exception of the specified type when the arranged async call occurs.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         IAssertable ThrowsAsync<TException>(params object[] args) where TException : Exception;
 #endif
     }

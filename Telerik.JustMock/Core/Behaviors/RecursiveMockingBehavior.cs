@@ -1,4 +1,4 @@
-/*
+﻿/*
  JustMock Lite
  Copyright © 2010-2015,2019 Progress Software Corporation
 
@@ -216,10 +216,18 @@ namespace Telerik.JustMock.Core.Behaviors
     }
 
 #if !PORTABLE
+
+    /// <summary>
+    /// Returns a reference to the current instance of <see cref="DefaultRef{T}"/>.
+    /// </summary>
+    /// <returns>A reference to the current <see cref="DefaultRef{T}"/> instance.</returns>
     public sealed class DefaultRef<T>
     {
         static T value;
 
+        /// <summary>
+        /// Returns a reference to the current instance of <see cref="DefaultRef{T}"/>.
+        /// </summary>
         public static ref T Ref() { return ref DefaultRef<T>.value; }
     }
 #endif

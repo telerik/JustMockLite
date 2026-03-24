@@ -24,15 +24,17 @@ using Telerik.JustMock.Expectations.Abstraction;
 namespace Telerik.JustMock
 {
     /// <summary>
-    /// Defines the expectation for a specific method.
+    /// Adds async return helpers to function expectations.
     /// </summary>
     public static partial class AsyncExtensions
     {
         /// <summary>
-        /// Specifies the return value for an asynchronous method.
+        /// Returns the specified value from an arranged asynchronous method.
         /// </summary>
         /// <typeparam name="TResult">Type of the return value.</typeparam>
-        /// <returns>Reference to <see cref="IAssertable"/> interface.</returns>
+        /// <param name="mock">Expectation for the asynchronous call.</param>
+        /// <param name="value">Value to wrap in a completed task.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public static IAssertable ReturnsAsync<TResult>(this FuncExpectation<Task<TResult>> mock, TResult value)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -43,10 +45,12 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Specifies the return value for an asynchronous method.
+        /// Returns the specified value from an arranged asynchronous method.
         /// </summary>
         /// <typeparam name="TResult">Type of the return value.</typeparam>
-        /// <returns>Reference to <see cref="IAssertable"/> interface.</returns>
+        /// <param name="mock">Expectation for the asynchronous call.</param>
+        /// <param name="value">Value to wrap in a completed task.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public static IAssertable ReturnsAsync<TResult>(this FuncExpectation<Task> mock, TResult value)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -57,11 +61,12 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Specifies a function to evaluate and return the value for an asynchronous method.
+        /// Specifies the return value for an arranged asynchronous method.
         /// </summary>
         /// <typeparam name="TResult">Type of the return value.</typeparam>
-        /// <param name="valueFunction">The function that will evaluate the return value.</param>
-        /// <returns>Reference to <see cref="IAssertable"/> interface.</returns>
+        /// <param name="mock">Expectation for the asynchronous call.</param>
+        /// <param name="valueFunction">Function that calculates the return value.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public static IAssertable ReturnsAsync<TResult>(this FuncExpectation<Task<TResult>> mock, Func<TResult> valueFunction)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -77,11 +82,12 @@ namespace Telerik.JustMock
 
 
         /// <summary>
-        /// Specifies a function to evaluate and return the value for an asynchronous method.
+        /// Specifies the return value for an arranged asynchronous method.
         /// </summary>
         /// <typeparam name="TResult">Type of the return value.</typeparam>
-        /// <param name="valueFunction">The function that will evaluate the return value.</param>
-        /// <returns>Reference to <see cref="IAssertable"/> interface.</returns>
+        /// <param name="mock">Expectation for the asynchronous call.</param>
+        /// <param name="valueFunction">Function that calculates the return value.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public static IAssertable ReturnsAsync<TResult>(this FuncExpectation<Task> mock, Func<TResult> valueFunction)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -97,10 +103,12 @@ namespace Telerik.JustMock
 
 #if NETCORE
         /// <summary>
-        /// Specifies the return value for an asynchronous method.
+        /// Returns the specified value from an arranged asynchronous method.
         /// </summary>
         /// <typeparam name="TResult">Type of the return value.</typeparam>
-        /// <returns>Reference to <see cref="IAssertable"/> interface.</returns>
+        /// <param name="mock">Expectation for the asynchronous call.</param>
+        /// <param name="value">Value to wrap in a completed value task.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public static IAssertable ReturnsAsync<TResult>(this FuncExpectation<ValueTask<TResult>> mock, TResult value)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -111,11 +119,12 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Specifies a function to evaluate and return the value for an asynchronous method.
+        /// Specifies the return value for an arranged asynchronous method.
         /// </summary>
         /// <typeparam name="TResult">Type of the return value.</typeparam>
-        /// <param name="valueFunction">The function that will evaluate the return value.</param>
-        /// <returns>Reference to <see cref="IAssertable"/> interface.</returns>
+        /// <param name="mock">Expectation for the asynchronous call.</param>
+        /// <param name="valueFunction">Function that calculates the return value.</param>
+        /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public static IAssertable ReturnsAsync<TResult>(this FuncExpectation<ValueTask<TResult>> mock, Func<TResult> valueFunction)
         {
             return ProfilerInterceptor.GuardInternal(() =>

@@ -25,57 +25,54 @@ using Telerik.JustMock.Core.MatcherTree;
 namespace Telerik.JustMock
 {
     /// <summary>
-    /// Allows specification of a matching condition for an argument for a non-public method, rather
-    /// a specific value.
+    /// Defines expression-based argument matchers for non-public member arrangements.
     /// </summary>
     public partial interface IArgExpr
     {
         /// <summary>
-        /// Matches argument for any value.
+        /// Matches any value of the specified type.
         /// </summary>
-        /// <typeparam name="T">Type for the argument</typeparam>
-        /// <returns>Argument type</returns>
+        /// <typeparam name="T">Type of the argument.</typeparam>
+        /// <returns>An expression that represents the matcher.</returns>
         Expression IsAny<T>();
 
         /// <summary>
-        /// Matches argument for any value of a given type.
+        /// Matches any value of the specified runtime type.
         /// </summary>
-        /// <param name="type">Type for the argument</param>
-        /// <param name="args">Constructor arguments</param>
-        /// <returns>Argument type</returns>
+        /// <param name="type">Type of the argument.</param>
+        /// <param name="args">Constructor arguments for matcher creation when required.</param>
+        /// <returns>An expression that represents the matcher.</returns>
         Expression IsAny(Type type, params object[] args);
 
         /// <summary>
-        /// Matches argument for the expected condition.
+        /// Matches an argument when it satisfies the specified predicate.
         /// </summary>
-        /// <typeparam name="T">
-        /// Contains the type of the argument.
-        /// </typeparam>
-        /// <param name="match">Matcher expression</param>
-        /// <returns>Argument type</returns>
+        /// <typeparam name="T">Type of the argument.</typeparam>
+        /// <param name="match">Predicate that evaluates the argument value.</param>
+        /// <returns>An expression that represents the matcher.</returns>
         Expression Matches<T>(Expression<Predicate<T>> match);
 
         /// <summary>
-        /// Matches argument for null value.
+        /// Matches a <see langword="null"/> value.
         /// </summary>
-        /// <typeparam name="T">Type for the argument</typeparam>
-        /// <returns>Argument type</returns>
+        /// <typeparam name="T">Type of the argument.</typeparam>
+        /// <returns>An expression that represents the matcher.</returns>
         Expression IsNull<T>();
 
         /// <summary>
-        /// Returns a value from a ref or out argument.
+        /// Supplies a value for a <c>ref</c> or <c>out</c> argument.
         /// </summary>
-        /// <typeparam name="T">Type for the argument</typeparam>
-        /// <param name="value">Value to match.</param>
-        /// <returns>Argument type</returns>
+        /// <typeparam name="T">Type of the argument.</typeparam>
+        /// <param name="value">Value to assign.</param>
+        /// <returns>An expression that represents the argument value.</returns>
         Expression Out<T>(T value);
 
         /// <summary>
-        /// Matches a value for ref argument.
+        /// Matches a <c>ref</c> argument by value.
         /// </summary>
-        /// <typeparam name="T">Type for the argument</typeparam>
+        /// <typeparam name="T">Type of the argument.</typeparam>
         /// <param name="value">Value to match.</param>
-        /// <returns>Argument type</returns>
+        /// <returns>An expression that represents the matcher.</returns>
         Expression Ref<T>(T value);
     }
 }
