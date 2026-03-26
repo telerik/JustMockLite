@@ -57,11 +57,11 @@ namespace Telerik.JustMock
         private readonly Type type;
 
         /// <summary>
-        /// Gets or sets a value that controls whether <see cref="CallMethod(string, object[])"/> rethrows the original exception.
+        /// Gets or sets a value that controls whether <see cref="CallMethod(string, object[])"/> and other <c>CallMethod*</c> overloads rethrow the original exception.
         /// </summary>
         /// <remarks>
         /// By default, reflection wraps exceptions in <see cref="TargetInvocationException"/>. Set this property to
-        /// <see langword="true"/> if you want to receive the original exception instead.
+        /// <see langword="true"/> if you want to receive the original exception instead when invoking methods through <see cref="CallMethod(string, object[])"/> or its overloads.
         /// </remarks>
         public bool RethrowOriginalOnCallMethod { get; set; }
 
@@ -69,8 +69,7 @@ namespace Telerik.JustMock
         /// Initializes a new <see cref="PrivateAccessor"/> that wraps the given object instance,
         /// enabling access to both its instance and static non-public members.
         /// </summary>
-        /// <param name="instance">The object whose non-public members you want to access. Must not be <see langword="null"/>.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="instance"/> is <see langword="null"/>.</exception>
+        /// <param name="instance">The object whose non-public members you want to access.</param>
         public PrivateAccessor(object instance)
             : this(instance, null)
         { }

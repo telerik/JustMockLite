@@ -20,13 +20,10 @@ using System;
 namespace Telerik.JustMock.Core.Behaviors
 {
     /// <summary>
-    /// An implementation detail interface. Not intended for external usage.
+    /// Processes the specified invocation by applying the behavior.
     /// </summary>
     public interface IBehavior
     {
-    /// <summary>
-    /// Processes the specified invocation by applying the behavior.
-    /// </summary>
         void Process(Invocation invocation);
     }
 
