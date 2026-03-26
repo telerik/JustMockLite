@@ -27,18 +27,12 @@ namespace Telerik.JustMock
     public partial class Mock
     {
         /// <summary>
-        /// Setups the target call to act in a specific way.
+        /// Arranges a return-value call for the specified type.
         /// </summary>
-        /// <typeparam name="T">Target type</typeparam>
-        /// <typeparam name="TResult">
-        /// Return type for the target setup.
-        /// </typeparam>
-        /// <param name="func">
-        /// Expression delegate to the target call
-        /// </param>
-        /// <returns>
-        /// Reference to <see cref="FuncExpectation{TResult}"/> to setup the mock.
-        /// </returns>
+        /// <typeparam name="T">Type that declares the member to arrange.</typeparam>
+        /// <typeparam name="TResult">Return type of the arranged member.</typeparam>
+        /// <param name="func">Delegate that performs the call to arrange.</param>
+        /// <returns>Reference to <see cref="FuncExpectation"/> to setup the mock.</returns>
         public static FuncExpectation<TResult> Arrange<T, TResult>(Func<TResult> func)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -50,17 +44,11 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Setups the target mock call with user expectation.
+        /// Arranges a return-value call by using an expression.
         /// </summary>
-        /// <typeparam name="TResult">
-        /// Return type for the target setup.
-        /// </typeparam>
-        /// <param name="expression">
-        /// Provide the target method call
-        /// </param>
-        /// <returns>
-        /// Reference to <see cref="FuncExpectation{TResult}"/> to setup the mock.
-        /// </returns>
+        /// <typeparam name="TResult">Return type of the arranged member.</typeparam>
+        /// <param name="expression">Expression that identifies the call to arrange.</param>
+        /// <returns>Reference to <see cref="FuncExpectation"/> to setup the mock.</returns>
         public static FuncExpectation<TResult> Arrange<TResult>(Expression<Func<TResult>> expression)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -70,21 +58,13 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Setups the target mock call with user expectation.
+        /// Arranges a return-value call for a specific instance.
         /// </summary>
-        /// <typeparam name="T">Target type</typeparam>
-        /// <typeparam name="TResult">
-        /// Return type for the target setup.
-        /// </typeparam>
-        /// <param name="obj">
-        /// Target instance.
-        /// </param>
-        /// <param name="func">
-        /// Expression delegate to the target call
-        /// </param>
-        /// <returns>
-        /// Reference to <see cref="FuncExpectation{TResult}"/> to setup the mock.
-        /// </returns>
+        /// <typeparam name="T">Type that declares the member to arrange.</typeparam>
+        /// <typeparam name="TResult">Return type of the arranged member.</typeparam>
+        /// <param name="obj">Instance on which the arranged call should occur.</param>
+        /// <param name="func">Delegate that performs the call to arrange.</param>
+        /// <returns>Reference to <see cref="FuncExpectation"/> to setup the mock.</returns>
         public static FuncExpectation<TResult> Arrange<T, TResult>(T obj, Func<T, TResult> func)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -96,18 +76,12 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Setups the target mock call with user expectation.
+        /// Arranges a void call for a specific instance.
         /// </summary>
-        /// <typeparam name="T">Target type</typeparam>
-        /// <param name="obj">
-        /// Target instance.
-        /// </param>
-        /// <param name="func">
-        /// Expression delegate to the target call
-        /// </param>
-        /// <returns>
-        /// Reference to <see cref="ActionExpectation"/> to setup the mock.
-        /// </returns>
+        /// <typeparam name="T">Type that declares the member to arrange.</typeparam>
+        /// <param name="obj">Instance on which the arranged call should occur.</param>
+        /// <param name="func">Delegate that performs the call to arrange.</param>
+        /// <returns>Reference to <see cref="ActionExpectation"/> to setup the mock.</returns>
         public static ActionExpectation Arrange<T>(T obj, Action<T> action)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -119,14 +93,10 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Setups the target call to act in a specific way.
+        /// Arranges a void call by using an expression.
         /// </summary>
-        /// <param name="expression">
-        /// Target expression
-        /// </param>
-        /// <returns>
-        /// Reference to <see cref="ActionExpectation"/> to setup the mock.
-        /// </returns>
+        /// <param name="expression">Expression that identifies the call to arrange.</param>
+        /// <returns>Reference to <see cref="ActionExpectation"/> to setup the mock.</returns>
         public static ActionExpectation Arrange(Expression<Action> expression)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -136,20 +106,19 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Setups target property set operation to act in a specific way. Does not work correctly with OnDemand option enabled.
+        /// Arranges a property setter.
         /// <example>
         /// <code>
         /// Mock.ArrangeSet(() => foo.MyValue = 10).Throws(new InvalidOperationException());
         /// </code>
-        /// This will throw InvalidOperationException for when foo.MyValue is set with 10.
+        /// This arrangement throws <see cref="InvalidOperationException"/> when <c>foo.MyValue</c> is set to <c>10</c>.
         /// </example>
         /// </summary>
-        /// <param name="action">
-        /// Target action
-        /// </param>
-        /// <returns>
-        /// Reference to <see cref="ActionExpectation"/> to setup the mock.
-        /// </returns>
+        /// <remarks>
+        /// This overload is not compatible with On Demand interception.
+        /// </remarks>
+        /// <param name="action">Setter expression that identifies the property assignment to arrange.</param>
+        /// <returns>Reference to <see cref="ActionExpectation"/> to setup the mock.</returns>
         public static ActionExpectation ArrangeSet(Action action)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -177,20 +146,17 @@ namespace Telerik.JustMock
 
 #if !PORTABLE
         /// <summary>
-        /// Setups target property set operation to act in a specific way.  Use <see cref="Mock.ArrangeSet{T}(Action)"/>
+        /// Arranges a property setter and enables interception for the specified declaring type.
         /// <example>
         /// <code>
         /// Mock.ArrangeSet(() => foo.MyValue = 10).Throws(new InvalidOperationException());
         /// </code>
-        /// This will throw InvalidOperationException for when foo.MyValue is set with 10.
+        /// This arrangement throws <see cref="InvalidOperationException"/> when <c>foo.MyValue</c> is set to <c>10</c>.
         /// </example>
         /// </summary>
-        /// <param name="action">
-        /// Target action
-        /// </param>
-        /// <returns>
-        /// Reference to <see cref="ActionExpectation"/> to setup the mock.
-        /// </returns>
+        /// <typeparam name="T">Type that declares the property to arrange.</typeparam>
+        /// <param name="action">Setter expression that identifies the property assignment to arrange.</param>
+        /// <returns>Reference to <see cref="ActionExpectation"/> to setup the mock.</returns>
         public static ActionExpectation ArrangeSet<T>(Action action)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -203,13 +169,13 @@ namespace Telerik.JustMock
 #endif
 
         /// <summary>
-        /// Arranges the return values of properties and methods according to the given functional specification.
+        /// Arranges methods and properties by applying a functional specification.
         /// </summary>
         /// <typeparam name="T">Mock type.</typeparam>
-        /// <param name="mock">The mock on which to make the arrangements. If 'null' then the specification will be applied to all instances.</param>
-        /// <param name="functionalSpecification">The functional specification to apply to this mock.</param>
+        /// <param name="mock">Mock on which to apply the specification. If this value is <see langword="null"/>, JustMock applies the specification to all instances.</param>
+        /// <param name="functionalSpecification">Functional specification that describes the arranged behavior.</param>
         /// <remarks>
-        /// See article "Create Mocks By Example" for further information on how to write functional specifications.
+        /// Use this when you want to express behavior as a specification instead of arranging each member separately.
         /// </remarks>
         public static void ArrangeLike<T>(T mock, Expression<Func<T, bool>> functionalSpecification)
         {
@@ -217,15 +183,11 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Setups the target mock call with user expectation.
+        /// Arranges a void call for the specified type.
         /// </summary>
-        /// <typeparam name="T">Target type</typeparam>
-        /// <param name="action">
-        /// Target action
-        /// </param>
-        /// <returns>
-        /// Reference to <see cref="ActionExpectation"/> to setup the mock.
-        /// </returns>
+        /// <typeparam name="T">Type that declares the member to arrange.</typeparam>
+        /// <param name="action">Delegate that performs the call to arrange.</param>
+        /// <returns>Reference to <see cref="ActionExpectation"/> to setup the mock.</returns>
         public static ActionExpectation Arrange<T>(Action action)
         {
             return ProfilerInterceptor.GuardInternal(() =>

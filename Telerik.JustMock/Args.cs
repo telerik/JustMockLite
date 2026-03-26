@@ -22,12 +22,12 @@ using Telerik.JustMock.Core;
 namespace Telerik.JustMock
 {
     /// <summary>
-    /// Specifies Mock.Assert to ignore any specific arguments.
+    /// Configures how JustMock matches arguments and instances during verification.
     /// </summary>
     public sealed partial class Args
     {
         /// <summary>
-        /// Gets or sets value indicating whether to ignore arguments.
+        /// Gets or sets a value that indicates whether verification ignores argument values.
         /// </summary>
         /// <remarks>
         /// Unless explicitly specified, the arguments will be ignored by default if there is a filter present.
@@ -35,7 +35,7 @@ namespace Telerik.JustMock
         public bool? IsIgnored { get; set; }
 
         /// <summary>
-        /// Gets or sets value indicating whether to ignore instance.
+        /// Gets or sets a value that indicates whether verification ignores the target instance.
         /// </summary>
         /// <remarks>
         /// Unless explicitly specified, the instance will be ignored by default if there is a filter present
@@ -47,16 +47,15 @@ namespace Telerik.JustMock
         /// Gets or sets a customized filter on the invocation arguments.
         /// </summary>
         /// <remarks>
-        /// If a filter is specified it has to have the same signature as the asserted method,
-        /// and may optionally have a first argument of the same type as the one declaring the method
-        /// to receive the 'this' argument on which the method was called.
+        /// The delegate must match the asserted member signature. You can add an optional first parameter of the declaring type
+        /// to inspect the instance on which the call occurred.
         /// </remarks>
         public Delegate Filter { get; set; }
 
         /// <summary>
-        /// Marks that Mock.Assert should ignore any argument match.
+        /// Creates an <see cref="Args"/> configuration that ignores argument values.
         /// </summary>
-        /// <returns>Returns Args configuration.</returns>
+        /// <returns>An <see cref="Args"/> configuration for verification.</returns>
         public static Args Ignore()
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -66,9 +65,9 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Marks that Mock.Assert should ignore the instance match.
+        /// Creates an <see cref="Args"/> configuration that ignores the target instance.
         /// </summary>
-        /// <returns>Returns Args configuration.</returns>
+        /// <returns>An <see cref="Args"/> configuration for verification.</returns>
         public static Args IgnoreInstance()
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -78,9 +77,9 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Marks that Mock.Assert should ignore any argument match.
+        /// Configures the current <see cref="Args"/> instance to ignore argument values.
         /// </summary>
-        /// <returns>Returns Args configuration.</returns>
+        /// <returns>The current <see cref="Args"/> instance.</returns>
         public Args AndIgnoreArguments()
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -91,9 +90,9 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Marks that Mock.Assert should ignore the instance match.
+        /// Configures the current <see cref="Args"/> instance to ignore the target instance.
         /// </summary>
-        /// <returns>Returns Args configuration.</returns>
+        /// <returns>The current <see cref="Args"/> instance.</returns>
         public Args AndIgnoreInstance()
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -104,16 +103,20 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Specifies a condition on the invocation arguments. See <see cref="M:Telerik.JustMock.Args.Filter"/> for usage details.
+        /// Creates an <see cref="Args"/> configuration that uses a custom predicate to match calls.
         /// </summary>
+        /// <param name="predicate">Predicate that evaluates the invocation arguments.</param>
+        /// <returns>An <see cref="Args"/> configuration for verification.</returns>
         public static Args Matching(Delegate predicate)
         {
             return ProfilerInterceptor.GuardInternal(() => new Args().AndMatching(predicate));
         }
 
         /// <summary>
-        /// Specifies a condition on the invocation arguments. See <see cref="M:Telerik.JustMock.Args.Filter"/> for usage details.
+        /// Configures the current <see cref="Args"/> instance to use a custom predicate to match calls.
         /// </summary>
+        /// <param name="predicate">Predicate that evaluates the invocation arguments.</param>
+        /// <returns>The current <see cref="Args"/> instance.</returns>
         public Args AndMatching(Delegate predicate)
         {
             return ProfilerInterceptor.GuardInternal(() =>
