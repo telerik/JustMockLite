@@ -29,9 +29,9 @@ namespace Telerik.JustMock
         /// <summary>
         /// Create a mocked instance from specified real constructor with <see cref="Behavior.RecursiveLoose"/> behavior.
         /// </summary>
-        /// <typeparam name="T">Target type for the mocked instance</typeparam>
-        /// <param name="expression">Target expression for specifying the new type.</param>
-        /// <returns>Mock instance</returns>
+        /// <typeparam name="T">Type to mock.</typeparam>
+        /// <param name="expression">Constructor expression that identifies the type and constructor arguments.</param>
+        /// <returns>A mock instance that uses <see cref="Behavior.RecursiveLoose"/> behavior.</returns>
         public static T Create<T>(Expression<Func<T>> expression)
         {
             return ProfilerInterceptor.GuardInternal(() => CreateFromNew<T>(expression, null));
@@ -40,10 +40,10 @@ namespace Telerik.JustMock
         /// <summary>
         /// Creates a mocked instance from specified real constructor.
         /// </summary>
-        /// <typeparam name="T">Target type for the mocked instance</typeparam>
-        /// <param name="expression">Target expression for specifying the new type.</param>
+        /// <typeparam name="T">Type to mock.</typeparam>
+        /// <param name="expression">Constructor expression that identifies the type and constructor arguments.</param>
         /// <param name="behavior">Specifies behavior of the mock. Default is <see cref="Behavior.RecursiveLoose"/></param>
-        /// <returns>Mock instance</returns>
+        /// <returns>A mock instance for the specified constructor expression.</returns>
         public static T Create<T>(Expression<Func<T>> expression, Behavior behavior)
         {
             return ProfilerInterceptor.GuardInternal(() => CreateFromNew<T>(expression, behavior));
@@ -64,11 +64,11 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Creates a mocked instance from settings specified in the lambda.
+        /// Creates a mock by using fluent configuration settings.
         /// </summary>
-        /// <typeparam name="T">Type of the mock</typeparam>
-        /// <param name="settings">Specifies mock settings</param>
-        /// <returns>Mock instance</returns>
+        /// <typeparam name="T">Type to mock.</typeparam>
+        /// <param name="settings">Delegate that configures mock creation.</param>
+        /// <returns>A configured mock instance.</returns>
         public static T Create<T>(Action<IFluentConfig<T>> settings)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -80,12 +80,12 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Creates a mocked instance from a given type.
+        /// Creates a mock by using the specified behavior and constructor arguments.
         /// </summary>
-        /// <typeparam name="T">Type of the mock</typeparam>
+        /// <typeparam name="T">Type to mock.</typeparam>
         /// <param name="behavior">Specifies behavior of the mock. Default is <see cref="Behavior.RecursiveLoose"/></param>
-        /// <param name="args">Constructor arguments</param>
-        /// <returns>Mock instance</returns>
+        /// <param name="args">Arguments to pass to the constructor when JustMock creates the instance.</param>
+        /// <returns>A configured mock instance.</returns>
         public static T Create<T>(Behavior behavior, params object[] args)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -96,11 +96,11 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Creates a mocked instance from a given type.
+        /// Creates a mock by using the specified behavior.
         /// </summary>
-        /// <typeparam name="T">Type of the mock</typeparam>
+        /// <typeparam name="T">Type to mock.</typeparam>
         /// <param name="behavior">Specifies behavior of the mock. Default is <see cref="Behavior.RecursiveLoose"/></param>
-        /// <returns>Mock instance</returns>
+        /// <returns>A configured mock instance.</returns>
         public static T Create<T>(Behavior behavior)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -111,10 +111,10 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Creates a mocked instance from a given type with <see cref="Behavior.RecursiveLoose"/> behavior.
+        /// Creates a mock that uses <see cref="Behavior.RecursiveLoose"/> behavior.
         /// </summary>
-        /// <typeparam name="T">Type of the mock</typeparam>
-        /// <returns>Mock instance</returns>
+        /// <typeparam name="T">Type to mock.</typeparam>
+        /// <returns>A mock instance.</returns>
         public static T Create<T>()
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -125,11 +125,11 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Creates a mocked instance from a given type with <see cref="Behavior.RecursiveLoose"/> behavior.
+        /// Creates a mock for the specified runtime type.
         /// </summary>
-        /// <param name="target">Target to mock</param>
-        /// <param name="args">Constructor arguments</param>
-        /// <returns>Mock instance</returns>
+        /// <param name="target">Type to mock.</param>
+        /// <param name="args">Arguments to pass to the constructor when JustMock creates the instance.</param>
+        /// <returns>A mock instance that uses <see cref="Behavior.RecursiveLoose"/> behavior.</returns>
         public static object Create(Type target, params object[] args)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -140,10 +140,10 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Creates a mocked instance from a given type with <see cref="Behavior.RecursiveLoose"/> behavior.
+        /// Creates a mock for the specified runtime type.
         /// </summary>
-        /// <param name="target">Target to mock</param>
-        /// <returns>Mock instance</returns>
+        /// <param name="target">Type to mock.</param>
+        /// <returns>A mock instance that uses <see cref="Behavior.RecursiveLoose"/> behavior.</returns>
         public static object Create(Type target)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -154,13 +154,13 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Creates a mocked instance from a given type with <see cref="Behavior.RecursiveLoose"/> behavior.
+        /// Creates a mock and controls whether JustMock calls the instance constructor.
         /// </summary>
         /// <param name="constructor">
-        /// Specifies whether to call the base constructor
+        /// Specifies whether JustMock calls the original constructor.
         /// </param>
-        /// <typeparam name="T">Target type</typeparam>
-        /// <returns>Mock instance</returns>
+        /// <typeparam name="T">Type to mock.</typeparam>
+        /// <returns>A mock instance that uses <see cref="Behavior.RecursiveLoose"/> behavior.</returns>
         public static T Create<T>(Constructor constructor)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -171,14 +171,14 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Creates a mocked instance from a given type.
+        /// Creates a mock and controls both constructor execution and default behavior.
         /// </summary>
         /// <param name="constructor">
-        /// Specifies whether to call the base constructor
+        /// Specifies whether JustMock calls the base constructor.
         /// </param>
         /// <param name="behavior">Specifies behavior of the mock. Default is <see cref="Behavior.RecursiveLoose"/></param>
-        /// <returns>Mock instance</returns>
-        /// <typeparam name="T">Target type</typeparam>
+        /// <returns>A configured mock instance.</returns>
+        /// <typeparam name="T">Type to mock.</typeparam>
         public static T Create<T>(Constructor constructor, Behavior behavior)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -189,14 +189,14 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Creates a mocked instance from a given type.
+        /// Creates a mock for the specified runtime type and controls constructor execution.
         /// </summary>
-        /// <param name="type">Target to mock</param>
+        /// <param name="type">Type to mock.</param>
         /// <param name="constructor">
-        /// Specifies whether to call the base constructor
+        /// Specifies whether JustMock calls the original constructor.
         /// </param>
         /// <param name="behavior">Specifies behavior of the mock. Default is <see cref="Behavior.RecursiveLoose"/></param>
-        /// <returns>Mock instance</returns>
+        /// <returns>A configured mock instance.</returns>
         public static object Create(Type type, Constructor constructor, Behavior behavior)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -207,11 +207,11 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Creates a mocked instance from a given type.
+        /// Creates a mock for the specified runtime type by using fluent configuration settings.
         /// </summary>
-        /// <param name="type">Target type to mock</param>
-        /// <param name="settings">Mock settings</param>
-        /// <returns>Mock instance</returns>
+        /// <param name="type">Type to mock.</param>
+        /// <param name="settings">Delegate that configures mock creation.</param>
+        /// <returns>A configured mock instance.</returns>
         public static object Create(Type type, Action<IFluentConfig> settings)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -223,12 +223,12 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Creates a mock instance from a given type.
+        /// Creates a mock for the specified runtime type by using the supplied behavior and constructor arguments.
         /// </summary>
-        /// <param name="type">Mocking type</param>
+        /// <param name="type">Type to mock.</param>
         /// <param name="behavior">Specifies behavior of the mock. Default is <see cref="Behavior.RecursiveLoose"/></param>
-        /// <param name="args">Constructor arguments</param>
-        /// <returns>Mock instance</returns>
+        /// <param name="args">Arguments to pass to the constructor when JustMock creates the instance.</param>
+        /// <returns>A configured mock instance.</returns>
         public static object Create(Type type, Behavior behavior, params object[] args)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -239,11 +239,11 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Creates a mock instance from a given type.
+        /// Creates a mock for the specified runtime type by using the supplied behavior.
         /// </summary>
-        /// <param name="type">Mocking type</param>
+        /// <param name="type">Type to mock.</param>
         /// <param name="behavior">Specifies behavior of the mock. Default is <see cref="Behavior.RecursiveLoose"/></param>
-        /// <returns>Mock instance</returns>
+        /// <returns>A configured mock instance.</returns>
         public static object Create(Type type, Behavior behavior)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -254,11 +254,11 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Creates a mocked instance from a given type with <see cref="Behavior.RecursiveLoose"/> behavior.
+        /// Creates a mock that uses <see cref="Behavior.RecursiveLoose"/> behavior and the supplied constructor arguments.
         /// </summary>
-        /// <typeparam name="T">Mocked object type.</typeparam>
-        /// <param name="args">Constructor arguments</param>
-        /// <returns>Mock instance</returns>
+        /// <typeparam name="T">Type to mock.</typeparam>
+        /// <param name="args">Arguments to pass to the constructor when JustMock creates the instance.</param>
+        /// <returns>A mock instance.</returns>
         public static T Create<T>(params object[] args)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -269,14 +269,14 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Creates a mock with <see cref="Behavior.RecursiveLoose"/> behavior by parsing the given functional specification.
+        /// Creates a mock and arranges it by applying the specified functional specification.
         /// </summary>
         /// <remarks>
-        /// See article "Create Mocks By Example" for further information on how to write functional specifications.
+        /// Use this overload when you want to describe behavior declaratively instead of arranging members one by one.
         /// </remarks>
-        /// <typeparam name="T">Type for the argument.</typeparam>
-        /// <param name="functionalSpecification">The functional specification to apply to the mock object.</param>
-        /// <returns>A mock with the given functional specification.</returns>
+        /// <typeparam name="T">Type to mock.</typeparam>
+        /// <param name="functionalSpecification">Functional specification to apply to the mock.</param>
+        /// <returns>A mock that uses <see cref="Behavior.RecursiveLoose"/> behavior.</returns>
         public static T CreateLike<T>(Expression<Func<T, bool>> functionalSpecification)
         {
             return ProfilerInterceptor.GuardInternal(() =>

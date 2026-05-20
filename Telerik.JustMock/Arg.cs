@@ -24,8 +24,7 @@ using Telerik.JustMock.Core.MatcherTree;
 namespace Telerik.JustMock
 {
     /// <summary>
-    /// Allows specification of a matching condition for an argument, rather
-    /// a specific value.
+    /// Provides argument matchers that you can use when you arrange or verify calls.
     /// </summary>
     public static partial class Arg
     {
@@ -46,13 +45,11 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Matches argument for the expected condition.
+        /// Matches an argument when it satisfies the specified predicate.
         /// </summary>
-        /// <typeparam name="T">
-        /// Contains the type of the argument.
-        /// </typeparam>
-        /// <param name="match">Matcher expression</param>
-        /// <returns>Argument type</returns>
+        /// <typeparam name="T">Type of the argument.</typeparam>
+        /// <param name="match">Predicate that evaluates the argument value.</param>
+        /// <returns>A placeholder value that records the matcher in the current arrangement or assertion.</returns>
         [ArgMatcher(Matcher = typeof(PredicateMatcher<>))]
         public static T Matches<T>(Expression<Predicate<T>> match)
         {
@@ -64,13 +61,13 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Matches argument for the specified range.
+        /// Matches an argument when it falls inside the specified range.
         /// </summary>
         /// <typeparam name="T">Type of the argument.</typeparam>
-        /// <param name="from">starting value.</param>
-        /// <param name="to">ending value.</param>
-        /// <param name="kind">Kind of Range</param>
-        /// <returns>Argument type</returns>
+        /// <param name="from">Range start value.</param>
+        /// <param name="to">Range end value.</param>
+        /// <param name="kind">Range comparison mode.</param>
+        /// <returns>A placeholder value that records the matcher in the current arrangement or assertion.</returns>
         [ArgMatcher(Matcher = typeof(RangeMatcher<>))]
         public static T IsInRange<T>(T from, T to, RangeKind kind) where T : IComparable
         {
@@ -82,10 +79,10 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Matches argument for any value.
+        /// Matches any value of the specified type.
         /// </summary>
-        /// <typeparam name="T">Type for the argument</typeparam>
-        /// <returns>Argument type</returns>
+        /// <typeparam name="T">Type of the argument.</typeparam>
+        /// <returns>A placeholder value that records the matcher in the current arrangement or assertion.</returns>
         [ArgIgnore]
         public static T IsAny<T>()
         {
@@ -99,8 +96,8 @@ namespace Telerik.JustMock
         /// <summary>
         /// Matches argument for null value.
         /// </summary>
-        /// <typeparam name="T">Type for the argument</typeparam>
-        /// <returns>Argument type</returns>
+        /// <typeparam name="T">Type of the argument.</typeparam>
+        /// <returns>A placeholder value that records the matcher in the current arrangement or assertion.</returns>
         [ArgMatcher(Matcher = typeof(ValueMatcher), MatcherArgs = new object[] { null })]
         public static T IsNull<T>()
         {
@@ -112,9 +109,9 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Matches argument for null or empty value.
+        /// Matches a string that is null or empty.
         /// </summary>
-        /// <returns>Null</returns>
+        /// <returns>A placeholder string that records the matcher in the current arrangement or assertion.</returns>
         [ArgMatcher(Matcher = typeof(StringNullOrEmptyMatcher))]
         public static string NullOrEmpty
         {
@@ -129,12 +126,14 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Matches the specified value. Useful for mingling concrete values and more general matchers
-        /// in the same expression when using delegate-based overloads.
+        /// Matches the specified value explicitly.
         /// </summary>
-        /// <typeparam name="T">Type for the argument</typeparam>
-        /// <param name="value">Value to match</param>
-        /// <returns>Argument type</returns>
+        /// <remarks>
+        /// Use this method when you combine concrete values and broader matchers in the same delegate-based arrangement or assertion.
+        /// </remarks>
+        /// <typeparam name="T">Type of the argument.</typeparam>
+        /// <param name="value">Value to match.</param>
+        /// <returns>A placeholder value that records the matcher in the current arrangement or assertion.</returns>
         [ArgMatcher(Matcher = typeof(ValueMatcher))]
         public static T Is<T>(T value)
         {
@@ -146,27 +145,26 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// An implementation detail that allows passing ref arguments in C#
+        /// Wraps a value so that you can pass it to a <c>ref</c> or <c>out</c> parameter matcher.
         /// </summary>
-        /// <typeparam name="T">Type for the argument</typeparam>
+        /// <typeparam name="T">Type of the wrapped value.</typeparam>
         public sealed class OutRefResult<T>
         {
             /// <summary>
-            /// Pass this member as a ref argument in C#
+            /// Gets the wrapped value that you pass by reference.
             /// </summary>
             [RefArg]
             public T Value;
         }
 
         /// <summary>
-        /// Applies a matcher to a 'ref' parameter.
-        /// 
-        /// By default, 'ref' parameters work like implicitly
-        /// arranged return values. In other words, you arrange a method to return a given value
-        /// through its 'ref' and 'out' parameters. Use this method to specify that the
-        /// argument should have a matcher applied just like regular arguments.
+        /// Applies a matcher to a <c>ref</c> parameter.
         /// </summary>
-        /// <typeparam name="T">Type for the argument</typeparam>
+        /// <remarks>
+        /// By default, JustMock treats <c>ref</c> parameters like arranged output values. Use this method when you want to match
+        /// the incoming <c>ref</c> argument in the same way that you match regular arguments.
+        /// </remarks>
+        /// <typeparam name="T">Type of the argument.</typeparam>
         /// <example>
         /// interface IHasRef
         /// {
@@ -178,8 +176,8 @@ namespace Telerik.JustMock
         /// 
         /// The above example arranges PassRef to return 200 whenever its argument is 100.
         /// </example>
-        /// <param name="value">A matcher or a value.</param>
-        /// <returns>A special value with member 'Value' that must be passed by ref.</returns>
+        /// <param name="value">Concrete value or matcher to apply to the <c>ref</c> argument.</param>
+        /// <returns>A wrapper whose <see cref="OutRefResult{T}.Value"/> member must be passed by reference.</returns>
         public static OutRefResult<T> Ref<T>(T value)
         {
             return ProfilerInterceptor.GuardInternal(() => new OutRefResult<T>() { Value = value });

@@ -22,7 +22,7 @@ using Telerik.JustMock.Core;
 namespace Telerik.JustMock
 {
     /// <summary>
-    /// Defines filters for calls , used in conjunction with assert.
+    /// Defines call-count conditions for verification.
     /// </summary>
     public sealed class Occurs
     {
@@ -36,9 +36,9 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Specifies that the expected call must never occur
+        /// Verifies that the arranged call never occurs.
         /// </summary>
-        /// <returns>Occurs type.</returns>
+        /// <returns>An occurrence filter for zero calls.</returns>
         public static Occurs Never()
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -48,9 +48,9 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Specifies that the expected call should occur once.
+        /// Verifies that the arranged call occurs once.
         /// </summary>
-        /// <returns>Occurs type.</returns>
+        /// <returns>An occurrence filter for one call.</returns>
         public static Occurs Once()
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -60,10 +60,10 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Specifies that the expected call should occur at least <paramref name="numberOfTimes"/>  times.
+        /// Verifies that the arranged call occurs at least <paramref name="numberOfTimes"/> times.
         /// </summary>
-        /// <param name="numberOfTimes">Specific number of times</param>
-        /// <returns>Occurs type.</returns>
+        /// <param name="numberOfTimes">Minimum number of calls.</param>
+        /// <returns>An occurrence filter with a lower bound.</returns>
         public static Occurs AtLeast(int numberOfTimes)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -73,9 +73,9 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Specifies that the expected call should occur at least once.
+        /// Verifies that the arranged call occurs at least once.
         /// </summary>
-        /// <returns>Occurs type.</returns>
+        /// <returns>An occurrence filter with a minimum of one call.</returns>
         public static Occurs AtLeastOnce()
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -85,10 +85,10 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Specifies that the expected call should occur at most <paramref name="numberOfTimes"/>  times.
+        /// Verifies that the arranged call occurs no more than <paramref name="numberOfTimes"/> times.
         /// </summary>
-        /// <param name="numberOfTimes">Specific number of times</param>
-        /// <returns>Occurs type.</returns>
+        /// <param name="numberOfTimes">Maximum number of calls.</param>
+        /// <returns>An occurrence filter with an upper bound.</returns>
         public static Occurs AtMost(int numberOfTimes)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -98,10 +98,10 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Specifies that the expected call should occur exactly <paramref name="numberOfTimes"/>  times.
+        /// Verifies that the arranged call occurs exactly <paramref name="numberOfTimes"/> times.
         /// </summary>
-        /// <param name="numberOfTimes">Specific number of times</param>
-        /// <returns>Occurs type.</returns>
+        /// <param name="numberOfTimes">Exact number of calls.</param>
+        /// <returns>An occurrence filter with matching lower and upper bounds.</returns>
         public static Occurs Exactly(int numberOfTimes)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -113,7 +113,7 @@ namespace Telerik.JustMock
         /// <summary>
         /// Specifies that occurrence is not available.
         /// </summary>
-        /// <returns>Occurs type.</returns>
+        /// <returns><see langword="null"/>.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static Occurs NotAvailable()
         {

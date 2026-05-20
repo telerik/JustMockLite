@@ -22,7 +22,7 @@ using Telerik.JustMock.Expectations.Abstraction;
 namespace Telerik.JustMock.Expectations
 {
     /// <summary>
-    /// Defines action related setups.
+    /// Represents an arrangement for a member that does not return a value.
     /// </summary>
     public sealed class ActionExpectation : CommonExpectation<ActionExpectation>, IIgnorable<ActionExpectation>
     {

@@ -18,7 +18,7 @@
 namespace Telerik.JustMock
 {
     /// <summary>
-    /// Specifies the behavior of the mock.
+    /// Defines how a mock behaves when you do not arrange a call explicitly.
     /// </summary>
     public enum Behavior
     {

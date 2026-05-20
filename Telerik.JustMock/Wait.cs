@@ -28,10 +28,10 @@ namespace Telerik.JustMock
     public static class Wait
     {
         /// <summary>
-        /// Specifies the number of seconds to wait for executing an event.
+        /// Creates a wait duration from a number of seconds.
         /// </summary>
-        /// <param name="seconds">Seconds to wait</param>
-        /// <returns>IWaitDuration type</returns>
+        /// <param name="seconds">Number of seconds to wait before the event is raised.</param>
+        /// <returns>An object that represents the wait duration.</returns>
         public static IWaitDuration For(int seconds)
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -41,10 +41,10 @@ namespace Telerik.JustMock
         }
 
         /// <summary>
-        /// Specifies the number of seconds to wait for executing an event.
+        /// Creates a wait duration from a <see cref="TimeSpan"/>.
         /// </summary>
-        /// <param name="duration">Time duration to wait</param>
-        /// <returns>IWaitDuration type</returns>
+        /// <param name="duration">Time to wait before the event is raised.</param>
+        /// <returns>An object that represents the wait duration.</returns>
         public static IWaitDuration For(TimeSpan duration)
         {
             return ProfilerInterceptor.GuardInternal(() =>
