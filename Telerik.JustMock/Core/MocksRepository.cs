@@ -899,6 +899,52 @@ namespace Telerik.JustMock.Core
             }
         }
 
+        internal void ClearInvocations(object instance)
+        {
+            if (instance == null)
+                throw new ArgumentNullException("instance");
+
+            MockingUtil.UnwrapDelegateTarget(ref instance);
+            if (instance == null)
+                throw new ArgumentException("Object is not a JustMock mock instance.", "instance");
+
+            var methodMocks = GetMethodMocksFromObject(instance);
+            if (methodMocks.Count == 0 && GetMockMixin(instance, null) == null)
+                throw new ArgumentException("Object is not a JustMock mock instance.", "instance");
+
+            foreach (var node in methodMocks)
+            {
+                node.MethodMock.OccurencesBehavior.Reset();
+                node.MethodMock.IsUsed = false;
+            }
+
+            var instanceMatcher = new ReferenceMatcher(instance);
+            foreach (var root in invocationTreeRoots.Values)
+                root.Children.RemoveAll(child => child.Matcher.Equals(instanceMatcher));
+        }
+
+        internal void ResetInstance(object instance)
+        {
+            if (instance == null)
+                throw new ArgumentNullException("instance");
+
+            MockingUtil.UnwrapDelegateTarget(ref instance);
+            if (instance == null)
+                throw new ArgumentException("Object is not a JustMock mock instance.", "instance");
+
+            var methodMocks = GetMethodMocksFromObject(instance);
+            if (methodMocks.Count == 0 && GetMockMixin(instance, null) == null)
+                throw new ArgumentException("Object is not a JustMock mock instance.", "instance");
+
+            var instanceMatcher = new ReferenceMatcher(instance);
+
+            foreach (var root in invocationTreeRoots.Values)
+                root.Children.RemoveAll(child => child.Matcher.Equals(instanceMatcher));
+
+            foreach (var root in arrangementTreeRoots.Values)
+                root.Children.RemoveAll(child => child.Matcher.Equals(instanceMatcher));
+        }
+
         internal void Assert(string message, object mock, Expression expr = null, Args args = null, Occurs occurs = null)
         {
             using (MockingContext.BeginFailureAggregation(message))
