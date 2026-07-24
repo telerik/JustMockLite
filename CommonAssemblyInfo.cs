@@ -27,7 +27,7 @@ using System.Reflection;
 [assembly: AssemblyCompany("Progress Software Corporation")]
 [assembly: AssemblyCopyright("Copyright © 2010-2015 Progress Software Corporation")]
 
-[assembly: AssemblyVersion("2013.3.1021.0")]
-[assembly: AssemblyFileVersion("2013.3.1021.0")]
+[assembly: AssemblyVersion("2026.2.519.512")]
+[assembly: AssemblyFileVersion("2026.2.519.512")]
 
 [assembly: AssemblyMetadata("BuildDate", "2013/10/21")]
