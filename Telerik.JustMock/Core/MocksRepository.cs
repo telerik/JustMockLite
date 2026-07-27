@@ -75,6 +75,7 @@ namespace Telerik.JustMock.Core
         private readonly List<WeakReference> controlledMocks = new List<WeakReference>();
 
         private bool isRetired;
+        internal bool DeferInOrderViolations { get; set; }
 
         internal static readonly HashSet<Type> KnownUnmockableTypes = new HashSet<Type>
             {
@@ -876,8 +877,17 @@ namespace Telerik.JustMock.Core
                 }
 
                 foreach (var behavior in methodMock.Behaviors.OfType<IAssertableBehavior>())
+                {
+                    if (ignoreMethodMockOccurrences && behavior is InOrderBehavior)
+                    {
+                        continue;
+                    }
+
                     if (!occurrenceAsserted || behavior != methodMock.OccurencesBehavior)
+                    {
                         behavior.Assert();
+                    }
+                }
             }
         }
 
@@ -912,10 +922,17 @@ namespace Telerik.JustMock.Core
             if (methodMocks.Count == 0 && GetMockMixin(instance, null) == null)
                 throw new ArgumentException("Object is not a JustMock mock instance.", "instance");
 
+            this.DeferInOrderViolations = true;
+
             foreach (var node in methodMocks)
             {
                 node.MethodMock.OccurencesBehavior.Reset();
                 node.MethodMock.IsUsed = false;
+
+                foreach (var inOrderBehavior in node.MethodMock.Behaviors.OfType<InOrderBehavior>())
+                {
+                    inOrderBehavior.Reset();
+                }
             }
 
             var instanceMatcher = new ReferenceMatcher(instance);
@@ -935,6 +952,19 @@ namespace Telerik.JustMock.Core
             var methodMocks = GetMethodMocksFromObject(instance);
             if (methodMocks.Count == 0 && GetMockMixin(instance, null) == null)
                 throw new ArgumentException("Object is not a JustMock mock instance.", "instance");
+
+            this.DeferInOrderViolations = true;
+
+            foreach (var node in methodMocks)
+            {
+                node.MethodMock.OccurencesBehavior.Reset();
+                node.MethodMock.IsUsed = false;
+
+                foreach (var inOrderBehavior in node.MethodMock.Behaviors.OfType<InOrderBehavior>())
+                {
+                    inOrderBehavior.Reset();
+                }
+            }
 
             var instanceMatcher = new ReferenceMatcher(instance);
 
