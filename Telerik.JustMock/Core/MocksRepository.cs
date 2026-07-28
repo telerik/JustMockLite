@@ -922,18 +922,19 @@ namespace Telerik.JustMock.Core
             if (methodMocks.Count == 0 && GetMockMixin(instance, null) == null)
                 throw new ArgumentException("Object is not a JustMock mock instance.", "instance");
 
-            this.DeferInOrderViolations = true;
-
-            foreach (var node in methodMocks)
+            ExecuteWithDeferredInOrderViolations(() =>
             {
-                node.MethodMock.OccurencesBehavior.Reset();
-                node.MethodMock.IsUsed = false;
-
-                foreach (var inOrderBehavior in node.MethodMock.Behaviors.OfType<InOrderBehavior>())
+                foreach (var node in methodMocks)
                 {
-                    inOrderBehavior.Reset();
+                    node.MethodMock.OccurencesBehavior.Reset();
+                    node.MethodMock.IsUsed = false;
+
+                    foreach (var inOrderBehavior in node.MethodMock.Behaviors.OfType<InOrderBehavior>())
+                    {
+                        inOrderBehavior.Reset();
+                    }
                 }
-            }
+            });
 
             var instanceMatcher = new ReferenceMatcher(instance);
             foreach (var root in invocationTreeRoots.Values)
@@ -953,18 +954,19 @@ namespace Telerik.JustMock.Core
             if (methodMocks.Count == 0 && GetMockMixin(instance, null) == null)
                 throw new ArgumentException("Object is not a JustMock mock instance.", "instance");
 
-            this.DeferInOrderViolations = true;
-
-            foreach (var node in methodMocks)
+            ExecuteWithDeferredInOrderViolations(() =>
             {
-                node.MethodMock.OccurencesBehavior.Reset();
-                node.MethodMock.IsUsed = false;
-
-                foreach (var inOrderBehavior in node.MethodMock.Behaviors.OfType<InOrderBehavior>())
+                foreach (var node in methodMocks)
                 {
-                    inOrderBehavior.Reset();
+                    node.MethodMock.OccurencesBehavior.Reset();
+                    node.MethodMock.IsUsed = false;
+
+                    foreach (var inOrderBehavior in node.MethodMock.Behaviors.OfType<InOrderBehavior>())
+                    {
+                        inOrderBehavior.Reset();
+                    }
                 }
-            }
+            });
 
             var instanceMatcher = new ReferenceMatcher(instance);
 
@@ -973,6 +975,21 @@ namespace Telerik.JustMock.Core
 
             foreach (var root in arrangementTreeRoots.Values)
                 root.Children.RemoveAll(child => child.Matcher.Equals(instanceMatcher));
+        }
+
+        private void ExecuteWithDeferredInOrderViolations(Action action)
+        {
+            var previousValue = this.DeferInOrderViolations;
+            this.DeferInOrderViolations = true;
+
+            try
+            {
+                action();
+            }
+            finally
+            {
+                this.DeferInOrderViolations = previousValue;
+            }
         }
 
         internal void Assert(string message, object mock, Expression expr = null, Args args = null, Occurs occurs = null)

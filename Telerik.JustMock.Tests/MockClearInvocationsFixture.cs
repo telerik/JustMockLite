@@ -192,8 +192,7 @@ namespace Telerik.JustMock.Tests
             Mock.ClearInvocations(mock);
 
             // Call in wrong order after clear
-            mock.GetValue();
-            mock.Execute();
+            Assert.Throws<AssertionException>(() => mock.GetValue());
             Assert.Throws<AssertionException>(() => Mock.Assert(mock));
         }
 
@@ -263,6 +262,28 @@ namespace Telerik.JustMock.Tests
             Mock.Assert(mockB);
         }
 
+        [TestMethod, TestCategory("Lite"), TestCategory("ClearInvocations")]
+        public void ClearInvocations_SiblingInOrderWrongSequenceStillFailsAtCallSite()
+        {
+            var mockA = Mock.Create<IService>();
+            var mockB = Mock.Create<IService>();
+
+            Mock.Arrange(() => mockA.Execute()).InOrder();
+            Mock.Arrange(() => mockA.GetValue()).InOrder();
+
+            Mock.Arrange(() => mockB.Execute()).InOrder();
+            Mock.Arrange(() => mockB.GetValue()).InOrder();
+
+            mockA.Execute();
+            mockA.GetValue();
+
+            Mock.ClearInvocations(mockA);
+
+            mockA.Execute();
+
+            Assert.Throws<AssertionException>(() => mockB.GetValue());
+        }
+
         [TestMethod, TestCategory("Lite"), TestCategory("ResetInstance")]
         public void ResetInstance_RemovesArrangementsFromMock()
         {
@@ -318,6 +339,38 @@ namespace Telerik.JustMock.Tests
             // Can re-arrange after reset
             Mock.Arrange(() => mock.GetValue()).Returns(10);
             Assert.Equal(10, mock.GetValue());
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("ResetInstance")]
+        public void ResetInstance_RearrangedInOrderWrongSequenceFailsAtCallSite()
+        {
+            var mock = Mock.Create<IService>();
+            Mock.Arrange(() => mock.Execute()).InOrder();
+            Mock.Arrange(() => mock.GetValue()).InOrder();
+
+            Mock.Reset(mock);
+
+            Mock.Arrange(() => mock.Execute()).InOrder();
+            Mock.Arrange(() => mock.GetValue()).InOrder();
+
+            Assert.Throws<AssertionException>(() => mock.GetValue());
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("ResetInstance")]
+        public void ResetInstance_SiblingInOrderWrongSequenceStillFailsAtCallSite()
+        {
+            var mockA = Mock.Create<IService>();
+            var mockB = Mock.Create<IService>();
+
+            Mock.Arrange(() => mockA.Execute()).InOrder();
+            Mock.Arrange(() => mockA.GetValue()).InOrder();
+
+            Mock.Arrange(() => mockB.Execute()).InOrder();
+            Mock.Arrange(() => mockB.GetValue()).InOrder();
+
+            Mock.Reset(mockA);
+
+            Assert.Throws<AssertionException>(() => mockB.GetValue());
         }
 
         [TestMethod, TestCategory("Lite"), TestCategory("ResetInstance")]
