@@ -88,11 +88,20 @@ namespace Telerik.JustMock.Core.Behaviors
 
             this.InOrderExecutionLog += invocation.InputToString() + " called at:\n" + MockingContext.GetStackTrace("    ");
 
-            if (this.calledInWrongOrder)
+            if (this.calledInWrongOrder && !this.Repository.DeferInOrderViolations)
             {
                 MockingContext.Fail("{0}Last call executed out of order. Order of calls so far:\n{1}",
                     this.message != null ? this.message + " " : "", InOrderExecutionMessage);
             }
+        }
+
+        internal void Reset()
+        {
+            this.wasCalled = false;
+            this.calledInWrongOrder = false;
+            this.Repository.StoreValue(typeof(InOrderBehavior), "count", 0);
+            this.Repository.StoreValue(typeof(InOrderBehavior), "id", -1);
+            this.Repository.StoreValue<string>(typeof(InOrderBehavior), "log", null);
         }
 
         public void Assert()

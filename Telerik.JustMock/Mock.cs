@@ -125,6 +125,31 @@ namespace Telerik.JustMock
             ProfilerInterceptor.GuardInternal(() => MockingContext.RetireRepository());
         }
 
+        /// <summary>
+        /// Removes all arrangements and clears all recorded invocations for the specified mock instance.
+        /// The mock object itself remains usable; new arrangements may be added after this call.
+        /// </summary>
+        /// <param name="instance">The mock object to reset.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="instance"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="instance"/> is not a mock object created by JustMock.</exception>
+        public static void Reset(object instance)
+        {
+            ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.ResetInstance(instance));
+        }
+
+        /// <summary>
+        /// Clears the recorded invocations for all arrangements on the specified mock instance,
+        /// without removing or modifying the arrangements themselves.
+        /// Subsequent calls to <see cref="Mock.Assert"/> will count only invocations that occur after this call.
+        /// </summary>
+        /// <param name="instance">The mock object whose invocation history should be cleared.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="instance"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="instance"/> is not a mock object created by JustMock.</exception>
+        public static void ClearInvocations(object instance)
+        {
+            ProfilerInterceptor.GuardInternal(() => MockingContext.CurrentRepository.ClearInvocations(instance));
+        }
+
 #if !LITE_EDITION
         /// <summary>
         /// Explicitly enables the interception of the given type by the profiler. Interception is usually enabled
