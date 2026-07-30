@@ -180,14 +180,9 @@ namespace Telerik.JustMock.Core
 #if FEATURE_LICENSING
         internal static string GetLicenseValidationFailureMessage()
         {
-            if (!LicenseManager.IsLicenseKeyFileFound)
+            if (!LicenseManager.IsLicenseKeyFileFound || !LicenseManager.IsLicenseKeyFileValid)
             {
-                return "No license key file is available.";
-            }
-
-            if (!LicenseManager.IsLicenseKeyFileValid)
-            {
-                return "A license key file is available, but it is invalid.";
+                return GetLicenseAvailabilityMessage(LicenseManager.IsLicenseKeyFileFound, LicenseManager.IsLicenseKeyFileValid);
             }
 
             return String.IsNullOrWhiteSpace(LicenseManager.Message) ? "License is not valid." : LicenseManager.Message;
