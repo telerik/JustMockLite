@@ -64,6 +64,12 @@ namespace Telerik.JustMock.Core.Behaviors
             this.message = message;
         }
 
+        internal void Reset()
+        {
+            this.calls = 0;
+        }
+
+
         public void Process(Invocation invocation)
         {
             ++calls;
