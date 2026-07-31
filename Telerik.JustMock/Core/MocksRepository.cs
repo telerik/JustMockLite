@@ -135,12 +135,70 @@ namespace Telerik.JustMock.Core
 
         internal int RepositoryId { get { return this.repositoryId; } }
 
+#if FEATURE_LICENSING
+        internal static string BuildLicensingDebugMessage()
+        {
+            var licensingMessage = String.IsNullOrWhiteSpace(LicenseManager.Message) ? "N/A" : LicenseManager.Message;
+            var productName = String.IsNullOrWhiteSpace(LicenseManager.LicenseProductName) ? "N/A" : LicenseManager.LicenseProductName;
+            var productVersion = String.IsNullOrWhiteSpace(LicenseManager.LicenseProductVersion) ? "N/A" : LicenseManager.LicenseProductVersion;
+            var licenseType = String.IsNullOrWhiteSpace(LicenseManager.LicenseType) ? "N/A" : LicenseManager.LicenseType;
+            var expiration = LicenseManager.LicenseExpiration.HasValue ? LicenseManager.LicenseExpiration.Value.ToString("O") : "N/A";
+            var licenseDate = LicenseManager.LicenseDate.ToString("O");
+            var availabilityMessage = GetLicenseAvailabilityMessage(LicenseManager.IsLicenseKeyFileFound, LicenseManager.IsLicenseKeyFileValid);
+
+            var sb = new StringBuilder();
+            sb.AppendLine("Licensing information:");
+            sb.AppendLine(String.Format("    IsLicenseValid: {0}", LicenseManager.IsLicenseValid));
+            sb.AppendLine(String.Format("    IsLicenseKeyFileFound: {0}", LicenseManager.IsLicenseKeyFileFound));
+            sb.AppendLine(String.Format("    IsLicenseKeyFileValid: {0}", LicenseManager.IsLicenseKeyFileValid));
+            sb.AppendLine(String.Format("    Availability: {0}", availabilityMessage));
+            sb.AppendLine(String.Format("    LicenseProductName: {0}", productName));
+            sb.AppendLine(String.Format("    LicenseProductCode: {0}", LicenseManager.LicenseProductCode));
+            sb.AppendLine(String.Format("    LicenseProductVersion: {0}", productVersion));
+            sb.AppendLine(String.Format("    LicenseType: {0}", licenseType));
+            sb.AppendLine(String.Format("    LicenseDate: {0}", licenseDate));
+            sb.AppendLine(String.Format("    LicenseExpiration: {0}", expiration));
+            sb.AppendLine(String.Format("    Message: {0}", licensingMessage));
+            return sb.ToString().TrimEnd();
+        }
+#endif
+
+        internal static string GetLicenseAvailabilityMessage(bool isLicenseKeyFileFound, bool isLicenseKeyFileValid)
+        {
+            if (!isLicenseKeyFileFound)
+            {
+                return "No license key file is available.";
+            }
+
+            if (!isLicenseKeyFileValid)
+            {
+                return "A license key file is available, but it is invalid.";
+            }
+
+            return "A license key file is available.";
+        }
+
+#if FEATURE_LICENSING
+        internal static string GetLicenseValidationFailureMessage()
+        {
+            if (!LicenseManager.IsLicenseKeyFileFound || !LicenseManager.IsLicenseKeyFileValid)
+            {
+                return GetLicenseAvailabilityMessage(LicenseManager.IsLicenseKeyFileFound, LicenseManager.IsLicenseKeyFileValid);
+            }
+
+            return String.IsNullOrWhiteSpace(LicenseManager.Message) ? "License is not valid." : LicenseManager.Message;
+        }
+#endif
+
         static MocksRepository()
         {
 #if FEATURE_LICENSING
+            DebugView.TraceEvent(IndentLevel.Configuration, BuildLicensingDebugMessage);
             if (!Licensing.LicenseManager.IsLicenseValid)
             {
-                throw new Licensing.LicenseException(Licensing.LicenseManager.Message);
+                var failureMessage = GetLicenseValidationFailureMessage();
+                DebugView.TraceEvent(IndentLevel.Warning, () => failureMessage);
+                throw new Licensing.LicenseException(failureMessage);
             }
 #endif
 
