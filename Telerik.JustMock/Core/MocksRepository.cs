@@ -198,7 +198,7 @@ namespace Telerik.JustMock.Core
             {
                 var failureMessage = GetLicenseValidationFailureMessage();
                 DebugView.TraceEvent(IndentLevel.Warning, () => failureMessage);
-                throw new Licensing.LicenseException(failureMessage);
+                throw new Licensing.LicenseException(Licensing.LicenseManager.Message);
             }
 #endif
 
