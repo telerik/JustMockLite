@@ -7,83 +7,96 @@ using Telerik.JustMock;
 namespace JustMock.NonElevatedExamples.AdvancedUsage.MockingDbSetQueries
 {
     /// <summary>
-    /// A DbSet can be arranged to an EF Core in-memory set so LINQ operators execute normally.
+    /// A DbSet can be arranged to an EF Core in-memory patient set so LINQ operators execute normally.
     /// </summary>
     [TestClass]
     public class MockingDbSetQueries_Tests
     {
         [TestMethod]
-        public void ShouldRunQueryAgainstArrangedDbSet()
+        public void ShouldReturnFakePatientCollectionForQuery()
         {
-            using (var backingContext = CustomerContext.CreateInMemory())
+            using (var backingContext = HealthcareContext.CreateInMemory())
             {
-                backingContext.Customers.AddRange(
-                    new Customer { Id = 1, Name = "Ada", Region = "North", IsActive = true },
-                    new Customer { Id = 2, Name = "Grace", Region = "North", IsActive = false },
-                    new Customer { Id = 3, Name = "Linus", Region = "South", IsActive = true });
+                backingContext.Patients.AddRange(
+                    new Patient { Id = 1, Name = "Olivia Carter", Department = "Cardiology", DoctorId = 10, IsActive = true },
+                    new Patient { Id = 2, Name = "Liam Turner", Department = "Cardiology", DoctorId = 10, IsActive = false },
+                    new Patient { Id = 3, Name = "Noah Williams", Department = "Neurology", DoctorId = 20, IsActive = true });
                 backingContext.SaveChanges();
 
-                var context = Mock.Create<CustomerContext>();
-                Mock.Arrange(() => context.Customers).Returns(backingContext.Customers);
+                var context = Mock.Create<HealthcareContext>();
+                Mock.Arrange(() => context.Patients).Returns(backingContext.Patients);
 
-                var actual = new CustomerDirectory(context).GetActiveNames("North");
+                var actual = new PatientDirectory(context).GetActiveNames("Cardiology");
 
-                CollectionAssert.AreEqual(new[] { "Ada" }, actual);
+                CollectionAssert.AreEqual(new[] { "Olivia Carter" }, actual);
             }
         }
     }
 
-    public class CustomerContext : DbContext
+    public class HealthcareContext : DbContext
     {
-        public CustomerContext()
+        public HealthcareContext()
         {
         }
 
-        public CustomerContext(DbContextOptions<CustomerContext> options)
+        public HealthcareContext(DbContextOptions<HealthcareContext> options)
             : base(options)
         {
         }
 
-        public virtual DbSet<Customer> Customers { get; set; }
+        public virtual DbSet<Patient> Patients { get; set; }
 
-        public static CustomerContext CreateInMemory()
+        public virtual DbSet<Doctor> Doctors { get; set; }
+
+        public static HealthcareContext CreateInMemory()
         {
-            var options = new DbContextOptionsBuilder<CustomerContext>()
+            var options = new DbContextOptionsBuilder<HealthcareContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
                 .Options;
 
-            return new CustomerContext(options);
+            return new HealthcareContext(options);
         }
     }
 
-    public class CustomerDirectory
+    public class PatientDirectory
     {
-        private readonly CustomerContext context;
+        private readonly HealthcareContext context;
 
-        public CustomerDirectory(CustomerContext context)
+        public PatientDirectory(HealthcareContext context)
         {
             this.context = context;
         }
 
-        public string[] GetActiveNames(string region)
+        public string[] GetActiveNames(string department)
         {
-            return this.context.Customers
+            return this.context.Patients
                 .AsNoTracking()
-                .Where(customer => customer.Region == region && customer.IsActive)
-                .OrderBy(customer => customer.Name)
-                .Select(customer => customer.Name)
+                .Where(patient => patient.Department == department && patient.IsActive)
+                .OrderBy(patient => patient.Name)
+                .Select(patient => patient.Name)
                 .ToArray();
         }
     }
 
-    public class Customer
+    public class Patient
     {
         public int Id { get; set; }
 
         public string Name { get; set; }
 
-        public string Region { get; set; }
+        public string Department { get; set; }
+
+        public int DoctorId { get; set; }
 
         public bool IsActive { get; set; }
+    }
+
+    public class Doctor
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public string Specialty { get; set; }
     }
 }

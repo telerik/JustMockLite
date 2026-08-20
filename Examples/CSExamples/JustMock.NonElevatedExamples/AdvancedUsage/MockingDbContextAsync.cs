@@ -10,70 +10,85 @@ namespace JustMock.NonElevatedExamples.AdvancedUsage.MockingDbContextAsync
 {
     /// <summary>
     /// Virtual EF Core members can be arranged with JustMock Lite while asynchronous
-    /// queries and persistence use the EF Core InMemory provider.
+    /// healthcare queries and persistence use the EF Core InMemory provider.
     /// </summary>
     [TestClass]
     public class MockingDbContextAsync_Tests
     {
         [TestMethod]
-        public async Task ShouldQueryArrangedVirtualDbSetAsynchronously()
+        public async Task ShouldQueryArrangedVirtualPatientSetAsynchronously()
         {
-            using (var backingContext = AsyncCatalogContext.CreateInMemory("MockingDbContextAsync.Query"))
+            using (var backingContext = AsyncHealthcareContext.CreateInMemory("MockingDbContextAsync.Query"))
             {
-                backingContext.Products.AddRange(
-                    new AsyncProduct { Id = 1, Name = "Keyboard", Category = "Hardware", IsFeatured = true },
-                    new AsyncProduct { Id = 2, Name = "Monitor", Category = "Hardware", IsFeatured = false },
-                    new AsyncProduct { Id = 3, Name = "Mouse", Category = "Hardware", IsFeatured = true },
-                    new AsyncProduct { Id = 4, Name = "Notebook", Category = "Office", IsFeatured = true });
+                backingContext.Patients.AddRange(
+                    new AsyncPatient { Id = 1, Name = "Olivia Carter", Department = "Cardiology", DoctorId = 10, IsActive = true },
+                    new AsyncPatient { Id = 2, Name = "Liam Turner", Department = "Cardiology", DoctorId = 10, IsActive = false },
+                    new AsyncPatient { Id = 3, Name = "Maya Patel", Department = "Cardiology", DoctorId = 20, IsActive = true },
+                    new AsyncPatient { Id = 4, Name = "Noah Williams", Department = "Pediatrics", DoctorId = 30, IsActive = true });
                 await backingContext.SaveChangesAsync();
 
-                var context = Mock.Create<AsyncCatalogContext>();
-                Mock.Arrange(() => context.Products).Returns(backingContext.Products);
+                var context = Mock.Create<AsyncHealthcareContext>();
+                Mock.Arrange(() => context.Patients).Returns(backingContext.Patients);
 
-                var actual = await new AsyncProductCatalog(context).FindFeaturedNamesAsync("Hardware");
+                var actual = await new AsyncPatientDirectory(context).FindActiveNamesAsync("Cardiology");
 
-                CollectionAssert.AreEqual(new[] { "Keyboard", "Mouse" }, actual);
+                CollectionAssert.AreEqual(new[] { "Maya Patel", "Olivia Carter" }, actual);
             }
         }
 
         [TestMethod]
-        public async Task ShouldSaveThroughArrangedVirtualContextAsynchronously()
+        public async Task ShouldSavePatientThroughArrangedVirtualContextAsynchronously()
         {
-            using (var backingContext = AsyncCatalogContext.CreateInMemory("MockingDbContextAsync.Save"))
+            using (var backingContext = AsyncHealthcareContext.CreateInMemory("MockingDbContextAsync.Save"))
             {
-                var context = Mock.Create<AsyncCatalogContext>();
-                Mock.Arrange(() => context.Products).Returns(backingContext.Products);
+                var context = Mock.Create<AsyncHealthcareContext>();
+                Mock.Arrange(() => context.Patients).Returns(backingContext.Patients);
                 Mock.Arrange(() => context.SaveChangesAsync(Arg.IsAny<CancellationToken>()))
                     .ReturnsAsync(1)
                     .MustBeCalled();
 
-                var result = await new AsyncProductWriter(context).AddAsync(new AsyncProduct
+                var result = await new AsyncPatientWriter(context).AddAsync(new AsyncPatient
                 {
                     Id = 5,
-                    Name = "Dock",
-                    Category = "Hardware",
-                    IsFeatured = false
+                    Name = "Ava Brooks",
+                    Department = "Pediatrics",
+                    DoctorId = 30,
+                    IsActive = true
                 });
 
                 Assert.AreEqual(1, result);
-                Assert.AreEqual(1, backingContext.Products.Local.Count);
+                Assert.AreEqual(1, backingContext.Patients.Local.Count);
                 Mock.Assert(context);
             }
         }
 
         [TestMethod]
-        public async Task ShouldVerifyAsyncSaveOccurrence()
+        public async Task ShouldVerifyAsyncPatientSaveOccurrence()
         {
-            using (var backingContext = AsyncCatalogContext.CreateInMemory("MockingDbContextAsync.Occurrence"))
+            using (var backingContext = AsyncHealthcareContext.CreateInMemory("MockingDbContextAsync.Occurrence"))
             {
-                var context = Mock.Create<AsyncCatalogContext>();
-                Mock.Arrange(() => context.Products).Returns(backingContext.Products);
+                var context = Mock.Create<AsyncHealthcareContext>();
+                Mock.Arrange(() => context.Patients).Returns(backingContext.Patients);
                 Mock.Arrange(() => context.SaveChangesAsync(Arg.IsAny<CancellationToken>()))
                     .ReturnsAsync(1);
 
-                var writer = new AsyncProductWriter(context);
-                await writer.AddAsync(new AsyncProduct { Id = 6, Name = "Tablet", Category = "Hardware" });
-                await writer.AddAsync(new AsyncProduct { Id = 7, Name = "Planner", Category = "Office" });
+                var writer = new AsyncPatientWriter(context);
+                await writer.AddAsync(new AsyncPatient
+                {
+                    Id = 6,
+                    Name = "Ethan Clark",
+                    Department = "Cardiology",
+                    DoctorId = 10,
+                    IsActive = true
+                });
+                await writer.AddAsync(new AsyncPatient
+                {
+                    Id = 7,
+                    Name = "Sofia Green",
+                    Department = "Neurology",
+                    DoctorId = 20,
+                    IsActive = true
+                });
 
                 Mock.Assert(
                     () => context.SaveChangesAsync(Arg.IsAny<CancellationToken>()),
@@ -82,79 +97,92 @@ namespace JustMock.NonElevatedExamples.AdvancedUsage.MockingDbContextAsync
         }
     }
 
-    public class AsyncCatalogContext : DbContext
+    public class AsyncHealthcareContext : DbContext
     {
-        public AsyncCatalogContext()
+        public AsyncHealthcareContext()
         {
         }
 
-        public AsyncCatalogContext(DbContextOptions<AsyncCatalogContext> options)
+        public AsyncHealthcareContext(DbContextOptions<AsyncHealthcareContext> options)
             : base(options)
         {
         }
 
-        public virtual DbSet<AsyncProduct> Products { get; set; }
+        public virtual DbSet<AsyncPatient> Patients { get; set; }
 
-        public static AsyncCatalogContext CreateInMemory(string databaseName)
+        public virtual DbSet<AsyncDoctor> Doctors { get; set; }
+
+        public static AsyncHealthcareContext CreateInMemory(string databaseName)
         {
-            var options = new DbContextOptionsBuilder<AsyncCatalogContext>()
+            var options = new DbContextOptionsBuilder<AsyncHealthcareContext>()
                 .UseInMemoryDatabase(databaseName)
                 .Options;
-            var context = new AsyncCatalogContext(options);
+            var context = new AsyncHealthcareContext(options);
 
             context.Database.EnsureDeleted();
             return context;
         }
     }
 
-    public class AsyncProductCatalog
+    public class AsyncPatientDirectory
     {
-        private readonly AsyncCatalogContext context;
+        private readonly AsyncHealthcareContext context;
 
-        public AsyncProductCatalog(AsyncCatalogContext context)
+        public AsyncPatientDirectory(AsyncHealthcareContext context)
         {
             this.context = context;
         }
 
-        public async Task<string[]> FindFeaturedNamesAsync(
-            string category,
+        public async Task<string[]> FindActiveNamesAsync(
+            string department,
             CancellationToken cancellationToken = default)
         {
-            return await context.Products
+            return await context.Patients
                 .AsNoTracking()
-                .Where(product => product.Category == category && product.IsFeatured)
-                .OrderBy(product => product.Name)
-                .Select(product => product.Name)
+                .Where(patient => patient.Department == department && patient.IsActive)
+                .OrderBy(patient => patient.Name)
+                .Select(patient => patient.Name)
                 .ToArrayAsync(cancellationToken);
         }
     }
 
-    public class AsyncProductWriter
+    public class AsyncPatientWriter
     {
-        private readonly AsyncCatalogContext context;
+        private readonly AsyncHealthcareContext context;
 
-        public AsyncProductWriter(AsyncCatalogContext context)
+        public AsyncPatientWriter(AsyncHealthcareContext context)
         {
             this.context = context;
         }
 
         public async Task<int> AddAsync(
-            AsyncProduct product,
+            AsyncPatient patient,
             CancellationToken cancellationToken = default)
         {
-            await context.Products.AddAsync(product, cancellationToken);
+            await context.Patients.AddAsync(patient, cancellationToken);
             return await context.SaveChangesAsync(cancellationToken);
         }
     }
 
-    public class AsyncProduct
+    public class AsyncPatient
     {
         public int Id { get; set; }
 
         public string Name { get; set; }
 
-        public string Category { get; set; }
+        public string Department { get; set; }
 
-        public bool IsFeatured { get; set; }
+        public int DoctorId { get; set; }
+
+        public bool IsActive { get; set; }
+    }
+
+    public class AsyncDoctor
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public string Specialty { get; set; }
     }
 }

@@ -7,130 +7,189 @@ using Telerik.JustMock;
 namespace JustMock.NonElevatedExamples.AdvancedUsage.MockingDbContextSeams
 {
     /// <summary>
-    /// JustMock Lite cannot intercept constructors, non-public members, or sealed types.
-    /// An explicit virtual or interface seam keeps the same workflow testable without
-    /// elevated interception.
+    /// JustMock Lite keeps healthcare data access testable through explicit virtual or
+    /// interface seams without elevated interception.
     /// </summary>
     [TestClass]
     public class MockingDbContextSeams_Tests
     {
         [TestMethod]
-        public void ShouldUseVirtualContextSeamForQueries()
+        public void ShouldUseVirtualContextSeamForPatientQueries()
         {
-            using (var backingContext = SeamOrderContext.CreateInMemory("MockingDbContextSeams.Virtual"))
+            using (var backingContext = SeamHealthcareContext.CreateInMemory("MockingDbContextSeams.Virtual"))
             {
-                backingContext.Orders.AddRange(
-                    new SeamOrder { Id = 1, Number = "SO-100", Status = "Closed" },
-                    new SeamOrder { Id = 2, Number = "SO-101", Status = "Open" });
+                backingContext.Patients.AddRange(
+                    new SeamPatient { Id = 1, Name = "Olivia Carter", Department = "Cardiology", IsActive = false },
+                    new SeamPatient { Id = 2, Name = "Liam Turner", Department = "Cardiology", IsActive = true });
                 backingContext.SaveChanges();
 
-                var context = Mock.Create<SeamOrderContext>();
-                Mock.Arrange(() => context.Orders).Returns(backingContext.Orders);
+                var context = Mock.Create<SeamHealthcareContext>();
+                Mock.Arrange(() => context.Patients).Returns(backingContext.Patients);
 
-                var actual = new VirtualOrderReader(context).FindOpenOrder();
+                var actual = new VirtualPatientReader(context).FindActivePatient();
 
                 Assert.IsNotNull(actual);
-                Assert.AreEqual("SO-101", actual.Number);
+                Assert.AreEqual("Liam Turner", actual.Name);
             }
         }
 
         [TestMethod]
-        public void ShouldUseInterfaceContextSeamForWrites()
+        public void ShouldReturnFakePatientCollectionForFutureInstance()
         {
-            using (var backingContext = SeamOrderContext.CreateInMemory("MockingDbContextSeams.Interface"))
+            using (var backingContext = SeamHealthcareContext.CreateInMemory("MockingDbContextSeams.Future"))
             {
-                var context = Mock.Create<ISeamOrderContext>();
-                Mock.Arrange(() => context.Orders).Returns(backingContext.Orders);
+                backingContext.Patients.Add(
+                    new SeamPatient { Id = 4, Name = "Mia Chen", Department = "Neurology", IsActive = true });
+                backingContext.SaveChanges();
+
+                var context = Mock.Create<FuturePatientContext>();
+                Mock.Arrange(() => context.GetPatients())
+                    .IgnoreInstance()
+                    .Returns(backingContext.Patients);
+
+                var actual = new FuturePatientReader(Mock.Create<FuturePatientContext>).GetById(4);
+
+                Assert.AreEqual("Mia Chen", actual.Name);
+            }
+        }
+
+        [TestMethod]
+        public void ShouldUseInterfaceContextSeamForPatientWrites()
+        {
+            using (var backingContext = SeamHealthcareContext.CreateInMemory("MockingDbContextSeams.Interface"))
+            {
+                var context = Mock.Create<ISeamPatientContext>();
+                Mock.Arrange(() => context.Patients).Returns(backingContext.Patients);
                 Mock.Arrange(() => context.SaveChanges())
                     .Returns(1)
                     .MustBeCalled();
 
-                var result = new InterfaceOrderWriter(context).Add(new SeamOrder
+                var result = new InterfacePatientWriter(context).Add(new SeamPatient
                 {
                     Id = 3,
-                    Number = "SO-102",
-                    Status = "Open"
+                    Name = "Noah Williams",
+                    Department = "Pediatrics",
+                    IsActive = true
                 });
 
                 Assert.AreEqual(1, result);
-                Assert.AreEqual(1, backingContext.Orders.Local.Count);
+                Assert.AreEqual(1, backingContext.Patients.Local.Count);
                 Mock.Assert(context);
             }
         }
     }
 
-    public class SeamOrderContext : DbContext
+    public class SeamHealthcareContext : DbContext
     {
-        public SeamOrderContext()
+        public SeamHealthcareContext()
         {
         }
 
-        public SeamOrderContext(DbContextOptions<SeamOrderContext> options)
+        public SeamHealthcareContext(DbContextOptions<SeamHealthcareContext> options)
             : base(options)
         {
         }
 
-        public virtual DbSet<SeamOrder> Orders { get; set; }
+        public virtual DbSet<SeamPatient> Patients { get; set; }
 
-        public static SeamOrderContext CreateInMemory(string databaseName)
+        public virtual DbSet<SeamDoctor> Doctors { get; set; }
+
+        public static SeamHealthcareContext CreateInMemory(string databaseName)
         {
-            var options = new DbContextOptionsBuilder<SeamOrderContext>()
+            var options = new DbContextOptionsBuilder<SeamHealthcareContext>()
                 .UseInMemoryDatabase(databaseName)
                 .Options;
-            var context = new SeamOrderContext(options);
+            var context = new SeamHealthcareContext(options);
 
             context.Database.EnsureDeleted();
             return context;
         }
     }
 
-    public interface ISeamOrderContext
+    public interface ISeamPatientContext
     {
-        DbSet<SeamOrder> Orders { get; }
+        DbSet<SeamPatient> Patients { get; }
 
         int SaveChanges();
     }
 
-    public class VirtualOrderReader
+    public class VirtualPatientReader
     {
-        private readonly SeamOrderContext context;
+        private readonly SeamHealthcareContext context;
 
-        public VirtualOrderReader(SeamOrderContext context)
+        public VirtualPatientReader(SeamHealthcareContext context)
         {
             this.context = context;
         }
 
-        public SeamOrder FindOpenOrder()
+        public SeamPatient FindActivePatient()
         {
-            return context.Orders
-                .Where(order => order.Status == "Open")
-                .OrderBy(order => order.Id)
+            return context.Patients
+                .Where(patient => patient.IsActive)
+                .OrderBy(patient => patient.Id)
                 .FirstOrDefault();
         }
     }
 
-    public class InterfaceOrderWriter
+    public class FuturePatientReader
     {
-        private readonly ISeamOrderContext context;
+        private readonly Func<FuturePatientContext> createContext;
 
-        public InterfaceOrderWriter(ISeamOrderContext context)
+        public FuturePatientReader(Func<FuturePatientContext> createContext)
+        {
+            this.createContext = createContext;
+        }
+
+        public SeamPatient GetById(int patientId)
+        {
+            var context = this.createContext();
+            return context.GetPatients()
+                .Where(patient => patient.Id == patientId)
+                .Single();
+        }
+    }
+
+    public class FuturePatientContext
+    {
+        public virtual IQueryable<SeamPatient> GetPatients()
+        {
+            return null;
+        }
+    }
+
+    public class InterfacePatientWriter
+    {
+        private readonly ISeamPatientContext context;
+
+        public InterfacePatientWriter(ISeamPatientContext context)
         {
             this.context = context;
         }
 
-        public int Add(SeamOrder order)
+        public int Add(SeamPatient patient)
         {
-            context.Orders.Add(order);
+            context.Patients.Add(patient);
             return context.SaveChanges();
         }
     }
 
-    public class SeamOrder
+    public class SeamPatient
     {
         public int Id { get; set; }
 
-        public string Number { get; set; }
+        public string Name { get; set; }
 
-        public string Status { get; set; }
+        public string Department { get; set; }
+
+        public bool IsActive { get; set; }
+    }
+
+    public class SeamDoctor
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public string Specialty { get; set; }
     }
 }

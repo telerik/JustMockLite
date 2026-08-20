@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -8,119 +9,138 @@ namespace JustMock.NonElevatedExamples.AdvancedUsage.MockingDbContext
 {
     /// <summary>
     /// Entity Framework Core contexts expose virtual members that can be arranged with JustMock Lite.
-    /// An in-memory context supplies a real DbSet while the context itself remains isolated from the test.
+    /// An in-memory context supplies a real DbSet while the healthcare data access code remains isolated from the test.
     /// </summary>
     [TestClass]
     public class MockingDbContext_Tests
     {
         [TestMethod]
-        public void ShouldUseArrangedDbSetForQuery()
+        public void ShouldReturnFakePatientCollectionForQuery()
         {
-            using (var backingContext = CatalogContext.CreateInMemory())
+            using (var backingContext = HealthcareContext.CreateInMemory())
             {
-                backingContext.Products.AddRange(
-                    new Product { Id = 1, Name = "Keyboard", Category = "Hardware", IsFeatured = false },
-                    new Product { Id = 2, Name = "Monitor", Category = "Hardware", IsFeatured = true },
-                    new Product { Id = 3, Name = "Notebook", Category = "Office", IsFeatured = true });
+                backingContext.Patients.AddRange(
+                    new Patient { Id = 1, Name = "Olivia Carter", Department = "Cardiology", DoctorId = 10, IsActive = false },
+                    new Patient { Id = 2, Name = "Liam Turner", Department = "Cardiology", DoctorId = 10, IsActive = true },
+                    new Patient { Id = 3, Name = "Mia Chen", Department = "Neurology", DoctorId = 20, IsActive = true });
                 backingContext.SaveChanges();
 
-                var context = Mock.Create<CatalogContext>();
-                Mock.Arrange(() => context.Products).Returns(backingContext.Products);
+                var context = Mock.Create<HealthcareContext>();
+                Mock.Arrange(() => context.Patients).Returns(backingContext.Patients);
 
-                var actual = new ProductCatalog(context).FindFeaturedProduct("Hardware");
+                var actual = new PatientDirectory(context).FindActivePatient("Cardiology");
 
                 Assert.IsNotNull(actual);
-                Assert.AreEqual(2, actual.Id);
+                Assert.AreEqual("Liam Turner", actual.Name);
             }
         }
 
         [TestMethod]
-        public void ShouldArrangeSaveChangesWithoutWritingToDatabase()
+        public void ShouldFakeAddingPatientWithoutWritingToDatabase()
         {
-            using (var backingContext = CatalogContext.CreateInMemory())
+            var context = Mock.Create<HealthcareContext>();
+            var patients = new List<Patient>();
+            var patientSet = Mock.Create<DbSet<Patient>>();
+            var patient = new Patient
             {
-                var context = Mock.Create<CatalogContext>();
-                Mock.Arrange(() => context.Products).Returns(backingContext.Products);
-                Mock.Arrange(() => context.SaveChanges()).Returns(1);
+                Id = 4,
+                Name = "Noah Williams",
+                Department = "Pediatrics",
+                DoctorId = 30,
+                IsActive = true
+            };
 
-                var actual = new ProductWriter(context).Add(new Product
-                {
-                    Id = 4,
-                    Name = "Mouse",
-                    Category = "Hardware"
-                });
+            Mock.Arrange(() => context.Patients).Returns(patientSet);
+            Mock.Arrange(() => patientSet.Add(patient))
+                .DoInstead(() => patients.Add(patient));
+            Mock.Arrange(() => context.SaveChanges()).DoNothing();
 
-                Assert.AreEqual(1, actual);
-                Assert.AreEqual(1, backingContext.Products.Local.Count);
-            }
+            var result = new PatientWriter(context).Add(patient);
+
+            Assert.AreEqual(0, result);
+            Assert.AreEqual(1, patients.Count);
+            Assert.AreSame(patient, patients[0]);
         }
     }
 
-    public class CatalogContext : DbContext
+    public class HealthcareContext : DbContext
     {
-        public CatalogContext()
+        public HealthcareContext()
         {
         }
 
-        public CatalogContext(DbContextOptions<CatalogContext> options)
+        public HealthcareContext(DbContextOptions<HealthcareContext> options)
             : base(options)
         {
         }
 
-        public virtual DbSet<Product> Products { get; set; }
+        public virtual DbSet<Patient> Patients { get; set; }
 
-        public static CatalogContext CreateInMemory()
+        public virtual DbSet<Doctor> Doctors { get; set; }
+
+        public static HealthcareContext CreateInMemory()
         {
-            var options = new DbContextOptionsBuilder<CatalogContext>()
+            var options = new DbContextOptionsBuilder<HealthcareContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
                 .Options;
 
-            return new CatalogContext(options);
+            return new HealthcareContext(options);
         }
     }
 
-    public class ProductCatalog
+    public class PatientDirectory
     {
-        private readonly CatalogContext context;
+        private readonly HealthcareContext context;
 
-        public ProductCatalog(CatalogContext context)
+        public PatientDirectory(HealthcareContext context)
         {
             this.context = context;
         }
 
-        public Product FindFeaturedProduct(string category)
+        public Patient FindActivePatient(string department)
         {
-            return this.context.Products
-                .Where(product => product.Category == category && product.IsFeatured)
-                .OrderBy(product => product.Id)
+            return this.context.Patients
+                .Where(patient => patient.Department == department && patient.IsActive)
+                .OrderBy(patient => patient.Id)
                 .FirstOrDefault();
         }
     }
 
-    public class ProductWriter
+    public class PatientWriter
     {
-        private readonly CatalogContext context;
+        private readonly HealthcareContext context;
 
-        public ProductWriter(CatalogContext context)
+        public PatientWriter(HealthcareContext context)
         {
             this.context = context;
         }
 
-        public int Add(Product product)
+        public int Add(Patient patient)
         {
-            this.context.Products.Add(product);
+            this.context.Patients.Add(patient);
             return this.context.SaveChanges();
         }
     }
 
-    public class Product
+    public class Patient
     {
         public int Id { get; set; }
 
         public string Name { get; set; }
 
-        public string Category { get; set; }
+        public string Department { get; set; }
 
-        public bool IsFeatured { get; set; }
+        public int DoctorId { get; set; }
+
+        public bool IsActive { get; set; }
+    }
+
+    public class Doctor
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public string Specialty { get; set; }
     }
 }
