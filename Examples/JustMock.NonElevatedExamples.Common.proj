@@ -10,6 +10,18 @@
     <PackageReference Include="MSTest.TestFramework" Version="3.6.4" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.8" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' != '' And '$(TargetFramework)' != 'net8.0'">
+    <Compile Remove="AdvancedUsage\MockingDbContext.cs" />
+    <Compile Remove="AdvancedUsage\MockingDbSetQueries.cs" />
+    <Compile Remove="AdvancedUsage\MockingDbContextAsync.cs" />
+    <Compile Remove="AdvancedUsage\MockingDbContextSeams.cs" />
+  </ItemGroup>
+
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
     <Reference Include="Telerik.JustMock">
       <HintPath>$(JustmockBinaryPath)\Telerik.JustMock.dll</HintPath>
