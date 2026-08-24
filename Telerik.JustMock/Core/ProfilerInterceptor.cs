@@ -148,6 +148,37 @@ namespace Telerik.JustMock.Core
             }
         }
 
+        private static bool InterceptBaseCtorCall(object instance, RuntimeTypeHandle typeHandle, RuntimeMethodHandle methodHandle, object[] data)
+        {
+            if (!IsInterceptionEnabled || isFinalizerThread)
+                return true; // call original
+
+            try
+            {
+                ReentrancyCounter++;
+
+                var method = MethodBase.GetMethodFromHandle(methodHandle, typeHandle);
+                if (method.DeclaringType == null)
+                    return true;
+
+#if DEBUG
+                ProfilerLogger.Info("*** +++ [MANAGED] Intercepting base ctor call for {0}.{1}", method.DeclaringType.Name, method.Name);
+#endif
+
+                var invocation = new Invocation(instance, method, data ?? new object[0]);
+
+                if (DispatchInvocation(invocation))
+                {
+                    return invocation.CallOriginal;
+                }
+                return true; // no arrangement found, call original
+            }
+            finally
+            {
+                ReentrancyCounter--;
+            }
+        }
+
         static ProfilerInterceptor()
         {
 #if !LITE_EDITION
@@ -260,6 +291,14 @@ namespace Telerik.JustMock.Core
                     Func<RuntimeTypeHandle, RuntimeMethodHandle, object[], object> interceptNewobjAsAction = InterceptNewobj;
                     var interceptNewobjDelegate = Delegate.CreateDelegate(processNewobjType, interceptNewobjAsAction.Method);
                     bridge.GetField("ProcessNewobj").SetValue(null, interceptNewobjDelegate);
+
+                    var processBaseCtorCallType = typeof(object).Assembly.GetType("Telerik.JustMock.ProcessBaseCtorCallDelegate");
+                    if (processBaseCtorCallType != null)
+                    {
+                        Func<object, RuntimeTypeHandle, RuntimeMethodHandle, object[], bool> interceptBaseCtorCallFunc = InterceptBaseCtorCall;
+                        var interceptBaseCtorCallDelegate = Delegate.CreateDelegate(processBaseCtorCallType, interceptBaseCtorCallFunc.Method);
+                        bridge.GetField("ProcessBaseCtorCall").SetValue(null, interceptBaseCtorCallDelegate);
+                    }
 
                     var arrangedTypesField = bridge.GetField("ArrangedTypesArray");
                     arrangedTypesField.SetValue(null, arrangedTypesArray);
