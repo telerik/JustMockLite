@@ -226,6 +226,19 @@ namespace Telerik.JustMock
         /// <summary>
         /// Arranges the base constructor of <typeparamref name="TBase"/> matching the specified arguments.
         /// </summary>
+        /// <typeparam name="TBase">The base class whose constructor to arrange. Must be a non-sealed reference type.</typeparam>
+        /// <param name="arg1">First argument value or matcher.</param>
+        /// <param name="arg2">Second argument value or matcher.</param>
+        /// <param name="arg3">Third argument value or matcher.</param>
+        /// <param name="arg4">Fourth argument value or matcher.</param>
+        /// <param name="arg5">Fifth argument value or matcher.</param>
+        /// <param name="arg6">Sixth argument value or matcher.</param>
+        /// <param name="arg7">Seventh argument value or matcher.</param>
+        /// <param name="arg8">Eighth argument value or matcher.</param>
+        /// <returns>Reference to <see cref="ActionExpectation"/> to set up the mock behavior.</returns>
+        /// <remarks>Requires the JustMock profiler. The arrangement applies globally.</remarks>
+        /// <exception cref="ElevatedMockingException">Thrown when the profiler is not attached.</exception>
+        /// <exception cref="MockException">Thrown on invalid type or unresolvable constructor overload.</exception>
         public static ActionExpectation ArrangeBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7, object arg8) where TBase : class
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -501,6 +514,13 @@ namespace Telerik.JustMock
             if (to == typeof(float) && (from == typeof(int)))
                 return true;
             if (to == typeof(decimal) && (from == typeof(int) || from == typeof(long)))
+                return true;
+            // Unsigned numeric promotions
+            if (to == typeof(ulong) && (from == typeof(uint) || from == typeof(ushort) || from == typeof(byte)))
+                return true;
+            if (to == typeof(uint) && (from == typeof(ushort) || from == typeof(byte)))
+                return true;
+            if (to == typeof(ushort) && from == typeof(byte))
                 return true;
             return false;
         }
