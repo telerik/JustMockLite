@@ -545,7 +545,11 @@ namespace Telerik.JustMock
             {
                 ProfilerInterceptor.RequestReJit(ctor);
             }
-            return repo.Arrange(null, ctor, args, () => new ActionExpectation());
+            var expectation = repo.Arrange(null, ctor, args, () => new ActionExpectation());
+            // Mark as a base-ctor arrangement so dispatch only fires from InterceptBaseCtorCall,
+            // not from normal body interception when CallOriginal() lets the ctor body run.
+            ((IMethodMock)expectation).IsBaseCtorInterception = true;
+            return expectation;
         }
     }
 }

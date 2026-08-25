@@ -166,6 +166,7 @@ namespace Telerik.JustMock.Core
 #endif
 
                 var invocation = new Invocation(instance, method, data ?? new object[0]);
+                invocation.IsBaseCtorCall = true;
 
                 if (DispatchInvocation(invocation))
                 {
