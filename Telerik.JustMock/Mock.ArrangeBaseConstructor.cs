@@ -38,7 +38,7 @@ namespace Telerik.JustMock
         /// non-virtual and can only be intercepted at the IL level.</para>
         /// <para>The arrangement applies globally to all call sites of the specified constructor,
         /// regardless of which derived type triggers it.</para>
-        /// <para>When <see cref="ActionExpectation.DoNothing"/> is used to suppress the base constructor body,
+        /// <para>When <see cref="ActionExpectation"/> is used with <c>DoNothing()</c> to suppress the base constructor body,
         /// any further constructors chained from within that body (e.g. grandparent constructors) are also
         /// not executed, as they are only reachable through the suppressed body.</para>
         /// </remarks>
