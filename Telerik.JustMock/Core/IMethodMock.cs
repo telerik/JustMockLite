@@ -32,6 +32,7 @@ namespace Telerik.JustMock.Core
         bool IsSequential { get; set; }
         bool IsInOrder { get; set; }
         bool IsUsed { get; set; }
+        bool IsBaseCtorInterception { get; set; }
         ImplementationOverrideBehavior AcceptCondition { get; set; }
     }
 }

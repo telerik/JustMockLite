@@ -1707,7 +1707,11 @@ namespace Telerik.JustMock.Core
 
             var methodMock = DispatchInvocationToArrangements(callPattern, invocation);
 
-            if (!invocation.InArrange && !invocation.InAssertSet)
+            // Do not record occurrence for body-path invocations of base-ctor arrangements.
+            // When CallOriginal() is set, the profiler runs the actual base ctor body which
+            // triggers a second InterceptCall — we must not count that as a separate invocation.
+            bool shouldRecordOccurrence = !(methodMock != null && methodMock.IsBaseCtorInterception && !invocation.IsBaseCtorCall);
+            if (!invocation.InArrange && !invocation.InAssertSet && shouldRecordOccurrence)
             {
                 funcRoot.AddOrUpdateOccurence(callPattern, methodMock);
             }
@@ -1757,7 +1761,7 @@ namespace Telerik.JustMock.Core
         {
             var behaviorsToExecute = new List<IBehavior>();
 
-            var behaviorTypesToSkip = GetBehaviorTypesToSkip(invocation);
+            var behaviorTypesToSkip = GetBehaviorTypesToSkip(invocation, methodMock);
             behaviorsToExecute.AddRange(
                 methodMock.Behaviors.Where(behavior => !behaviorTypesToSkip.Contains(behavior.GetType())));
 
@@ -1782,11 +1786,19 @@ namespace Telerik.JustMock.Core
             return behaviorsToExecute;
         }
 
-        private static List<Type> GetBehaviorTypesToSkip(Invocation invocation)
+        private static List<Type> GetBehaviorTypesToSkip(Invocation invocation, IMethodMock methodMock = null)
         {
             var behaviorTypesToSkip = new List<Type>();
 
             if (invocation.InAssertSet)
+            {
+                behaviorTypesToSkip.Add(typeof(InvocationOccurrenceBehavior));
+            }
+
+            // When a base-ctor arrangement is dispatched from the normal body-intercept path
+            // (not from InterceptBaseCtorCall), skip occurrence counting to prevent double-counting.
+            // The arrangement's CallOriginal/DoNothing/Throws behaviors still execute normally.
+            if (methodMock != null && methodMock.IsBaseCtorInterception && !invocation.IsBaseCtorCall)
             {
                 behaviorTypesToSkip.Add(typeof(InvocationOccurrenceBehavior));
             }
