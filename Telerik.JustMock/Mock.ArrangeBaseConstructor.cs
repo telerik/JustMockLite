@@ -38,6 +38,9 @@ namespace Telerik.JustMock
         /// non-virtual and can only be intercepted at the IL level.</para>
         /// <para>The arrangement applies globally to all call sites of the specified constructor,
         /// regardless of which derived type triggers it.</para>
+        /// <para>When <see cref="ActionExpectation.DoNothing"/> is used to suppress the base constructor body,
+        /// any further constructors chained from within that body (e.g. grandparent constructors) are also
+        /// not executed, as they are only reachable through the suppressed body.</para>
         /// </remarks>
         /// <exception cref="ElevatedMockingException">Thrown when the profiler is not attached.</exception>
         /// <exception cref="MockException">Thrown when <typeparamref name="TBase"/> is sealed or a value type,
@@ -103,6 +106,14 @@ namespace Telerik.JustMock
         /// <summary>
         /// Arranges the base constructor of <typeparamref name="TBase"/> matching the specified arguments.
         /// </summary>
+        /// <typeparam name="TBase">The base class whose constructor to arrange. Must be a non-sealed reference type.</typeparam>
+        /// <param name="arg1">First argument value or matcher.</param>
+        /// <param name="arg2">Second argument value or matcher.</param>
+        /// <param name="arg3">Third argument value or matcher.</param>
+        /// <returns>Reference to <see cref="ActionExpectation"/> to set up the mock behavior.</returns>
+        /// <remarks>Requires the JustMock profiler. The arrangement applies globally.</remarks>
+        /// <exception cref="ElevatedMockingException">Thrown when the profiler is not attached.</exception>
+        /// <exception cref="MockException">Thrown on invalid type or unresolvable constructor overload.</exception>
         public static ActionExpectation ArrangeBaseConstructor<TBase>(object arg1, object arg2, object arg3) where TBase : class
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -117,6 +128,15 @@ namespace Telerik.JustMock
         /// <summary>
         /// Arranges the base constructor of <typeparamref name="TBase"/> matching the specified arguments.
         /// </summary>
+        /// <typeparam name="TBase">The base class whose constructor to arrange. Must be a non-sealed reference type.</typeparam>
+        /// <param name="arg1">First argument value or matcher.</param>
+        /// <param name="arg2">Second argument value or matcher.</param>
+        /// <param name="arg3">Third argument value or matcher.</param>
+        /// <param name="arg4">Fourth argument value or matcher.</param>
+        /// <returns>Reference to <see cref="ActionExpectation"/> to set up the mock behavior.</returns>
+        /// <remarks>Requires the JustMock profiler. The arrangement applies globally.</remarks>
+        /// <exception cref="ElevatedMockingException">Thrown when the profiler is not attached.</exception>
+        /// <exception cref="MockException">Thrown on invalid type or unresolvable constructor overload.</exception>
         public static ActionExpectation ArrangeBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4) where TBase : class
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -131,6 +151,16 @@ namespace Telerik.JustMock
         /// <summary>
         /// Arranges the base constructor of <typeparamref name="TBase"/> matching the specified arguments.
         /// </summary>
+        /// <typeparam name="TBase">The base class whose constructor to arrange. Must be a non-sealed reference type.</typeparam>
+        /// <param name="arg1">First argument value or matcher.</param>
+        /// <param name="arg2">Second argument value or matcher.</param>
+        /// <param name="arg3">Third argument value or matcher.</param>
+        /// <param name="arg4">Fourth argument value or matcher.</param>
+        /// <param name="arg5">Fifth argument value or matcher.</param>
+        /// <returns>Reference to <see cref="ActionExpectation"/> to set up the mock behavior.</returns>
+        /// <remarks>Requires the JustMock profiler. The arrangement applies globally.</remarks>
+        /// <exception cref="ElevatedMockingException">Thrown when the profiler is not attached.</exception>
+        /// <exception cref="MockException">Thrown on invalid type or unresolvable constructor overload.</exception>
         public static ActionExpectation ArrangeBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4, object arg5) where TBase : class
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -145,6 +175,17 @@ namespace Telerik.JustMock
         /// <summary>
         /// Arranges the base constructor of <typeparamref name="TBase"/> matching the specified arguments.
         /// </summary>
+        /// <typeparam name="TBase">The base class whose constructor to arrange. Must be a non-sealed reference type.</typeparam>
+        /// <param name="arg1">First argument value or matcher.</param>
+        /// <param name="arg2">Second argument value or matcher.</param>
+        /// <param name="arg3">Third argument value or matcher.</param>
+        /// <param name="arg4">Fourth argument value or matcher.</param>
+        /// <param name="arg5">Fifth argument value or matcher.</param>
+        /// <param name="arg6">Sixth argument value or matcher.</param>
+        /// <returns>Reference to <see cref="ActionExpectation"/> to set up the mock behavior.</returns>
+        /// <remarks>Requires the JustMock profiler. The arrangement applies globally.</remarks>
+        /// <exception cref="ElevatedMockingException">Thrown when the profiler is not attached.</exception>
+        /// <exception cref="MockException">Thrown on invalid type or unresolvable constructor overload.</exception>
         public static ActionExpectation ArrangeBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4, object arg5, object arg6) where TBase : class
         {
             return ProfilerInterceptor.GuardInternal(() =>
@@ -159,6 +200,18 @@ namespace Telerik.JustMock
         /// <summary>
         /// Arranges the base constructor of <typeparamref name="TBase"/> matching the specified arguments.
         /// </summary>
+        /// <typeparam name="TBase">The base class whose constructor to arrange. Must be a non-sealed reference type.</typeparam>
+        /// <param name="arg1">First argument value or matcher.</param>
+        /// <param name="arg2">Second argument value or matcher.</param>
+        /// <param name="arg3">Third argument value or matcher.</param>
+        /// <param name="arg4">Fourth argument value or matcher.</param>
+        /// <param name="arg5">Fifth argument value or matcher.</param>
+        /// <param name="arg6">Sixth argument value or matcher.</param>
+        /// <param name="arg7">Seventh argument value or matcher.</param>
+        /// <returns>Reference to <see cref="ActionExpectation"/> to set up the mock behavior.</returns>
+        /// <remarks>Requires the JustMock profiler. The arrangement applies globally.</remarks>
+        /// <exception cref="ElevatedMockingException">Thrown when the profiler is not attached.</exception>
+        /// <exception cref="MockException">Thrown on invalid type or unresolvable constructor overload.</exception>
         public static ActionExpectation ArrangeBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7) where TBase : class
         {
             return ProfilerInterceptor.GuardInternal(() =>
