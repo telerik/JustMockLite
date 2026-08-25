@@ -1106,7 +1106,7 @@ namespace Telerik.JustMock.Core
         {
             using (MockingContext.BeginFailureAggregation(message))
             {
-                CallPattern callPattern = CallPatternCreator.FromMethodBase(instance, method, arguments);
+                CallPattern callPattern = CallPatternCreator.FromMethodBase(this, instance, method, arguments);
                 AssertForCallPattern(callPattern, null, occurs);
             }
         }
@@ -1139,7 +1139,7 @@ namespace Telerik.JustMock.Core
 
         internal int GetTimesCalledFromMethodInfo(object instance, MethodBase method, object[] arguments)
         {
-            var callPattern = CallPatternCreator.FromMethodBase(instance, method, arguments);
+            var callPattern = CallPatternCreator.FromMethodBase(this, instance, method, arguments);
             int callsCount;
             CountMethodMockInvocations(callPattern, null, out callsCount);
             return callsCount;
