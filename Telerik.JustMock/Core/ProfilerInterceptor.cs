@@ -299,6 +299,12 @@ namespace Telerik.JustMock.Core
                         var interceptBaseCtorCallDelegate = Delegate.CreateDelegate(processBaseCtorCallType, interceptBaseCtorCallFunc.Method);
                         bridge.GetField("ProcessBaseCtorCall").SetValue(null, interceptBaseCtorCallDelegate);
                     }
+#if DEBUG
+                    else
+                    {
+                        Debug.WriteLine("[JustMock] ProcessBaseCtorCallDelegate not found in profiler bridge — base constructor interception is disabled. Ensure the profiler DLL matches the managed assembly version.");
+                    }
+#endif
 
                     var arrangedTypesField = bridge.GetField("ArrangedTypesArray");
                     arrangedTypesField.SetValue(null, arrangedTypesArray);
