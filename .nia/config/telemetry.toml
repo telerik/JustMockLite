@@ -1,0 +1,9 @@
+[consent]
+notice_shown = true
+notice_shown_date = "2026-08-31T12:12:36.494017900+00:00"
+notice_shown_by = "nia"
+consented = true
+opted_out = false
+consent_date = "2026-08-31T12:12:36.494019300+00:00"
+consent_phrase = "i agree"
+consented_by = "nia"

@@ -155,3 +155,10 @@ $RECYCLE.BIN/
 
 # Mac crap
 .DS_Store
+
+# Nia
+/.nia/work
+/.nia/context.toml
+/.nia/logs
+/.nia/.config_lock
+/.nia/.config.lock
