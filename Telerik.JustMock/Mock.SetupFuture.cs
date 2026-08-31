@@ -32,7 +32,12 @@ namespace Telerik.JustMock
         /// </summary>
         /// <remarks>
         /// This method requires the JustMock profiler (CodeWeaver). It is not available in JustMock Lite.
-        /// Constructors are not intercepted; use <c>Mock.Arrange(() => new T()).DoNothing()</c> for constructor mocking.
+        /// Like <see cref="SetupStatic{T}()"/>, this call enables wholesale interception of all members
+        /// of <typeparamref name="T"/>, including constructors. When using the default
+        /// <see cref="Behavior.RecursiveLoose"/> behavior, constructor bodies do not execute — fields
+        /// will not be initialized by the constructor. Use <see cref="Behavior.CallOriginal"/> if
+        /// constructor execution is required, or arrange the constructor explicitly with
+        /// <c>Mock.Arrange(() => new T()).CallOriginal()</c>.
         /// Per-method arrangements made after this call take precedence over the class-level default.
         /// </remarks>
         /// <typeparam name="T">Target type to future-mock.</typeparam>
@@ -51,7 +56,11 @@ namespace Telerik.JustMock
         /// </summary>
         /// <remarks>
         /// This method requires the JustMock profiler (CodeWeaver). It is not available in JustMock Lite.
-        /// Constructors are not intercepted; use <c>Mock.Arrange(() => new T()).DoNothing()</c> for constructor mocking.
+        /// Like <see cref="SetupStatic{T}()"/>, this call enables wholesale interception of all members
+        /// of <typeparamref name="T"/>, including constructors. When using <see cref="Behavior.RecursiveLoose"/>
+        /// or <see cref="Behavior.Loose"/> behavior, constructor bodies do not execute — fields will not be
+        /// initialized by the constructor. Use <see cref="Behavior.CallOriginal"/> if constructor execution
+        /// is required, or arrange the constructor explicitly with <c>Mock.Arrange(() => new T()).CallOriginal()</c>.
         /// Per-method arrangements made after this call take precedence over the class-level default.
         /// </remarks>
         /// <typeparam name="T">Target type to future-mock.</typeparam>
@@ -71,6 +80,14 @@ namespace Telerik.JustMock
         /// Sets up future mocking for all instance members of the specified type
         /// with <see cref="Behavior.RecursiveLoose"/> behavior.
         /// </summary>
+        /// <remarks>
+        /// This method requires the JustMock profiler (CodeWeaver). It is not available in JustMock Lite.
+        /// Like <see cref="SetupStatic(Type)"/>, this call enables wholesale interception of all members
+        /// of <paramref name="type"/>, including constructors. Constructor bodies do not execute under the
+        /// default <see cref="Behavior.RecursiveLoose"/> behavior. Use <see cref="Behavior.CallOriginal"/>
+        /// if constructor execution is required.
+        /// Per-method arrangements made after this call take precedence over the class-level default.
+        /// </remarks>
         /// <param name="type">Target type to future-mock.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="type"/> is <c>null</c>.</exception>
         public static void SetupFuture(Type type)
@@ -89,6 +106,14 @@ namespace Telerik.JustMock
         /// Sets up future mocking for all instance members of the specified type
         /// with the specified behavior.
         /// </summary>
+        /// <remarks>
+        /// This method requires the JustMock profiler (CodeWeaver). It is not available in JustMock Lite.
+        /// Like <see cref="SetupStatic(Type)"/>, this call enables wholesale interception of all members
+        /// of <paramref name="type"/>, including constructors. Constructor bodies do not execute under
+        /// <see cref="Behavior.RecursiveLoose"/> or <see cref="Behavior.Loose"/> behavior. Use
+        /// <see cref="Behavior.CallOriginal"/> if constructor execution is required.
+        /// Per-method arrangements made after this call take precedence over the class-level default.
+        /// </remarks>
         /// <param name="type">Target type to future-mock.</param>
         /// <param name="behavior">
         /// Specifies behavior of the mock. Default is <see cref="Behavior.RecursiveLoose"/>.
