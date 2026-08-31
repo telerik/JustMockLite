@@ -1,0 +1,54 @@
+schema_version = "1.0.0"
+
+[project]
+name = "JustMockLite"
+description = "Project description"
+language = "Rust"  # Change to your primary language
+framework = "None"  # Update with your framework (e.g., "actix-web", "axum")
+testing_framework = "cargo test"
+package_manager = "cargo"
+
+[beta_consent]
+acknowledged = true
+acknowledgement_date = "2026-08-31T12:12:34.189752600+00:00"
+acknowledged_by = "nia"
+version_at_consent = "4.4.0"
+consent_phrase = "i agree"
+
+# Uncomment and configure for monorepo
+# [monorepo]
+# enabled = true
+#
+# [[monorepo.services]]
+# name = "service-a"
+# path = "services/service-a"
+
+# Context files and directories
+#
+# Files and directories listed here are always included as context for AI prompts.
+# This is useful for architecture docs, coding standards, or API specifications.
+#
+# [[project.context]]
+# type = "file"
+# path = "docs/architecture.md"
+# description = "System architecture overview"
+#
+# [[project.context]]
+# type = "directory"
+# path = "docs/standards/"
+# description = "Coding standards and guidelines"
+
+# Commit behavior configuration
+#
+# Controls how nia handles git commits during code generation tasks.
+#
+# Options:
+#   - "enabled" (default): Include basic commit instructions in prompts
+#   - "tagged": Include commit instructions with nia co-author attribution
+#   - "disabled": Do not include any commit instructions (you handle commits manually)
+#
+# Note: This is a global override. To configure commit behavior per command,
+#       use the agents.toml file (see comments in that file for examples).
+#
+# [commit]
+# behavior = "enabled"
