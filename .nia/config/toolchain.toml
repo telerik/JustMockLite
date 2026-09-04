@@ -1,0 +1,129 @@
+# Nia toolchain configuration
+# This file tells AI agents what tools are available and how to access them
+#
+# To switch access methods for a tool:
+#   1. Comment out the current 'description' field (add # prefix to each line)
+#   2. Uncomment your preferred method's description block
+#   3. Update the 'method' field to match the new method
+schema_version = "1.0.0"
+
+# Issue tracker configuration
+[issue_tracker]
+name = "jira"
+type = "built-in"
+method = "skill"  # Options: "cli", "mcp", "api", "skill" (default)
+description = """
+When retrieving or reading issues from JIRA, use the "{{issue_tracker_skill_name}}" skill.
+This skill provides guidance on JQL queries, field navigation, authentication,
+and JIRA-specific best practices including checking comments and attachments.
+"""
+
+# [CLI Method]:
+# description = """
+# JIRA for agile project management and issue tracking.
+# Access via Atlassian CLI (`acli jira` command).
+# The Atlassian CLI must be installed and configured separately.
+# Common operations:
+# - View issue: acli jira workitem view {{issue_id}}
+# - Edit issue: acli jira workitem edit {{issue_id}}
+# """
+
+# [MCP Method]:
+# description = """
+# JIRA for agile project management and issue tracking.
+# Access via JIRA MCP Server (if available).
+# The MCP server provides tools for managing JIRA issues, sprints, and boards.
+# All authentication is handled by the MCP server configuration.
+# """
+
+# [API Method]:
+# description = """
+# JIRA for agile project management and issue tracking.
+# Access via JIRA REST API.
+#
+# Authentication: API token required
+# - Environment variable: NIA_ISSUE_TOKEN
+# - Scope: Read and write access to JIRA issues
+# - Management: User-managed; set externally before running Nia
+# - Security: Nia does not inject tokens into logs, traces, or prompts
+#
+# The Coding Agent will read this token dynamically when making API calls.
+#
+# Common operations:
+# - List issues: GET /rest/api/2/search?jql=<query>
+# - View issue: GET /rest/api/2/issue/{{issue_id}}
+# - Create issue: POST /rest/api/2/issue
+# - Update issue: PUT /rest/api/2/issue/{{issue_id}}
+# """
+
+# Code platform configuration
+[code_platform]
+name = "github"
+type = "built-in"
+method = "skill"  # Options: "cli", "mcp", "api", "skill" (default)
+description = """
+When retrieving or reading pull requests from the code platform, use the "{{code_platform_skill_name}}" skill.
+This skill provides guidance on PR navigation, review status, diff inspection,
+and code platform best practices.
+"""
+
+# [CLI Method]:
+# description = """
+# GitHub for code hosting and collaboration.
+# Access via 'gh' CLI commands.
+#
+# {{#if code_platform_repo_slug}}Repository: {{code_platform_repo_slug}}
+#
+# Common operations (repository configured — use --repo flag):
+# - Create PR: gh pr create --title "..." --body "..." --repo {{code_platform_repo_slug}}
+# - View PR: gh pr view {{pr_id}} --repo {{code_platform_repo_slug}}
+# - List PRs: gh pr list --repo {{code_platform_repo_slug}}
+# - Review PR: gh pr review {{pr_id}} --repo {{code_platform_repo_slug}}
+# - Merge PR: gh pr merge {{pr_id}} --repo {{code_platform_repo_slug}}
+# - View repo: gh repo view --repo {{code_platform_repo_slug}}
+# {{/if}}
+# {{#unless code_platform_repo_slug}}Common operations:
+# - Create PR: gh pr create --title "..." --body "..."
+# - View PR: gh pr view {{pr_id}}
+# - List PRs: gh pr list
+# - Review PR: gh pr review {{pr_id}}
+# - Merge PR: gh pr merge {{pr_id}}
+# - View repo: gh repo view
+# {{/unless}}
+# """
+
+# [MCP Method]:
+# description = """
+# GitHub for code hosting and collaboration.
+# Access via GitHub MCP Server.
+# The MCP server provides comprehensive tools for repository operations including pull requests, code reviews, branches, and commits.
+# All authentication is handled by the MCP server configuration.
+# """
+
+# [API Method]:
+# description = """
+# GitHub for code hosting and collaboration.
+# Access via GitHub REST API.
+#
+# Authentication: API token required
+# - Environment variable: NIA_CODE_TOKEN
+# - Scope: Read and write access to repositories, pull requests, and code
+# - Management: User-managed; set externally before running Nia
+# - Security: Nia does not inject tokens into logs, traces, or prompts
+#
+# The Coding Agent will read this token dynamically when making API calls.
+#
+# Repository placeholders: {{code_platform_repo_owner}}/{{code_platform_repo_name}}
+#
+# Common operations:
+# - List PRs: GET /repos/{{code_platform_repo_owner}}/{{code_platform_repo_name}}/pulls
+# - View PR: GET /repos/{{code_platform_repo_owner}}/{{code_platform_repo_name}}/pulls/{{pr_id}}
+# - Create PR: POST /repos/{{code_platform_repo_owner}}/{{code_platform_repo_name}}/pulls
+# - Update PR: PATCH /repos/{{code_platform_repo_owner}}/{{code_platform_repo_name}}/pulls/{{pr_id}}
+# - Merge PR: PUT /repos/{{code_platform_repo_owner}}/{{code_platform_repo_name}}/pulls/{{pr_id}}/merge
+# - List commits: GET /repos/{{code_platform_repo_owner}}/{{code_platform_repo_name}}/commits
+# - Get repo: GET /repos/{{code_platform_repo_owner}}/{{code_platform_repo_name}}
+#
+# Note: When repository placeholders are empty (not configured), use auto-detected repository information from Git remote.
+# """
+
