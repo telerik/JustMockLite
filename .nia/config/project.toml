@@ -7,6 +7,7 @@ language = "C#"
 framework = ".NET"
 testing_framework = "MSTest, NUnit, xUnit"
 package_manager = "NuGet"
+allow_app = "b66a541a-02ad-4431-bd0f-2d11cfb10ce9"
 
 # Uncomment and configure for monorepo
 # [monorepo]
