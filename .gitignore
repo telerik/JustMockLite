@@ -161,4 +161,4 @@ $RECYCLE.BIN/
 /.nia/context.toml
 /.nia/logs
 /.nia/.config_lock
-/.nia/.context.lock
+/.nia/*.lock
