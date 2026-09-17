@@ -23,23 +23,23 @@ This skill guides you through retrieving and reading JIRA issues.
 
 ```bash
 # View issue by key
-acli jira --action getIssue --issue PROJECT-123
+acli jira workitem view PROJECT-123
 
 # Get issue with all fields
-acli jira --action getIssue --issue PROJECT-123 --outputFormat 2
+acli jira workitem view PROJECT-123 --fields "*all" --json
 ```
 
 ### List Issues with JQL
 
 ```bash
 # Find issues in project
-acli jira --action getIssueList --jql "project = PROJECT"
+acli jira workitem search --jql "project = PROJECT" --paginate
 
 # Find assigned issues
-acli jira --action getIssueList --jql "assignee = currentUser()"
+acli jira workitem search --jql "assignee = currentUser()" --paginate
 
 # Find by status
-acli jira --action getIssueList --jql "status = 'In Progress'"
+acli jira workitem search --jql "status = 'In Progress'" --paginate
 ```
 
 ## API Access
@@ -70,10 +70,10 @@ GET /rest/api/2/search?jql=project=PROJECT
 
 ```bash
 # Get issue with comments
-acli jira --action getIssue --issue PROJECT-123 --comment
+acli jira workitem view PROJECT-123 --fields "summary,description,comment" --json
 
 # Get attachments list
-acli jira --action getAttachmentList --issue PROJECT-123
+acli jira workitem attachment list --key PROJECT-123 --json
 ```
 
 ## Placeholders

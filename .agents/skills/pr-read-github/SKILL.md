@@ -98,22 +98,24 @@ local branches or assume that the target branch is `main`.
 
 ```bash
 # Retrieve the PR's source and target branches, commit IDs, merge state, and review decision.
-gh pr view 123 --json baseRefName,baseRefOid,headRefName,headRefOid,mergeable,mergeStateStatus,reviewDecision,body
+gh pr view 123 --repo {{code_platform_repo_slug}} --json baseRefName,baseRefOid,headRefName,headRefOid,mergeable,mergeStateStatus,reviewDecision,body
 
 # Retrieve review summaries and conversation comments.
-gh pr view 123 --comments --json reviews,comments
+gh pr view 123 --repo {{code_platform_repo_slug}} --comments --json reviews,comments
 
-# Retrieve inline review comments, including comments from Copilot.
+# Retrieve every inline review comment, including replies and comments from Copilot.
 gh api --paginate repos/{{code_platform_repo_slug}}/pulls/123/comments
 
-# Retrieve every review thread and its resolved/outdated state. Replace OWNER and REPOSITORY
-# with the two components of {{code_platform_repo_slug}}.
-gh api graphql --paginate -f query='query($owner:String!, $repo:String!, $number:Int!, $endCursor:String) { repository(owner:$owner, name:$repo) { pullRequest(number:$number) { reviewThreads(first:100, after:$endCursor) { nodes { id isResolved isOutdated comments(first:100) { nodes { author { login } body path line originalLine url } } } pageInfo { hasNextPage endCursor } } } } }' -F owner=OWNER -F repo=REPOSITORY -F number=123
+# Retrieve every review thread's resolved/outdated state. The first comment ID and URL
+# correlate the thread with the complete, separately paginated REST inventory above.
+gh api graphql --paginate -f query='query($owner:String!, $repo:String!, $number:Int!, $endCursor:String) { repository(owner:$owner, name:$repo) { pullRequest(number:$number) { reviewThreads(first:100, after:$endCursor) { nodes { id isResolved isOutdated comments(first:1) { nodes { databaseId url } } } pageInfo { hasNextPage endCursor } } } } }' -F owner=OWNER -F repo=REPOSITORY -F number=123
 ```
 
-Use the actual PR number and repository slug in every command. Follow pagination until
-there are no additional results. Include Copilot review summaries and inline comments,
-human review comments, conversation comments, and unresolved review threads in the review.
+Use the actual PR number and repository slug in every command. The paginated REST request
+is the authoritative inline-comment inventory; the GraphQL request adds thread state and
+uses each root comment to correlate the results. Include Copilot review summaries and
+inline comments, human review comments, conversation comments, and unresolved review
+threads in the review.
 
 For every actionable item, retain its author, permalink, thread status, requested change,
 and disposition: applied, deferred, or intentionally not changed with a reason. Do not
