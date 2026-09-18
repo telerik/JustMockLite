@@ -9,6 +9,13 @@ testing_framework = "MSTest, NUnit, xUnit"
 package_manager = "NuGet"
 allow_app = "b66a541a-02ad-4431-bd0f-2d11cfb10ce9"
 
+[beta_consent]
+acknowledged = true
+acknowledgement_date = "2026-09-17T10:52:51.037881600+00:00"
+acknowledged_by = "nia"
+version_at_consent = "4.6.0"
+consent_phrase = "i agree"
+
 # Uncomment and configure for monorepo
 # [monorepo]
 # enabled = true
