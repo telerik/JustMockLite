@@ -63,6 +63,7 @@ namespace Telerik.JustMock.Core
         private readonly int repositoryId;
         private readonly Thread creatingThread;
         private readonly Dictionary<Type, IMockMixin> staticMixinDatabase = new Dictionary<Type, IMockMixin>();
+        private readonly Dictionary<Type, IMockMixin> futureMixinDatabase = new Dictionary<Type, IMockMixin>();
         private readonly Dictionary<MethodBase, MethodInfoMatcherTreeNode> arrangementTreeRoots = new Dictionary<MethodBase, MethodInfoMatcherTreeNode>();
         private readonly Dictionary<MethodBase, MethodInfoMatcherTreeNode> invocationTreeRoots = new Dictionary<MethodBase, MethodInfoMatcherTreeNode>();
         private readonly Dictionary<KeyValuePair<object, object>, object> valueStore = new Dictionary<KeyValuePair<object, object>, object>();
@@ -274,6 +275,17 @@ namespace Telerik.JustMock.Core
             if (obj != null)
             {
                 asMixin = GetMixinFromExternalDatabase(obj, objType);
+
+                // Check future mixin database for instance calls where no explicit mock exists
+                if (asMixin == null)
+                {
+                    MocksRepository repo = MockingContext.ResolveRepository(UnresolvedContextBehavior.CreateNewContextual);
+                    if (repo != null)
+                    {
+                        lock (repo.futureMixinDatabase)
+                            repo.futureMixinDatabase.TryGetValue(objType, out asMixin);
+                    }
+                }
             }
             else if (objType != null)
             {
@@ -431,6 +443,7 @@ namespace Telerik.JustMock.Core
 
             this.arrangedTypes.Clear();
             this.staticMixinDatabase.Clear();
+            this.futureMixinDatabase.Clear();
 
             foreach (var method in this.globallyInterceptedMethods)
             {
@@ -794,6 +807,29 @@ namespace Telerik.JustMock.Core
             mockMixin.IsStaticConstructorMocked = mockStaticConstructor;
             lock (staticMixinDatabase)
                 staticMixinDatabase[type] = mockMixin;
+
+            this.EnableInterception(type);
+        }
+
+        internal void InterceptFuture(Type type, MockCreationSettings settings)
+        {
+            if (!ProfilerInterceptor.IsProfilerAttached)
+                ProfilerInterceptor.ThrowElevatedMockingException(type);
+
+            if (!settings.FallbackBehaviors.OfType<CallOriginalBehavior>().Any())
+                ProfilerInterceptor.CheckIfSafeToInterceptWholesale(type);
+
+            var mockMixin = (IMockMixin)Create(typeof(ExternalMockMixin),
+                new MockCreationSettings
+                {
+                    Mixins = settings.Mixins,
+                    SupplementaryBehaviors = settings.SupplementaryBehaviors,
+                    FallbackBehaviors = settings.FallbackBehaviors,
+                    MustCreateProxy = true,
+                });
+
+            lock (futureMixinDatabase)
+                futureMixinDatabase[type] = mockMixin;
 
             this.EnableInterception(type);
         }
