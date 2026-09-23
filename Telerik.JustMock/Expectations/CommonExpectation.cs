@@ -45,6 +45,7 @@ namespace Telerik.JustMock.Expectations
         bool IMethodMock.IsSequential { get; set; }
         bool IMethodMock.IsInOrder { get; set; }
         bool IMethodMock.IsUsed { get; set; }
+        bool IMethodMock.IsBaseCtorInterception { get; set; }
         CallPattern IMethodMock.CallPattern { get; set; }
         ICollection<IBehavior> IMethodMock.Behaviors { get { return this.behaviors; } }
         InvocationOccurrenceBehavior IMethodMock.OccurencesBehavior { get { return this.occurences; } }
