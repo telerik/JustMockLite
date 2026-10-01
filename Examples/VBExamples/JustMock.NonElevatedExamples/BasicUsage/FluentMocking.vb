@@ -25,7 +25,7 @@ Namespace JustMock.NonElevatedExamples.BasicUsage.FluentMocking
     ''' <summary>
     ''' Fluent Assertions allow you to easily follow the Arrange Act Assert pattern in a straigtforward way.
     ''' Note that JustMock dynamically checks for any assertion mechanism provided by the underlying test framework 
-    ''' if such one is available (MSTest, XUnit, NUnit, MbUnit, Silverlight) and uses it, rather than using its own 
+    ''' if such one is available (MSTest, XUnit, NUnit, Silverlight) and uses it, rather than using its own
     ''' MockAssertionException when a mock assertion fails. This functionality extends the JustMock tooling support 
     ''' for different test runners. 
     ''' See http://www.telerik.com/help/justmock/basic-usage-fluent-mocking.html for full documentation of the feature.
