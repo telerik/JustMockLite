@@ -61,7 +61,7 @@
   <PropertyGroup Condition=" '$(EnableLicensing)' == 'true' ">
     <DefineConstants>$(DefineConstants);FEATURE_LICENSING;FEATURE_SEND_LICENSING_TELEMETRY;FEATURE_SEND_LICENSING_TELEMETRY_TOGGLE;INTERNAL_ATTRIBUTES</DefineConstants>
     <LicensingBasePath>..\..\CodeBase\Build\Licensing</LicensingBasePath>
-    <CallHomePath>..\..\call-home</CallHomePath>
+    <TelerikLicensingPath>..\..\telerik-licensing</TelerikLicensingPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net472' ">
     <DefineConstants>$(DefineConstants);FEATURE_APPDOMAIN;FEATURE_ASSEMBLYBUILDER_SAVE</DefineConstants>
