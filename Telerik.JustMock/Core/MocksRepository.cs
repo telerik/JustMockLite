@@ -1705,13 +1705,10 @@ namespace Telerik.JustMock.Core
                 }
             }
 
-            var methodMock = DispatchInvocationToArrangements(callPattern, invocation);
+            bool baseConstructorBodyInvocation;
+            var methodMock = DispatchInvocationToArrangements(callPattern, invocation, out baseConstructorBodyInvocation);
 
-            // Do not record occurrence for body-path invocations of base-ctor arrangements.
-            // When CallOriginal() is set, the profiler runs the actual base ctor body which
-            // triggers a second InterceptCall — we must not count that as a separate invocation.
-            bool shouldRecordOccurrence = !(methodMock != null && methodMock.IsBaseCtorInterception && !invocation.IsBaseCtorCall);
-            if (!invocation.InArrange && !invocation.InAssertSet && shouldRecordOccurrence)
+            if (!invocation.InArrange && !invocation.InAssertSet && !baseConstructorBodyInvocation)
             {
                 funcRoot.AddOrUpdateOccurence(callPattern, methodMock);
             }
@@ -1719,10 +1716,11 @@ namespace Telerik.JustMock.Core
             return methodMock != null;
         }
 
-        private IMethodMock DispatchInvocationToArrangements(CallPattern callPattern, Invocation invocation)
+        private IMethodMock DispatchInvocationToArrangements(CallPattern callPattern, Invocation invocation, out bool baseConstructorBodyInvocation)
         {
             MethodInfoMatcherTreeNode arrangeFuncRoot;
             var methodMockNodes = new List<MethodMockMatcherTreeNode>();
+            baseConstructorBodyInvocation = false;
 
             var allMethods = new[] { callPattern.Method }
                 .Concat(callPattern.Method.GetInheritanceChain().Where(m => m.DeclaringType.IsInterface));
@@ -1734,6 +1732,16 @@ namespace Telerik.JustMock.Core
 
                 var results = arrangeFuncRoot.GetMethodMock(callPattern);
                 methodMockNodes.AddRange(results);
+            }
+
+            for (int i = methodMockNodes.Count - 1; i >= 0; --i)
+            {
+                var isBaseConstructorArrangement = methodMockNodes[i].MethodMock.IsBaseCtorInterception;
+                if (isBaseConstructorArrangement != invocation.IsBaseCtorCall)
+                {
+                    baseConstructorBodyInvocation |= isBaseConstructorArrangement;
+                    methodMockNodes.RemoveAt(i);
+                }
             }
 
             var methodMock = GetMethodMockFromNodes(methodMockNodes, invocation);
@@ -1761,7 +1769,7 @@ namespace Telerik.JustMock.Core
         {
             var behaviorsToExecute = new List<IBehavior>();
 
-            var behaviorTypesToSkip = GetBehaviorTypesToSkip(invocation, methodMock);
+            var behaviorTypesToSkip = GetBehaviorTypesToSkip(invocation);
             behaviorsToExecute.AddRange(
                 methodMock.Behaviors.Where(behavior => !behaviorTypesToSkip.Contains(behavior.GetType())));
 
@@ -1786,19 +1794,11 @@ namespace Telerik.JustMock.Core
             return behaviorsToExecute;
         }
 
-        private static List<Type> GetBehaviorTypesToSkip(Invocation invocation, IMethodMock methodMock = null)
+        private static List<Type> GetBehaviorTypesToSkip(Invocation invocation)
         {
             var behaviorTypesToSkip = new List<Type>();
 
             if (invocation.InAssertSet)
-            {
-                behaviorTypesToSkip.Add(typeof(InvocationOccurrenceBehavior));
-            }
-
-            // When a base-ctor arrangement is dispatched from the normal body-intercept path
-            // (not from InterceptBaseCtorCall), skip occurrence counting to prevent double-counting.
-            // The arrangement's CallOriginal/DoNothing/Throws behaviors still execute normally.
-            if (methodMock != null && methodMock.IsBaseCtorInterception && !invocation.IsBaseCtorCall)
             {
                 behaviorTypesToSkip.Add(typeof(InvocationOccurrenceBehavior));
             }
