@@ -148,6 +148,38 @@ namespace Telerik.JustMock.Core
             }
         }
 
+        private static bool InterceptBaseCtorCall(object instance, RuntimeTypeHandle typeHandle, RuntimeMethodHandle methodHandle, object[] data)
+        {
+            if (!IsInterceptionEnabled || isFinalizerThread)
+                return true; // call original
+
+            try
+            {
+                ReentrancyCounter++;
+
+                var method = MethodBase.GetMethodFromHandle(methodHandle, typeHandle);
+                if (method.DeclaringType == null)
+                    return true;
+
+#if DEBUG
+                ProfilerLogger.Info("*** +++ [MANAGED] Intercepting base ctor call for {0}.{1}", method.DeclaringType.Name, method.Name);
+#endif
+
+                var invocation = new Invocation(instance, method, data ?? new object[0]);
+                invocation.IsBaseCtorCall = true;
+
+                if (DispatchInvocation(invocation))
+                {
+                    return invocation.CallOriginal || !invocation.UserProvidedImplementation;
+                }
+                return true; // no arrangement found, call original
+            }
+            finally
+            {
+                ReentrancyCounter--;
+            }
+        }
+
         static ProfilerInterceptor()
         {
 #if !LITE_EDITION
@@ -260,6 +292,22 @@ namespace Telerik.JustMock.Core
                     Func<RuntimeTypeHandle, RuntimeMethodHandle, object[], object> interceptNewobjAsAction = InterceptNewobj;
                     var interceptNewobjDelegate = Delegate.CreateDelegate(processNewobjType, interceptNewobjAsAction.Method);
                     bridge.GetField("ProcessNewobj").SetValue(null, interceptNewobjDelegate);
+
+                    var processBaseCtorCallType = typeof(object).Assembly.GetType("Telerik.JustMock.ProcessBaseCtorCallDelegate");
+                    var processBaseCtorCallField = bridge.GetField("ProcessBaseCtorCall");
+                    if (processBaseCtorCallType != null && processBaseCtorCallField != null)
+                    {
+                        Func<object, RuntimeTypeHandle, RuntimeMethodHandle, object[], bool> interceptBaseCtorCallFunc = InterceptBaseCtorCall;
+                        var interceptBaseCtorCallDelegate = Delegate.CreateDelegate(processBaseCtorCallType, interceptBaseCtorCallFunc.Method);
+                        processBaseCtorCallField.SetValue(null, interceptBaseCtorCallDelegate);
+                        IsBaseConstructorInterceptionAvailable = true;
+                    }
+#if DEBUG
+                    else
+                    {
+                        Debug.WriteLine("[JustMock] ProcessBaseCtorCallDelegate not found in profiler bridge — base constructor interception is disabled. Ensure the profiler DLL matches the managed assembly version.");
+                    }
+#endif
 
                     var arrangedTypesField = bridge.GetField("ArrangedTypesArray");
                     arrangedTypesField.SetValue(null, arrangedTypesArray);
@@ -681,6 +729,7 @@ namespace Telerik.JustMock.Core
         }
 
         public static bool IsProfilerAttached { [DebuggerHidden] get { return bridge != null; } }
+        public static bool IsBaseConstructorInterceptionAvailable { get; private set; }
         public static bool IsInterceptionEnabled { get; set; }
         public static readonly Func<Type, object> GetUninitializedObjectImpl;
         public static readonly Func<string, byte[], object> CreateStrongNameAssemblyNameImpl;
