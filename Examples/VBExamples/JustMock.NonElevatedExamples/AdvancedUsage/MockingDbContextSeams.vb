@@ -19,13 +19,14 @@ Namespace JustMock.NonElevatedExamples.AdvancedUsage.MockingDbContextSeams
                     New SeamPatient With {.Id = 2, .Name = "Liam Turner", .Department = "Cardiology", .IsActive = True})
                 backingContext.SaveChanges()
 
-                Dim context = Mock.Create(Of SeamHealthcareContext)()
-                Mock.Arrange(Function() context.Patients).Returns(backingContext.Patients)
+                Using context = Mock.Create(Of SeamHealthcareContext)()
+                    Mock.Arrange(Function() context.Patients).Returns(backingContext.Patients)
 
-                Dim actual = New VirtualPatientReader(context).FindActivePatient()
+                    Dim actual = New VirtualPatientReader(context).FindActivePatient()
 
-                Assert.IsNotNull(actual)
-                Assert.AreEqual("Liam Turner", actual.Name)
+                    Assert.IsNotNull(actual)
+                    Assert.AreEqual("Liam Turner", actual.Name)
+                End Using
             End Using
         End Sub
 

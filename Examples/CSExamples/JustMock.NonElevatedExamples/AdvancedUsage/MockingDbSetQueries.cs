@@ -23,7 +23,7 @@ namespace JustMock.NonElevatedExamples.AdvancedUsage.MockingDbSetQueries
                     new Patient { Id = 3, Name = "Noah Williams", Department = "Neurology", DoctorId = 20, IsActive = true });
                 backingContext.SaveChanges();
 
-                var context = Mock.Create<HealthcareContext>();
+                using var context = Mock.Create<HealthcareContext>();
                 Mock.Arrange(() => context.Patients).Returns(backingContext.Patients);
 
                 var actual = new PatientDirectory(context).GetActiveNames("Cardiology");

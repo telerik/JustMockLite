@@ -21,39 +21,41 @@ Namespace JustMock.NonElevatedExamples.AdvancedUsage.MockingDbContext
                     New Patient With {.Id = 3, .Name = "Mia Chen", .Department = "Neurology", .DoctorId = 20, .IsActive = True})
                 backingContext.SaveChanges()
 
-                Dim context = Mock.Create(Of HealthcareContext)()
-                Mock.Arrange(Function() context.Patients).Returns(backingContext.Patients)
+                Using context = Mock.Create(Of HealthcareContext)()
+                    Mock.Arrange(Function() context.Patients).Returns(backingContext.Patients)
 
-                Dim actual = New PatientDirectory(context).FindActivePatient("Cardiology")
+                    Dim actual = New PatientDirectory(context).FindActivePatient("Cardiology")
 
-                Assert.IsNotNull(actual)
-                Assert.AreEqual("Liam Turner", actual.Name)
+                    Assert.IsNotNull(actual)
+                    Assert.AreEqual("Liam Turner", actual.Name)
+                End Using
             End Using
         End Sub
 
         <TestMethod>
         Public Sub ShouldFakeAddingPatientWithoutWritingToDatabase()
-            Dim context = Mock.Create(Of HealthcareContext)()
-            Dim patients = New List(Of Patient)()
-            Dim patientSet = Mock.Create(Of DbSet(Of Patient))()
-            Dim patient = New Patient With {
-                .Id = 4,
-                .Name = "Noah Williams",
-                .Department = "Pediatrics",
-                .DoctorId = 30,
-                .IsActive = True
-            }
+            Using context = Mock.Create(Of HealthcareContext)()
+                Dim patients = New List(Of Patient)()
+                Dim patientSet = Mock.Create(Of DbSet(Of Patient))()
+                Dim patient = New Patient With {
+                    .Id = 4,
+                    .Name = "Noah Williams",
+                    .Department = "Pediatrics",
+                    .DoctorId = 30,
+                    .IsActive = True
+                }
 
-            Mock.Arrange(Function() context.Patients).Returns(patientSet)
-            Mock.Arrange(Function() patientSet.Add(patient)).
-                DoInstead(Sub() patients.Add(patient))
-            Mock.Arrange(Function() context.SaveChanges()).DoNothing()
+                Mock.Arrange(Function() context.Patients).Returns(patientSet)
+                Mock.Arrange(Function() patientSet.Add(patient)).
+                    DoInstead(Sub() patients.Add(patient))
+                Mock.Arrange(Function() context.SaveChanges()).DoNothing()
 
-            Dim result = New PatientWriter(context).Add(patient)
+                Dim result = New PatientWriter(context).Add(patient)
 
-            Assert.AreEqual(0, result)
-            Assert.AreEqual(1, patients.Count)
-            Assert.AreSame(patient, patients(0))
+                Assert.AreEqual(0, result)
+                Assert.AreEqual(1, patients.Count)
+                Assert.AreSame(patient, patients(0))
+            End Using
         End Sub
     End Class
 

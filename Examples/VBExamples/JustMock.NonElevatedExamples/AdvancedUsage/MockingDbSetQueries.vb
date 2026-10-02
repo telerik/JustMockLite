@@ -19,12 +19,13 @@ Namespace JustMock.NonElevatedExamples.AdvancedUsage.MockingDbSetQueries
                     New Patient With {.Id = 3, .Name = "Noah Williams", .Department = "Neurology", .DoctorId = 20, .IsActive = True})
                 backingContext.SaveChanges()
 
-                Dim context = Mock.Create(Of HealthcareContext)()
-                Mock.Arrange(Function() context.Patients).Returns(backingContext.Patients)
+                Using context = Mock.Create(Of HealthcareContext)()
+                    Mock.Arrange(Function() context.Patients).Returns(backingContext.Patients)
 
-                Dim actual = New PatientDirectory(context).GetActiveNames("Cardiology")
+                    Dim actual = New PatientDirectory(context).GetActiveNames("Cardiology")
 
-                CollectionAssert.AreEqual(New String() {"Olivia Carter"}, actual)
+                    CollectionAssert.AreEqual(New String() {"Olivia Carter"}, actual)
+                End Using
             End Using
         End Sub
     End Class

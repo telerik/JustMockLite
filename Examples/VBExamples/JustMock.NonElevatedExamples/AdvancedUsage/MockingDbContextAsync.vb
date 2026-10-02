@@ -23,65 +23,68 @@ Namespace JustMock.NonElevatedExamples.AdvancedUsage.MockingDbContextAsync
                     New AsyncPatient With {.Id = 4, .Name = "Noah Williams", .Department = "Pediatrics", .DoctorId = 30, .IsActive = True})
                 Await backingContext.SaveChangesAsync()
 
-                Dim context = Mock.Create(Of AsyncHealthcareContext)()
-                Mock.Arrange(Function() context.Patients).Returns(backingContext.Patients)
+                Using context = Mock.Create(Of AsyncHealthcareContext)()
+                    Mock.Arrange(Function() context.Patients).Returns(backingContext.Patients)
 
-                Dim actual = Await New AsyncPatientDirectory(context).FindActiveNamesAsync("Cardiology")
+                    Dim actual = Await New AsyncPatientDirectory(context).FindActiveNamesAsync("Cardiology")
 
-                CollectionAssert.AreEqual(New String() {"Maya Patel", "Olivia Carter"}, actual)
+                    CollectionAssert.AreEqual(New String() {"Maya Patel", "Olivia Carter"}, actual)
+                End Using
             End Using
         End Function
 
         <TestMethod>
         Public Async Function ShouldSavePatientThroughArrangedVirtualContextAsynchronously() As Task
             Using backingContext = AsyncHealthcareContext.CreateInMemory("MockingDbContextAsync.Save")
-                Dim context = Mock.Create(Of AsyncHealthcareContext)()
-                Mock.Arrange(Function() context.Patients).Returns(backingContext.Patients)
-                Mock.Arrange(Function() context.SaveChangesAsync(Arg.IsAny(Of CancellationToken)())).
-                    ReturnsAsync(1).
-                    MustBeCalled()
+                Using context = Mock.Create(Of AsyncHealthcareContext)()
+                    Mock.Arrange(Function() context.Patients).Returns(backingContext.Patients)
+                    Mock.Arrange(Function() context.SaveChangesAsync(Arg.IsAny(Of CancellationToken)())).
+                        ReturnsAsync(1).
+                        MustBeCalled()
 
-                Dim result = Await New AsyncPatientWriter(context).AddAsync(New AsyncPatient With {
-                    .Id = 5,
-                    .Name = "Ava Brooks",
-                    .Department = "Pediatrics",
-                    .DoctorId = 30,
-                    .IsActive = True
-                })
+                    Dim result = Await New AsyncPatientWriter(context).AddAsync(New AsyncPatient With {
+                        .Id = 5,
+                        .Name = "Ava Brooks",
+                        .Department = "Pediatrics",
+                        .DoctorId = 30,
+                        .IsActive = True
+                    })
 
-                Assert.AreEqual(1, result)
-                Assert.AreEqual(1, backingContext.Patients.Local.Count)
-                Mock.Assert(context)
+                    Assert.AreEqual(1, result)
+                    Assert.AreEqual(1, backingContext.Patients.Local.Count)
+                    Mock.Assert(context)
+                End Using
             End Using
         End Function
 
         <TestMethod>
         Public Async Function ShouldVerifyAsyncPatientSaveOccurrence() As Task
             Using backingContext = AsyncHealthcareContext.CreateInMemory("MockingDbContextAsync.Occurrence")
-                Dim context = Mock.Create(Of AsyncHealthcareContext)()
-                Mock.Arrange(Function() context.Patients).Returns(backingContext.Patients)
-                Mock.Arrange(Function() context.SaveChangesAsync(Arg.IsAny(Of CancellationToken)())).
-                    ReturnsAsync(1)
+                Using context = Mock.Create(Of AsyncHealthcareContext)()
+                    Mock.Arrange(Function() context.Patients).Returns(backingContext.Patients)
+                    Mock.Arrange(Function() context.SaveChangesAsync(Arg.IsAny(Of CancellationToken)())).
+                        ReturnsAsync(1)
 
-                Dim writer = New AsyncPatientWriter(context)
-                Await writer.AddAsync(New AsyncPatient With {
-                    .Id = 6,
-                    .Name = "Ethan Clark",
-                    .Department = "Cardiology",
-                    .DoctorId = 10,
-                    .IsActive = True
-                })
-                Await writer.AddAsync(New AsyncPatient With {
-                    .Id = 7,
-                    .Name = "Sofia Green",
-                    .Department = "Neurology",
-                    .DoctorId = 20,
-                    .IsActive = True
-                })
+                    Dim writer = New AsyncPatientWriter(context)
+                    Await writer.AddAsync(New AsyncPatient With {
+                        .Id = 6,
+                        .Name = "Ethan Clark",
+                        .Department = "Cardiology",
+                        .DoctorId = 10,
+                        .IsActive = True
+                    })
+                    Await writer.AddAsync(New AsyncPatient With {
+                        .Id = 7,
+                        .Name = "Sofia Green",
+                        .Department = "Neurology",
+                        .DoctorId = 20,
+                        .IsActive = True
+                    })
 
-                Mock.Assert(
-                    Function() context.SaveChangesAsync(Arg.IsAny(Of CancellationToken)()),
-                    Occurs.Exactly(2))
+                    Mock.Assert(
+                        Function() context.SaveChangesAsync(Arg.IsAny(Of CancellationToken)()),
+                        Occurs.Exactly(2))
+                End Using
             End Using
         End Function
     End Class
