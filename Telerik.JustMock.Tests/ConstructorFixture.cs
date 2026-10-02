@@ -16,6 +16,7 @@
 */
 
 using System;
+using Telerik.JustMock.Core;
 
 #region JustMock Test Attributes
 #if NUNIT
@@ -94,6 +95,111 @@ namespace Telerik.JustMock.Tests
 
             new CtorLongArg(100);
             Assert.True(arg.Value == 100);
+        }
+
+        [TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
+        public void ShouldCallBaseConstructorByDefaultWhenOnlyOccurrenceIsArranged()
+        {
+            BaseCtorTarget.CallCount = 0;
+            Mock.ArrangeBaseConstructor<BaseCtorTarget>().OccursOnce();
+
+            new BaseCtorDerived();
+
+            Assert.Equal(1, BaseCtorTarget.CallCount);
+            Mock.AssertBaseConstructor<BaseCtorTarget>();
+        }
+
+        [TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
+        public void ShouldSuppressBaseConstructorWhenDoNothingIsArranged()
+        {
+            BaseCtorTarget.CallCount = 0;
+            Mock.ArrangeBaseConstructor<BaseCtorTarget>().DoNothing().OccursOnce();
+
+            new BaseCtorDerived();
+
+            Assert.Equal(0, BaseCtorTarget.CallCount);
+            Mock.AssertBaseConstructor<BaseCtorTarget>();
+        }
+
+        [TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
+        public void ShouldResolveBaseConstructorUsingReferenceTypeMatcher()
+        {
+            Mock.ArrangeBaseConstructor<OverloadedBaseCtorTarget>(Arg.IsAny<string>()).OccursOnce();
+
+            new OverloadedBaseCtorDerived("value");
+
+            Mock.AssertBaseConstructor<OverloadedBaseCtorTarget>(Arg.IsAny<string>());
+        }
+
+        [TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
+        public void ShouldClearMatcherContextAfterBaseConstructorResolutionFails()
+        {
+            Assert.Throws<MockException>(() =>
+                Mock.ArrangeBaseConstructor<AmbiguousBaseCtorTarget>(Arg.IsAny<string>()));
+
+            Mock.ArrangeBaseConstructor<CleanupBaseCtorTarget>(42).OccursOnce();
+            new CleanupBaseCtorDerived(42);
+
+            Mock.AssertBaseConstructor<CleanupBaseCtorTarget>(42);
+        }
+
+        public class BaseCtorTarget
+        {
+            public static int CallCount;
+
+            protected BaseCtorTarget()
+            {
+                CallCount++;
+            }
+        }
+
+        public class BaseCtorDerived : BaseCtorTarget
+        {
+        }
+
+        public class OverloadedBaseCtorTarget
+        {
+            protected OverloadedBaseCtorTarget(string value)
+            {
+            }
+
+            protected OverloadedBaseCtorTarget(Uri value)
+            {
+            }
+        }
+
+        public class OverloadedBaseCtorDerived : OverloadedBaseCtorTarget
+        {
+            public OverloadedBaseCtorDerived(string value)
+                : base(value)
+            {
+            }
+        }
+
+        public class AmbiguousBaseCtorTarget
+        {
+            protected AmbiguousBaseCtorTarget(string value)
+            {
+            }
+
+            protected AmbiguousBaseCtorTarget(object value)
+            {
+            }
+        }
+
+        public class CleanupBaseCtorTarget
+        {
+            protected CleanupBaseCtorTarget(int value)
+            {
+            }
+        }
+
+        public class CleanupBaseCtorDerived : CleanupBaseCtorTarget
+        {
+            public CleanupBaseCtorDerived(int value)
+                : base(value)
+            {
+            }
         }
 
 #endif
