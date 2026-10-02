@@ -21,6 +21,7 @@ using System.Reflection;
 using System.Text;
 using Telerik.JustMock.Core;
 using Telerik.JustMock.Core.Context;
+using Telerik.JustMock.Core.MatcherTree;
 using Telerik.JustMock.Expectations;
 
 namespace Telerik.JustMock
@@ -54,12 +55,7 @@ namespace Telerik.JustMock
         /// </example>
         public static ActionExpectation ArrangeBaseConstructor<TBase>() where TBase : class
         {
-            return ProfilerInterceptor.GuardInternal(() =>
-            {
-                ValidateBaseConstructorTarget(typeof(TBase));
-                var ctor = ResolveBaseConstructor(typeof(TBase), Type.EmptyTypes);
-                return ArrangeBaseConstructorCore(ctor, new object[0]);
-            });
+            return ProfilerInterceptor.GuardInternal(() => ArrangeBaseConstructor(typeof(TBase), new object[0]));
         }
 
         /// <summary>
@@ -73,13 +69,7 @@ namespace Telerik.JustMock
         /// <exception cref="MockException">Thrown on invalid type or unresolvable constructor overload.</exception>
         public static ActionExpectation ArrangeBaseConstructor<TBase>(object arg1) where TBase : class
         {
-            return ProfilerInterceptor.GuardInternal(() =>
-            {
-                ValidateBaseConstructorTarget(typeof(TBase));
-                var args = new object[] { arg1 };
-                var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                return ArrangeBaseConstructorCore(ctor, args);
-            });
+            return ProfilerInterceptor.GuardInternal(() => ArrangeBaseConstructor(typeof(TBase), new object[] { arg1 }));
         }
 
         /// <summary>
@@ -94,13 +84,7 @@ namespace Telerik.JustMock
         /// <exception cref="MockException">Thrown on invalid type or unresolvable constructor overload.</exception>
         public static ActionExpectation ArrangeBaseConstructor<TBase>(object arg1, object arg2) where TBase : class
         {
-            return ProfilerInterceptor.GuardInternal(() =>
-            {
-                ValidateBaseConstructorTarget(typeof(TBase));
-                var args = new object[] { arg1, arg2 };
-                var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                return ArrangeBaseConstructorCore(ctor, args);
-            });
+            return ProfilerInterceptor.GuardInternal(() => ArrangeBaseConstructor(typeof(TBase), new object[] { arg1, arg2 }));
         }
 
         /// <summary>
@@ -116,13 +100,7 @@ namespace Telerik.JustMock
         /// <exception cref="MockException">Thrown on invalid type or unresolvable constructor overload.</exception>
         public static ActionExpectation ArrangeBaseConstructor<TBase>(object arg1, object arg2, object arg3) where TBase : class
         {
-            return ProfilerInterceptor.GuardInternal(() =>
-            {
-                ValidateBaseConstructorTarget(typeof(TBase));
-                var args = new object[] { arg1, arg2, arg3 };
-                var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                return ArrangeBaseConstructorCore(ctor, args);
-            });
+            return ProfilerInterceptor.GuardInternal(() => ArrangeBaseConstructor(typeof(TBase), new object[] { arg1, arg2, arg3 }));
         }
 
         /// <summary>
@@ -139,13 +117,7 @@ namespace Telerik.JustMock
         /// <exception cref="MockException">Thrown on invalid type or unresolvable constructor overload.</exception>
         public static ActionExpectation ArrangeBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4) where TBase : class
         {
-            return ProfilerInterceptor.GuardInternal(() =>
-            {
-                ValidateBaseConstructorTarget(typeof(TBase));
-                var args = new object[] { arg1, arg2, arg3, arg4 };
-                var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                return ArrangeBaseConstructorCore(ctor, args);
-            });
+            return ProfilerInterceptor.GuardInternal(() => ArrangeBaseConstructor(typeof(TBase), new object[] { arg1, arg2, arg3, arg4 }));
         }
 
         /// <summary>
@@ -163,13 +135,7 @@ namespace Telerik.JustMock
         /// <exception cref="MockException">Thrown on invalid type or unresolvable constructor overload.</exception>
         public static ActionExpectation ArrangeBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4, object arg5) where TBase : class
         {
-            return ProfilerInterceptor.GuardInternal(() =>
-            {
-                ValidateBaseConstructorTarget(typeof(TBase));
-                var args = new object[] { arg1, arg2, arg3, arg4, arg5 };
-                var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                return ArrangeBaseConstructorCore(ctor, args);
-            });
+            return ProfilerInterceptor.GuardInternal(() => ArrangeBaseConstructor(typeof(TBase), new object[] { arg1, arg2, arg3, arg4, arg5 }));
         }
 
         /// <summary>
@@ -188,13 +154,7 @@ namespace Telerik.JustMock
         /// <exception cref="MockException">Thrown on invalid type or unresolvable constructor overload.</exception>
         public static ActionExpectation ArrangeBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4, object arg5, object arg6) where TBase : class
         {
-            return ProfilerInterceptor.GuardInternal(() =>
-            {
-                ValidateBaseConstructorTarget(typeof(TBase));
-                var args = new object[] { arg1, arg2, arg3, arg4, arg5, arg6 };
-                var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                return ArrangeBaseConstructorCore(ctor, args);
-            });
+            return ProfilerInterceptor.GuardInternal(() => ArrangeBaseConstructor(typeof(TBase), new object[] { arg1, arg2, arg3, arg4, arg5, arg6 }));
         }
 
         /// <summary>
@@ -214,13 +174,7 @@ namespace Telerik.JustMock
         /// <exception cref="MockException">Thrown on invalid type or unresolvable constructor overload.</exception>
         public static ActionExpectation ArrangeBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7) where TBase : class
         {
-            return ProfilerInterceptor.GuardInternal(() =>
-            {
-                ValidateBaseConstructorTarget(typeof(TBase));
-                var args = new object[] { arg1, arg2, arg3, arg4, arg5, arg6, arg7 };
-                var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                return ArrangeBaseConstructorCore(ctor, args);
-            });
+            return ProfilerInterceptor.GuardInternal(() => ArrangeBaseConstructor(typeof(TBase), new object[] { arg1, arg2, arg3, arg4, arg5, arg6, arg7 }));
         }
 
         /// <summary>
@@ -241,13 +195,7 @@ namespace Telerik.JustMock
         /// <exception cref="MockException">Thrown on invalid type or unresolvable constructor overload.</exception>
         public static ActionExpectation ArrangeBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7, object arg8) where TBase : class
         {
-            return ProfilerInterceptor.GuardInternal(() =>
-            {
-                ValidateBaseConstructorTarget(typeof(TBase));
-                var args = new object[] { arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 };
-                var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                return ArrangeBaseConstructorCore(ctor, args);
-            });
+            return ProfilerInterceptor.GuardInternal(() => ArrangeBaseConstructor(typeof(TBase), new object[] { arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 }));
         }
 
         // ---- Assert overloads ----
@@ -263,12 +211,7 @@ namespace Telerik.JustMock
         /// <exception cref="MockException">Thrown on invalid type or unresolvable constructor overload.</exception>
         public static void AssertBaseConstructor<TBase>() where TBase : class
         {
-            ProfilerInterceptor.GuardInternal(() =>
-            {
-                ValidateBaseConstructorTarget(typeof(TBase));
-                var ctor = ResolveBaseConstructor(typeof(TBase), Type.EmptyTypes);
-                MockingContext.CurrentRepository.AssertMethodInfo(null, null, ctor, new object[0], null);
-            });
+            ProfilerInterceptor.GuardInternal(() => AssertBaseConstructor(typeof(TBase), new object[0]));
         }
 
         /// <summary>
@@ -280,13 +223,7 @@ namespace Telerik.JustMock
         /// <exception cref="MockException">Thrown on invalid type or unresolvable constructor overload.</exception>
         public static void AssertBaseConstructor<TBase>(object arg1) where TBase : class
         {
-            ProfilerInterceptor.GuardInternal(() =>
-            {
-                ValidateBaseConstructorTarget(typeof(TBase));
-                var args = new object[] { arg1 };
-                var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                MockingContext.CurrentRepository.AssertMethodInfo(null, null, ctor, args, null);
-            });
+            ProfilerInterceptor.GuardInternal(() => AssertBaseConstructor(typeof(TBase), new object[] { arg1 }));
         }
 
         /// <summary>
@@ -294,13 +231,7 @@ namespace Telerik.JustMock
         /// </summary>
         public static void AssertBaseConstructor<TBase>(object arg1, object arg2) where TBase : class
         {
-            ProfilerInterceptor.GuardInternal(() =>
-            {
-                ValidateBaseConstructorTarget(typeof(TBase));
-                var args = new object[] { arg1, arg2 };
-                var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                MockingContext.CurrentRepository.AssertMethodInfo(null, null, ctor, args, null);
-            });
+            ProfilerInterceptor.GuardInternal(() => AssertBaseConstructor(typeof(TBase), new object[] { arg1, arg2 }));
         }
 
         /// <summary>
@@ -308,13 +239,7 @@ namespace Telerik.JustMock
         /// </summary>
         public static void AssertBaseConstructor<TBase>(object arg1, object arg2, object arg3) where TBase : class
         {
-            ProfilerInterceptor.GuardInternal(() =>
-            {
-                ValidateBaseConstructorTarget(typeof(TBase));
-                var args = new object[] { arg1, arg2, arg3 };
-                var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                MockingContext.CurrentRepository.AssertMethodInfo(null, null, ctor, args, null);
-            });
+            ProfilerInterceptor.GuardInternal(() => AssertBaseConstructor(typeof(TBase), new object[] { arg1, arg2, arg3 }));
         }
 
         /// <summary>
@@ -322,13 +247,7 @@ namespace Telerik.JustMock
         /// </summary>
         public static void AssertBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4) where TBase : class
         {
-            ProfilerInterceptor.GuardInternal(() =>
-            {
-                ValidateBaseConstructorTarget(typeof(TBase));
-                var args = new object[] { arg1, arg2, arg3, arg4 };
-                var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                MockingContext.CurrentRepository.AssertMethodInfo(null, null, ctor, args, null);
-            });
+            ProfilerInterceptor.GuardInternal(() => AssertBaseConstructor(typeof(TBase), new object[] { arg1, arg2, arg3, arg4 }));
         }
 
         /// <summary>
@@ -336,13 +255,7 @@ namespace Telerik.JustMock
         /// </summary>
         public static void AssertBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4, object arg5) where TBase : class
         {
-            ProfilerInterceptor.GuardInternal(() =>
-            {
-                ValidateBaseConstructorTarget(typeof(TBase));
-                var args = new object[] { arg1, arg2, arg3, arg4, arg5 };
-                var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                MockingContext.CurrentRepository.AssertMethodInfo(null, null, ctor, args, null);
-            });
+            ProfilerInterceptor.GuardInternal(() => AssertBaseConstructor(typeof(TBase), new object[] { arg1, arg2, arg3, arg4, arg5 }));
         }
 
         /// <summary>
@@ -350,13 +263,7 @@ namespace Telerik.JustMock
         /// </summary>
         public static void AssertBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4, object arg5, object arg6) where TBase : class
         {
-            ProfilerInterceptor.GuardInternal(() =>
-            {
-                ValidateBaseConstructorTarget(typeof(TBase));
-                var args = new object[] { arg1, arg2, arg3, arg4, arg5, arg6 };
-                var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                MockingContext.CurrentRepository.AssertMethodInfo(null, null, ctor, args, null);
-            });
+            ProfilerInterceptor.GuardInternal(() => AssertBaseConstructor(typeof(TBase), new object[] { arg1, arg2, arg3, arg4, arg5, arg6 }));
         }
 
         /// <summary>
@@ -364,13 +271,7 @@ namespace Telerik.JustMock
         /// </summary>
         public static void AssertBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7) where TBase : class
         {
-            ProfilerInterceptor.GuardInternal(() =>
-            {
-                ValidateBaseConstructorTarget(typeof(TBase));
-                var args = new object[] { arg1, arg2, arg3, arg4, arg5, arg6, arg7 };
-                var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                MockingContext.CurrentRepository.AssertMethodInfo(null, null, ctor, args, null);
-            });
+            ProfilerInterceptor.GuardInternal(() => AssertBaseConstructor(typeof(TBase), new object[] { arg1, arg2, arg3, arg4, arg5, arg6, arg7 }));
         }
 
         /// <summary>
@@ -378,16 +279,40 @@ namespace Telerik.JustMock
         /// </summary>
         public static void AssertBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7, object arg8) where TBase : class
         {
-            ProfilerInterceptor.GuardInternal(() =>
-            {
-                ValidateBaseConstructorTarget(typeof(TBase));
-                var args = new object[] { arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 };
-                var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                MockingContext.CurrentRepository.AssertMethodInfo(null, null, ctor, args, null);
-            });
+            ProfilerInterceptor.GuardInternal(() => AssertBaseConstructor(typeof(TBase), new object[] { arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 }));
         }
 
         // ---- Private helpers ----
+
+        private static ActionExpectation ArrangeBaseConstructor(Type baseType, object[] args)
+        {
+            var repository = MockingContext.CurrentRepository;
+            try
+            {
+                ValidateBaseConstructorTarget(baseType);
+                var ctor = ResolveBaseConstructor(baseType, args);
+                return ArrangeBaseConstructorCore(ctor, args);
+            }
+            finally
+            {
+                repository.MatchersInContext.Clear();
+            }
+        }
+
+        private static void AssertBaseConstructor(Type baseType, object[] args)
+        {
+            var repository = MockingContext.CurrentRepository;
+            try
+            {
+                ValidateBaseConstructorTarget(baseType);
+                var ctor = ResolveBaseConstructor(baseType, args);
+                repository.AssertMethodInfo(null, null, ctor, args, null);
+            }
+            finally
+            {
+                repository.MatchersInContext.Clear();
+            }
+        }
 
         private static void ValidateBaseConstructorTarget(Type baseType)
         {
@@ -408,6 +333,14 @@ namespace Telerik.JustMock
             if (!ProfilerInterceptor.IsProfilerAttached)
             {
                 throw new ElevatedMockingException(baseType);
+            }
+
+            if (!ProfilerInterceptor.IsBaseConstructorInterceptionAvailable)
+            {
+                throw new ElevatedMockingException(
+                    baseType,
+                    "The attached JustMock profiler does not support base constructor interception. " +
+                    "Ensure that the profiler and managed JustMock assemblies have matching versions.");
             }
         }
 
@@ -441,7 +374,8 @@ namespace Telerik.JustMock
                     BuildAvailableConstructorsList(type, ctors));
             }
 
-            var matches = candidates.Where(c => ConstructorMatchesArguments(c, args)).ToArray();
+            var matcherTypes = GetMatcherTypes(args.Length);
+            var matches = candidates.Where(c => ConstructorMatchesArguments(c, args, matcherTypes)).ToArray();
             if (matches.Length == 0)
             {
                 throw new MockException(
@@ -459,28 +393,34 @@ namespace Telerik.JustMock
             return matches[0];
         }
 
-        private static ConstructorInfo ResolveBaseConstructor(Type type, Type[] argTypes)
+        private static Type[] GetMatcherTypes(int argumentCount)
         {
-            var ctor = type.GetConstructor(
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-                null, argTypes, null);
-
-            if (ctor == null)
+            var matchers = MockingContext.CurrentRepository.MatchersInContext;
+            var matcherTypes = new Type[argumentCount];
+            for (int i = 0; i < argumentCount; i++)
             {
-                throw new MockException(
-                    $"No constructor on type '{type.Name}' with parameter types [{string.Join(", ", argTypes.Select(t => t.Name))}] was found.");
+                var matcherIndex = i - (argumentCount - matchers.Count);
+                if (matcherIndex >= 0 && matcherIndex < matchers.Count)
+                {
+                    var typedMatcher = matchers[matcherIndex] as ITypedMatcher;
+                    if (typedMatcher != null)
+                    {
+                        matcherTypes[i] = typedMatcher.Type;
+                    }
+                }
             }
 
-            return ctor;
+            return matcherTypes;
         }
 
-        private static bool ConstructorMatchesArguments(ConstructorInfo ctor, object[] args)
+        private static bool ConstructorMatchesArguments(ConstructorInfo ctor, object[] args, Type[] matcherTypes)
         {
             var parameters = ctor.GetParameters();
             for (int i = 0; i < parameters.Length; i++)
             {
                 var arg = args[i];
-                if (arg == null)
+                var argType = matcherTypes[i] ?? (arg != null ? arg.GetType() : null);
+                if (argType == null)
                 {
                     // null matches any reference type or nullable
                     if (parameters[i].ParameterType.IsValueType &&
@@ -491,7 +431,6 @@ namespace Telerik.JustMock
                     continue;
                 }
 
-                var argType = arg.GetType();
                 var paramType = parameters[i].ParameterType;
 
                 if (!paramType.IsAssignableFrom(argType) && !IsImplicitlyConvertible(argType, paramType))

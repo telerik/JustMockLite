@@ -170,7 +170,7 @@ namespace Telerik.JustMock.Core
 
                 if (DispatchInvocation(invocation))
                 {
-                    return invocation.CallOriginal;
+                    return invocation.CallOriginal || !invocation.UserProvidedImplementation;
                 }
                 return true; // no arrangement found, call original
             }
@@ -294,11 +294,13 @@ namespace Telerik.JustMock.Core
                     bridge.GetField("ProcessNewobj").SetValue(null, interceptNewobjDelegate);
 
                     var processBaseCtorCallType = typeof(object).Assembly.GetType("Telerik.JustMock.ProcessBaseCtorCallDelegate");
-                    if (processBaseCtorCallType != null)
+                    var processBaseCtorCallField = bridge.GetField("ProcessBaseCtorCall");
+                    if (processBaseCtorCallType != null && processBaseCtorCallField != null)
                     {
                         Func<object, RuntimeTypeHandle, RuntimeMethodHandle, object[], bool> interceptBaseCtorCallFunc = InterceptBaseCtorCall;
                         var interceptBaseCtorCallDelegate = Delegate.CreateDelegate(processBaseCtorCallType, interceptBaseCtorCallFunc.Method);
-                        bridge.GetField("ProcessBaseCtorCall").SetValue(null, interceptBaseCtorCallDelegate);
+                        processBaseCtorCallField.SetValue(null, interceptBaseCtorCallDelegate);
+                        IsBaseConstructorInterceptionAvailable = true;
                     }
 #if DEBUG
                     else
@@ -727,6 +729,7 @@ namespace Telerik.JustMock.Core
         }
 
         public static bool IsProfilerAttached { [DebuggerHidden] get { return bridge != null; } }
+        public static bool IsBaseConstructorInterceptionAvailable { get; private set; }
         public static bool IsInterceptionEnabled { get; set; }
         public static readonly Func<Type, object> GetUninitializedObjectImpl;
         public static readonly Func<string, byte[], object> CreateStrongNameAssemblyNameImpl;
