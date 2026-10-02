@@ -25,7 +25,7 @@ namespace JustMock.NonElevatedExamples.AdvancedUsage.MockingDbContext
                     new Patient { Id = 3, Name = "Mia Chen", Department = "Neurology", DoctorId = 20, IsActive = true });
                 backingContext.SaveChanges();
 
-                var context = Mock.Create<HealthcareContext>();
+                using var context = Mock.Create<HealthcareContext>();
                 Mock.Arrange(() => context.Patients).Returns(backingContext.Patients);
 
                 var actual = new PatientDirectory(context).FindActivePatient("Cardiology");
@@ -38,7 +38,7 @@ namespace JustMock.NonElevatedExamples.AdvancedUsage.MockingDbContext
         [TestMethod]
         public void ShouldFakeAddingPatientWithoutWritingToDatabase()
         {
-            var context = Mock.Create<HealthcareContext>();
+            using var context = Mock.Create<HealthcareContext>();
             var patients = new List<Patient>();
             var patientSet = Mock.Create<DbSet<Patient>>();
             var patient = new Patient

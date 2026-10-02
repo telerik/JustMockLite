@@ -23,7 +23,7 @@ namespace JustMock.NonElevatedExamples.AdvancedUsage.MockingDbContextSeams
                     new SeamPatient { Id = 2, Name = "Liam Turner", Department = "Cardiology", IsActive = true });
                 backingContext.SaveChanges();
 
-                var context = Mock.Create<SeamHealthcareContext>();
+                using var context = Mock.Create<SeamHealthcareContext>();
                 Mock.Arrange(() => context.Patients).Returns(backingContext.Patients);
 
                 var actual = new VirtualPatientReader(context).FindActivePatient();

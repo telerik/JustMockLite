@@ -27,7 +27,7 @@ namespace JustMock.NonElevatedExamples.AdvancedUsage.MockingDbContextAsync
                     new AsyncPatient { Id = 4, Name = "Noah Williams", Department = "Pediatrics", DoctorId = 30, IsActive = true });
                 await backingContext.SaveChangesAsync();
 
-                var context = Mock.Create<AsyncHealthcareContext>();
+                using var context = Mock.Create<AsyncHealthcareContext>();
                 Mock.Arrange(() => context.Patients).Returns(backingContext.Patients);
 
                 var actual = await new AsyncPatientDirectory(context).FindActiveNamesAsync("Cardiology");
@@ -41,7 +41,7 @@ namespace JustMock.NonElevatedExamples.AdvancedUsage.MockingDbContextAsync
         {
             using (var backingContext = AsyncHealthcareContext.CreateInMemory("MockingDbContextAsync.Save"))
             {
-                var context = Mock.Create<AsyncHealthcareContext>();
+                using var context = Mock.Create<AsyncHealthcareContext>();
                 Mock.Arrange(() => context.Patients).Returns(backingContext.Patients);
                 Mock.Arrange(() => context.SaveChangesAsync(Arg.IsAny<CancellationToken>()))
                     .ReturnsAsync(1)
@@ -67,7 +67,7 @@ namespace JustMock.NonElevatedExamples.AdvancedUsage.MockingDbContextAsync
         {
             using (var backingContext = AsyncHealthcareContext.CreateInMemory("MockingDbContextAsync.Occurrence"))
             {
-                var context = Mock.Create<AsyncHealthcareContext>();
+                using var context = Mock.Create<AsyncHealthcareContext>();
                 Mock.Arrange(() => context.Patients).Returns(backingContext.Patients);
                 Mock.Arrange(() => context.SaveChangesAsync(Arg.IsAny<CancellationToken>()))
                     .ReturnsAsync(1);

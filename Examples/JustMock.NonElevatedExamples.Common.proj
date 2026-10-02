@@ -20,6 +20,10 @@
     <Compile Remove="AdvancedUsage\MockingDbSetQueries.cs" />
     <Compile Remove="AdvancedUsage\MockingDbContextAsync.cs" />
     <Compile Remove="AdvancedUsage\MockingDbContextSeams.cs" />
+    <Compile Remove="AdvancedUsage\MockingDbContext.vb" />
+    <Compile Remove="AdvancedUsage\MockingDbSetQueries.vb" />
+    <Compile Remove="AdvancedUsage\MockingDbContextAsync.vb" />
+    <Compile Remove="AdvancedUsage\MockingDbContextSeams.vb" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
