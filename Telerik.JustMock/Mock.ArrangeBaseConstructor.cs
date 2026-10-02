@@ -257,18 +257,17 @@ namespace Telerik.JustMock
         /// any occurrence expectations set via <see cref="ArrangeBaseConstructor{TBase}()"/>.
         /// </summary>
         /// <typeparam name="TBase">The base class whose constructor to assert. Must be a non-sealed reference type.</typeparam>
-        /// <param name="message">Optional failure message.</param>
         /// <remarks>Requires the JustMock profiler. Must be paired with a prior
         /// <see cref="ArrangeBaseConstructor{TBase}()"/> call that sets occurrence expectations.</remarks>
         /// <exception cref="ElevatedMockingException">Thrown when the profiler is not attached.</exception>
         /// <exception cref="MockException">Thrown on invalid type or unresolvable constructor overload.</exception>
-        public static void AssertBaseConstructor<TBase>(string message = null) where TBase : class
+        public static void AssertBaseConstructor<TBase>() where TBase : class
         {
             ProfilerInterceptor.GuardInternal(() =>
             {
                 ValidateBaseConstructorTarget(typeof(TBase));
                 var ctor = ResolveBaseConstructor(typeof(TBase), Type.EmptyTypes);
-                MockingContext.CurrentRepository.AssertMethodInfo(message, null, ctor, new object[0], null);
+                MockingContext.CurrentRepository.AssertMethodInfo(null, null, ctor, new object[0], null);
             });
         }
 
@@ -277,115 +276,114 @@ namespace Telerik.JustMock
         /// </summary>
         /// <typeparam name="TBase">The base class whose constructor to assert. Must be a non-sealed reference type.</typeparam>
         /// <param name="arg1">The first argument value or argument matcher.</param>
-        /// <param name="message">Optional failure message.</param>
         /// <exception cref="ElevatedMockingException">Thrown when the profiler is not attached.</exception>
         /// <exception cref="MockException">Thrown on invalid type or unresolvable constructor overload.</exception>
-        public static void AssertBaseConstructor<TBase>(object arg1, string message = null) where TBase : class
+        public static void AssertBaseConstructor<TBase>(object arg1) where TBase : class
         {
             ProfilerInterceptor.GuardInternal(() =>
             {
                 ValidateBaseConstructorTarget(typeof(TBase));
                 var args = new object[] { arg1 };
                 var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                MockingContext.CurrentRepository.AssertMethodInfo(message, null, ctor, args, null);
+                MockingContext.CurrentRepository.AssertMethodInfo(null, null, ctor, args, null);
             });
         }
 
         /// <summary>
         /// Asserts the base constructor of <typeparamref name="TBase"/> matching the specified arguments.
         /// </summary>
-        public static void AssertBaseConstructor<TBase>(object arg1, object arg2, string message = null) where TBase : class
+        public static void AssertBaseConstructor<TBase>(object arg1, object arg2) where TBase : class
         {
             ProfilerInterceptor.GuardInternal(() =>
             {
                 ValidateBaseConstructorTarget(typeof(TBase));
                 var args = new object[] { arg1, arg2 };
                 var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                MockingContext.CurrentRepository.AssertMethodInfo(message, null, ctor, args, null);
+                MockingContext.CurrentRepository.AssertMethodInfo(null, null, ctor, args, null);
             });
         }
 
         /// <summary>
         /// Asserts the base constructor of <typeparamref name="TBase"/> matching the specified arguments.
         /// </summary>
-        public static void AssertBaseConstructor<TBase>(object arg1, object arg2, object arg3, string message = null) where TBase : class
+        public static void AssertBaseConstructor<TBase>(object arg1, object arg2, object arg3) where TBase : class
         {
             ProfilerInterceptor.GuardInternal(() =>
             {
                 ValidateBaseConstructorTarget(typeof(TBase));
                 var args = new object[] { arg1, arg2, arg3 };
                 var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                MockingContext.CurrentRepository.AssertMethodInfo(message, null, ctor, args, null);
+                MockingContext.CurrentRepository.AssertMethodInfo(null, null, ctor, args, null);
             });
         }
 
         /// <summary>
         /// Asserts the base constructor of <typeparamref name="TBase"/> matching the specified arguments.
         /// </summary>
-        public static void AssertBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4, string message = null) where TBase : class
+        public static void AssertBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4) where TBase : class
         {
             ProfilerInterceptor.GuardInternal(() =>
             {
                 ValidateBaseConstructorTarget(typeof(TBase));
                 var args = new object[] { arg1, arg2, arg3, arg4 };
                 var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                MockingContext.CurrentRepository.AssertMethodInfo(message, null, ctor, args, null);
+                MockingContext.CurrentRepository.AssertMethodInfo(null, null, ctor, args, null);
             });
         }
 
         /// <summary>
         /// Asserts the base constructor of <typeparamref name="TBase"/> matching the specified arguments.
         /// </summary>
-        public static void AssertBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4, object arg5, string message = null) where TBase : class
+        public static void AssertBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4, object arg5) where TBase : class
         {
             ProfilerInterceptor.GuardInternal(() =>
             {
                 ValidateBaseConstructorTarget(typeof(TBase));
                 var args = new object[] { arg1, arg2, arg3, arg4, arg5 };
                 var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                MockingContext.CurrentRepository.AssertMethodInfo(message, null, ctor, args, null);
+                MockingContext.CurrentRepository.AssertMethodInfo(null, null, ctor, args, null);
             });
         }
 
         /// <summary>
         /// Asserts the base constructor of <typeparamref name="TBase"/> matching the specified arguments.
         /// </summary>
-        public static void AssertBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, string message = null) where TBase : class
+        public static void AssertBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4, object arg5, object arg6) where TBase : class
         {
             ProfilerInterceptor.GuardInternal(() =>
             {
                 ValidateBaseConstructorTarget(typeof(TBase));
                 var args = new object[] { arg1, arg2, arg3, arg4, arg5, arg6 };
                 var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                MockingContext.CurrentRepository.AssertMethodInfo(message, null, ctor, args, null);
+                MockingContext.CurrentRepository.AssertMethodInfo(null, null, ctor, args, null);
             });
         }
 
         /// <summary>
         /// Asserts the base constructor of <typeparamref name="TBase"/> matching the specified arguments.
         /// </summary>
-        public static void AssertBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7, string message = null) where TBase : class
+        public static void AssertBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7) where TBase : class
         {
             ProfilerInterceptor.GuardInternal(() =>
             {
                 ValidateBaseConstructorTarget(typeof(TBase));
                 var args = new object[] { arg1, arg2, arg3, arg4, arg5, arg6, arg7 };
                 var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                MockingContext.CurrentRepository.AssertMethodInfo(message, null, ctor, args, null);
+                MockingContext.CurrentRepository.AssertMethodInfo(null, null, ctor, args, null);
             });
         }
 
         /// <summary>
         /// Asserts the base constructor of <typeparamref name="TBase"/> matching the specified arguments.
         /// </summary>
-        public static void AssertBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7, object arg8, string message = null) where TBase : class
+        public static void AssertBaseConstructor<TBase>(object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7, object arg8) where TBase : class
         {
             ProfilerInterceptor.GuardInternal(() =>
             {
                 ValidateBaseConstructorTarget(typeof(TBase));
                 var args = new object[] { arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 };
                 var ctor = ResolveBaseConstructor(typeof(TBase), args);
-                MockingContext.CurrentRepository.AssertMethodInfo(message, null, ctor, args, null);
+                MockingContext.CurrentRepository.AssertMethodInfo(null, null, ctor, args, null);
             });
         }
 
