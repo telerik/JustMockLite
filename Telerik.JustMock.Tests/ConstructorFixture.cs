@@ -59,6 +59,17 @@ namespace Telerik.JustMock.Tests
             });
         }
 
+#if LITE_EDITION
+        [TestMethod, TestCategory("Lite"), TestCategory("Constructor")]
+        public void ShouldNotExposeBaseConstructorApiInLiteEdition()
+        {
+            var publicMethods = typeof(Mock).GetMethods();
+
+            Assert.False(Array.Exists(publicMethods, method =>
+                method.Name == "ArrangeBaseConstructor" || method.Name == "AssertBaseConstructor"));
+        }
+#endif
+
 #if !(COREFX && LITE_EDITION)
         [TestMethod, TestCategory("Lite"), TestCategory("Constructor")]
 #if SILVERLIGHT
