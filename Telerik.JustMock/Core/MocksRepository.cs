@@ -508,6 +508,11 @@ namespace Telerik.JustMock.Core
                 }
             }
 
+            if (invocation.IsBaseCtorBodyInvocation)
+            {
+                invocation.CallOriginal = true;
+            }
+
             if (!invocation.CallOriginal && !invocation.IsReturnValueSet && invocation.Method.GetReturnType() != typeof(void))
             {
                 Type returnType = invocation.Method.GetReturnType();
@@ -1711,6 +1716,13 @@ namespace Telerik.JustMock.Core
             if (!invocation.InArrange && !invocation.InAssertSet && !baseConstructorBodyInvocation)
             {
                 funcRoot.AddOrUpdateOccurence(callPattern, methodMock);
+            }
+            else if (baseConstructorBodyInvocation && methodMock == null)
+            {
+                // A base-constructor arrangement is intentionally excluded from the
+                // constructor-body path. The body must still execute when the dedicated
+                // base-call arrangement only records an occurrence.
+                invocation.IsBaseCtorBodyInvocation = true;
             }
 
             return methodMock != null;

@@ -60,6 +60,7 @@ namespace Telerik.JustMock.Core
 
         internal bool InArrange { get; set; }
         internal bool IsBaseCtorCall { get; set; }
+        internal bool IsBaseCtorBodyInvocation { get; set; }
         internal bool InArrangeArgMatching { get; set; }
         internal bool InAssertSet { get; set; }
         internal bool InRunClassConstructor { get; set; }
