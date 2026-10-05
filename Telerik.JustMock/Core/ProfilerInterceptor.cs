@@ -129,9 +129,13 @@ namespace Telerik.JustMock.Core
 
                 if (DispatchInvocation(invocation))
                 {
-                    if (invocation.CallOriginal && invocation.UserProvidedImplementation)
+                    if (invocation.CallOriginal)
                     {
-                        SkipMethodInterceptionOnce(method);
+                        if (invocation.UserProvidedImplementation)
+                        {
+                            SkipMethodInterceptionOnce(method);
+                        }
+
                         return null;
                     }
                     if (invocation.IsReturnValueSet && invocation.ReturnValue != null)
