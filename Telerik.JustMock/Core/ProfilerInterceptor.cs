@@ -170,6 +170,14 @@ namespace Telerik.JustMock.Core
 
                 if (DispatchInvocation(invocation))
                 {
+                    if (invocation.CallOriginal)
+                    {
+                        // The base constructor body is instrumented separately. Consume that
+                        // interception so CallOriginal executes the body exactly once without
+                        // dispatching the base-constructor arrangement a second time.
+                        SkipMethodInterceptionOnce(method);
+                    }
+
                     return invocation.CallOriginal || !invocation.UserProvidedImplementation;
                 }
                 return true; // no arrangement found, call original
