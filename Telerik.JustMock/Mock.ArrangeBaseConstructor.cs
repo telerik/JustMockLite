@@ -15,6 +15,7 @@
    limitations under the License.
 */
 
+#if !LITE_EDITION
 using System;
 using System.Linq;
 using System.Reflection;
@@ -490,3 +491,4 @@ namespace Telerik.JustMock
         }
     }
 }
+#endif
