@@ -40,6 +40,8 @@ namespace Telerik.JustMock
         /// non-virtual and can only be intercepted at the IL level.</para>
         /// <para>The arrangement applies globally to all call sites of the specified constructor,
         /// regardless of which derived type triggers it.</para>
+        /// <para>Constructor overload resolution prefers exact argument or typed-matcher types,
+        /// then more specific compatible parameter types. Unrelated overloads remain ambiguous.</para>
         /// <para>When <see cref="ActionExpectation"/> is used with <c>DoNothing()</c> to suppress the base constructor body,
         /// any further constructors chained from within that body (e.g. grandparent constructors) are also
         /// not executed, as they are only reachable through the suppressed body.</para>
@@ -348,8 +350,8 @@ namespace Telerik.JustMock
         /// <summary>
         /// Resolves a constructor on <paramref name="type"/> whose parameter count matches
         /// <paramref name="args"/>.Length and whose parameter types are compatible with the supplied values.
-        /// Argument matchers (e.g. <c>Arg.IsAny&lt;int&gt;()</c>) are supported — the matcher value's
-        /// runtime type is used for compatibility checking.
+        /// Typed matcher information takes precedence over placeholder values. Exact parameter
+        /// matches and more specific compatible parameter types take precedence over broader overloads.
         /// </summary>
         private static ConstructorInfo ResolveBaseConstructor(Type type, object[] args)
         {
@@ -385,6 +387,11 @@ namespace Telerik.JustMock
             }
             if (matches.Length > 1)
             {
+                matches = matches.Where(candidate => !matches.Any(other =>
+                    other != candidate && IsBetterConstructorMatch(other, candidate, args, matcherTypes))).ToArray();
+            }
+            if (matches.Length > 1)
+            {
                 throw new MockException(
                     $"Ambiguous constructor match on type '{type.Name}': multiple constructors match the supplied arguments. " +
                     "Provide arguments with more specific types to disambiguate. " +
@@ -392,6 +399,39 @@ namespace Telerik.JustMock
             }
 
             return matches[0];
+        }
+
+        private static bool IsBetterConstructorMatch(ConstructorInfo candidate, ConstructorInfo other, object[] args, Type[] matcherTypes)
+        {
+            var parameters = candidate.GetParameters();
+            var otherParameters = other.GetParameters();
+            bool better = false;
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                var parameterType = parameters[i].ParameterType;
+                var otherType = otherParameters[i].ParameterType;
+                if (parameterType == otherType)
+                    continue;
+
+                var argumentType = matcherTypes[i] ?? (args[i] != null ? args[i].GetType() : null);
+                if (argumentType == parameterType)
+                {
+                    better = true;
+                    continue;
+                }
+                if (argumentType == otherType)
+                    return false;
+
+                bool candidateConvertsToOther = otherType.IsAssignableFrom(parameterType)
+                    || IsImplicitlyConvertible(parameterType, otherType);
+                bool otherConvertsToCandidate = parameterType.IsAssignableFrom(otherType)
+                    || IsImplicitlyConvertible(otherType, parameterType);
+                if (!candidateConvertsToOther || otherConvertsToCandidate)
+                    return false;
+
+                better = true;
+            }
+            return better;
         }
 
         private static Type[] GetMatcherTypes(int argumentCount)
