@@ -476,13 +476,7 @@ namespace Telerik.JustMock
         {
             var repo = MockingContext.CurrentRepository;
             repo.EnableInterception(ctor.DeclaringType);
-            // RequestRejitForTypeMethods only covers regular methods, not constructors.
-            // Explicitly ReJIT the specific constructor so EmitCallInterceptionCode
-            // instruments it, allowing InterceptCall to intercept the base call.
-            if (ProfilerInterceptor.IsReJitEnabled)
-            {
-                ProfilerInterceptor.RequestReJit(ctor);
-            }
+            
             var expectation = repo.Arrange(null, ctor, args, () => new ActionExpectation());
             // Mark as a base-ctor arrangement so dispatch only fires from InterceptBaseCtorCall,
             // not from normal body interception when CallOriginal() lets the ctor body run.
