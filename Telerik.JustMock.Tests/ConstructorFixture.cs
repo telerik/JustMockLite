@@ -133,6 +133,66 @@ namespace Telerik.JustMock.Tests
         }
 
         [TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
+        public void ShouldCallOriginalBaseConstructorWhenCallOriginalIsArranged()
+        {
+            BaseCtorTarget.CallCount = 0;
+            Mock.ArrangeBaseConstructor<BaseCtorTarget>().CallOriginal().OccursOnce();
+
+            new BaseCtorDerived();
+
+            Assert.Equal(1, BaseCtorTarget.CallCount);
+            Mock.AssertBaseConstructor<BaseCtorTarget>();
+        }
+
+        [TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
+        public void ShouldRunCallbackOnceWhenCallingOriginalBaseConstructor()
+        {
+            BaseCtorTarget.CallCount = 0;
+            var callbackCount = 0;
+            Mock.ArrangeBaseConstructor<BaseCtorTarget>()
+                .DoInstead(() => callbackCount++)
+                .CallOriginal()
+                .OccursOnce();
+
+            new BaseCtorDerived();
+
+            Assert.Equal(1, callbackCount);
+            Assert.Equal(1, BaseCtorTarget.CallCount);
+            Mock.AssertBaseConstructor<BaseCtorTarget>();
+        }
+
+        [TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
+        public void ShouldCallBaseConstructorForEachDerivedConstruction()
+        {
+            BaseCtorTarget.CallCount = 0;
+            Mock.ArrangeBaseConstructor<BaseCtorTarget>().Occurs(2);
+
+            new BaseCtorDerived();
+            new BaseCtorDerived();
+
+            Assert.Equal(2, BaseCtorTarget.CallCount);
+            Mock.AssertBaseConstructor<BaseCtorTarget>();
+        }
+
+        [TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
+        public void ShouldFailBaseConstructorAssertionWhenOccurrenceIsNotMet()
+        {
+            Mock.ArrangeBaseConstructor<BaseCtorTarget>().Occurs(2);
+
+            new BaseCtorDerived();
+
+            Assert.Throws<AssertionException>(() => Mock.AssertBaseConstructor<BaseCtorTarget>());
+        }
+
+        [TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
+        public void ShouldReportForbiddenBaseConstructorCall()
+        {
+            Mock.ArrangeBaseConstructor<BaseCtorTarget>().OccursNever();
+
+            Assert.Throws<AssertionException>(() => new BaseCtorDerived());
+        }
+
+        [TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
         public void ShouldResolveBaseConstructorUsingReferenceTypeMatcher()
         {
             Mock.ArrangeBaseConstructor<OverloadedBaseCtorTarget>(Arg.IsAny<string>()).OccursOnce();
@@ -140,6 +200,69 @@ namespace Telerik.JustMock.Tests
             new OverloadedBaseCtorDerived("value");
 
             Mock.AssertBaseConstructor<OverloadedBaseCtorTarget>(Arg.IsAny<string>());
+        }
+
+        [TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
+        public void ShouldResolveOverloadedBaseConstructorWithSpecificMatcherType()
+        {
+            Mock.ArrangeBaseConstructor<OverloadedBaseCtorTarget>(Arg.IsAny<Uri>()).OccursOnce();
+
+            new OverloadedBaseCtorDerived(new Uri("https://example.com"));
+
+            Mock.AssertBaseConstructor<OverloadedBaseCtorTarget>(Arg.IsAny<Uri>());
+        }
+
+        [TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
+        public void ShouldNotMatchBaseConstructorWithDifferentArgument()
+        {
+            Mock.ArrangeBaseConstructor<ArgumentBaseCtorTarget>(42).OccursOnce();
+
+            new ArgumentBaseCtorDerived(43);
+
+            Assert.Throws<AssertionException>(() =>
+                Mock.AssertBaseConstructor<ArgumentBaseCtorTarget>(42));
+        }
+
+        [TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
+        public void ShouldResolveImplicitNumericConstructorConversion()
+        {
+            var arrangement = Mock.ArrangeBaseConstructor<NumericBaseCtorTarget>(42);
+
+            Assert.NotNull(arrangement);
+        }
+
+        [TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
+        public void ShouldApplyBaseConstructorArrangementAcrossDerivedTypes()
+        {
+            Mock.ArrangeBaseConstructor<SharedBaseCtorTarget>().Occurs(2);
+
+            new FirstSharedBaseCtorDerived();
+            new SecondSharedBaseCtorDerived();
+
+            Mock.AssertBaseConstructor<SharedBaseCtorTarget>();
+        }
+
+        [TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
+        public void ShouldSuppressReachableConstructorsWhenIntermediateBodyIsSuppressed()
+        {
+            InheritanceBaseCtorTarget.GrandparentCallCount = 0;
+            InheritanceBaseCtorTarget.ParentCallCount = 0;
+            Mock.ArrangeBaseConstructor<InheritanceParentCtorTarget>().DoNothing().OccursOnce();
+
+            new InheritanceDerived();
+
+            Assert.Equal(0, InheritanceBaseCtorTarget.GrandparentCallCount);
+            Assert.Equal(0, InheritanceBaseCtorTarget.ParentCallCount);
+            Mock.AssertBaseConstructor<InheritanceParentCtorTarget>();
+        }
+
+        [TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
+        public void ShouldReportWhenBaseConstructorOverloadDoesNotExist()
+        {
+            var exception = Assert.Throws<MockException>(() =>
+                Mock.ArrangeBaseConstructor<CleanupBaseCtorTarget>("wrong"));
+
+            Assert.True(exception.Message.Contains("No constructor"));
         }
 
         [TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
@@ -185,6 +308,79 @@ namespace Telerik.JustMock.Tests
                 : base(value)
             {
             }
+
+            public OverloadedBaseCtorDerived(Uri value)
+                : base(value)
+            {
+            }
+        }
+
+        public class ArgumentBaseCtorTarget
+        {
+            protected ArgumentBaseCtorTarget(int value)
+            {
+            }
+        }
+
+        public class ArgumentBaseCtorDerived : ArgumentBaseCtorTarget
+        {
+            public ArgumentBaseCtorDerived(int value)
+                : base(value)
+            {
+            }
+        }
+
+        public class NumericBaseCtorTarget
+        {
+            protected NumericBaseCtorTarget(long value)
+            {
+            }
+        }
+
+        public class NumericBaseCtorDerived : NumericBaseCtorTarget
+        {
+            public NumericBaseCtorDerived(long value)
+                : base(value)
+            {
+            }
+        }
+
+        public class SharedBaseCtorTarget
+        {
+            protected SharedBaseCtorTarget()
+            {
+            }
+        }
+
+        public class FirstSharedBaseCtorDerived : SharedBaseCtorTarget
+        {
+        }
+
+        public class SecondSharedBaseCtorDerived : SharedBaseCtorTarget
+        {
+        }
+
+        public class InheritanceBaseCtorTarget
+        {
+            public static int GrandparentCallCount;
+            public static int ParentCallCount;
+
+            protected InheritanceBaseCtorTarget()
+            {
+                GrandparentCallCount++;
+            }
+        }
+
+        public class InheritanceParentCtorTarget : InheritanceBaseCtorTarget
+        {
+            protected InheritanceParentCtorTarget()
+            {
+                ParentCallCount++;
+            }
+        }
+
+        public class InheritanceDerived : InheritanceParentCtorTarget
+        {
         }
 
         public class AmbiguousBaseCtorTarget
