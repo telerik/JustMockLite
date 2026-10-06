@@ -16,6 +16,7 @@
 */
 
 using System;
+using System.Reflection;
 using Telerik.JustMock.Core;
 
 #region JustMock Test Attributes
@@ -91,6 +92,131 @@ namespace Telerik.JustMock.Tests
 #endif
 
 #if !LITE_EDITION
+        [TestMethod, TestCategory("ConstructorResolution"), TestCategory("Constructor")]
+        public void ShouldPreferExactBaseConstructorOverObjectOverload()
+        {
+            var ctor = ResolveBaseConstructorForTest(typeof(RankedBaseCtorTarget), "value");
+
+            Assert.Equal(typeof(string), ctor.GetParameters()[0].ParameterType);
+        }
+
+        [TestMethod, TestCategory("ConstructorResolution"), TestCategory("Constructor")]
+        public void ShouldPreferMoreSpecificBaseConstructorForNull()
+        {
+            var ctor = ResolveBaseConstructorForTest(typeof(RankedBaseCtorTarget), new object[] { null });
+
+            Assert.Equal(typeof(string), ctor.GetParameters()[0].ParameterType);
+        }
+
+        [TestMethod, TestCategory("ConstructorResolution"), TestCategory("Constructor")]
+        public void ShouldPreferTypedMatcherOverNullPlaceholderSpecificity()
+        {
+            var flags = BindingFlags.Instance | BindingFlags.NonPublic;
+            var objectCtor = typeof(RankedBaseCtorTarget).GetConstructor(flags, null, new[] { typeof(object) }, null);
+            var stringCtor = typeof(RankedBaseCtorTarget).GetConstructor(flags, null, new[] { typeof(string) }, null);
+            var accessor = PrivateAccessor.ForType(typeof(Mock));
+
+            Assert.True((bool)accessor.CallMethod("IsBetterConstructorMatch",
+                objectCtor, stringCtor, new object[] { null }, new[] { typeof(object) }));
+            Assert.False((bool)accessor.CallMethod("IsBetterConstructorMatch",
+                stringCtor, objectCtor, new object[] { null }, new[] { typeof(object) }));
+        }
+
+        [TestMethod, TestCategory("ConstructorResolution"), TestCategory("Constructor")]
+        public void ShouldPreferInterfaceBaseConstructorOverObjectOverload()
+        {
+            var ctor = ResolveBaseConstructorForTest(typeof(InterfaceRankedBaseCtorTarget), "value");
+
+            Assert.Equal(typeof(IComparable), ctor.GetParameters()[0].ParameterType);
+        }
+
+        [TestMethod, TestCategory("ConstructorResolution"), TestCategory("Constructor")]
+        public void ShouldPreferExactNumericBaseConstructorOverWidening()
+        {
+            var ctor = ResolveBaseConstructorForTest(typeof(NumericRankedBaseCtorTarget), 42);
+
+            Assert.Equal(typeof(int), ctor.GetParameters()[0].ParameterType);
+        }
+
+        [TestMethod, TestCategory("ConstructorResolution"), TestCategory("Constructor")]
+        public void ShouldPreferNarrowerCompatibleNumericBaseConstructor()
+        {
+            var ctor = ResolveBaseConstructorForTest(typeof(NumericWideningBaseCtorTarget), 42);
+
+            Assert.Equal(typeof(long), ctor.GetParameters()[0].ParameterType);
+        }
+
+        [TestMethod, TestCategory("ConstructorResolution"), TestCategory("Constructor")]
+        public void ShouldKeepUnrelatedInterfaceBaseConstructorsAmbiguous()
+        {
+            var exception = Assert.Throws<TargetInvocationException>(() =>
+                ResolveBaseConstructorForTest(typeof(AmbiguousBaseCtorTarget), "value"));
+
+            Assert.True(exception.InnerException is MockException);
+            Assert.True(exception.InnerException.Message.Contains("Ambiguous constructor"));
+        }
+
+        [TestMethod, TestCategory("ConstructorResolution"), TestCategory("Constructor")]
+        public void ShouldKeepConflictingParameterPreferencesAmbiguous()
+        {
+            var exception = Assert.Throws<TargetInvocationException>(() =>
+                ResolveBaseConstructorForTest(typeof(CrossRankedBaseCtorTarget), "first", "second"));
+
+            Assert.True(exception.InnerException is MockException);
+            Assert.True(exception.InnerException.Message.Contains("Ambiguous constructor"));
+        }
+
+        private static ConstructorInfo ResolveBaseConstructorForTest(Type type, params object[] args)
+        {
+            return (ConstructorInfo)PrivateAccessor.ForType(typeof(Mock))
+                .CallMethod("ResolveBaseConstructor", type, args);
+        }
+
+        public class RankedBaseCtorTarget
+        {
+            protected RankedBaseCtorTarget(object value) { }
+            protected RankedBaseCtorTarget(string value) { }
+        }
+
+        public class InterfaceRankedBaseCtorTarget
+        {
+            protected InterfaceRankedBaseCtorTarget(object value) { }
+            protected InterfaceRankedBaseCtorTarget(IComparable value) { }
+        }
+
+        public class NumericRankedBaseCtorTarget
+        {
+            protected NumericRankedBaseCtorTarget(long value) { }
+            protected NumericRankedBaseCtorTarget(int value) { }
+        }
+
+        public class NumericWideningBaseCtorTarget
+        {
+            protected NumericWideningBaseCtorTarget(double value) { }
+            protected NumericWideningBaseCtorTarget(long value) { }
+        }
+
+        public class CrossRankedBaseCtorTarget
+        {
+            protected CrossRankedBaseCtorTarget(string first, object second) { }
+            protected CrossRankedBaseCtorTarget(object first, string second) { }
+        }
+
+        [TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
+        public void ShouldPreferExactBaseConstructorWithTypedMatcher()
+        {
+            Mock.ArrangeBaseConstructor<RankedBaseCtorTarget>(Arg.IsAny<string>()).OccursOnce();
+
+            new RankedBaseCtorDerived("value");
+
+            Mock.AssertBaseConstructor<RankedBaseCtorTarget>(Arg.IsAny<string>());
+        }
+
+        public class RankedBaseCtorDerived : RankedBaseCtorTarget
+        {
+            public RankedBaseCtorDerived(string value) : base(value) { }
+        }
+
         [TestMethod, TestCategory("Elevated"), TestCategory("Constructor")]
         public void ShouldCreateMockForFrameWorkClassWithInternalCtor()
         {
@@ -385,11 +511,11 @@ namespace Telerik.JustMock.Tests
 
         public class AmbiguousBaseCtorTarget
         {
-            protected AmbiguousBaseCtorTarget(string value)
+            protected AmbiguousBaseCtorTarget(IComparable value)
             {
             }
 
-            protected AmbiguousBaseCtorTarget(object value)
+            protected AmbiguousBaseCtorTarget(ICloneable value)
             {
             }
         }
