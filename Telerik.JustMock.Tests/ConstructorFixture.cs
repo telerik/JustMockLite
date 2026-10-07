@@ -172,6 +172,104 @@ namespace Telerik.JustMock.Tests
                 .CallMethod("ResolveBaseConstructor", type, args);
         }
 
+        [TestMethod, TestCategory("ConstructorResolution"), TestCategory("Constructor")]
+        public void ShouldSupportAllImplicitNumericBaseConstructorConversions()
+        {
+            var sources = new[] { typeof(sbyte), typeof(byte), typeof(short), typeof(ushort), typeof(int),
+                typeof(uint), typeof(long), typeof(ulong), typeof(char), typeof(float), typeof(double), typeof(decimal) };
+            var targets = new[]
+            {
+                new[] { typeof(short), typeof(int), typeof(long), typeof(float), typeof(double), typeof(decimal) },
+                new[] { typeof(short), typeof(ushort), typeof(int), typeof(uint), typeof(long), typeof(ulong), typeof(float), typeof(double), typeof(decimal) },
+                new[] { typeof(int), typeof(long), typeof(float), typeof(double), typeof(decimal) },
+                new[] { typeof(int), typeof(uint), typeof(long), typeof(ulong), typeof(float), typeof(double), typeof(decimal) },
+                new[] { typeof(long), typeof(float), typeof(double), typeof(decimal) },
+                new[] { typeof(long), typeof(ulong), typeof(float), typeof(double), typeof(decimal) },
+                new[] { typeof(float), typeof(double), typeof(decimal) },
+                new[] { typeof(float), typeof(double), typeof(decimal) },
+                new[] { typeof(ushort), typeof(int), typeof(uint), typeof(long), typeof(ulong), typeof(float), typeof(double), typeof(decimal) },
+                new[] { typeof(double) },
+                new Type[0],
+                new Type[0]
+            };
+            var accessor = PrivateAccessor.ForType(typeof(Mock));
+            for (int i = 0; i < sources.Length; i++)
+            {
+                foreach (var target in sources)
+                {
+                    Assert.Equal(Array.IndexOf(targets[i], target) >= 0,
+                        (bool)accessor.CallMethod("IsImplicitlyConvertible", sources[i], target));
+                }
+            }
+            Assert.False((bool)accessor.CallMethod("IsImplicitlyConvertible", typeof(DayOfWeek), typeof(long)));
+            Assert.False((bool)accessor.CallMethod("IsImplicitlyConvertible", typeof(byte), typeof(DayOfWeek)));
+            Assert.False((bool)accessor.CallMethod("IsImplicitlyConvertible", typeof(bool), typeof(int)));
+        }
+
+        [TestMethod, TestCategory("ConstructorResolution"), TestCategory("Constructor")]
+        public void ShouldResolveWidenedBaseConstructorArguments()
+        {
+            var ctor = ResolveBaseConstructorForTest(typeof(NumericRankedBaseCtorTarget), (byte)42);
+            Assert.Equal(typeof(int), ctor.GetParameters()[0].ParameterType);
+
+            ctor = ResolveBaseConstructorForTest(typeof(NumericWideningBaseCtorTarget), (uint)42);
+            Assert.Equal(typeof(long), ctor.GetParameters()[0].ParameterType);
+        }
+
+        [TestMethod, TestCategory("ConstructorResolution"), TestCategory("Constructor")]
+        public void ShouldNormalizeWidenedBaseConstructorLiteralArguments()
+        {
+            var accessor = PrivateAccessor.ForType(typeof(Mock));
+            var ctor = ResolveBaseConstructorForTest(typeof(NumericRankedBaseCtorTarget), (byte)42);
+            var args = new object[] { (byte)42 };
+            accessor.CallMethod("NormalizeBaseConstructorArguments", ctor, args);
+            Assert.Equal(typeof(int), args[0].GetType());
+            Assert.Equal(42, (int)args[0]);
+
+            ctor = ResolveBaseConstructorForTest(typeof(NumericWideningBaseCtorTarget), 'A');
+            args = new object[] { 'A' };
+            accessor.CallMethod("NormalizeBaseConstructorArguments", ctor, args);
+            Assert.Equal(typeof(long), args[0].GetType());
+            Assert.Equal(65L, (long)args[0]);
+        }
+
+        [TestMethod, TestCategory("ConstructorResolution"), TestCategory("Constructor")]
+        public void ShouldNormalizeWidenedBaseConstructorTypeMatchers()
+        {
+            var accessor = PrivateAccessor.ForType(typeof(Mock));
+            try
+            {
+                var args = new object[] { Arg.IsAny<byte>() };
+                var ctor = ResolveBaseConstructorForTest(typeof(NumericRankedBaseCtorTarget), args);
+                accessor.CallMethod("NormalizeBaseConstructorArguments", ctor, args);
+                var matcherTypes = (Type[])accessor.CallMethod("GetMatcherTypes", 1);
+                Assert.Equal(typeof(int), matcherTypes[0]);
+            }
+            finally
+            {
+                Mock.Reset();
+            }
+        }
+
+        [TestMethod, TestCategory("ConstructorResolution"), TestCategory("Constructor")]
+        public void ShouldRejectWidenedPredicateBaseConstructorMatcherExplicitly()
+        {
+            var accessor = PrivateAccessor.ForType(typeof(Mock));
+            try
+            {
+                var args = new object[] { Arg.Matches<byte>(value => value == 42) };
+                var ctor = ResolveBaseConstructorForTest(typeof(NumericRankedBaseCtorTarget), args);
+                var exception = Assert.Throws<TargetInvocationException>(() =>
+                    accessor.CallMethod("NormalizeBaseConstructorArguments", ctor, args));
+                Assert.True(exception.InnerException is MockException);
+                Assert.True(exception.InnerException.Message.Contains("parameter type 'Int32'"));
+            }
+            finally
+            {
+                Mock.Reset();
+            }
+        }
+
         public class RankedBaseCtorTarget
         {
             protected RankedBaseCtorTarget(object value) { }
