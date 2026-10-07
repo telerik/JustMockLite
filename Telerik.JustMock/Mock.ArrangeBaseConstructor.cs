@@ -38,17 +38,20 @@ namespace Telerik.JustMock
         /// <remarks>
         /// <para>This method requires the JustMock profiler (elevated mocking). Base constructors are
         /// non-virtual and can only be intercepted at the IL level.</para>
+        /// <para>Base constructor interception is not supported when OnDemand optimization is enabled.</para>
         /// <para>The arrangement applies globally to all call sites of the specified constructor,
         /// regardless of which derived type triggers it.</para>
         /// <para>Constructor overload resolution prefers exact argument or typed-matcher types,
         /// then more specific compatible parameter types. Unrelated overloads remain ambiguous.</para>
+        /// <para>Numeric values and <c>Arg.IsAny&lt;T&gt;()</c> support implicit numeric widening.
+        /// Predicate and range matchers must use the selected constructor parameter type.</para>
         /// <para>When <see cref="ActionExpectation"/> is used with <c>DoNothing()</c> to suppress the base constructor body,
         /// any further constructors chained from within that body (e.g. grandparent constructors) are also
         /// not executed, as they are only reachable through the suppressed body.</para>
         /// </remarks>
         /// <exception cref="ElevatedMockingException">Thrown when the profiler is not attached.</exception>
         /// <exception cref="MockException">Thrown when <typeparamref name="TBase"/> is sealed or a value type,
-        /// or when no matching constructor is found.</exception>
+        /// when OnDemand optimization is enabled, or when no matching constructor is found.</exception>
         /// <example>
         /// <code>
         /// Mock.ArrangeBaseConstructor&lt;MyBase&gt;().DoNothing().Occurs(1);
@@ -294,6 +297,7 @@ namespace Telerik.JustMock
             {
                 ValidateBaseConstructorTarget(baseType);
                 var ctor = ResolveBaseConstructor(baseType, args);
+                NormalizeBaseConstructorArguments(ctor, args);
                 return ArrangeBaseConstructorCore(ctor, args);
             }
             finally
@@ -309,6 +313,7 @@ namespace Telerik.JustMock
             {
                 ValidateBaseConstructorTarget(baseType);
                 var ctor = ResolveBaseConstructor(baseType, args);
+                NormalizeBaseConstructorArguments(ctor, args);
                 repository.AssertMethodInfo(null, null, ctor, args, null);
             }
             finally
@@ -319,6 +324,11 @@ namespace Telerik.JustMock
 
         private static void ValidateBaseConstructorTarget(Type baseType)
         {
+            if (ProfilerInterceptor.IsReJitEnabled)
+            {
+                throw new MockException("Base constructor interception is not available with OnDemand optimization enabled.");
+            }
+
             if (baseType.IsSealed)
             {
                 throw new MockException(
@@ -484,23 +494,71 @@ namespace Telerik.JustMock
 
         private static bool IsImplicitlyConvertible(Type from, Type to)
         {
-            // Handle common numeric promotions used with default values from Arg matchers
-            if (to == typeof(long) && (from == typeof(int) || from == typeof(short) || from == typeof(byte)))
-                return true;
-            if (to == typeof(double) && (from == typeof(float) || from == typeof(int) || from == typeof(long)))
-                return true;
-            if (to == typeof(float) && (from == typeof(int)))
-                return true;
-            if (to == typeof(decimal) && (from == typeof(int) || from == typeof(long)))
-                return true;
-            // Unsigned numeric promotions
-            if (to == typeof(ulong) && (from == typeof(uint) || from == typeof(ushort) || from == typeof(byte)))
-                return true;
-            if (to == typeof(uint) && (from == typeof(ushort) || from == typeof(byte)))
-                return true;
-            if (to == typeof(ushort) && from == typeof(byte))
-                return true;
-            return false;
+            if (from.IsEnum || to.IsEnum)
+                return false;
+
+            var target = Type.GetTypeCode(to);
+            switch (Type.GetTypeCode(from))
+            {
+                case TypeCode.SByte:
+                    return target == TypeCode.Int16 || target == TypeCode.Int32 || target == TypeCode.Int64
+                        || target == TypeCode.Single || target == TypeCode.Double || target == TypeCode.Decimal;
+                case TypeCode.Byte:
+                    return target == TypeCode.Int16 || target == TypeCode.UInt16 || target == TypeCode.Int32
+                        || target == TypeCode.UInt32 || target == TypeCode.Int64 || target == TypeCode.UInt64
+                        || target == TypeCode.Single || target == TypeCode.Double || target == TypeCode.Decimal;
+                case TypeCode.Int16:
+                    return target == TypeCode.Int32 || target == TypeCode.Int64
+                        || target == TypeCode.Single || target == TypeCode.Double || target == TypeCode.Decimal;
+                case TypeCode.UInt16:
+                case TypeCode.Char:
+                    return (from == typeof(char) && target == TypeCode.UInt16)
+                        || target == TypeCode.Int32 || target == TypeCode.UInt32 || target == TypeCode.Int64
+                        || target == TypeCode.UInt64 || target == TypeCode.Single || target == TypeCode.Double
+                        || target == TypeCode.Decimal;
+                case TypeCode.Int32:
+                    return target == TypeCode.Int64 || target == TypeCode.Single
+                        || target == TypeCode.Double || target == TypeCode.Decimal;
+                case TypeCode.UInt32:
+                    return target == TypeCode.Int64 || target == TypeCode.UInt64 || target == TypeCode.Single
+                        || target == TypeCode.Double || target == TypeCode.Decimal;
+                case TypeCode.Int64:
+                case TypeCode.UInt64:
+                    return target == TypeCode.Single || target == TypeCode.Double || target == TypeCode.Decimal;
+                case TypeCode.Single:
+                    return target == TypeCode.Double;
+                default:
+                    return false;
+            }
+        }
+
+        private static void NormalizeBaseConstructorArguments(ConstructorInfo ctor, object[] args)
+        {
+            var parameters = ctor.GetParameters();
+            var matchers = MockingContext.CurrentRepository.MatchersInContext;
+            for (int i = 0; i < args.Length; i++)
+            {
+                var matcherIndex = i - (args.Length - matchers.Count);
+                var parameterType = parameters[i].ParameterType;
+                if (matcherIndex >= 0)
+                {
+                    var typedMatcher = matchers[matcherIndex] as ITypedMatcher;
+                    if (typedMatcher != null && IsImplicitlyConvertible(typedMatcher.Type, parameterType))
+                    {
+                        if (!(typedMatcher is TypeMatcher))
+                        {
+                            throw new MockException(
+                                $"Numeric base constructor matchers other than Arg.IsAny must use parameter type '{parameterType.Name}'.");
+                        }
+                        matchers[matcherIndex] = new TypeMatcher(parameterType);
+                    }
+                }
+                else if (args[i] != null && IsImplicitlyConvertible(args[i].GetType(), parameterType))
+                {
+                    var value = args[i] is char ? (object)(ushort)(char)args[i] : args[i];
+                    args[i] = Convert.ChangeType(value, parameterType, System.Globalization.CultureInfo.InvariantCulture);
+                }
+            }
         }
 
         private static string BuildAvailableConstructorsList(Type type, ConstructorInfo[] ctors)
