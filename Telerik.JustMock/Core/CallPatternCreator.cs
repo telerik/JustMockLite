@@ -356,7 +356,25 @@ namespace Telerik.JustMock.Core
                         throw new MockException("Argument count mismatch.");
                     }
 
-                    callPattern.ArgumentMatchers.AddRange(arguments.Select(arg => MocksRepository.CreateMatcherForArgument(arg)));
+                    // Drain MatchersInContext the same way FromAction does so that Arg.IsAny<T>() and
+                    // similar matchers pushed before this call are honoured. Trailing matchers replace
+                    // the corresponding argument values; leading arguments fall back to ValueMatcher.
+                    if (repository != null && repository.MatchersInContext.Count > 0)
+                    {
+                        for (int i = 0; i < arguments.Length; ++i)
+                        {
+                            var indexInMatchers = i - (arguments.Length - repository.MatchersInContext.Count);
+                            callPattern.ArgumentMatchers.Add(
+                                indexInMatchers >= 0
+                                    ? repository.MatchersInContext[indexInMatchers]
+                                    : MocksRepository.CreateMatcherForArgument(arguments[i]));
+                        }
+                        repository.MatchersInContext.Clear();
+                    }
+                    else
+                    {
+                        callPattern.ArgumentMatchers.AddRange(arguments.Select(arg => MocksRepository.CreateMatcherForArgument(arg)));
+                    }
                 }
             }
 

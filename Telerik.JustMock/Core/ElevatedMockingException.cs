@@ -41,6 +41,10 @@ namespace Telerik.JustMock.Core
             : this((string)null)
         { }
 
+        internal ElevatedMockingException(MemberInfo target, string details)
+            : base(String.Format("Cannot mock '{0}'. {1}", target, details))
+        { }
+
         private ElevatedMockingException(string details)
             : base(ConstructMessage(details))
         {

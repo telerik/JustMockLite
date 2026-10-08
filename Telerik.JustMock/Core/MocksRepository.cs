@@ -508,6 +508,11 @@ namespace Telerik.JustMock.Core
                 }
             }
 
+            if (invocation.IsBaseCtorBodyInvocation)
+            {
+                invocation.CallOriginal = true;
+            }
+
             if (!invocation.CallOriginal && !invocation.IsReturnValueSet && invocation.Method.GetReturnType() != typeof(void))
             {
                 Type returnType = invocation.Method.GetReturnType();
@@ -1106,7 +1111,7 @@ namespace Telerik.JustMock.Core
         {
             using (MockingContext.BeginFailureAggregation(message))
             {
-                CallPattern callPattern = CallPatternCreator.FromMethodBase(instance, method, arguments);
+                CallPattern callPattern = CallPatternCreator.FromMethodBase(this, instance, method, arguments);
                 AssertForCallPattern(callPattern, null, occurs);
             }
         }
@@ -1139,7 +1144,7 @@ namespace Telerik.JustMock.Core
 
         internal int GetTimesCalledFromMethodInfo(object instance, MethodBase method, object[] arguments)
         {
-            var callPattern = CallPatternCreator.FromMethodBase(instance, method, arguments);
+            var callPattern = CallPatternCreator.FromMethodBase(this, instance, method, arguments);
             int callsCount;
             CountMethodMockInvocations(callPattern, null, out callsCount);
             return callsCount;
@@ -1705,20 +1710,29 @@ namespace Telerik.JustMock.Core
                 }
             }
 
-            var methodMock = DispatchInvocationToArrangements(callPattern, invocation);
+            bool baseConstructorBodyInvocation;
+            var methodMock = DispatchInvocationToArrangements(callPattern, invocation, out baseConstructorBodyInvocation);
 
-            if (!invocation.InArrange && !invocation.InAssertSet)
+            if (!invocation.InArrange && !invocation.InAssertSet && !baseConstructorBodyInvocation)
             {
                 funcRoot.AddOrUpdateOccurence(callPattern, methodMock);
+            }
+            else if (baseConstructorBodyInvocation && methodMock == null)
+            {
+                // A base-constructor arrangement is intentionally excluded from the
+                // constructor-body path. The body must still execute when the dedicated
+                // base-call arrangement only records an occurrence.
+                invocation.IsBaseCtorBodyInvocation = true;
             }
 
             return methodMock != null;
         }
 
-        private IMethodMock DispatchInvocationToArrangements(CallPattern callPattern, Invocation invocation)
+        private IMethodMock DispatchInvocationToArrangements(CallPattern callPattern, Invocation invocation, out bool baseConstructorBodyInvocation)
         {
             MethodInfoMatcherTreeNode arrangeFuncRoot;
             var methodMockNodes = new List<MethodMockMatcherTreeNode>();
+            baseConstructorBodyInvocation = false;
 
             var allMethods = new[] { callPattern.Method }
                 .Concat(callPattern.Method.GetInheritanceChain().Where(m => m.DeclaringType.IsInterface));
@@ -1730,6 +1744,16 @@ namespace Telerik.JustMock.Core
 
                 var results = arrangeFuncRoot.GetMethodMock(callPattern);
                 methodMockNodes.AddRange(results);
+            }
+
+            for (int i = methodMockNodes.Count - 1; i >= 0; --i)
+            {
+                var isBaseConstructorArrangement = methodMockNodes[i].MethodMock.IsBaseCtorInterception;
+                if (isBaseConstructorArrangement != invocation.IsBaseCtorCall)
+                {
+                    baseConstructorBodyInvocation |= isBaseConstructorArrangement;
+                    methodMockNodes.RemoveAt(i);
+                }
             }
 
             var methodMock = GetMethodMockFromNodes(methodMockNodes, invocation);
