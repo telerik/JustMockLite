@@ -824,6 +824,12 @@ namespace Telerik.JustMock.Core
 
         internal void InterceptFuture(Type type, MockCreationSettings settings)
         {
+            if (KnownUnmockableTypes.Contains(type) || !type.IsClass || type.ContainsGenericParameters
+                || (type.IsAbstract && type.IsSealed) || typeof(Delegate).IsAssignableFrom(type))
+                throw new MockException(String.Format(
+                    "Cannot set up future mocking for type '{0}'. Specify a supported closed instance class; CLR-restricted types, interfaces, value types, delegates, open generic types, and static classes are not supported.",
+                    type));
+
             if (!ProfilerInterceptor.IsProfilerAttached)
                 ProfilerInterceptor.ThrowElevatedMockingException(type);
 
@@ -835,7 +841,9 @@ namespace Telerik.JustMock.Core
                 {
                     Mixins = settings.Mixins,
                     SupplementaryBehaviors = settings.SupplementaryBehaviors,
-                    FallbackBehaviors = settings.FallbackBehaviors,
+                    FallbackBehaviors = settings.FallbackBehaviors
+                        .Select(behavior => behavior is PropertyStubsBehavior
+                            ? new PropertyStubsBehavior(separateInstances: true) : behavior).ToList(),
                     MockConstructorCall = settings.MockConstructorCall,
                     MustCreateProxy = true,
                 });

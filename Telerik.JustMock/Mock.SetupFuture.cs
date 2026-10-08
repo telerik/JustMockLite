@@ -32,16 +32,18 @@ namespace Telerik.JustMock
         /// </summary>
         /// <remarks>
         /// This method requires the JustMock profiler (CodeWeaver). It is not available in JustMock Lite.
-        /// Like <see cref="SetupStatic{T}()"/>, this call enables wholesale interception of all members
-        /// of <typeparamref name="T"/>, including constructors. When using the default
-        /// <see cref="Behavior.RecursiveLoose"/> behavior, constructor bodies do not execute — fields
+        /// In standard profiler mode this includes constructors. In on-demand mode constructors run normally.
+        /// When using the default <see cref="Behavior.RecursiveLoose"/> behavior in standard mode, constructor bodies do not execute — fields
         /// will not be initialized by the constructor. Use <see cref="Behavior.CallOriginal"/> if
         /// constructor execution is required, or arrange the constructor explicitly with
         /// <c>Mock.Arrange(() => new T()).CallOriginal()</c>.
         /// Per-method arrangements made after this call take precedence over the class-level default.
         /// Inherited members use the nearest future-mocking setup in the runtime instance's type hierarchy.
+        /// Members declared only on a derived class require a setup for that derived class.
+        /// Setups are scoped to the current mocking context, not independent thread contexts.
         /// </remarks>
         /// <typeparam name="T">Target type to future-mock.</typeparam>
+        /// <exception cref="MockException">The target is not a supported closed instance class.</exception>
         public static void SetupFuture<T>()
         {
             ProfilerInterceptor.GuardInternal(() =>
@@ -57,18 +59,21 @@ namespace Telerik.JustMock
         /// </summary>
         /// <remarks>
         /// This method requires the JustMock profiler (CodeWeaver). It is not available in JustMock Lite.
-        /// Like <see cref="SetupStatic{T}()"/>, this call enables wholesale interception of all members
-        /// of <typeparamref name="T"/>, including constructors. When using <see cref="Behavior.RecursiveLoose"/>
+        /// In standard profiler mode this includes constructors. In on-demand mode constructors run normally.
+        /// When using <see cref="Behavior.RecursiveLoose"/>
         /// or <see cref="Behavior.Loose"/> or <see cref="Behavior.Strict"/> behavior, constructor bodies do not execute — fields will not be
-        /// initialized by the constructor. Use <see cref="Behavior.CallOriginal"/> if constructor execution
+        /// initialized by the constructor in standard mode. Use <see cref="Behavior.CallOriginal"/> if constructor execution
         /// is required, or arrange the constructor explicitly with <c>Mock.Arrange(() => new T()).CallOriginal()</c>.
         /// Per-method arrangements made after this call take precedence over the class-level default.
         /// Inherited members use the nearest future-mocking setup in the runtime instance's type hierarchy.
+        /// Members declared only on a derived class require a setup for that derived class.
+        /// Setups are scoped to the current mocking context, not independent thread contexts.
         /// </remarks>
         /// <typeparam name="T">Target type to future-mock.</typeparam>
         /// <param name="behavior">
         /// Specifies behavior of the mock. Default is <see cref="Behavior.RecursiveLoose"/>.
         /// </param>
+        /// <exception cref="MockException">The target is not a supported closed instance class.</exception>
         public static void SetupFuture<T>(Behavior behavior)
         {
             ProfilerInterceptor.GuardInternal(() =>
@@ -84,15 +89,18 @@ namespace Telerik.JustMock
         /// </summary>
         /// <remarks>
         /// This method requires the JustMock profiler (CodeWeaver). It is not available in JustMock Lite.
-        /// Like <see cref="SetupStatic(Type)"/>, this call enables wholesale interception of all members
-        /// of <paramref name="type"/>, including constructors. Constructor bodies do not execute under the
-        /// default <see cref="Behavior.RecursiveLoose"/> behavior. Use <see cref="Behavior.CallOriginal"/>
+        /// In standard profiler mode this includes constructors. In on-demand mode constructors run normally.
+        /// Constructor bodies do not execute under the default <see cref="Behavior.RecursiveLoose"/>
+        /// behavior in standard mode. Use <see cref="Behavior.CallOriginal"/>
         /// if constructor execution is required.
         /// Per-method arrangements made after this call take precedence over the class-level default.
         /// Inherited members use the nearest future-mocking setup in the runtime instance's type hierarchy.
+        /// Members declared only on a derived class require a setup for that derived class.
+        /// Setups are scoped to the current mocking context, not independent thread contexts.
         /// </remarks>
         /// <param name="type">Target type to future-mock.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="type"/> is <c>null</c>.</exception>
+        /// <exception cref="MockException">The target is not a supported closed instance class.</exception>
         public static void SetupFuture(Type type)
         {
             ProfilerInterceptor.GuardInternal(() =>
@@ -111,18 +119,21 @@ namespace Telerik.JustMock
         /// </summary>
         /// <remarks>
         /// This method requires the JustMock profiler (CodeWeaver). It is not available in JustMock Lite.
-        /// Like <see cref="SetupStatic(Type)"/>, this call enables wholesale interception of all members
-        /// of <paramref name="type"/>, including constructors. Constructor bodies do not execute under
+        /// In standard profiler mode this includes constructors. In on-demand mode constructors run normally.
+        /// Constructor bodies do not execute in standard mode under
         /// <see cref="Behavior.RecursiveLoose"/>, <see cref="Behavior.Loose"/>, or <see cref="Behavior.Strict"/> behavior. Use
         /// <see cref="Behavior.CallOriginal"/> if constructor execution is required.
         /// Per-method arrangements made after this call take precedence over the class-level default.
         /// Inherited members use the nearest future-mocking setup in the runtime instance's type hierarchy.
+        /// Members declared only on a derived class require a setup for that derived class.
+        /// Setups are scoped to the current mocking context, not independent thread contexts.
         /// </remarks>
         /// <param name="type">Target type to future-mock.</param>
         /// <param name="behavior">
         /// Specifies behavior of the mock. Default is <see cref="Behavior.RecursiveLoose"/>.
         /// </param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="type"/> is <c>null</c>.</exception>
+        /// <exception cref="MockException">The target is not a supported closed instance class.</exception>
         public static void SetupFuture(Type type, Behavior behavior)
         {
             ProfilerInterceptor.GuardInternal(() =>
