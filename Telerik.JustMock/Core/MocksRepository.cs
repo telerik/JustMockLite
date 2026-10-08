@@ -283,7 +283,13 @@ namespace Telerik.JustMock.Core
                     if (repo != null)
                     {
                         lock (repo.futureMixinDatabase)
-                            repo.futureMixinDatabase.TryGetValue(objType, out asMixin);
+                        {
+                            for (var type = obj.GetType(); type != null; type = type.BaseType)
+                            {
+                                if (repo.futureMixinDatabase.TryGetValue(type, out asMixin))
+                                    break;
+                            }
+                        }
                     }
                 }
             }
@@ -830,6 +836,7 @@ namespace Telerik.JustMock.Core
                     Mixins = settings.Mixins,
                     SupplementaryBehaviors = settings.SupplementaryBehaviors,
                     FallbackBehaviors = settings.FallbackBehaviors,
+                    MockConstructorCall = settings.MockConstructorCall,
                     MustCreateProxy = true,
                 });
 
