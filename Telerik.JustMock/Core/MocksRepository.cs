@@ -63,6 +63,7 @@ namespace Telerik.JustMock.Core
         private readonly int repositoryId;
         private readonly Thread creatingThread;
         private readonly Dictionary<Type, IMockMixin> staticMixinDatabase = new Dictionary<Type, IMockMixin>();
+        private readonly Dictionary<Type, IMockMixin> futureMixinDatabase = new Dictionary<Type, IMockMixin>();
         private readonly Dictionary<MethodBase, MethodInfoMatcherTreeNode> arrangementTreeRoots = new Dictionary<MethodBase, MethodInfoMatcherTreeNode>();
         private readonly Dictionary<MethodBase, MethodInfoMatcherTreeNode> invocationTreeRoots = new Dictionary<MethodBase, MethodInfoMatcherTreeNode>();
         private readonly Dictionary<KeyValuePair<object, object>, object> valueStore = new Dictionary<KeyValuePair<object, object>, object>();
@@ -274,6 +275,23 @@ namespace Telerik.JustMock.Core
             if (obj != null)
             {
                 asMixin = GetMixinFromExternalDatabase(obj, objType);
+
+                // Check future mixin database for instance calls where no explicit mock exists
+                if (asMixin == null)
+                {
+                    MocksRepository repo = MockingContext.ResolveRepository(UnresolvedContextBehavior.CreateNewContextual);
+                    if (repo != null)
+                    {
+                        lock (repo.futureMixinDatabase)
+                        {
+                            for (var type = obj.GetType(); type != null; type = type.BaseType)
+                            {
+                                if (repo.futureMixinDatabase.TryGetValue(type, out asMixin))
+                                    break;
+                            }
+                        }
+                    }
+                }
             }
             else if (objType != null)
             {
@@ -431,6 +449,7 @@ namespace Telerik.JustMock.Core
 
             this.arrangedTypes.Clear();
             this.staticMixinDatabase.Clear();
+            this.futureMixinDatabase.Clear();
 
             foreach (var method in this.globallyInterceptedMethods)
             {
@@ -799,6 +818,38 @@ namespace Telerik.JustMock.Core
             mockMixin.IsStaticConstructorMocked = mockStaticConstructor;
             lock (staticMixinDatabase)
                 staticMixinDatabase[type] = mockMixin;
+
+            this.EnableInterception(type);
+        }
+
+        internal void InterceptFuture(Type type, MockCreationSettings settings)
+        {
+            if (KnownUnmockableTypes.Contains(type) || !type.IsClass || type.ContainsGenericParameters
+                || (type.IsAbstract && type.IsSealed) || typeof(Delegate).IsAssignableFrom(type))
+                throw new MockException(String.Format(
+                    "Cannot set up future mocking for type '{0}'. Specify a supported closed instance class; CLR-restricted types, interfaces, value types, delegates, open generic types, and static classes are not supported.",
+                    type));
+
+            if (!ProfilerInterceptor.IsProfilerAttached)
+                ProfilerInterceptor.ThrowElevatedMockingException(type);
+
+            if (!settings.FallbackBehaviors.OfType<CallOriginalBehavior>().Any())
+                ProfilerInterceptor.CheckIfSafeToInterceptWholesale(type);
+
+            var mockMixin = (IMockMixin)Create(typeof(ExternalMockMixin),
+                new MockCreationSettings
+                {
+                    Mixins = settings.Mixins,
+                    SupplementaryBehaviors = settings.SupplementaryBehaviors,
+                    FallbackBehaviors = settings.FallbackBehaviors
+                        .Select(behavior => behavior is PropertyStubsBehavior
+                            ? new PropertyStubsBehavior(separateInstances: true) : behavior).ToList(),
+                    MockConstructorCall = settings.MockConstructorCall,
+                    MustCreateProxy = true,
+                });
+
+            lock (futureMixinDatabase)
+                futureMixinDatabase[type] = mockMixin;
 
             this.EnableInterception(type);
         }
