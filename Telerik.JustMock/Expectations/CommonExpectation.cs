@@ -390,6 +390,9 @@ namespace Telerik.JustMock.Expectations
         /// <summary>
         /// Calls the original implementation when the arranged call occurs.
         /// </summary>
+        /// <remarks>
+        /// This includes concrete default interface bodies on runtimes supporting default interface members.
+        /// </remarks>
         /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public IAssertable CallOriginal()
         {
