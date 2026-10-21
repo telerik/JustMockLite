@@ -19,7 +19,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
     using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
-    using System.Reflection.Emit;
 
     using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
     using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
@@ -98,27 +97,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
                                                           callback, null)
                 .Generate(@class, namingScope)
                 .BuildType();
-        }
-
-        private MethodBuilder CreateCallbackMethod(ClassEmitter emitter, MethodInfo methodInfo, MethodInfo methodOnTarget)
-        {
-            var targetMethod = methodOnTarget ?? methodInfo;
-            var callBackMethod = emitter.CreateMethod(namingScope.GetUniqueName(methodInfo.Name + "_callback"), targetMethod);
-
-            if (targetMethod.IsGenericMethod)
-            {
-                targetMethod = targetMethod.MakeGenericMethod(callBackMethod.GenericTypeParams.AsTypeArray());
-            }
-
-            // invocation on base class
-
-            callBackMethod.CodeBuilder.AddStatement(
-                new ReturnStatement(
-                    new MethodInvocationExpression(SelfReference.Self,
-                                                   targetMethod,
-                                                   callBackMethod.Arguments)));
-
-            return callBackMethod.MethodBuilder;
         }
 
         private bool ExplicitlyImplementedInterfaceMethod(MetaMethod method)

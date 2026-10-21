@@ -17,6 +17,7 @@
 
 using System;
 using Telerik.JustMock.Core.Castle.DynamicProxy;
+using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
 using Telerik.JustMock.Diagnostics;
 
 namespace Telerik.JustMock.Core
@@ -75,9 +76,17 @@ namespace Telerik.JustMock.Core
         {
             try
             {
-                invocation.Proceed();
+                var method = invocation.GetConcreteMethod();
+                if (ProfilerInterceptor.IsProfilerAttached && method.DeclaringType.IsInterface && !method.IsAbstract)
+                {
+                    ProfilerInterceptor.GuardDefaultInterfaceCallOriginal(method, invocation.Proxy, invocation.Proceed);
+                }
+                else
+                {
+                    invocation.Proceed();
+                }
             }
-            catch (NotImplementedException)
+            catch (NoTargetException)
             {
                 if (throwOnFail)
                     throw new NotImplementedException("You can't call the original implementation of a method that does not have one (abstract or interface method).");

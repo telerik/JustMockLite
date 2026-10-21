@@ -283,6 +283,23 @@ namespace Telerik.JustMock.Tests
             }
         }
 
+        [TestMethod, TestCategory("Lite"), TestCategory("Behavior"), TestCategory("CallOriginal")]
+        public void ShouldPreserveNotImplementedExceptionFromOriginalClassMethod()
+        {
+            var mock = Mock.Create<ThrowingOriginal>(Behavior.CallOriginal);
+            var expected = new NotImplementedException("real class body");
+
+            Assert.Same(expected, Assert.Throws<NotImplementedException>(() => mock.Throw(expected)));
+        }
+
+        public class ThrowingOriginal
+        {
+            public virtual void Throw(Exception exception)
+            {
+                throw exception;
+            }
+        }
+
         [TestMethod, TestCategory("Lite"), TestCategory("Behavior"), TestCategory("Strict")]
         public void ShouldAssertStrictMock()
         {

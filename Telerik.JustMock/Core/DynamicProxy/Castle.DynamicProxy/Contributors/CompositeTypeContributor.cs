@@ -18,10 +18,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Reflection;
+    using System.Reflection.Emit;
 
     using Telerik.JustMock.Core.Castle.Core.Logging;
     using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
     using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
     using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
 
     internal abstract class CompositeTypeContributor : ITypeContributor
@@ -60,6 +62,24 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
         }
 
         protected abstract IEnumerable<MembersCollector> GetCollectors();
+
+        protected MethodBuilder CreateCallbackMethod(ClassEmitter emitter, MethodInfo methodInfo, MethodInfo methodOnTarget)
+        {
+            var targetMethod = methodOnTarget ?? methodInfo;
+            var callback = emitter.CreateMethod(namingScope.GetUniqueName(methodInfo.Name + "_callback"), targetMethod);
+
+            if (targetMethod.IsGenericMethod)
+            {
+                targetMethod = targetMethod.MakeGenericMethod(callback.GenericTypeParams.AsTypeArray());
+            }
+
+            // Bypass virtual dispatch so the original body does not re-enter the proxy.
+            callback.CodeBuilder.AddStatement(
+                new ReturnStatement(
+                    new MethodInvocationExpression(SelfReference.Self, targetMethod, callback.Arguments)));
+
+            return callback.MethodBuilder;
+        }
 
         public virtual void Generate(ClassEmitter @class)
         {

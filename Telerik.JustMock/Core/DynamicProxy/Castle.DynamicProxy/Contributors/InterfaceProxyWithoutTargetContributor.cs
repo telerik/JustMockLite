@@ -20,6 +20,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 
     using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
     using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters.SimpleAST;
     using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
 
     internal class InterfaceProxyWithoutTargetContributor : CompositeTypeContributor
@@ -51,10 +52,15 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
             }
 
             var invocation = GetInvocationType(method, @class);
+            GetTargetExpressionDelegate target = getTargetExpression;
+            if (!canChangeTarget && !method.Method.IsAbstract)
+            {
+                target = (c, m) => new TypeTokenExpression(c.TypeBuilder);
+            }
             return new MethodWithInvocationGenerator(method,
                                                      @class.GetField("__interceptors"),
                                                      invocation,
-                                                     getTargetExpression,
+                                                     target,
                                                      overrideMethod,
                                                      null);
         }
@@ -63,11 +69,18 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
         {
             var methodInfo = method.Method;
 
-            if (canChangeTarget == false && methodInfo.IsAbstract)
+            if (canChangeTarget == false)
             {
-                // We do not need to generate a custom invocation type because no custom implementation
-                // for `InvokeMethodOnTarget` will be needed (proceeding to target isn't possible here):
-                return typeof(InterfaceMethodWithoutTargetInvocation);
+                if (methodInfo.IsAbstract)
+                {
+                    return typeof(InterfaceMethodWithoutTargetInvocation);
+                }
+
+                var callback = CreateCallbackMethod(emitter, methodInfo, methodInfo);
+                // The callback belongs to this proxy type, so its invocation cannot be cached by interface method.
+                return new InheritanceInvocationTypeGenerator(callback.DeclaringType, method, callback, null)
+                    .Generate(emitter, namingScope)
+                    .BuildType();
             }
 
             var scope = emitter.ModuleScope;
