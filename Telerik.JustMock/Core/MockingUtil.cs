@@ -477,7 +477,7 @@ namespace Telerik.JustMock.Core
         public static bool IsImplementedBy(this MethodInfo interfaceMethod, MethodBase implMethod)
         {
             var type = implMethod.DeclaringType;
-            if (type == null || !type.GetInterfaces().Contains(interfaceMethod.DeclaringType))
+            if (type == null || type.IsInterface || !type.GetInterfaces().Contains(interfaceMethod.DeclaringType))
                 return false;
 
             var mapping = type.GetInterfaceMap(interfaceMethod.DeclaringType);
