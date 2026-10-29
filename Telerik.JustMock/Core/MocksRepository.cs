@@ -63,7 +63,7 @@ namespace Telerik.JustMock.Core
         private readonly int repositoryId;
         private readonly Thread creatingThread;
         private readonly Dictionary<Type, IMockMixin> staticMixinDatabase = new Dictionary<Type, IMockMixin>();
-        private readonly Dictionary<Type, IMockMixin> futureMixinDatabase = new Dictionary<Type, IMockMixin>();
+        private readonly Dictionary<Type, Behavior> futureMixinDatabase = new Dictionary<Type, Behavior>();
         private readonly Dictionary<MethodBase, MethodInfoMatcherTreeNode> arrangementTreeRoots = new Dictionary<MethodBase, MethodInfoMatcherTreeNode>();
         private readonly Dictionary<MethodBase, MethodInfoMatcherTreeNode> invocationTreeRoots = new Dictionary<MethodBase, MethodInfoMatcherTreeNode>();
         private readonly Dictionary<KeyValuePair<object, object>, object> valueStore = new Dictionary<KeyValuePair<object, object>, object>();
@@ -259,7 +259,7 @@ namespace Telerik.JustMock.Core
             DebugView.TraceEvent(IndentLevel.Configuration, () => String.Format("Created mocks repository #{0} for {1}", this.repositoryId, this.Method));
         }
 
-        internal static IMockMixin GetMockMixin(object obj, Type objType)
+        internal static IMockMixin GetMockMixin(object obj, Type objType, bool isConstructorCall = false)
         {
             IMockMixin asMixin = GetMockMixinFromAnyMock(obj);
             if (asMixin != null)
@@ -276,21 +276,11 @@ namespace Telerik.JustMock.Core
             {
                 asMixin = GetMixinFromExternalDatabase(obj, objType);
 
-                // Check future mixin database for instance calls where no explicit mock exists
-                if (asMixin == null)
+                if (asMixin == null && isConstructorCall)
                 {
                     MocksRepository repo = MockingContext.ResolveRepository(UnresolvedContextBehavior.CreateNewContextual);
                     if (repo != null)
-                    {
-                        lock (repo.futureMixinDatabase)
-                        {
-                            for (var type = obj.GetType(); type != null; type = type.BaseType)
-                            {
-                                if (repo.futureMixinDatabase.TryGetValue(type, out asMixin))
-                                    break;
-                            }
-                        }
-                    }
+                        asMixin = repo.CreateFutureMockMixin(obj);
                 }
             }
             else if (objType != null)
@@ -395,6 +385,20 @@ namespace Telerik.JustMock.Core
             this.valueStore.Clear();
             this.controlledMocks.Clear();
 
+            KeyValuePair<Type, Behavior>[] inheritedFutureSetups = new KeyValuePair<Type, Behavior>[0];
+            if (parentRepository != null && !this.IsRetired)
+            {
+                lock (parentRepository.futureMixinDatabase)
+                    inheritedFutureSetups = parentRepository.futureMixinDatabase.ToArray();
+            }
+
+            lock (this.futureMixinDatabase)
+            {
+                this.futureMixinDatabase.Clear();
+                foreach (var setup in inheritedFutureSetups)
+                    this.futureMixinDatabase.Add(setup.Key, setup.Value);
+            }
+
             if (parentRepository != null)
             {
                 foreach (var root in parentRepository.arrangementTreeRoots)
@@ -422,6 +426,9 @@ namespace Telerik.JustMock.Core
                     }
                 }
             }
+
+            foreach (var setup in inheritedFutureSetups)
+                this.EnableInterception(setup.Key);
         }
 
         internal void Retire()
@@ -449,7 +456,8 @@ namespace Telerik.JustMock.Core
 
             this.arrangedTypes.Clear();
             this.staticMixinDatabase.Clear();
-            this.futureMixinDatabase.Clear();
+            lock (this.futureMixinDatabase)
+                this.futureMixinDatabase.Clear();
 
             foreach (var method in this.globallyInterceptedMethods)
             {
@@ -747,7 +755,7 @@ namespace Telerik.JustMock.Core
             return instance;
         }
 
-        internal IMockMixin CreateExternalMockMixin(Type mockObjectType, object mockObject, MockCreationSettings settings)
+        internal IMockMixin CreateExternalMockMixin(Type mockObjectType, object mockObject, MockCreationSettings settings, bool enableInterception = true)
         {
             if (mockObjectType == null)
             {
@@ -756,7 +764,8 @@ namespace Telerik.JustMock.Core
                 mockObjectType = mockObject.GetType();
             }
 
-            this.EnableInterception(mockObjectType);
+            if (enableInterception)
+                this.EnableInterception(mockObjectType);
 
             if (mockObject == null)
                 throw new MockException(String.Format("Failed to create instance of type '{0}'", mockObjectType));
@@ -822,7 +831,7 @@ namespace Telerik.JustMock.Core
             this.EnableInterception(type);
         }
 
-        internal void InterceptFuture(Type type, MockCreationSettings settings)
+        internal void InterceptFuture(Type type, Behavior behavior)
         {
             if (KnownUnmockableTypes.Contains(type) || !type.IsClass || type.ContainsGenericParameters
                 || (type.IsAbstract && type.IsSealed) || typeof(Delegate).IsAssignableFrom(type))
@@ -833,25 +842,43 @@ namespace Telerik.JustMock.Core
             if (!ProfilerInterceptor.IsProfilerAttached)
                 ProfilerInterceptor.ThrowElevatedMockingException(type);
 
+#if !PORTABLE
+            if (ProfilerInterceptor.IsReJitEnabled)
+                throw new MockException("Future mocking requires constructor interception and is not supported in on-demand profiler mode. Enable the profiler in standard mode.");
+#endif
+
+            var settings = MockCreationSettings.GetSettings(behavior);
             if (!settings.FallbackBehaviors.OfType<CallOriginalBehavior>().Any())
                 ProfilerInterceptor.CheckIfSafeToInterceptWholesale(type);
 
-            var mockMixin = (IMockMixin)Create(typeof(ExternalMockMixin),
-                new MockCreationSettings
-                {
-                    Mixins = settings.Mixins,
-                    SupplementaryBehaviors = settings.SupplementaryBehaviors,
-                    FallbackBehaviors = settings.FallbackBehaviors
-                        .Select(behavior => behavior is PropertyStubsBehavior
-                            ? new PropertyStubsBehavior(separateInstances: true) : behavior).ToList(),
-                    MockConstructorCall = settings.MockConstructorCall,
-                    MustCreateProxy = true,
-                });
-
             lock (futureMixinDatabase)
-                futureMixinDatabase[type] = mockMixin;
+                futureMixinDatabase[type] = behavior;
 
             this.EnableInterception(type);
+        }
+
+        private IMockMixin CreateFutureMockMixin(object instance)
+        {
+            lock (this.futureMixinDatabase)
+            {
+                var existing = GetMixinFromExternalDatabase(instance, instance.GetType());
+                if (existing != null)
+                    return existing;
+
+                for (var type = instance.GetType(); type != null; type = type.BaseType)
+                {
+                    Behavior behavior;
+                    if (!this.futureMixinDatabase.TryGetValue(type, out behavior))
+                        continue;
+
+                    var settings = MockCreationSettings.GetSettings(behavior);
+                    var mixin = this.CreateExternalMockMixin(instance.GetType(), instance, settings, enableInterception: false);
+                    mixin.IsInstanceConstructorMocked = settings.MockConstructorCall;
+                    return mixin;
+                }
+            }
+
+            return null;
         }
 
         private MockMixin CreateMockMixin(Type declaringType, MockCreationSettings settings)

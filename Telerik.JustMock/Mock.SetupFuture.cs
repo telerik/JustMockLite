@@ -32,7 +32,7 @@ namespace Telerik.JustMock
         /// </summary>
         /// <remarks>
         /// This method requires the JustMock profiler (CodeWeaver). It is not available in JustMock Lite.
-        /// In standard profiler mode this includes constructors. In on-demand mode constructors run normally.
+        /// Requires standard profiler mode, including constructor interception; on-demand mode is not supported.
         /// When using the default <see cref="Behavior.RecursiveLoose"/> behavior in standard mode, constructor bodies do not execute — fields
         /// will not be initialized by the constructor. Use <see cref="Behavior.CallOriginal"/> if
         /// constructor execution is required, or arrange the constructor explicitly with
@@ -41,15 +41,16 @@ namespace Telerik.JustMock
         /// Inherited members use the nearest future-mocking setup in the runtime instance's type hierarchy.
         /// Members declared only on a derived class require a setup for that derived class.
         /// Setups are scoped to the current mocking context, not independent thread contexts.
+        /// Existing instances are not affected. Each new instance has independent property and event state.
+        /// Child test contexts inherit setups; a child setup for the same type overrides its inherited setup.
         /// </remarks>
         /// <typeparam name="T">Target type to future-mock.</typeparam>
-        /// <exception cref="MockException">The target is not a supported closed instance class.</exception>
+        /// <exception cref="MockException">The target is not a supported closed instance class, or the profiler is in on-demand mode.</exception>
         public static void SetupFuture<T>()
         {
             ProfilerInterceptor.GuardInternal(() =>
             {
-                MockCreationSettings settings = MockCreationSettings.GetSettings();
-                MockingContext.CurrentRepository.InterceptFuture(typeof(T), settings);
+                MockingContext.CurrentRepository.InterceptFuture(typeof(T), Behavior.RecursiveLoose);
             });
         }
 
@@ -59,7 +60,7 @@ namespace Telerik.JustMock
         /// </summary>
         /// <remarks>
         /// This method requires the JustMock profiler (CodeWeaver). It is not available in JustMock Lite.
-        /// In standard profiler mode this includes constructors. In on-demand mode constructors run normally.
+        /// Requires standard profiler mode, including constructor interception; on-demand mode is not supported.
         /// When using <see cref="Behavior.RecursiveLoose"/>
         /// or <see cref="Behavior.Loose"/> or <see cref="Behavior.Strict"/> behavior, constructor bodies do not execute — fields will not be
         /// initialized by the constructor in standard mode. Use <see cref="Behavior.CallOriginal"/> if constructor execution
@@ -68,18 +69,19 @@ namespace Telerik.JustMock
         /// Inherited members use the nearest future-mocking setup in the runtime instance's type hierarchy.
         /// Members declared only on a derived class require a setup for that derived class.
         /// Setups are scoped to the current mocking context, not independent thread contexts.
+        /// Existing instances are not affected. Each new instance has independent property and event state.
+        /// Child test contexts inherit setups; a child setup for the same type overrides its inherited setup.
         /// </remarks>
         /// <typeparam name="T">Target type to future-mock.</typeparam>
         /// <param name="behavior">
         /// Specifies behavior of the mock. Default is <see cref="Behavior.RecursiveLoose"/>.
         /// </param>
-        /// <exception cref="MockException">The target is not a supported closed instance class.</exception>
+        /// <exception cref="MockException">The target is not a supported closed instance class, or the profiler is in on-demand mode.</exception>
         public static void SetupFuture<T>(Behavior behavior)
         {
             ProfilerInterceptor.GuardInternal(() =>
             {
-                MockCreationSettings settings = MockCreationSettings.GetSettings(behavior);
-                MockingContext.CurrentRepository.InterceptFuture(typeof(T), settings);
+                MockingContext.CurrentRepository.InterceptFuture(typeof(T), behavior);
             });
         }
 
@@ -89,7 +91,7 @@ namespace Telerik.JustMock
         /// </summary>
         /// <remarks>
         /// This method requires the JustMock profiler (CodeWeaver). It is not available in JustMock Lite.
-        /// In standard profiler mode this includes constructors. In on-demand mode constructors run normally.
+        /// Requires standard profiler mode, including constructor interception; on-demand mode is not supported.
         /// Constructor bodies do not execute under the default <see cref="Behavior.RecursiveLoose"/>
         /// behavior in standard mode. Use <see cref="Behavior.CallOriginal"/>
         /// if constructor execution is required.
@@ -97,10 +99,12 @@ namespace Telerik.JustMock
         /// Inherited members use the nearest future-mocking setup in the runtime instance's type hierarchy.
         /// Members declared only on a derived class require a setup for that derived class.
         /// Setups are scoped to the current mocking context, not independent thread contexts.
+        /// Existing instances are not affected. Each new instance has independent property and event state.
+        /// Child test contexts inherit setups; a child setup for the same type overrides its inherited setup.
         /// </remarks>
         /// <param name="type">Target type to future-mock.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="type"/> is <c>null</c>.</exception>
-        /// <exception cref="MockException">The target is not a supported closed instance class.</exception>
+        /// <exception cref="MockException">The target is not a supported closed instance class, or the profiler is in on-demand mode.</exception>
         public static void SetupFuture(Type type)
         {
             ProfilerInterceptor.GuardInternal(() =>
@@ -108,8 +112,7 @@ namespace Telerik.JustMock
                 if (type == null)
                     throw new ArgumentNullException(nameof(type));
 
-                MockCreationSettings settings = MockCreationSettings.GetSettings();
-                MockingContext.CurrentRepository.InterceptFuture(type, settings);
+                MockingContext.CurrentRepository.InterceptFuture(type, Behavior.RecursiveLoose);
             });
         }
 
@@ -119,7 +122,7 @@ namespace Telerik.JustMock
         /// </summary>
         /// <remarks>
         /// This method requires the JustMock profiler (CodeWeaver). It is not available in JustMock Lite.
-        /// In standard profiler mode this includes constructors. In on-demand mode constructors run normally.
+        /// Requires standard profiler mode, including constructor interception; on-demand mode is not supported.
         /// Constructor bodies do not execute in standard mode under
         /// <see cref="Behavior.RecursiveLoose"/>, <see cref="Behavior.Loose"/>, or <see cref="Behavior.Strict"/> behavior. Use
         /// <see cref="Behavior.CallOriginal"/> if constructor execution is required.
@@ -127,13 +130,15 @@ namespace Telerik.JustMock
         /// Inherited members use the nearest future-mocking setup in the runtime instance's type hierarchy.
         /// Members declared only on a derived class require a setup for that derived class.
         /// Setups are scoped to the current mocking context, not independent thread contexts.
+        /// Existing instances are not affected. Each new instance has independent property and event state.
+        /// Child test contexts inherit setups; a child setup for the same type overrides its inherited setup.
         /// </remarks>
         /// <param name="type">Target type to future-mock.</param>
         /// <param name="behavior">
         /// Specifies behavior of the mock. Default is <see cref="Behavior.RecursiveLoose"/>.
         /// </param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="type"/> is <c>null</c>.</exception>
-        /// <exception cref="MockException">The target is not a supported closed instance class.</exception>
+        /// <exception cref="MockException">The target is not a supported closed instance class, or the profiler is in on-demand mode.</exception>
         public static void SetupFuture(Type type, Behavior behavior)
         {
             ProfilerInterceptor.GuardInternal(() =>
@@ -141,8 +146,7 @@ namespace Telerik.JustMock
                 if (type == null)
                     throw new ArgumentNullException(nameof(type));
 
-                MockCreationSettings settings = MockCreationSettings.GetSettings(behavior);
-                MockingContext.CurrentRepository.InterceptFuture(type, settings);
+                MockingContext.CurrentRepository.InterceptFuture(type, behavior);
             });
         }
 #endif

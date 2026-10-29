@@ -84,6 +84,9 @@ namespace Telerik.JustMock.Core
                 if (method == skipMethodInterceptionOnce)
                 {
                     skipMethodInterceptionOnce = null;
+                    // CallOriginal newobj dispatch used a temporary instance; bind the actual object here.
+                    if (method.IsConstructor && !method.IsStatic && data[0] != null)
+                        MocksRepository.GetMockMixin(data[0], method.DeclaringType, isConstructorCall: true);
                     return true;
                 }
 

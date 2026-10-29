@@ -79,7 +79,7 @@ namespace Telerik.JustMock.Core
 
             this.MockMixin = method.IsExtensionMethod() && args.Length >= 1
                 ? MocksRepository.GetMockMixin(args[0], null)
-                : MocksRepository.GetMockMixin(instance, method.DeclaringType);
+                : MocksRepository.GetMockMixin(instance, method.DeclaringType, method.IsConstructor && !method.IsStatic);
         }
 
         internal void ThrowExceptionIfNecessary()
