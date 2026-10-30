@@ -90,6 +90,13 @@ namespace Telerik.JustMock.Core
                     return true;
                 }
 
+                if (method == defaultInterfaceOriginalMethod && ReferenceEquals(data[0], defaultInterfaceOriginalInstance))
+                {
+                    defaultInterfaceOriginalMethod = null;
+                    defaultInterfaceOriginalInstance = null;
+                    return true;
+                }
+
 #if DEBUG
                 ProfilerLogger.Info("*** +++ [MANAGED] Intercepting method call for {0}.{1}", method.DeclaringType.Name, method.Name);
 #endif
@@ -777,10 +784,34 @@ namespace Telerik.JustMock.Core
         [ThreadStatic]
         private static MethodBase skipMethodInterceptionOnce;
 
+        [ThreadStatic]
+        private static MethodBase defaultInterfaceOriginalMethod;
+
+        [ThreadStatic]
+        private static object defaultInterfaceOriginalInstance;
+
         internal static void SkipMethodInterceptionOnce(MethodBase method)
         {
             JMDebug.Assert(skipMethodInterceptionOnce == null || skipMethodInterceptionOnce == method);
             skipMethodInterceptionOnce = method;
+        }
+
+        internal static void GuardDefaultInterfaceCallOriginal(MethodBase method, object instance, Action action)
+        {
+            var previousMethod = defaultInterfaceOriginalMethod;
+            var previousInstance = defaultInterfaceOriginalInstance;
+            defaultInterfaceOriginalMethod = method;
+            defaultInterfaceOriginalInstance = instance;
+            try
+            {
+                // The proxy has already dispatched this call; skip only the profiler's body entry.
+                action();
+            }
+            finally
+            {
+                defaultInterfaceOriginalMethod = previousMethod;
+                defaultInterfaceOriginalInstance = previousInstance;
+            }
         }
     }
 }

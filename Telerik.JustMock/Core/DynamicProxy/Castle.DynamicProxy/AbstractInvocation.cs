@@ -18,6 +18,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
     using System.Diagnostics;
     using System.Reflection;
 
+    using Telerik.JustMock.Core.Castle.DynamicProxy.Internal;
+
     public abstract class AbstractInvocation : IInvocation
     {
         private readonly IInterceptor[] interceptors;
@@ -169,7 +171,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy
                                         "(set return value, out arguments etc)",
                                         interceptorsMessage, Method, methodKindIs, methodKindDescription);
 
-            throw new NotImplementedException(message);
+            throw new NoTargetException(message);
         }
 
         private MethodInfo EnsureClosedMethod(MethodInfo method)
