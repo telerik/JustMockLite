@@ -471,6 +471,7 @@ namespace Telerik.JustMock.Tests
             var future = new EqualFutureTarget();
             Assert.Equal(0, future.GetValue());
             Mock.NonPublic.Arrange<int>(future, "GetHiddenValue").Returns(19);
+            Mock.Arrange(() => future.ReadHiddenValue()).CallOriginal();
 
             Assert.Equal(19, future.ReadHiddenValue());
             Assert.Equal(typeof(EqualFutureTarget), Lookup(future).DeclaringType);
