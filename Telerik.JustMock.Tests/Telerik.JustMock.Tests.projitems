@@ -34,6 +34,7 @@
       <AutoGen>True</AutoGen>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)DelegateFixture.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DefaultInterfaceImplementationFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DynamicFixture.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EventClassFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EventsFixture.cs" />

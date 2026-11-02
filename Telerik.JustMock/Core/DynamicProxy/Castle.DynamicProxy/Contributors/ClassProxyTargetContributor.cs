@@ -19,7 +19,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
     using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
-    using System.Reflection.Emit;
 
     using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
     using Telerik.JustMock.Core.Castle.DynamicProxy.Generators.Emitters;
@@ -100,27 +99,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
                 .BuildType();
         }
 
-        private MethodBuilder CreateCallbackMethod(ClassEmitter emitter, MethodInfo methodInfo, MethodInfo methodOnTarget)
-        {
-            var targetMethod = methodOnTarget ?? methodInfo;
-            var callBackMethod = emitter.CreateMethod(namingScope.GetUniqueName(methodInfo.Name + "_callback"), targetMethod);
-
-            if (targetMethod.IsGenericMethod)
-            {
-                targetMethod = targetMethod.MakeGenericMethod(callBackMethod.GenericTypeParams.AsTypeArray());
-            }
-
-            // invocation on base class
-
-            callBackMethod.CodeBuilder.AddStatement(
-                new ReturnStatement(
-                    new MethodInvocationExpression(SelfReference.Self,
-                                                   targetMethod,
-                                                   callBackMethod.Arguments)));
-
-            return callBackMethod.MethodBuilder;
-        }
-
         private bool ExplicitlyImplementedInterfaceMethod(MetaMethod method)
         {
             return method.MethodOnTarget.IsPrivate;
@@ -129,8 +107,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
         private MethodGenerator ExplicitlyImplementedInterfaceMethodGenerator(MetaMethod method, ClassEmitter @class,
                                                                               OverrideMethodDelegate overrideMethod)
         {
-            var @delegate = GetDelegateType(method, @class);
-            var contributor = GetContributor(@delegate, method);
+            var @delegate = GetDelegateType(method, @class, targetType);
+            var contributor = GetDelegateContributor(@delegate, method, targetType);
             var invocation = new InheritanceInvocationTypeGenerator(targetType, method, null, contributor)
                 .Generate(@class, namingScope)
                 .BuildType();
@@ -140,34 +118,6 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
                                                      (c, m) => new TypeTokenExpression(targetType),
                                                      overrideMethod,
                                                      contributor);
-        }
-
-        private IInvocationCreationContributor GetContributor(Type @delegate, MetaMethod method)
-        {
-            if (@delegate.IsGenericType == false)
-            {
-                return new InvocationWithDelegateContributor(@delegate, targetType, method, namingScope);
-            }
-            return new InvocationWithGenericDelegateContributor(@delegate,
-                                                                method,
-                                                                new FieldReference(InvocationMethods.ProxyObject));
-        }
-
-        private Type GetDelegateType(MetaMethod method, ClassEmitter @class)
-        {
-            var scope = @class.ModuleScope;
-            var key = new CacheKey(
-                typeof(Delegate),
-                targetType,
-                new[] { method.MethodOnTarget.ReturnType }
-                    .Concat(ArgumentsUtil.GetTypes(method.MethodOnTarget.GetParameters())).
-                    ToArray(),
-                null);
-
-            return scope.TypeCache.GetOrAddWithoutTakingLock(key, _ =>
-                new DelegateTypeGenerator(method, targetType)
-                .Generate(@class, namingScope)
-                .BuildType());
         }
 
         private Type GetInvocationType(MetaMethod method, ClassEmitter @class)
