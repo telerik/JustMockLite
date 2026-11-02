@@ -32,9 +32,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Internal
             // to a target, i.e. where `InvokeMethodOnTarget` will always throw:
 
             Debug.Assert(target == null, $"{nameof(InterfaceMethodWithoutTargetInvocation)} does not support targets.");
-            Debug.Assert(proxiedMethod.IsAbstract, $"{nameof(InterfaceMethodWithoutTargetInvocation)} does not support non-abstract methods.");
-
-            // Why this restriction? Because it greatly benefits proxy type generation performance.
+            // Sharing this invocation greatly benefits proxy type generation performance,
+            // including default methods reabstracted by a derived interface.
             //
             // For invocations that can proceed to a target, `InvokeMethodOnTarget`'s implementation
             // depends on the target method's signature. Because of this, DynamicProxy needs to

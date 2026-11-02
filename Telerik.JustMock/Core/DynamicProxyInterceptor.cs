@@ -77,6 +77,10 @@ namespace Telerik.JustMock.Core
             try
             {
                 var method = invocation.GetConcreteMethod();
+                if (ProfilerInterceptor.IsProfilerAttached && method.DeclaringType.IsInterface && invocation.TargetType != null)
+                {
+                    method = invocation.GetConcreteMethodInvocationTarget() ?? method;
+                }
                 if (ProfilerInterceptor.IsProfilerAttached && method.DeclaringType.IsInterface && !method.IsAbstract)
                 {
                     ProfilerInterceptor.GuardDefaultInterfaceCallOriginal(method, invocation.Proxy, invocation.Proceed);

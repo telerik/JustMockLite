@@ -29,7 +29,8 @@ namespace Telerik.JustMock.Expectations.Abstraction
         /// </summary>
         /// <remarks>
         /// On runtimes supporting default interface members, an interface mock can call a concrete default body.
-        /// Abstract members without an implementation cannot be called.
+        /// The most-specific implementation in the proxied interface hierarchy is used, including derived
+        /// implementations of abstract base members. Reabstracted members and members without an implementation cannot be called.
         /// </remarks>
         /// <returns></returns>
         IAssertable CallOriginal();

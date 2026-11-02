@@ -392,6 +392,7 @@ namespace Telerik.JustMock.Expectations
         /// </summary>
         /// <remarks>
         /// This includes concrete default interface bodies on runtimes supporting default interface members.
+        /// The most-specific body in the proxied interface hierarchy is selected, even for an abstract base declaration.
         /// </remarks>
         /// <returns>The current expectation so that you can continue the arrangement.</returns>
         public IAssertable CallOriginal()

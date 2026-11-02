@@ -81,6 +81,25 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
             return callback.MethodBuilder;
         }
 
+        protected Type GetDelegateType(MetaMethod method, ClassEmitter emitter, Type targetType)
+        {
+            var key = new CacheKey(method.MethodOnTarget, typeof(Delegate), new[] { targetType }, null);
+            return emitter.ModuleScope.TypeCache.GetOrAddWithoutTakingLock(key, _ =>
+                new DelegateTypeGenerator(method, targetType)
+                    .Generate(emitter, namingScope)
+                    .BuildType());
+        }
+
+        protected IInvocationCreationContributor GetDelegateContributor(Type delegateType, MetaMethod method, Type targetType)
+        {
+            if (!delegateType.IsGenericType)
+            {
+                return new InvocationWithDelegateContributor(delegateType, targetType, method, namingScope);
+            }
+            return new InvocationWithGenericDelegateContributor(delegateType, method,
+                new FieldReference(Tokens.InvocationMethods.ProxyObject));
+        }
+
         public virtual void Generate(ClassEmitter @class)
         {
             foreach (var method in methods)
