@@ -57,6 +57,59 @@ namespace Telerik.JustMock.Tests
             T Echo(T value) => value;
         }
 
+        public interface IReimplemented : IDefault
+        {
+            int IDefault.GetValue() => 37;
+            int IDefault.Read() => 41;
+            int IDefault.Value => 43;
+            T IDefault.Echo<T>(T value) => default;
+            void IDefault.Throw(Exception exception) => throw exception;
+            void IDefault.ChangeAndThrow(ref int value, Exception exception)
+            {
+                value = 47;
+                throw exception;
+            }
+        }
+
+        public interface IMostSpecific : IReimplemented
+        {
+            int IDefault.GetValue() => 53;
+        }
+
+        public interface IReabstracted : IReimplemented
+        {
+            abstract int IDefault.GetValue();
+        }
+
+        public interface IGenericReimplemented<T> : IGenericDefault<T>
+        {
+            T IGenericDefault<T>.Echo(T value) => default;
+        }
+
+        public interface IHidden : IDefault
+        {
+            new int GetValue() => 59;
+        }
+
+        public interface ILeft : IDefault
+        {
+            int IDefault.GetValue() => 61;
+        }
+
+        public interface IRight : IDefault
+        {
+            int IDefault.GetValue() => 67;
+        }
+
+        public interface IResolvedDiamond : ILeft, IRight
+        {
+            int IDefault.GetValue() => 71;
+        }
+
+        public interface IAmbiguousDiamond : ILeft, IRight
+        {
+        }
+
         public class ClassOverride : IDefault
         {
             public virtual int GetValue() => 42;
@@ -103,6 +156,150 @@ namespace Telerik.JustMock.Tests
             Assert.Equal(19, mock.Value);
             Mock.Assert(() => mock.GetValue(), Occurs.Once());
             Mock.Assert(() => mock.Value, Occurs.Once());
+        }
+
+        [TestMethod, TestCategory("Lite")]
+        public void ShouldCallMostSpecificDefaultBodyThroughBaseInterface()
+        {
+            IDefault mock = Mock.Create<IReimplemented>(Behavior.CallOriginal);
+
+            Assert.Equal(37, mock.GetValue());
+            Mock.Assert(() => mock.GetValue(), Occurs.Once());
+        }
+
+        [TestMethod, TestCategory("Lite")]
+        public void ShouldCallDerivedBodyForAbstractBaseMember()
+        {
+            IDefault mock = Mock.Create<IReimplemented>(Behavior.CallOriginal);
+
+            Assert.Equal(41, mock.Read());
+            Mock.Assert(() => mock.Read(), Occurs.Once());
+        }
+
+        [TestMethod, TestCategory("Lite")]
+        public void ShouldArrangeCallOriginalForReimplementedMembers()
+        {
+            IDefault mock = Mock.Create<IReimplemented>(Behavior.Loose);
+            Mock.Arrange(() => mock.GetValue()).CallOriginal();
+            Mock.Arrange(() => mock.Read()).CallOriginal();
+            Mock.Arrange(() => mock.Value).CallOriginal();
+
+            Assert.Equal(37, mock.GetValue());
+            Assert.Equal(41, mock.Read());
+            Assert.Equal(43, mock.Value);
+        }
+
+        [TestMethod, TestCategory("Lite")]
+        public void ShouldPreferMostDerivedReimplementation()
+        {
+            IDefault mock = Mock.Create<IMostSpecific>(Behavior.CallOriginal);
+
+            Assert.Equal(53, mock.GetValue());
+            Assert.Equal(41, mock.Read());
+        }
+
+        [TestMethod, TestCategory("Lite")]
+        public void ShouldNotCallReabstractedDefaultBody()
+        {
+            IDefault mock = Mock.Create<IReabstracted>(Behavior.Loose);
+            Mock.Arrange(() => mock.GetValue()).CallOriginal();
+
+            var exception = Assert.Throws<NotImplementedException>(() => mock.GetValue());
+            Assert.Equal("You can't call the original implementation of a method that does not have one (abstract or interface method).",
+                exception.Message);
+        }
+
+        [TestMethod, TestCategory("Lite")]
+        public void ShouldKeepHiddenDefaultMemberSeparateFromBaseSlot()
+        {
+            var mock = Mock.Create<IHidden>(Behavior.CallOriginal);
+
+            Assert.Equal(59, mock.GetValue());
+            Assert.Equal(17, ((IDefault)mock).GetValue());
+        }
+
+        [TestMethod, TestCategory("Lite")]
+        public void ShouldResolveDefaultBodyAcrossAdditionalInterfaces()
+        {
+            var mock = Mock.Create<IDefault>(config =>
+            {
+                config.Implements<IReimplemented>();
+                config.SetBehavior(Behavior.CallOriginal);
+            });
+
+            Assert.Equal(37, mock.GetValue());
+            Assert.Equal(41, mock.Read());
+        }
+
+        [TestMethod, TestCategory("Lite")]
+        public void ShouldUseMostSpecificBodyInResolvedDiamond()
+        {
+            IDefault mock = Mock.Create<IResolvedDiamond>(Behavior.CallOriginal);
+
+            Assert.Equal(71, mock.GetValue());
+        }
+
+        [TestMethod, TestCategory("Lite")]
+        public void ShouldNotChooseArbitraryBodyInAmbiguousDiamond()
+        {
+            IDefault mock = Mock.Create<IAmbiguousDiamond>(Behavior.Loose);
+            Mock.Arrange(() => mock.GetValue()).CallOriginal();
+
+            var exception = Assert.Throws<NotImplementedException>(() => mock.GetValue());
+            Assert.Equal("You can't call the original implementation of a method that does not have one (abstract or interface method).",
+                exception.Message);
+        }
+
+        [TestMethod, TestCategory("Lite")]
+        public void ShouldInterceptNestedCallsToReimplementedMember()
+        {
+            IDefault mock = Mock.Create<IReimplemented>(Behavior.CallOriginal);
+            Mock.Arrange(() => mock.Read()).Returns(11);
+
+            Assert.Equal(22, mock.ReadTwice());
+            Mock.Assert(() => mock.ReadTwice(), Occurs.Once());
+            Mock.Assert(() => mock.Read(), Occurs.Exactly(2));
+        }
+
+        [TestMethod, TestCategory("Lite")]
+        public void ShouldCallReimplementedGenericDefaultMethod()
+        {
+            IDefault mock = Mock.Create<IReimplemented>(Behavior.CallOriginal);
+            var expected = new object();
+
+            Assert.Equal<object>(null, mock.Echo(expected));
+            Assert.Equal<string>(null, mock.Echo("text"));
+        }
+
+        [TestMethod, TestCategory("Lite")]
+        public void ShouldCallReimplementedDefaultOnClosedGenericInterfaces()
+        {
+            IGenericDefault<int> first = Mock.Create<IGenericReimplemented<int>>(Behavior.CallOriginal);
+            IGenericDefault<string> second = Mock.Create<IGenericReimplemented<string>>(Behavior.CallOriginal);
+
+            Assert.Equal(0, first.Echo(31));
+            Assert.Equal<string>(null, second.Echo("value"));
+        }
+
+        [TestMethod, TestCategory("Lite")]
+        public void ShouldPreserveExceptionFromReimplementedDefaultBody()
+        {
+            IDefault mock = Mock.Create<IReimplemented>(Behavior.CallOriginal);
+            var expected = new NotImplementedException("reimplemented body");
+
+            Assert.Same(expected, Assert.Throws<NotImplementedException>(() => mock.Throw(expected)));
+            Mock.Assert(() => mock.Throw(expected), Occurs.Once());
+        }
+
+        [TestMethod, TestCategory("Lite")]
+        public void ShouldCopyRefArgumentWhenReimplementedDefaultBodyThrows()
+        {
+            IDefault mock = Mock.Create<IReimplemented>(Behavior.CallOriginal);
+            var expected = new InvalidOperationException("reimplemented body");
+            int value = 7;
+
+            Assert.Same(expected, Assert.Throws<InvalidOperationException>(() => mock.ChangeAndThrow(ref value, expected)));
+            Assert.Equal(47, value);
         }
 
         [TestMethod, TestCategory("Lite")]
