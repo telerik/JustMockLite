@@ -59,6 +59,208 @@ namespace Telerik.JustMock.Tests
     [TestClass]
     public class AssertionFixture
     {
+        public class IdentityHistoryValue
+        {
+            public IdentityHistoryValue(int value)
+            {
+                this.Value = value;
+            }
+
+            public int Value { get; }
+
+            public override bool Equals(object obj)
+            {
+                var other = obj as IdentityHistoryValue;
+                return other != null && other.GetType() == this.GetType() && other.Value == this.Value;
+            }
+
+            public override int GetHashCode()
+            {
+                return this.Value.GetHashCode();
+            }
+        }
+
+        public interface IIdentityHistorySink
+        {
+            void Accept(IdentityHistoryValue value);
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+        public void ShouldPreserveIdentityOfEqualOrdinaryArguments()
+        {
+            var first = new IdentityHistoryValue(1);
+            var second = new IdentityHistoryValue(1);
+            var uncalled = new IdentityHistoryValue(1);
+            Assert.Equal(first, second);
+            Assert.NotSame(first, second);
+            var sink = Mock.Create<IIdentityHistorySink>(Behavior.Strict);
+            Mock.Arrange(() => sink.Accept(Arg.Matches<IdentityHistoryValue>(value => object.ReferenceEquals(value, first)))).DoNothing();
+            Mock.Arrange(() => sink.Accept(Arg.Matches<IdentityHistoryValue>(value => object.ReferenceEquals(value, second)))).DoNothing();
+
+            sink.Accept(first);
+            sink.Accept(second);
+            sink.Accept(first);
+
+            Assert.Equal(2, Mock.GetTimesCalled(() => sink.Accept(Arg.Matches<IdentityHistoryValue>(value => object.ReferenceEquals(value, first)))));
+            Assert.Equal(1, Mock.GetTimesCalled(() => sink.Accept(Arg.Matches<IdentityHistoryValue>(value => object.ReferenceEquals(value, second)))));
+            Assert.Equal(3, Mock.GetTimesCalled(() => sink.Accept(new IdentityHistoryValue(1))));
+            Assert.Equal(0, Mock.GetTimesCalled(() => sink.Accept(Arg.Matches<IdentityHistoryValue>(value => object.ReferenceEquals(value, uncalled)))));
+            Assert.Equal(0, Mock.GetTimesCalled(() => sink.Accept(Arg.Matches<IdentityHistoryValue>(value => object.ReferenceEquals(value, uncalled)))));
+            Assert.Equal(3, Mock.GetTimesCalled(() => sink.Accept(new IdentityHistoryValue(1))));
+            Assert.Equal(1, Mock.GetTimesCalled(() => sink.Accept(Arg.Matches<IdentityHistoryValue>(value => object.ReferenceEquals(value, second)))));
+            Assert.Equal(2, Mock.GetTimesCalled(() => sink.Accept(Arg.Matches<IdentityHistoryValue>(value => object.ReferenceEquals(value, first)))));
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+        public void ShouldPreserveValueArrangementAndOccurrenceConstraintsWithReferenceHistory()
+        {
+            var first = new IdentityHistoryValue(1);
+            var second = new IdentityHistoryValue(1);
+            var sink = Mock.Create<IIdentityHistorySink>(Behavior.Strict);
+            Mock.Arrange(() => sink.Accept(first)).Occurs(2);
+            sink.Accept(first);
+            sink.Accept(second);
+            Mock.Assert(sink);
+            Assert.Equal(2, Mock.GetTimesCalled(() => sink.Accept(first)));
+            Assert.Equal(1, Mock.GetTimesCalled(() => sink.Accept(Arg.Matches<IdentityHistoryValue>(value => object.ReferenceEquals(value, first)))));
+            Assert.Equal(1, Mock.GetTimesCalled(() => sink.Accept(Arg.Matches<IdentityHistoryValue>(value => object.ReferenceEquals(value, second)))));
+
+            var precedenceSink = Mock.Create<IIdentityHistorySink>(Behavior.Strict);
+            int olderCalls = 0;
+            int newerCalls = 0;
+            Mock.Arrange(() => precedenceSink.Accept(Arg.IsAny<IdentityHistoryValue>())).DoInstead(() => olderCalls++);
+            Mock.Arrange(() => precedenceSink.Accept(Arg.IsAny<IdentityHistoryValue>())).DoInstead(() => newerCalls++).Occurs(2);
+            precedenceSink.Accept(first);
+            precedenceSink.Accept(second);
+            Assert.Equal(0, olderCalls);
+            Assert.Equal(2, newerCalls);
+            Assert.Equal(2, Mock.GetTimesCalled(() => precedenceSink.Accept(Arg.IsAny<IdentityHistoryValue>())));
+            Mock.Assert(precedenceSink);
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+        public void ShouldPreserveIdentityHistoryForEqualCollections()
+        {
+            var first = new[] { 1, 2 };
+            var second = new[] { 1, 2 };
+            var sentinel = new[] { 3 };
+            var comparer = Mock.Create<IComparer<int[]>>();
+            comparer.Compare(first, sentinel);
+            comparer.Compare(second, sentinel);
+            Assert.Equal(2, Mock.GetTimesCalled(() => comparer.Compare(first, sentinel)));
+            Assert.Equal(1, Mock.GetTimesCalled(() => comparer.Compare(
+                Arg.Matches<int[]>(value => object.ReferenceEquals(value, first)), sentinel)));
+            Assert.Equal(1, Mock.GetTimesCalled(() => comparer.Compare(
+                Arg.Matches<int[]>(value => object.ReferenceEquals(value, second)), sentinel)));
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+        public void ShouldPreserveLargeReferenceHistoryAcrossArgumentPositions()
+        {
+            var values = Enumerable.Range(0, 32).Select(_ => new IdentityHistoryValue(1)).ToArray();
+            var comparer = Mock.Create<IComparer<IdentityHistoryValue>>();
+            comparer.Compare(null, null);
+            foreach (var value in values)
+            {
+                comparer.Compare(value, null);
+                comparer.Compare(values[0], value);
+            }
+            foreach (var value in values.Reverse())
+                comparer.Compare(value, null);
+            comparer.Compare(null, null);
+
+            foreach (var value in values)
+            {
+                var expected = value;
+                Assert.Equal(2, Mock.GetTimesCalled(() => comparer.Compare(
+                    Arg.Matches<IdentityHistoryValue>(arg => object.ReferenceEquals(arg, expected)), null)));
+                Assert.Equal(1, Mock.GetTimesCalled(() => comparer.Compare(values[0],
+                    Arg.Matches<IdentityHistoryValue>(arg => object.ReferenceEquals(arg, expected)))));
+            }
+            Assert.Equal(64, Mock.GetTimesCalled(() => comparer.Compare(new IdentityHistoryValue(1), null)));
+            Assert.Equal(32, Mock.GetTimesCalled(() => comparer.Compare(values[0], new IdentityHistoryValue(1))));
+            Assert.Equal(2, Mock.GetTimesCalled(() => comparer.Compare(null, null)));
+            Assert.Equal(98, Mock.GetTimesCalled(() => comparer.Compare(
+                Arg.IsAny<IdentityHistoryValue>(), Arg.IsAny<IdentityHistoryValue>())));
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+        public void ShouldDiscardLargeReferenceHistoryWhenClearingOrResettingInstance()
+        {
+            var values = Enumerable.Range(0, 32).Select(_ => new IdentityHistoryValue(1)).ToArray();
+            var sink = Mock.Create<IIdentityHistorySink>(Behavior.Strict);
+            var other = Mock.Create<IIdentityHistorySink>();
+            Mock.Arrange(() => sink.Accept(Arg.IsAny<IdentityHistoryValue>())).DoNothing();
+            foreach (var value in values)
+            {
+                sink.Accept(value);
+                other.Accept(value);
+            }
+
+            Mock.ClearInvocations(sink);
+            Assert.Equal(0, Mock.GetTimesCalled(() => sink.Accept(Arg.IsAny<IdentityHistoryValue>())));
+            Assert.Equal(32, Mock.GetTimesCalled(() => other.Accept(Arg.IsAny<IdentityHistoryValue>())));
+            foreach (var value in values.Reverse())
+                sink.Accept(value);
+            foreach (var value in values)
+            {
+                var expected = value;
+                Assert.Equal(1, Mock.GetTimesCalled(() => sink.Accept(
+                    Arg.Matches<IdentityHistoryValue>(arg => object.ReferenceEquals(arg, expected)))));
+            }
+
+            Mock.Reset(sink);
+            Assert.Equal(0, Mock.GetTimesCalled(() => sink.Accept(Arg.IsAny<IdentityHistoryValue>())));
+            Mock.Arrange(() => sink.Accept(Arg.IsAny<IdentityHistoryValue>())).DoNothing();
+            sink.Accept(values[0]);
+            Assert.Equal(1, Mock.GetTimesCalled(() => sink.Accept(values[0])));
+            Assert.Equal(32, Mock.GetTimesCalled(() => other.Accept(Arg.IsAny<IdentityHistoryValue>())));
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+        public void ShouldPreserveMixedValueAndReferenceHistory()
+        {
+            var comparer = Mock.Create<IComparer<object>>();
+            comparer.Compare(42, null);
+            comparer.Compare(null, null);
+            var values = Enumerable.Range(0, 32).Select(_ => new IdentityHistoryValue(1)).ToArray();
+            foreach (var value in values)
+                comparer.Compare(value, null);
+            comparer.Compare(42, null);
+            comparer.Compare(null, null);
+            comparer.Compare(values[0], null);
+
+            Assert.Equal(2, Mock.GetTimesCalled(() => comparer.Compare(42, null)));
+            Assert.Equal(2, Mock.GetTimesCalled(() => comparer.Compare(null, null)));
+            Assert.Equal(33, Mock.GetTimesCalled(() => comparer.Compare(new IdentityHistoryValue(1), null)));
+            Assert.Equal(2, Mock.GetTimesCalled(() => comparer.Compare(
+                Arg.Matches<object>(arg => object.ReferenceEquals(arg, values[0])), null)));
+            Assert.Equal(37, Mock.GetTimesCalled(() => comparer.Compare(Arg.IsAny<object>(), null)));
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
+        public void ShouldTraceMatchesInReferenceHistory()
+        {
+            var sink = Mock.Create<IIdentityHistorySink>();
+            var first = new IdentityHistoryValue(1);
+            sink.Accept(first);
+            sink.Accept(new IdentityHistoryValue(1));
+            bool traceEnabled = DebugView.IsTraceEnabled;
+            try
+            {
+                DebugView.IsTraceEnabled = true;
+                Assert.Equal(1, Mock.GetTimesCalled(() => sink.Accept(
+                    Arg.Matches<IdentityHistoryValue>(value => object.ReferenceEquals(value, first)))));
+                var trace = DebugView.FullTrace;
+                Assert.True(trace.Contains("arg 1: Match ->"));
+                Assert.True(trace.Contains("arg 1: No match ->"));
+            }
+            finally
+            {
+                DebugView.IsTraceEnabled = traceEnabled;
+            }
+        }
+
         [TestMethod, TestCategory("Lite"), TestCategory("Assertion")]
         public void ShouldAssertNotArrangedAndInvoked()
         {

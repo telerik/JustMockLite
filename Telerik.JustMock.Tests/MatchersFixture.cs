@@ -52,6 +52,29 @@ namespace Telerik.JustMock.Tests
     public partial class MatchersFixture
     {
         [TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
+        public void ShouldFilterEqualOrdinaryArgumentsByActualReference()
+        {
+            var first = new AssertionFixture.IdentityHistoryValue(1);
+            var second = new AssertionFixture.IdentityHistoryValue(1);
+            var sink = Mock.Create<AssertionFixture.IIdentityHistorySink>(Behavior.Loose);
+            sink.Accept(first);
+            sink.Accept(second);
+
+            Mock.Assert(() => sink.Accept(null),
+                Args.Matching<AssertionFixture.IdentityHistoryValue>(value => object.ReferenceEquals(value, first)), Occurs.Once());
+            Mock.Assert(() => sink.Accept(null),
+                Args.Matching<AssertionFixture.IdentityHistoryValue>(value => object.ReferenceEquals(value, second)), Occurs.Once());
+            Mock.Assert(() => sink.Accept(null),
+                Args.Matching<AssertionFixture.IdentityHistoryValue>(value => value.Value == 1), Occurs.Exactly(2));
+            Mock.Assert(() => sink.Accept(null),
+                Args.Matching<AssertionFixture.IdentityHistoryValue>(value => object.ReferenceEquals(value, first)).AndIgnoreArguments(), Occurs.Once());
+            Mock.Assert(() => sink.Accept(null),
+                Args.Matching<AssertionFixture.IdentityHistoryValue>(value => object.ReferenceEquals(value, second)).AndIgnoreArguments(), Occurs.Once());
+            Mock.Assert(() => sink.Accept(null),
+                Args.Matching<AssertionFixture.IdentityHistoryValue>(value => value.Value == 1).AndIgnoreArguments(), Occurs.Exactly(2));
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Matchers")]
         public void ShouldMatchAnyParameterValue()
         {
             var foo = Mock.Create<IFoo>();
