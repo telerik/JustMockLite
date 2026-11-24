@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Telerik.JustMock.Core.TransparentProxy;
 using Telerik.JustMock.Diagnostics;
 
 namespace Telerik.JustMock.Core.MatcherTree
@@ -44,6 +45,9 @@ namespace Telerik.JustMock.Core.MatcherTree
 
     internal class MatcherTreeNode : IMatcherTreeNode
     {
+        private static readonly object nullReferenceKey = new object();
+        private Dictionary<object, MatcherTreeNode> referenceOccurrenceChildren;
+
         public MatcherTreeNode(IMatcher matcher)
         {
             Matcher = matcher;
@@ -114,41 +118,99 @@ namespace Telerik.JustMock.Core.MatcherTree
         {
             if (depth == callPattern.ArgumentMatchers.Count+1)
             {
-                var resultNode = this.Children.FirstOrDefault() as OccurrencesMatcherTreeNode;
-                if(mock != null)
-                    resultNode.Mocks.Add(mock);
-                resultNode.Calls++;
+                if (this.Children.Count == 0)
+                {
+                    var leaf = new OccurrencesMatcherTreeNode(mock);
+                    this.Children.Add(leaf);
+                    leaf.Parent = this;
+                }
+                else
+                {
+                    var resultNode = (OccurrencesMatcherTreeNode)this.Children[0];
+                    if (mock != null)
+                        resultNode.Mocks.Add(mock);
+                    resultNode.Calls++;
+                }
                 return;
             }
 
             var matcher = depth == 0 ? callPattern.InstanceMatcher : callPattern.ArgumentMatchers[depth - 1];
-            var child = this.GetMatchingChild(matcher, MatchingOptions.Exact, depth);
+            var valueMatcher = depth > 0 ? matcher as IValueMatcher : null;
+            bool useReference = valueMatcher != null
+                && (valueMatcher.Value == null || !valueMatcher.Value.GetType().IsValueType);
+            var referenceKey = useReference ? GetReferenceKey(valueMatcher.Value) : null;
+            var child = useReference
+                ? GetReferenceOccurrenceChild(referenceKey)
+                : this.GetMatchingChild(matcher, MatchingOptions.Exact, depth);
 
-            if (child != null)
+            if (child == null)
             {
-                child.AddOrUpdateOccurenceInternal(callPattern, depth + 1, mock);
+                child = new MatcherTreeNode(useReference ? new ReferenceMatcher(valueMatcher.Value) : matcher);
+                this.Children.Add(child);
+                child.Parent = this;
+                if (useReference && referenceOccurrenceChildren != null)
+                    referenceOccurrenceChildren.Add(referenceKey, child);
             }
-            else
+
+            child.AddOrUpdateOccurenceInternal(callPattern, depth + 1, mock);
+        }
+
+        private MatcherTreeNode GetReferenceOccurrenceChild(object key)
+        {
+            // Only argument nodes are indexed. Reset removes whole receiver subtrees, and
+            // repository copies lazily rebuild their own indexes from the copied children.
+            if (referenceOccurrenceChildren == null && this.Children.Count >= 8)
             {
-                this.AddChildInternal(callPattern, depth, new OccurrencesMatcherTreeNode(mock));
+                referenceOccurrenceChildren = new Dictionary<object, MatcherTreeNode>(ByRefComparer<object>.Instance);
+                foreach (var child in this.Children)
+                {
+                    var referenceMatcher = child.Matcher as ReferenceMatcher;
+                    if (referenceMatcher != null
+                        && (referenceMatcher.Value == null || !referenceMatcher.Value.GetType().IsValueType))
+                        referenceOccurrenceChildren.Add(GetReferenceKey(referenceMatcher.Value), (MatcherTreeNode)child);
+                }
             }
+
+            if (referenceOccurrenceChildren != null)
+            {
+                MatcherTreeNode child;
+                referenceOccurrenceChildren.TryGetValue(key, out child);
+                return child;
+            }
+
+            foreach (var child in this.Children)
+            {
+                var referenceMatcher = child.Matcher as ReferenceMatcher;
+                if (referenceMatcher != null
+                    && (referenceMatcher.Value == null || !referenceMatcher.Value.GetType().IsValueType)
+                    && ReferenceEquals(GetReferenceKey(referenceMatcher.Value), key))
+                    return (MatcherTreeNode)child;
+            }
+            return null;
+        }
+
+        private static object GetReferenceKey(object value)
+        {
+            return MockingProxy.Unwrap(value) ?? nullReferenceKey;
         }
 
         protected void GetOccurencesInternal(CallPattern callPattern, int depth, List<OccurrencesMatcherTreeNode> results)
         {
             if (depth == callPattern.ArgumentMatchers.Count+1)
             {
-                var resultNode = this.Children.Cast<OccurrencesMatcherTreeNode>()
-                    .Where(node => NodeMatchesFilter(callPattern, node));
-                results.AddRange(resultNode);
+                foreach (OccurrencesMatcherTreeNode node in this.Children)
+                {
+                    if (NodeMatchesFilter(callPattern, node))
+                        results.Add(node);
+                }
                 return;
             }
 
             var matcher = depth == 0 ? callPattern.InstanceMatcher : callPattern.ArgumentMatchers[depth-1];
-            var children = this.GetMatchingChildren(matcher, MatchingOptions.Concretizing, depth);
-            foreach (var child in children)
+            foreach (MatcherTreeNode child in this.Children)
             {
-                child.GetOccurencesInternal(callPattern, depth+1, results);
+                if (TraceMatch(matcher, child.Matcher, depth))
+                    child.GetOccurencesInternal(callPattern, depth+1, results);
             }
         }
 
@@ -210,6 +272,14 @@ namespace Telerik.JustMock.Core.MatcherTree
         {
             bool isMatch = baseMatcher.Matches(targetMatcher);
 
+            if (DebugView.IsTraceActive)
+                TraceMatchResult(baseMatcher, targetMatcher, depth, isMatch);
+
+            return isMatch;
+        }
+
+        private static void TraceMatchResult(IMatcher baseMatcher, IMatcher targetMatcher, int depth, bool isMatch)
+        {
             DebugView.TraceEvent(IndentLevel.Matcher, () =>
                 String.Format("{3}: {0} -> \"{1}\" {4} \"{2}\"",
                     isMatch ? "Match" : "No match",
@@ -218,7 +288,6 @@ namespace Telerik.JustMock.Core.MatcherTree
                     depth == 0 ? "this" : "arg " + depth,
                     isMatch ? "is" : "is not"));
 
-            return isMatch;
         }
 
         private MatcherTreeNode GetMatchingChild(IMatcher matcher, MatchingOptions options, int depth)

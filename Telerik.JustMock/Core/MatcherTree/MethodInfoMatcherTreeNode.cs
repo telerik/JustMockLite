@@ -65,17 +65,7 @@ namespace Telerik.JustMock.Core.MatcherTree
 
         public void AddOrUpdateOccurence(CallPattern callPattern, IMethodMock mock)
         {
-            var occurrencePattern = callPattern.Clone();
-            for (int i = 0; i < occurrencePattern.ArgumentMatchers.Count; i++)
-            {
-                var valueMatcher = occurrencePattern.ArgumentMatchers[i] as IValueMatcher;
-                if (valueMatcher != null && (valueMatcher.Value == null || !valueMatcher.Value.GetType().IsValueType))
-                {
-                    occurrencePattern.ArgumentMatchers[i] = new ReferenceMatcher(valueMatcher.Value);
-                }
-            }
-
-            AddOrUpdateOccurenceInternal(occurrencePattern, 0, mock);
+            AddOrUpdateOccurenceInternal(callPattern, 0, mock);
         }
 
         public List<OccurrencesMatcherTreeNode> GetOccurences(CallPattern callPattern)
