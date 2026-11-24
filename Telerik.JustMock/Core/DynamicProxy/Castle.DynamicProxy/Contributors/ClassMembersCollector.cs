@@ -15,6 +15,8 @@
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
 
     using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
@@ -28,6 +30,11 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 
         protected override MetaMethod GetMethodToGenerate(MethodInfo method, IProxyGenerationHook hook, bool isStandalone)
         {
+            if (method.IsVirtual && MockingUtil.GetConcreteImplementer(method, type).DeclaringType != method.DeclaringType)
+            {
+                return null;
+            }
+
             if (ProxyUtil.IsAccessibleMethod(method) == false)
             {
                 return null;
@@ -40,7 +47,27 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
                 return null;
             }
 
-            return new MetaMethod(method, method, isStandalone, accepted, !method.IsAbstract);
+            var metaMethod = new MetaMethod(method, method, isStandalone, accepted, !method.IsAbstract);
+            if (method.DeclaringType != type && type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Any(candidate => candidate.DeclaringType != method.DeclaringType
+                    && method.DeclaringType.IsAssignableFrom(candidate.DeclaringType)
+                    && MethodSignatureComparer.Instance.Equals(method, candidate)))
+            {
+                // A hidden slot needs a separate name and an explicit MethodImpl, not an implicit override.
+                metaMethod.SwitchToExplicitImplementation();
+            }
+            return metaMethod;
+        }
+
+        protected override IEnumerable<MethodInfo> GetMethods()
+        {
+            return type.GetAllMethods().Where(method => !method.IsStatic).Distinct();
+        }
+
+        protected override IEnumerable<PropertyInfo> GetProperties()
+        {
+            return type.GetAllProperties().Where(property =>
+                !(property.GetGetMethod(true) ?? property.GetSetMethod(true)).IsStatic);
         }
     }
 }

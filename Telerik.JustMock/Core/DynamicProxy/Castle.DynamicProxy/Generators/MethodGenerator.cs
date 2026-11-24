@@ -48,7 +48,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
             var methodEmitter = overrideMethod(method.Name, method.Attributes, MethodToOverride);
             var proxiedMethod = BuildProxiedMethodBody(methodEmitter, @class, namingScope);
 
-            if (MethodToOverride.DeclaringType.IsInterface)
+            if (MethodToOverride.DeclaringType.IsInterface || method.Name != MethodToOverride.Name)
             {
                 @class.TypeBuilder.DefineMethodOverride(proxiedMethod.MethodBuilder, MethodToOverride);
             }
