@@ -119,6 +119,57 @@ namespace Telerik.JustMock.Tests
             public override int Value() => 2;
         }
 
+        public class InheritedEventBase
+        {
+            public virtual event EventHandler Changed;
+
+            protected void OnChanged() => Changed?.Invoke(this, EventArgs.Empty);
+        }
+
+        public class InheritedEventDerived : InheritedEventBase
+        {
+        }
+
+        public class GenericSlotBase
+        {
+            public virtual int Transform<T>(T[] value) => 1;
+            public virtual int Update<T>(ref T value) => 2;
+        }
+
+        public class GenericSlotDerived : GenericSlotBase
+        {
+            public new virtual int Transform<T>(T[] value) => 3;
+            public new virtual int Update<T>(ref T value) => 4;
+        }
+
+#if NET5_0_OR_GREATER
+        public class GenericCovariantBase
+        {
+            public virtual object Convert<T>(T[] value) => value;
+        }
+
+        public class GenericCovariantDerived : GenericCovariantBase
+        {
+            public override string Convert<T>(T[] value) => "derived";
+        }
+#endif
+
+        public class GenericOuterBase<T>
+        {
+            public class Node
+            {
+                public virtual int Value() => 1;
+            }
+        }
+
+        public class GenericOuterDerived<T>
+        {
+            public class Node : GenericOuterBase<T>.Node
+            {
+                public new virtual int Value() => 2;
+            }
+        }
+
         private sealed class ProceedInterceptor : IInterceptor
         {
             public int Calls { get; private set; }
@@ -177,6 +228,55 @@ namespace Telerik.JustMock.Tests
             Mock.Arrange(arrangement).Returns(17);
 
             Assert.Equal(17, mock.Value());
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldCreateMockWithInheritedVirtualEvent()
+        {
+            var mock = Mock.Create<InheritedEventDerived>();
+            EventHandler handler = (sender, args) => { };
+
+            mock.Changed += handler;
+            mock.Changed -= handler;
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldKeepHiddenGenericArrayAndByRefSlotsSeparate()
+        {
+            var mock = Mock.Create<GenericSlotDerived>(Behavior.CallOriginal);
+            var text = "value";
+            Mock.Arrange(() => mock.Transform(new[] { 1 })).Returns(11);
+            Mock.Arrange(() => ((GenericSlotBase)mock).Transform(new[] { 1 })).Returns(12);
+            Mock.Arrange(() => mock.Update(ref text)).Returns(13);
+            Mock.Arrange(() => ((GenericSlotBase)mock).Update(ref text)).Returns(14);
+
+            Assert.Equal(11, mock.Transform(new[] { 1 }));
+            Assert.Equal(12, ((GenericSlotBase)mock).Transform(new[] { 1 }));
+            Assert.Equal(13, mock.Update(ref text));
+            Assert.Equal(14, ((GenericSlotBase)mock).Update(ref text));
+        }
+
+#if NET5_0_OR_GREATER
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldResolveCovariantGenericOverrideWithArrayParameter()
+        {
+            var mock = Mock.Create<GenericCovariantDerived>(Behavior.CallOriginal);
+            GenericCovariantBase asBase = mock;
+            Mock.Arrange(() => asBase.Convert(new[] { 1 })).Returns("arranged");
+
+            Assert.Equal("arranged", mock.Convert(new[] { 1 }));
+        }
+#endif
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldCreateMockForNestedClosedGenericType()
+        {
+            var mock = Mock.Create<GenericOuterDerived<int>.Node>(Behavior.CallOriginal);
+            Mock.Arrange(() => mock.Value()).Returns(11);
+            Mock.Arrange(() => ((GenericOuterBase<int>.Node)mock).Value()).Returns(12);
+
+            Assert.Equal(11, mock.Value());
+            Assert.Equal(12, ((GenericOuterBase<int>.Node)mock).Value());
         }
 
         [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
