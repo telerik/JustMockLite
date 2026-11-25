@@ -412,6 +412,9 @@ namespace Telerik.JustMock.Core
             }
             else if (method.IsVirtual)
             {
+                if (method.DeclaringType != method.ReflectedType)
+                    method = (MethodInfo)MethodBase.GetMethodFromHandle(method.MethodHandle, method.DeclaringType.TypeHandle);
+
                 var baseMethod = GetClassVirtualBaseDefinition(method);
                 var baseDefinition = baseMethod.IsGenericMethod ? baseMethod.GetGenericMethodDefinition() : baseMethod;
                 targetMethod = baseMethod;

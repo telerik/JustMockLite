@@ -15,6 +15,7 @@
 namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 {
     using System;
+    using System.Collections.Generic;
     using System.Reflection;
     using System.Runtime.CompilerServices;
 
@@ -52,6 +53,17 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
             var accepted = hook.ShouldInterceptMethod(type, method);
 
             return new MetaMethod(method, method, isStandalone, accepted, hasTarget: true);
+        }
+
+        protected override IEnumerable<MethodInfo> GetMethods()
+        {
+            return MethodFinder.GetAllInstanceMethods(type,
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        }
+
+        protected override IEnumerable<PropertyInfo> GetProperties()
+        {
+            return type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         }
 
         protected bool IsGeneratedByTheCompiler(FieldInfo field)
