@@ -415,25 +415,32 @@ namespace Telerik.JustMock.Core
                 if (method.DeclaringType != method.ReflectedType)
                     method = (MethodInfo)MethodBase.GetMethodFromHandle(method.MethodHandle, method.DeclaringType.TypeHandle);
 
-                var baseMethod = GetClassVirtualBaseDefinition(method);
-                var baseDefinition = baseMethod.IsGenericMethod ? baseMethod.GetGenericMethodDefinition() : baseMethod;
-                targetMethod = baseMethod;
-                foreach (var candidateType in implementerType.GetInheritanceChain())
+                if (method.DeclaringType == implementerType)
                 {
-                    var candidate = candidateType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)
-                        .Where(m => m.IsVirtual)
-                        .SingleOrDefault(m =>
-                        {
-                            var root = GetClassVirtualBaseDefinition(m);
-                            return (root.IsGenericMethod ? root.GetGenericMethodDefinition() : root) == baseDefinition;
-                        });
-                    if (candidate != null)
+                    targetMethod = method;
+                }
+                else
+                {
+                    var baseMethod = GetClassVirtualBaseDefinition(method);
+                    var baseDefinition = baseMethod.IsGenericMethod ? baseMethod.GetGenericMethodDefinition() : baseMethod;
+                    targetMethod = baseMethod;
+                    foreach (var candidateType in implementerType.GetInheritanceChain())
                     {
-                        targetMethod = candidate;
-                        break;
+                        var candidate = candidateType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                            .Where(m => m.IsVirtual)
+                            .SingleOrDefault(m =>
+                            {
+                                var root = GetClassVirtualBaseDefinition(m);
+                                return (root.IsGenericMethod ? root.GetGenericMethodDefinition() : root) == baseDefinition;
+                            });
+                        if (candidate != null)
+                        {
+                            targetMethod = candidate;
+                            break;
+                        }
+                        if (candidateType == baseMethod.DeclaringType)
+                            break;
                     }
-                    if (candidateType == baseMethod.DeclaringType)
-                        break;
                 }
             }
 
