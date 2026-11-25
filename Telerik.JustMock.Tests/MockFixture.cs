@@ -24,6 +24,7 @@ using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using Telerik.JustMock.Core;
+using Telerik.JustMock.Core.Castle.DynamicProxy;
 
 #if LITE_EDITION
 #if !COREFX
@@ -67,6 +68,117 @@ namespace Telerik.JustMock.Tests
     [TestClass]
     public class MockFixture
     {
+        public class OuterA
+        {
+            public class Node
+            {
+                public virtual int Value() => 1;
+                public virtual int Property => 2;
+            }
+        }
+
+        public class OuterB
+        {
+            public class Node : OuterA.Node
+            {
+                public new virtual int Value() => 3;
+                public new virtual int Property => 4;
+            }
+        }
+
+        public class OuterC
+        {
+            public class Node : OuterB.Node
+            {
+                public new virtual int Value() => 5;
+                public new virtual int Property => 6;
+            }
+        }
+
+        public class WrappedBase
+        {
+            public virtual int Value() => 1;
+        }
+
+        public class WrappedDerived : WrappedBase
+        {
+            public override int Value() => 2;
+        }
+
+        public class InheritedMethodBase
+        {
+            public virtual int Value() => 1;
+        }
+
+        public class InheritedMethodMiddle : InheritedMethodBase
+        {
+        }
+
+        public class InheritedMethodLeaf : InheritedMethodMiddle
+        {
+            public override int Value() => 2;
+        }
+
+        private sealed class ProceedInterceptor : IInterceptor
+        {
+            public int Calls { get; private set; }
+
+            public void Intercept(IInvocation invocation)
+            {
+                Calls++;
+                invocation.Proceed();
+            }
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldCreateMockForNestedClassesWithHiddenVirtualSlots()
+        {
+            var mock = Mock.Create<OuterC.Node>(Behavior.CallOriginal);
+            Mock.Arrange(() => mock.Value()).Returns(11);
+            Mock.Arrange(() => mock.Property).Returns(12);
+            Mock.Arrange(() => ((OuterB.Node)mock).Value()).Returns(13);
+            Mock.Arrange(() => ((OuterB.Node)mock).Property).Returns(14);
+            Mock.Arrange(() => ((OuterA.Node)mock).Value()).Returns(15);
+            Mock.Arrange(() => ((OuterA.Node)mock).Property).Returns(16);
+
+            Assert.Equal(11, mock.Value());
+            Assert.Equal(12, mock.Property);
+            Assert.Equal(13, ((OuterB.Node)mock).Value());
+            Assert.Equal(14, ((OuterB.Node)mock).Property);
+            Assert.Equal(15, ((OuterA.Node)mock).Value());
+            Assert.Equal(16, ((OuterA.Node)mock).Property);
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldCreateClassProxyWithTargetForOverriddenMethod()
+        {
+            var target = new WrappedDerived();
+            var interceptor = new ProceedInterceptor();
+            var generatorType = typeof(Mock).Assembly.GetType(
+                "Telerik.JustMock.Core.Castle.DynamicProxy.ProxyGenerator", throwOnError: true);
+            var generator = Activator.CreateInstance(generatorType);
+            var createProxy = generatorType.GetMethod("CreateClassProxyWithTarget",
+                new[] { typeof(Type), typeof(object), typeof(IInterceptor[]) });
+            var proxy = (WrappedDerived)createProxy.Invoke(generator,
+                new object[] { typeof(WrappedDerived), target, new IInterceptor[] { interceptor } });
+
+            Assert.Equal(2, proxy.Value());
+            Assert.Equal(1, interceptor.Calls);
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldArrangeLeafOverrideFromInheritedMethodInfo()
+        {
+            var mock = Mock.Create<InheritedMethodLeaf>(Behavior.CallOriginal);
+            var inheritedMethod = typeof(InheritedMethodMiddle).GetMethod(nameof(InheritedMethodMiddle.Value));
+            var call = Expression.Call(Expression.Constant((InheritedMethodMiddle)mock), inheritedMethod);
+            var arrangement = Expression.Lambda<Func<int>>(call);
+
+            Mock.Arrange(arrangement).Returns(17);
+
+            Assert.Equal(17, mock.Value());
+        }
+
         [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
         public void ShouldMockInterface()
         {
