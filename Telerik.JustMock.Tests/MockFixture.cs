@@ -21,6 +21,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using Telerik.JustMock.Core;
@@ -152,6 +153,16 @@ namespace Telerik.JustMock.Tests
         {
             public override string Convert<T>(T[] value) => "derived";
         }
+
+        public class GenericReturnCovariantBase
+        {
+            public virtual IEnumerable<T> Create<T>() => Enumerable.Empty<T>();
+        }
+
+        public class GenericReturnCovariantDerived : GenericReturnCovariantBase
+        {
+            public override List<T> Create<T>() => new List<T>();
+        }
 #endif
 
         public class GenericOuterBase<T>
@@ -256,6 +267,35 @@ namespace Telerik.JustMock.Tests
             Assert.Equal(14, ((GenericSlotBase)mock).Update(ref text));
         }
 
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldKeepVectorAndVariableBoundArrayOverloadsSeparate()
+        {
+            var assemblyName = new AssemblyName("ArrayShapeInterface" + Guid.NewGuid().ToString("N"));
+#if !NETCORE
+            var assembly = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+#else
+            var assembly = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+#endif
+            var type = assembly.DefineDynamicModule(assemblyName.Name)
+                .DefineType(assemblyName.Name, TypeAttributes.Public | TypeAttributes.Interface | TypeAttributes.Abstract);
+            var methodAttributes = MethodAttributes.Public | MethodAttributes.Abstract
+                | MethodAttributes.Virtual | MethodAttributes.NewSlot;
+            type.DefineMethod("Transform", methodAttributes, typeof(int), new[] { typeof(int[]) });
+            type.DefineMethod("Transform", methodAttributes, typeof(int), new[] { typeof(int).MakeArrayType(1) });
+            var interfaceType = type.CreateType();
+            var comparerType = typeof(Mock).Assembly.GetType(
+                "Telerik.JustMock.Core.Castle.DynamicProxy.Generators.MethodSignatureComparer", throwOnError: true);
+            var comparer = (IEqualityComparer<MethodInfo>)comparerType
+                .GetField("Instance", BindingFlags.Public | BindingFlags.Static).GetValue(null);
+
+            Assert.Equal(2, interfaceType.GetMethods().Distinct(comparer).Count());
+#if NETCORE
+            var mock = Mock.Create(interfaceType);
+            Assert.NotNull(mock);
+            Assert.Equal(2, mock.GetType().GetMethods().Count(method => method.Name == "Transform"));
+#endif
+        }
+
 #if NET5_0_OR_GREATER
         [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
         public void ShouldResolveCovariantGenericOverrideWithArrayParameter()
@@ -265,6 +305,17 @@ namespace Telerik.JustMock.Tests
             Mock.Arrange(() => asBase.Convert(new[] { 1 })).Returns("arranged");
 
             Assert.Equal("arranged", mock.Convert(new[] { 1 }));
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldResolveCovariantOverrideWithGenericReturnType()
+        {
+            var mock = Mock.Create<GenericReturnCovariantDerived>(Behavior.CallOriginal);
+            GenericReturnCovariantBase asBase = mock;
+            var expected = new List<int> { 1 };
+            Mock.Arrange(() => asBase.Create<int>()).Returns(expected);
+
+            Assert.Same(expected, mock.Create<int>());
         }
 #endif
 
