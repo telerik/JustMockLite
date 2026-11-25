@@ -103,6 +103,19 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 
         private bool EqualSignatureTypes(Type x, Type y)
         {
+            if (x.HasElementType || y.HasElementType)
+            {
+                if (x.HasElementType != y.HasElementType
+                    || x.IsArray != y.IsArray
+                    || x.IsByRef != y.IsByRef
+                    || x.IsPointer != y.IsPointer
+                    || x.IsArray && x.GetArrayRank() != y.GetArrayRank())
+                {
+                    return false;
+                }
+                return EqualSignatureTypes(x.GetElementType(), y.GetElementType());
+            }
+
             if (x.IsGenericParameter != y.IsGenericParameter)
             {
                 return false;

@@ -144,6 +144,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 
             MetaMethod AddMethod(MethodInfo method, bool isStandalone)
             {
+                if (method.DeclaringType != method.ReflectedType)
+                {
+                    method = (MethodInfo)MethodBase.GetMethodFromHandle(
+                        method.MethodHandle, method.DeclaringType.TypeHandle);
+                }
+
                 if (checkedMethods.Add(method) == false)
                 {
                     return null;

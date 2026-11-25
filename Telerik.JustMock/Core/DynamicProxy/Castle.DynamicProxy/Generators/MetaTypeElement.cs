@@ -68,9 +68,25 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 
         private static void AppendTypeName(StringBuilder nameBuilder, Type type)
         {
+            if (type.IsGenericParameter)
+            {
+                nameBuilder.Append(type.Name);
+                return;
+            }
+
             if (type.DeclaringType != null)
             {
-                AppendTypeName(nameBuilder, type.DeclaringType);
+                var declaringType = type.DeclaringType;
+                var declaringTypeArgumentCount = declaringType.GetGenericArguments().Length;
+                if (declaringTypeArgumentCount > 0)
+                {
+                    var nestedTypeArguments = type.GetGenericArguments();
+                    var declaringTypeArguments = new Type[declaringTypeArgumentCount];
+                    Array.Copy(nestedTypeArguments, declaringTypeArguments, declaringTypeArgumentCount);
+                    declaringType = declaringType.GetGenericTypeDefinition()
+                        .MakeGenericType(declaringTypeArguments);
+                }
+                AppendTypeName(nameBuilder, declaringType);
                 nameBuilder.Append('.');
             }
             nameBuilder.Append(type.Name);
