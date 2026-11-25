@@ -462,7 +462,7 @@ namespace Telerik.JustMock.Core
                 var candidate = baseType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)
                     .SingleOrDefault(m => isCovariantRoot
                         ? m.IsVirtual && MethodSignatureComparer.Instance.Equals(method, m)
-                            && m.ReturnType.IsAssignableFrom(method.ReturnType)
+                            && MethodSignatureComparer.Instance.IsAssignableReturnType(m, method)
                         : m.GetBaseDefinition() == baseDefinition);
                 if (candidate != null)
                     return genericMethodArgs != null ? candidate.MakeGenericMethod(genericMethodArgs) : candidate;
@@ -470,7 +470,7 @@ namespace Telerik.JustMock.Core
             return null;
         }
 
-        private static MethodInfo GetClassVirtualBaseDefinition(MethodInfo method)
+        internal static MethodInfo GetClassVirtualBaseDefinition(MethodInfo method)
         {
             MethodInfo parent;
             while ((parent = GetImmediateClassBaseMethod(method)) != null)

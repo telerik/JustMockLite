@@ -23,14 +23,34 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 
     internal class ClassMembersCollector : MembersCollector
     {
+        private readonly Dictionary<Tuple<RuntimeMethodHandle, RuntimeTypeHandle>, Type> concreteTypesBySlot;
+
         public ClassMembersCollector(Type targetType)
             : base(targetType)
         {
+            concreteTypesBySlot = new Dictionary<Tuple<RuntimeMethodHandle, RuntimeTypeHandle>, Type>();
+            foreach (var candidateType in targetType.GetInheritanceChain())
+            {
+                var methods = candidateType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic
+                    | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+                foreach (var method in methods.Where(method => method.IsVirtual))
+                {
+                    var slot = GetMethodKey(MockingUtil.GetClassVirtualBaseDefinition(method));
+                    if (!concreteTypesBySlot.ContainsKey(slot))
+                    {
+                        concreteTypesBySlot.Add(slot, method.DeclaringType);
+                    }
+                }
+            }
         }
 
         protected override MetaMethod GetMethodToGenerate(MethodInfo method, IProxyGenerationHook hook, bool isStandalone)
         {
-            if (method.IsVirtual && MockingUtil.GetConcreteImplementer(method, type).DeclaringType != method.DeclaringType)
+            Type concreteType;
+            if (method.IsVirtual
+                && concreteTypesBySlot.TryGetValue(
+                    GetMethodKey(MockingUtil.GetClassVirtualBaseDefinition(method)), out concreteType)
+                && concreteType != method.DeclaringType)
             {
                 return null;
             }
@@ -57,6 +77,15 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
                 metaMethod.SwitchToExplicitImplementation();
             }
             return metaMethod;
+        }
+
+        private static Tuple<RuntimeMethodHandle, RuntimeTypeHandle> GetMethodKey(MethodInfo method)
+        {
+            if (method.IsGenericMethod)
+            {
+                method = method.GetGenericMethodDefinition();
+            }
+            return Tuple.Create(method.MethodHandle, method.DeclaringType.TypeHandle);
         }
 
         protected override IEnumerable<MethodInfo> GetMethods()

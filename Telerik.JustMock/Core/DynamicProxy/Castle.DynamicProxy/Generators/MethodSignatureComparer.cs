@@ -16,6 +16,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
 
     internal class MethodSignatureComparer : IEqualityComparer<MethodInfo>
@@ -81,10 +82,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
 
         public bool EqualReturnTypes(MethodInfo x, MethodInfo y)
         {
-            var xr = x.ReturnType;
-            var yr = y.ReturnType;
-
-            if (EqualSignatureTypes(xr, yr))
+            if (EqualSignatureTypes(x.ReturnType, y.ReturnType))
             {
                 return true;
             }
@@ -94,10 +92,33 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
             // see https://github.com/dotnet/runtime/blob/main/docs/design/features/covariant-return-methods.md.
             if (preserveBaseOverridesAttribute != null)
             {
-                return (x.IsDefined(preserveBaseOverridesAttribute, inherit: false) && yr.IsAssignableFrom(xr))
-                    || (y.IsDefined(preserveBaseOverridesAttribute, inherit: false) && xr.IsAssignableFrom(yr));
+                return (x.IsDefined(preserveBaseOverridesAttribute, inherit: false) && IsAssignableReturnType(y, x))
+                    || (y.IsDefined(preserveBaseOverridesAttribute, inherit: false) && IsAssignableReturnType(x, y));
             }
 
+            return false;
+        }
+
+        public bool IsAssignableReturnType(MethodInfo baseMethod, MethodInfo derivedMethod)
+        {
+            var commonGenericArguments = baseMethod.IsGenericMethod
+                ? baseMethod.GetGenericArguments()
+                : Type.EmptyTypes;
+            var baseReturnType = NormalizeMethodGenericParameters(baseMethod.ReturnType, commonGenericArguments);
+            var derivedReturnType = NormalizeMethodGenericParameters(derivedMethod.ReturnType, commonGenericArguments);
+            if (baseReturnType.IsAssignableFrom(derivedReturnType))
+            {
+                return true;
+            }
+
+            for (var candidateType = derivedReturnType; candidateType != null; candidateType = candidateType.BaseType)
+            {
+                if (EqualSignatureTypes(baseReturnType, candidateType)
+                    || candidateType.GetInterfaces().Any(type => EqualSignatureTypes(baseReturnType, type)))
+                {
+                    return true;
+                }
+            }
             return false;
         }
 
@@ -109,7 +130,8 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
                     || x.IsArray != y.IsArray
                     || x.IsByRef != y.IsByRef
                     || x.IsPointer != y.IsPointer
-                    || x.IsArray && x.GetArrayRank() != y.GetArrayRank())
+                    || x.IsArray && (x.GetArrayRank() != y.GetArrayRank()
+                        || IsVectorArray(x) != IsVectorArray(y)))
                 {
                     return false;
                 }
@@ -163,6 +185,48 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
                 }
             }
             return true;
+        }
+
+        private static Type NormalizeMethodGenericParameters(Type type, Type[] genericArguments)
+        {
+            if (type.IsGenericParameter && type.DeclaringMethod != null)
+            {
+                return genericArguments[type.GenericParameterPosition];
+            }
+
+            if (type.HasElementType)
+            {
+                var elementType = NormalizeMethodGenericParameters(type.GetElementType(), genericArguments);
+                if (type.IsArray)
+                {
+                    return IsVectorArray(type)
+                        ? elementType.MakeArrayType()
+                        : elementType.MakeArrayType(type.GetArrayRank());
+                }
+                if (type.IsByRef)
+                {
+                    return elementType.MakeByRefType();
+                }
+                return elementType.MakePointerType();
+            }
+
+            if (type.IsGenericType)
+            {
+                var genericArgumentsToNormalize = type.GetGenericArguments();
+                for (var i = 0; i < genericArgumentsToNormalize.Length; ++i)
+                {
+                    genericArgumentsToNormalize[i] = NormalizeMethodGenericParameters(
+                        genericArgumentsToNormalize[i], genericArguments);
+                }
+                return type.GetGenericTypeDefinition().MakeGenericType(genericArgumentsToNormalize);
+            }
+
+            return type;
+        }
+
+        private static bool IsVectorArray(Type type)
+        {
+            return type.IsArray && type == type.GetElementType().MakeArrayType();
         }
 
         public bool Equals(MethodInfo x, MethodInfo y)
