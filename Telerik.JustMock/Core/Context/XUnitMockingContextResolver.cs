@@ -75,4 +75,25 @@ namespace Telerik.JustMock.Core.Context
                 FixtureConstuctorSemantics.InstanceConstructorCalledOncePerTest);
         }
     }
+
+    internal class XUnit3xMockingContextResolver : XUnitMockingContextResolver
+    {
+        private const string XunitAssertionExceptionName = "Xunit.Sdk.XunitException, xunit.v3.assert";
+        private const string XunitFactAttributeName = "Xunit.FactAttribute, xunit.v3.core";
+        private const string XunitTheoryAttributeName = "Xunit.TheoryAttribute, xunit.v3.core";
+
+        public static bool IsAvailable
+        {
+            get { return FindType(XunitFactAttributeName, false, true) != null; }
+        }
+
+        public XUnit3xMockingContextResolver()
+            : base(XunitAssertionExceptionName)
+        {
+            SetupStandardHierarchicalTestStructure(
+                new[] { XunitFactAttributeName, XunitTheoryAttributeName },
+                null, null, null,
+                FixtureConstuctorSemantics.InstanceConstructorCalledOncePerTest);
+        }
+    }
 }
