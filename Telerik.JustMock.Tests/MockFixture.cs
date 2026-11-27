@@ -163,6 +163,11 @@ namespace Telerik.JustMock.Tests
         {
             public override List<T> Create<T>() => new List<T>();
         }
+
+        public interface INonGenericCreate
+        {
+            object Create();
+        }
 #endif
 
         public class GenericOuterBase<T>
@@ -316,6 +321,14 @@ namespace Telerik.JustMock.Tests
             Mock.Arrange(() => asBase.Create<int>()).Returns(expected);
 
             Assert.Same(expected, mock.Create<int>());
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldCreateCovariantGenericMockWithNonGenericInterfaceMethod()
+        {
+            var mock = Mock.Create<GenericReturnCovariantDerived>(config => config.Implements<INonGenericCreate>());
+
+            Assert.NotNull(mock);
         }
 #endif
 
