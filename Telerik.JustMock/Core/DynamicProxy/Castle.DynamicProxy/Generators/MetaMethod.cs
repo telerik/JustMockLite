@@ -67,12 +67,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
             }
 
             var comparer = MethodSignatureComparer.Instance;
-            if (!comparer.EqualReturnTypes(Method, other.Method))
+            if (!comparer.EqualGenericParameters(Method, other.Method))
             {
                 return false;
             }
 
-            if (!comparer.EqualGenericParameters(Method, other.Method))
+            if (!comparer.EqualReturnTypes(Method, other.Method))
             {
                 return false;
             }
