@@ -54,45 +54,59 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Generators
             var ns = sourceType.Namespace;
             Debug.Assert(ns == null || ns != "");
 
-            if (sourceType.IsGenericType)
+            var nameBuilder = new StringBuilder();
+            if (ns != null)
             {
-                var nameBuilder = new StringBuilder();
-                if (ns != null)
-                {
-                    nameBuilder.Append(ns);
-                    nameBuilder.Append('.');
-                }
-                AppendTypeName(nameBuilder, sourceType);
+                nameBuilder.Append(ns);
                 nameBuilder.Append('.');
-                nameBuilder.Append(name);
-                this.name = nameBuilder.ToString();
             }
-            else if (ns != null)
-            {
-                this.name = string.Concat(ns, ".", sourceType.Name, ".", name);
-            }
-            else
-            {
-                this.name = string.Concat(sourceType.Name, ".", name);
-            }
+            AppendTypeName(nameBuilder, sourceType);
+            nameBuilder.Append('.');
+            nameBuilder.Append(name);
+            this.name = nameBuilder.ToString();
         }
 
         private static void AppendTypeName(StringBuilder nameBuilder, Type type)
         {
+            if (type.IsGenericParameter)
+            {
+                nameBuilder.Append(type.Name);
+                return;
+            }
+
+            if (type.DeclaringType != null)
+            {
+                var declaringType = type.DeclaringType;
+                var declaringTypeArgumentCount = declaringType.GetGenericArguments().Length;
+                if (declaringTypeArgumentCount > 0)
+                {
+                    var nestedTypeArguments = type.GetGenericArguments();
+                    var declaringTypeArguments = new Type[declaringTypeArgumentCount];
+                    Array.Copy(nestedTypeArguments, declaringTypeArguments, declaringTypeArgumentCount);
+                    declaringType = declaringType.GetGenericTypeDefinition()
+                        .MakeGenericType(declaringTypeArguments);
+                }
+                AppendTypeName(nameBuilder, declaringType);
+                nameBuilder.Append('.');
+            }
             nameBuilder.Append(type.Name);
             if (type.IsGenericType)
             {
-                nameBuilder.Append('[');
                 var genericTypeArguments = type.GetGenericArguments();
-                for (int i = 0, n = genericTypeArguments.Length; i < n; ++i)
+                var inheritedArgumentCount = type.DeclaringType?.GetGenericArguments().Length ?? 0;
+                if (inheritedArgumentCount < genericTypeArguments.Length)
                 {
-                    if (i > 0)
+                    nameBuilder.Append('[');
+                    for (int i = inheritedArgumentCount, n = genericTypeArguments.Length; i < n; ++i)
                     {
-                        nameBuilder.Append(',');
+                        if (i > inheritedArgumentCount)
+                        {
+                            nameBuilder.Append(',');
+                        }
+                        AppendTypeName(nameBuilder, genericTypeArguments[i]);
                     }
-                    AppendTypeName(nameBuilder, genericTypeArguments[i]);
+                    nameBuilder.Append(']');
                 }
-                nameBuilder.Append(']');
             }
         }
     }

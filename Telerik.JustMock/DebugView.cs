@@ -172,6 +172,15 @@ namespace Telerik.JustMock
             get { return ProfilerInterceptor.GuardInternal(() => traceSink != null ? traceSink.LastTrace : null); }
         }
 
+        internal static bool IsTraceActive
+        {
+            get
+            {
+                var activeTrace = traceSink;
+                return activeTrace != null && activeTrace.TraceOptions != TraceOptions.Disabled;
+            }
+        }
+
         internal static void TraceEvent(IndentLevel traceLevel, Func<string> message)
         {
             var activeTrace = DebugView.traceSink;

@@ -21,9 +21,11 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using Telerik.JustMock.Core;
+using Telerik.JustMock.Core.Castle.DynamicProxy;
 
 #if LITE_EDITION
 #if !COREFX
@@ -67,6 +69,280 @@ namespace Telerik.JustMock.Tests
     [TestClass]
     public class MockFixture
     {
+        public class OuterA
+        {
+            public class Node
+            {
+                public virtual int Value() => 1;
+                public virtual int Property => 2;
+            }
+        }
+
+        public class OuterB
+        {
+            public class Node : OuterA.Node
+            {
+                public new virtual int Value() => 3;
+                public new virtual int Property => 4;
+            }
+        }
+
+        public class OuterC
+        {
+            public class Node : OuterB.Node
+            {
+                public new virtual int Value() => 5;
+                public new virtual int Property => 6;
+            }
+        }
+
+        public class WrappedBase
+        {
+            public virtual int Value() => 1;
+        }
+
+        public class WrappedDerived : WrappedBase
+        {
+            public override int Value() => 2;
+        }
+
+        public class InheritedMethodBase
+        {
+            public virtual int Value() => 1;
+        }
+
+        public class InheritedMethodMiddle : InheritedMethodBase
+        {
+        }
+
+        public class InheritedMethodLeaf : InheritedMethodMiddle
+        {
+            public override int Value() => 2;
+        }
+
+        public class InheritedEventBase
+        {
+            public virtual event EventHandler Changed;
+
+            protected void OnChanged() => Changed?.Invoke(this, EventArgs.Empty);
+        }
+
+        public class InheritedEventDerived : InheritedEventBase
+        {
+        }
+
+        public class GenericSlotBase
+        {
+            public virtual int Transform<T>(T[] value) => 1;
+            public virtual int Update<T>(ref T value) => 2;
+        }
+
+        public class GenericSlotDerived : GenericSlotBase
+        {
+            public new virtual int Transform<T>(T[] value) => 3;
+            public new virtual int Update<T>(ref T value) => 4;
+        }
+
+#if NET5_0_OR_GREATER
+        public class GenericCovariantBase
+        {
+            public virtual object Convert<T>(T[] value) => value;
+        }
+
+        public class GenericCovariantDerived : GenericCovariantBase
+        {
+            public override string Convert<T>(T[] value) => "derived";
+        }
+
+        public class GenericReturnCovariantBase
+        {
+            public virtual IEnumerable<T> Create<T>() => Enumerable.Empty<T>();
+        }
+
+        public class GenericReturnCovariantDerived : GenericReturnCovariantBase
+        {
+            public override List<T> Create<T>() => new List<T>();
+        }
+
+        public interface INonGenericCreate
+        {
+            object Create();
+        }
+#endif
+
+        public class GenericOuterBase<T>
+        {
+            public class Node
+            {
+                public virtual int Value() => 1;
+            }
+        }
+
+        public class GenericOuterDerived<T>
+        {
+            public class Node : GenericOuterBase<T>.Node
+            {
+                public new virtual int Value() => 2;
+            }
+        }
+
+        private sealed class ProceedInterceptor : IInterceptor
+        {
+            public int Calls { get; private set; }
+
+            public void Intercept(IInvocation invocation)
+            {
+                Calls++;
+                invocation.Proceed();
+            }
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldCreateMockForNestedClassesWithHiddenVirtualSlots()
+        {
+            var mock = Mock.Create<OuterC.Node>(Behavior.CallOriginal);
+            Mock.Arrange(() => mock.Value()).Returns(11);
+            Mock.Arrange(() => mock.Property).Returns(12);
+            Mock.Arrange(() => ((OuterB.Node)mock).Value()).Returns(13);
+            Mock.Arrange(() => ((OuterB.Node)mock).Property).Returns(14);
+            Mock.Arrange(() => ((OuterA.Node)mock).Value()).Returns(15);
+            Mock.Arrange(() => ((OuterA.Node)mock).Property).Returns(16);
+
+            Assert.Equal(11, mock.Value());
+            Assert.Equal(12, mock.Property);
+            Assert.Equal(13, ((OuterB.Node)mock).Value());
+            Assert.Equal(14, ((OuterB.Node)mock).Property);
+            Assert.Equal(15, ((OuterA.Node)mock).Value());
+            Assert.Equal(16, ((OuterA.Node)mock).Property);
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldCreateClassProxyWithTargetForOverriddenMethod()
+        {
+            var target = new WrappedDerived();
+            var interceptor = new ProceedInterceptor();
+            var generatorType = typeof(Mock).Assembly.GetType(
+                "Telerik.JustMock.Core.Castle.DynamicProxy.ProxyGenerator", throwOnError: true);
+            var generator = Activator.CreateInstance(generatorType);
+            var createProxy = generatorType.GetMethod("CreateClassProxyWithTarget",
+                new[] { typeof(Type), typeof(object), typeof(IInterceptor[]) });
+            var proxy = (WrappedDerived)createProxy.Invoke(generator,
+                new object[] { typeof(WrappedDerived), target, new IInterceptor[] { interceptor } });
+
+            Assert.Equal(2, proxy.Value());
+            Assert.Equal(1, interceptor.Calls);
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldArrangeLeafOverrideFromInheritedMethodInfo()
+        {
+            var mock = Mock.Create<InheritedMethodLeaf>(Behavior.CallOriginal);
+            var inheritedMethod = typeof(InheritedMethodMiddle).GetMethod(nameof(InheritedMethodMiddle.Value));
+            var call = Expression.Call(Expression.Constant((InheritedMethodMiddle)mock), inheritedMethod);
+            var arrangement = Expression.Lambda<Func<int>>(call);
+
+            Mock.Arrange(arrangement).Returns(17);
+
+            Assert.Equal(17, mock.Value());
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldCreateMockWithInheritedVirtualEvent()
+        {
+            var mock = Mock.Create<InheritedEventDerived>();
+            EventHandler handler = (sender, args) => { };
+
+            mock.Changed += handler;
+            mock.Changed -= handler;
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldKeepHiddenGenericArrayAndByRefSlotsSeparate()
+        {
+            var mock = Mock.Create<GenericSlotDerived>(Behavior.CallOriginal);
+            var text = "value";
+            Mock.Arrange(() => mock.Transform(new[] { 1 })).Returns(11);
+            Mock.Arrange(() => ((GenericSlotBase)mock).Transform(new[] { 1 })).Returns(12);
+            Mock.Arrange(() => mock.Update(ref text)).Returns(13);
+            Mock.Arrange(() => ((GenericSlotBase)mock).Update(ref text)).Returns(14);
+
+            Assert.Equal(11, mock.Transform(new[] { 1 }));
+            Assert.Equal(12, ((GenericSlotBase)mock).Transform(new[] { 1 }));
+            Assert.Equal(13, mock.Update(ref text));
+            Assert.Equal(14, ((GenericSlotBase)mock).Update(ref text));
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldKeepVectorAndVariableBoundArrayOverloadsSeparate()
+        {
+            var assemblyName = new AssemblyName("ArrayShapeInterface" + Guid.NewGuid().ToString("N"));
+#if !NETCORE
+            var assembly = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+#else
+            var assembly = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+#endif
+            var type = assembly.DefineDynamicModule(assemblyName.Name)
+                .DefineType(assemblyName.Name, TypeAttributes.Public | TypeAttributes.Interface | TypeAttributes.Abstract);
+            var methodAttributes = MethodAttributes.Public | MethodAttributes.Abstract
+                | MethodAttributes.Virtual | MethodAttributes.NewSlot;
+            type.DefineMethod("Transform", methodAttributes, typeof(int), new[] { typeof(int[]) });
+            type.DefineMethod("Transform", methodAttributes, typeof(int), new[] { typeof(int).MakeArrayType(1) });
+            var interfaceType = type.CreateType();
+            var comparerType = typeof(Mock).Assembly.GetType(
+                "Telerik.JustMock.Core.Castle.DynamicProxy.Generators.MethodSignatureComparer", throwOnError: true);
+            var comparer = (IEqualityComparer<MethodInfo>)comparerType
+                .GetField("Instance", BindingFlags.Public | BindingFlags.Static).GetValue(null);
+
+            Assert.Equal(2, interfaceType.GetMethods().Distinct(comparer).Count());
+#if NETCORE
+            var mock = Mock.Create(interfaceType);
+            Assert.NotNull(mock);
+            Assert.Equal(2, mock.GetType().GetMethods().Count(method => method.Name == "Transform"));
+#endif
+        }
+
+#if NET5_0_OR_GREATER
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldResolveCovariantGenericOverrideWithArrayParameter()
+        {
+            var mock = Mock.Create<GenericCovariantDerived>(Behavior.CallOriginal);
+            GenericCovariantBase asBase = mock;
+            Mock.Arrange(() => asBase.Convert(new[] { 1 })).Returns("arranged");
+
+            Assert.Equal("arranged", mock.Convert(new[] { 1 }));
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldResolveCovariantOverrideWithGenericReturnType()
+        {
+            var mock = Mock.Create<GenericReturnCovariantDerived>(Behavior.CallOriginal);
+            GenericReturnCovariantBase asBase = mock;
+            var expected = new List<int> { 1 };
+            Mock.Arrange(() => asBase.Create<int>()).Returns(expected);
+
+            Assert.Same(expected, mock.Create<int>());
+        }
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldCreateCovariantGenericMockWithNonGenericInterfaceMethod()
+        {
+            var mock = Mock.Create<GenericReturnCovariantDerived>(config => config.Implements<INonGenericCreate>());
+
+            Assert.NotNull(mock);
+        }
+#endif
+
+        [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
+        public void ShouldCreateMockForNestedClosedGenericType()
+        {
+            var mock = Mock.Create<GenericOuterDerived<int>.Node>(Behavior.CallOriginal);
+            Mock.Arrange(() => mock.Value()).Returns(11);
+            Mock.Arrange(() => ((GenericOuterBase<int>.Node)mock).Value()).Returns(12);
+
+            Assert.Equal(11, mock.Value());
+            Assert.Equal(12, ((GenericOuterBase<int>.Node)mock).Value());
+        }
+
         [TestMethod, TestCategory("Lite"), TestCategory("Mock")]
         public void ShouldMockInterface()
         {

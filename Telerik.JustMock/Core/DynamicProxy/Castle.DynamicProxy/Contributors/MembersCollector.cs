@@ -54,7 +54,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 
             void CollectProperties()
             {
-                var propertiesFound = type.GetProperties(Flags);
+                var propertiesFound = GetProperties();
                 foreach (var property in propertiesFound)
                 {
                     AddProperty(property);
@@ -72,7 +72,7 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 
             void CollectMethods()
             {
-                var methodsFound = MethodFinder.GetAllInstanceMethods(type, Flags);
+                var methodsFound = GetMethods();
                 foreach (var method in methodsFound)
                 {
                     AddMethod(method, true);
@@ -104,11 +104,17 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
                 var nonInheritableAttributes = property.GetNonInheritableAttributes();
                 var arguments = property.GetIndexParameters();
 
-                sink.Add(new MetaProperty(property,
+                var metaProperty = new MetaProperty(property,
                                           getter,
                                           setter,
                                           nonInheritableAttributes.Select(a => a.Builder),
-                                          arguments.Select(a => a.ParameterType).ToArray()));
+                                          arguments.Select(a => a.ParameterType).ToArray());
+                if (getter != null && getter.Name != getter.Method.Name
+                    || setter != null && setter.Name != setter.Method.Name)
+                {
+                    metaProperty.SwitchToExplicitImplementation();
+                }
+                sink.Add(metaProperty);
             }
 
             void AddEvent(EventInfo @event)
@@ -138,6 +144,12 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
 
             MetaMethod AddMethod(MethodInfo method, bool isStandalone)
             {
+                if (method.DeclaringType != method.ReflectedType)
+                {
+                    method = (MethodInfo)MethodBase.GetMethodFromHandle(
+                        method.MethodHandle, method.DeclaringType.TypeHandle);
+                }
+
                 if (checkedMethods.Add(method) == false)
                 {
                     return null;
@@ -154,6 +166,16 @@ namespace Telerik.JustMock.Core.Castle.DynamicProxy.Contributors
         }
 
         protected abstract MetaMethod GetMethodToGenerate(MethodInfo method, IProxyGenerationHook hook, bool isStandalone);
+
+        protected virtual IEnumerable<MethodInfo> GetMethods()
+        {
+            return MethodFinder.GetAllInstanceMethods(type, Flags);
+        }
+
+        protected virtual IEnumerable<PropertyInfo> GetProperties()
+        {
+            return type.GetProperties(Flags);
+        }
 
         /// <summary>
         ///   Performs some basic screening and invokes the <see cref = "IProxyGenerationHook" />

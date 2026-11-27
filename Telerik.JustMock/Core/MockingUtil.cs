@@ -27,6 +27,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using Telerik.JustMock.Core.Castle.DynamicProxy.Generators;
 using Telerik.JustMock.Core.MatcherTree;
 using Telerik.JustMock.Core.Recording;
 
@@ -38,6 +39,8 @@ namespace Telerik.JustMock.Core
 
         public const BindingFlags AllMembers = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
         public const BindingFlags Default = (BindingFlags)0;
+
+        private static readonly Type preserveBaseOverridesAttribute = Type.GetType("System.Runtime.CompilerServices.PreserveBaseOverridesAttribute", throwOnError: false);
 
         public static bool IsExtensionMethod(this MethodBase method)
         {
@@ -380,21 +383,9 @@ namespace Telerik.JustMock.Core
                         yield return interfaceMap.InterfaceMethods[index];
                 }
 
-                var genericMethodArgs = method.IsGenericMethod ? method.GetGenericArguments() : null;
-                method = method.IsGenericMethod ? method.GetGenericMethodDefinition() : method;
-                var baseDefinition = method.GetBaseDefinition();
-                while (baseDefinition != method)
+                while ((method = GetImmediateClassBaseMethod(method)) != null)
                 {
-                    do
-                    {
-                        var baseType = method.ReflectedType.BaseType;
-                        method = baseType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                                         .Single(m => m.GetBaseDefinition() == baseDefinition);
-                    }
-                    while (method.ReflectedType != method.DeclaringType);
-
-                    var baseMethod = genericMethodArgs != null ? method.MakeGenericMethod(genericMethodArgs) : method;
-                    yield return baseMethod;
+                    yield return method;
                 }
             }
         }
@@ -421,22 +412,79 @@ namespace Telerik.JustMock.Core
             }
             else if (method.IsVirtual)
             {
-                var baseMethod = method.GetBaseDefinition();
+                if (method.DeclaringType != method.ReflectedType)
+                    method = (MethodInfo)MethodBase.GetMethodFromHandle(method.MethodHandle, method.DeclaringType.TypeHandle);
 
-                var typesToSearch = implementerType.GetInheritanceChain()
-                    .TakeWhile(t => t != baseMethod.DeclaringType);
-
-                targetMethod = typesToSearch.Select(candidateType =>
-                    candidateType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                        .FirstOrDefault(m => m.GetBaseDefinition() == baseMethod))
-                    .FirstOrDefault(m => m != null)
-                    ?? baseMethod;
+                if (method.DeclaringType == implementerType)
+                {
+                    targetMethod = method;
+                }
+                else
+                {
+                    var baseMethod = GetClassVirtualBaseDefinition(method);
+                    var baseDefinition = baseMethod.IsGenericMethod ? baseMethod.GetGenericMethodDefinition() : baseMethod;
+                    targetMethod = baseMethod;
+                    foreach (var candidateType in implementerType.GetInheritanceChain())
+                    {
+                        var candidate = candidateType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                            .Where(m => m.IsVirtual)
+                            .SingleOrDefault(m =>
+                            {
+                                var root = GetClassVirtualBaseDefinition(m);
+                                return (root.IsGenericMethod ? root.GetGenericMethodDefinition() : root) == baseDefinition;
+                            });
+                        if (candidate != null)
+                        {
+                            targetMethod = candidate;
+                            break;
+                        }
+                        if (candidateType == baseMethod.DeclaringType)
+                            break;
+                    }
+                }
             }
 
             if (method.IsGenericMethod && targetMethod.IsGenericMethodDefinition)
                 targetMethod = targetMethod.MakeGenericMethod(method.GetGenericArguments());
 
             return targetMethod;
+        }
+
+        private static MethodInfo GetImmediateClassBaseMethod(MethodInfo method)
+        {
+            if (method.IsStatic || !method.IsVirtual || method.DeclaringType == null
+                || method.DeclaringType.IsInterface || method.DeclaringType.BaseType == null)
+                return null;
+
+            var genericMethodArgs = method.IsGenericMethod ? method.GetGenericArguments() : null;
+            method = method.IsGenericMethod ? method.GetGenericMethodDefinition() : method;
+            var baseDefinition = method.GetBaseDefinition();
+            bool isCovariantRoot = baseDefinition == method;
+            if (isCovariantRoot && (preserveBaseOverridesAttribute == null
+                || !method.IsDefined(preserveBaseOverridesAttribute, inherit: false)))
+                return null;
+
+            foreach (var baseType in method.DeclaringType.BaseType.GetInheritanceChain())
+            {
+                var candidate = baseType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                    .SingleOrDefault(m => isCovariantRoot
+                        ? m.IsVirtual && MethodSignatureComparer.Instance.Equals(method, m)
+                            && MethodSignatureComparer.Instance.IsAssignableReturnType(m, method)
+                        : m.GetBaseDefinition() == baseDefinition);
+                if (candidate != null)
+                    return genericMethodArgs != null ? candidate.MakeGenericMethod(genericMethodArgs) : candidate;
+            }
+            return null;
+        }
+
+        internal static MethodInfo GetClassVirtualBaseDefinition(MethodInfo method)
+        {
+            MethodInfo parent;
+            while ((parent = GetImmediateClassBaseMethod(method)) != null)
+            {
+                method = parent;
+            }
+            return method;
         }
 
         public static int IndexOf<T>(this IEnumerable<T> enumerable, Predicate<T> predicate)
